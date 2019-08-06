@@ -5,7 +5,9 @@ The name Ishlang (ish-lang) is shorthand for "Lisp'ish programming language", an
 
 The language is still under development, but already supports a rich set of features, including branching, looping, functions, structs and lambdas.
 
-More details about the language available in docs/specification.txt
+More details about the language available in [docs/specification.txt](docs/specification.txt)
+
+List of todos available in [docs/todos.txt](docs/todos.txt)
 
 ## Example: Hello World Program
 (println "Hello World")

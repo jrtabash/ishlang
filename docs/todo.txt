@@ -1,9 +1,17 @@
 * Add more examples
 
+* Update usage
+
 * Implement built-in data structures:
   - List
+  - Array
   - Hash table
 
-* Update usage
+* Add string functions:
+  - Length of string
+  - Get char at position
+  - Set char at position
+  - Concatenate
+  - Substring
 
 * Rework 'break' implementation to avoid using Break::Except
