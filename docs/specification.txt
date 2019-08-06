@@ -1,0 +1,112 @@
+Language Summary
+----------------
+Ishlang is a fully parenthesized prefix notation programming language inspired by Lisp. Though
+it is influnced by Lisp, the language diverts considerably from Lisp.
+
+The name Ishlang (ish-lang) is shorthand for "Lisp'ish programming language", and
+was chosen to pay homage to the Lisp programming language. It was a conscious decision to not
+name the language lispish (even though that was a first choice) as the language is not a lisp
+implementation, and does not try to be a lisp'ish implementation. Though many decisions
+and language features might look like lisp, there is no "lisp metric" that is being
+used in the development of Ishlang.
+
+Example: Hello world Program
+  (println "Hello World")
+
+Literals
+--------
+Can be characeters, numbers, strings, and logicals. Examples:
+- Character: 'a'
+- String: "hello"
+- Integer: 30
+- Real: 25.25
+- Logical: true
+
+The language uses 2 reserved keywods for logical literals; 'true' and 'false'
+
+Variables
+---------
+Defining: (var <name> <expression>)
+- Example: (var number 5)
+
+Assignment: (= <name> <expression>)
+- Example: (= number 10)
+
+Exists check: (? <name>)
+- Example: (? number)
+
+Input / Output
+--------------
+- Printing: (print <expression>) or (println <expression>)
+  Examples:
+    (print "Hello ")
+    (println "World")
+
+- Reading: (read)
+  Example:
+    (var something (read))
+
+Arithmetic
+----------
+Supported operations: + - * / %
+  (<op> <expression> <expression>)
+
+Examples:
+  (+ 10 12)
+  (* 2 5)
+
+If Statement
+------------
+(if <condition_expression> <true_expression> <false_expression>)
+
+Example:
+  (if true 1 0)
+
+Cond Statement
+--------------
+(cond
+  (<condition> <expression>)
+  ...
+  (t <expression>))
+
+The (t <expression>) case acts as a default catch all case, and is optional
+
+Example:
+  (var check1 false)
+  (var check2 false)
+  ...
+  (cond
+   (check1 (println "Check1"))
+   (check2 (println "Check2"))
+   (t      (println "Neither Check")))
+
+Progn and Block
+---------------
+
+Branching
+---------
+
+Looping
+-------
+- Also break
+
+Functions
+---------
+
+Lambda
+------
+
+Struct
+------
+- Also makeinstance
+- get
+- set
+
+Type Checking
+-------------
+- istypeof
+- isstructname
+- isinstanceof
+
+Cloning
+-------

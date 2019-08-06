@@ -1,0 +1,7 @@
+(def fact (n)
+  (if (<= n 1)
+      1
+    (* n (fact (- n 1)))))
+
+(print "Factory of 5: ")
+(println (fact 5))
