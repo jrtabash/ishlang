@@ -1,4 +1,4 @@
-# ishlang
+# Ishlang
 Ishlang is a fully parenthesized prefix notation programming language inspired by Lisp. Though it is inspired by Lisp, the language diverts considerably from Lisp.
 
 The name Ishlang (ish-lang) is shorthand for "Lisp'ish programming language", and was chosen to pay homage to Lisp.
@@ -11,3 +11,13 @@ List of todos available in [docs/todo.txt](docs/todo.txt)
 
 ## Example: Hello World Program
 (println "Hello World")
+
+## Basic Interpreter Commands:
+Run source file, batch mode:
+    ishlang -b -f <filename>
+
+Run ishlang REPL:
+    ishlang -i
+
+See usage for more information:
+    ishlang -h
