@@ -1,9 +1,9 @@
-* Finish writing up specification.txt
-
 * Add more examples
 
 * Implement built-in data structures:
   - List
   - Hash table
+
+* Update usage
 
 * Rework 'break' implementation to avoid using Break::Except
