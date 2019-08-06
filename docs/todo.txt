@@ -13,3 +13,5 @@
   - Substring
 
 * Rework 'break' implementation to avoid using Break::Except
+
+* Add multi-line expression support to REPL
