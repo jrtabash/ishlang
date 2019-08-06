@@ -1,7 +1,5 @@
 * Add more examples
 
-* Update usage
-
 * Implement built-in data structures:
   - List
   - Array

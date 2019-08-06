@@ -45,7 +45,17 @@ private:
     void usage() {
         std::cerr << "Usage:\n"
                   << '\t' << program << " [-h] [-i] [-b] [-f file] [-t [-v] [-l | -n test_name]]\n"
-                  << '\n';
+                  << '\n'
+                  << "Options:\n"
+                  << '\t' << "-h : Print usage\n"
+                  << '\t' << "-i : Enter interactive mode\n"
+                  << '\t' << "-b : Run in batch mode\n"
+                  << '\t' << "-f : Run code file\n"
+                  << '\t' << "-t : Run unit tests\n"
+                  << '\t' << "-v : With -t, use verbose mode\n"
+                  << '\t' << "-l : With -t, list unit test names\n"
+                  << '\t' << "-n : With -t, run specified unit test\n"
+                  << std::endl;
         exit(1);
     }
 
