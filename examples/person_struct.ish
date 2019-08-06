@@ -1,0 +1,26 @@
+(struct Person
+  (name
+   age))
+
+(def isPerson (p)
+  (isinstanceof p Person))
+
+(def makePerson (newName newAge)
+  (progn
+    (var newPerson (makeinstance Person))
+    (set newPerson name newName)
+    (set newPerson age newAge)
+    newPerson))
+
+(def printPerson (p)
+  (progn
+    (print "[Person: name='")
+    (print (get person name))
+    (print "' age=")
+    (print (get person age))
+    (println "]")))
+
+(var person (makePerson "Jon" 31))
+(printPerson person)
+(set person age 32)
+(printPerson person)
