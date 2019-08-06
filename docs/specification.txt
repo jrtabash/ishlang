@@ -28,7 +28,7 @@ Can be none, char, int, real, string, and bool. Examples:
 - real:   25.25
 - bool:   true
 
-Reserve literal keywords: null, true, false
+Reserved literal keywords: null, true, false
 
 Variables
 ---------
@@ -157,6 +157,10 @@ Functions
 User defined functions:
   (def <name> <param_list>
     <expression>)
+
+Functions can be nested, i.e defined inside other functions.
+
+Language supports recursion.
 
 Example:
   (def hello ()
