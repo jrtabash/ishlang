@@ -10,14 +10,22 @@ More details about the language available in [docs/specification.txt](docs/speci
 List of todos available in [docs/todo.txt](docs/todo.txt)
 
 ## Example: Hello World Program
+```
 (println "Hello World")
+```
 
 ## Basic Interpreter Commands:
 Run source file, batch mode:
-    ishlang -b -f <filename>
+```bash
+ishlang -b -f <filename>
+```
 
 Run ishlang REPL:
-    ishlang -i
+```bash
+ishlang -i
+```
 
 See usage for more information:
-    ishlang -h
+```bash
+ishlang -h
+```
