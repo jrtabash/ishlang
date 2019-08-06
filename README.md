@@ -7,7 +7,7 @@ The language is still under development, but already supports a rich set of feat
 
 More details about the language available in [docs/specification.txt](docs/specification.txt)
 
-List of todos available in [docs/todos.txt](docs/todos.txt)
+List of todos available in [docs/todo.txt](docs/todo.txt)
 
 ## Example: Hello World Program
 (println "Hello World")
