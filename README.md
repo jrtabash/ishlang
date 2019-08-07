@@ -7,6 +7,8 @@ The language is still under development, but already supports a rich set of feat
 
 More details about the language available in [docs/specification.txt](docs/specification.txt)
 
+REPL command definitions available in [docs/repl_commands.txt](docs/repl_commands.txt)
+
 List of todos available in [docs/todo.txt](docs/todo.txt)
 
 ## Example: Hello World Program

@@ -1,0 +1,14 @@
+The following commands are available from REPL:
+
+Exit from Interpreter
+---------------------
+When on the REPL prompt, enter the command 'exit' or 'quit' to exit program.
+Using CTRL-d also exits the REPL.
+
+Load Source File
+----------------
+The following command loads an Ishlang source file:
+
+  load <filename>
+
+Example: load hello.ish
