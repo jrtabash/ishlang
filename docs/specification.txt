@@ -48,7 +48,7 @@ Input / Output
     (print "Hello ")
     (println "World")
 
-  The functions print and println evaulate to null value
+  The functions print and println evaluate to null value
 
 - Reading: (read)
   Example:
@@ -84,9 +84,9 @@ Cond Statement
 (cond
   (<condition> <expression>)
   ...
-  (t <expression>))
+  (true <expression>))
 
-The (t <expression>) case acts as a default catch all case, and is optional
+The (true <expression>) case acts as a default catch all case, and is optional
 
 Example:
   (var check1 false)
@@ -95,11 +95,11 @@ Example:
   (cond
    (check1 (println "Check1"))
    (check2 (println "Check2"))
-   (t      (println "Neither Check")))
+   (true   (println "Neither Check")))
 
 Progn and Block
 ---------------
-Progn and block define a sequence of expressin, and groups them into an expression.
+Progn and block define a sequence of expression, and groups them into one expression.
 
 (progn
   <expression>
@@ -111,7 +111,7 @@ Progn and block define a sequence of expressin, and groups them into an expressi
 
 Difference between progn and block is that block defines an new environment and progn does not.
 
-The value of executing a seuqnce is the result of evaluating the last expression.
+The value of executing a sequence is the result of evaluating the last expression.
 
 Example:
   (progn
@@ -181,12 +181,16 @@ Example:
 
 Lambda
 ------
-Define a closure.
+The lambda expression defines a closure.
   (lambda <param_list>
     <expression>)
 
   Same as functions, lambda body is a single expression, so to create a multi-expression
   lambda, must use progn.
+
+  The closure environment is the enclosing environment where the lambda is defined.
+
+  When a lambda function is executed, the lambda execution environment will inherit the closure environment.
 
 Examples:
   (lambda (x y)
@@ -194,6 +198,11 @@ Examples:
 
   (var myAdd (lambda (x y) (+ x y)))
   (println (myAdd 2 3))
+
+  (var x 0)
+  (var addOne (lambda () (= x (+ x 1))))
+  (addOne)
+  (println x)
 
 Structs
 -------
