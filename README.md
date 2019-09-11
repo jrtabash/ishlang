@@ -27,12 +27,12 @@ Run ishlang REPL:
 ishlang -i
 ```
 
-See usage for more information:
-```bash
-ishlang -h
-```
-
 Run ishlang unit tests:
 ```bash
 ishlang -t
+```
+
+See usage for more information:
+```bash
+ishlang -h
 ```
