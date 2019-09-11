@@ -21,3 +21,5 @@
 * Command line updates:
   - Default interpreter to interactive mode if no options are specified
   - Default interpreter to batch mode if -f option is used with no other options
+
+* Rework parser to use streams. Rework interpreter readFile implementation.
