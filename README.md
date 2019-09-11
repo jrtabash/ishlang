@@ -31,3 +31,8 @@ See usage for more information:
 ```bash
 ishlang -h
 ```
+
+Run ishlang unit tests:
+```bash
+ishlang -t
+```
