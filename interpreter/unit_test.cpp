@@ -1578,47 +1578,47 @@ void UnitTest::testByteCodeGetSetMember() {
 
 // -------------------------------------------------------------
 void UnitTest::testTokenType() {
-    TEST_CASE(Parser::tokenType("") == Parser::Unknown);
-    TEST_CASE(Parser::tokenType("'") == Parser::Unknown);
-    TEST_CASE(Parser::tokenType("''") == Parser::Unknown);
-    TEST_CASE(Parser::tokenType("\"") == Parser::Unknown);
-    TEST_CASE(Parser::tokenType("_") == Parser::Unknown);
-    TEST_CASE(Parser::tokenType(".") == Parser::Unknown);
-    TEST_CASE(Parser::tokenType("9ABC") == Parser::Unknown);
-    TEST_CASE(Parser::tokenType("ABC-2") == Parser::Unknown);
-    TEST_CASE(Parser::tokenType("#ABC") == Parser::Unknown);
-    TEST_CASE(Parser::tokenType("ABC/3") == Parser::Unknown);
-    TEST_CASE(Parser::tokenType("A@BC3") == Parser::Unknown);
+    TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
+    TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
+    TEST_CASE(Lexer::tokenType("''") == Lexer::Unknown);
+    TEST_CASE(Lexer::tokenType("\"") == Lexer::Unknown);
+    TEST_CASE(Lexer::tokenType("_") == Lexer::Unknown);
+    TEST_CASE(Lexer::tokenType(".") == Lexer::Unknown);
+    TEST_CASE(Lexer::tokenType("9ABC") == Lexer::Unknown);
+    TEST_CASE(Lexer::tokenType("ABC-2") == Lexer::Unknown);
+    TEST_CASE(Lexer::tokenType("#ABC") == Lexer::Unknown);
+    TEST_CASE(Lexer::tokenType("ABC/3") == Lexer::Unknown);
+    TEST_CASE(Lexer::tokenType("A@BC3") == Lexer::Unknown);
 
-    TEST_CASE(Parser::tokenType("-") == Parser::Symbol);
-    TEST_CASE(Parser::tokenType("+") == Parser::Symbol);
-    TEST_CASE(Parser::tokenType("*") == Parser::Symbol);
-    TEST_CASE(Parser::tokenType("<") == Parser::Symbol);
-    TEST_CASE(Parser::tokenType("=") == Parser::Symbol);
-    TEST_CASE(Parser::tokenType("==") == Parser::Symbol);
-    TEST_CASE(Parser::tokenType("!=") == Parser::Symbol);
+    TEST_CASE(Lexer::tokenType("-") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("+") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("*") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("<") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("=") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("==") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("!=") == Lexer::Symbol);
 
-    TEST_CASE(Parser::tokenType("(") == Parser::LeftP);
-    TEST_CASE(Parser::tokenType(")") == Parser::RightP);
-    TEST_CASE(Parser::tokenType("'a'") == Parser::Char);
-    TEST_CASE(Parser::tokenType("\"\"") == Parser::String);
-    TEST_CASE(Parser::tokenType("\"a\"") == Parser::String);
-    TEST_CASE(Parser::tokenType("\"text\"") == Parser::String);
-    TEST_CASE(Parser::tokenType("123") == Parser::Int);
-    TEST_CASE(Parser::tokenType("+123") == Parser::Int);
-    TEST_CASE(Parser::tokenType("-123") == Parser::Int);
-    TEST_CASE(Parser::tokenType("123.45") == Parser::Real);
-    TEST_CASE(Parser::tokenType("+123.45") == Parser::Real);
-    TEST_CASE(Parser::tokenType("-123.45") == Parser::Real);
-    TEST_CASE(Parser::tokenType("123.") == Parser::Real);
-    TEST_CASE(Parser::tokenType(".45") == Parser::Real);
-    TEST_CASE(Parser::tokenType("true") == Parser::Bool);
-    TEST_CASE(Parser::tokenType("false") == Parser::Bool);
-    TEST_CASE(Parser::tokenType("null") == Parser::Null);
-    TEST_CASE(Parser::tokenType("ABC") == Parser::Symbol);
-    TEST_CASE(Parser::tokenType("ABC9") == Parser::Symbol);
-    TEST_CASE(Parser::tokenType("ABC09sds") == Parser::Symbol);
-    TEST_CASE(Parser::tokenType("ABC_3") == Parser::Symbol);
+    TEST_CASE(Lexer::tokenType("(") == Lexer::LeftP);
+    TEST_CASE(Lexer::tokenType(")") == Lexer::RightP);
+    TEST_CASE(Lexer::tokenType("'a'") == Lexer::Char);
+    TEST_CASE(Lexer::tokenType("\"\"") == Lexer::String);
+    TEST_CASE(Lexer::tokenType("\"a\"") == Lexer::String);
+    TEST_CASE(Lexer::tokenType("\"text\"") == Lexer::String);
+    TEST_CASE(Lexer::tokenType("123") == Lexer::Int);
+    TEST_CASE(Lexer::tokenType("+123") == Lexer::Int);
+    TEST_CASE(Lexer::tokenType("-123") == Lexer::Int);
+    TEST_CASE(Lexer::tokenType("123.45") == Lexer::Real);
+    TEST_CASE(Lexer::tokenType("+123.45") == Lexer::Real);
+    TEST_CASE(Lexer::tokenType("-123.45") == Lexer::Real);
+    TEST_CASE(Lexer::tokenType("123.") == Lexer::Real);
+    TEST_CASE(Lexer::tokenType(".45") == Lexer::Real);
+    TEST_CASE(Lexer::tokenType("true") == Lexer::Bool);
+    TEST_CASE(Lexer::tokenType("false") == Lexer::Bool);
+    TEST_CASE(Lexer::tokenType("null") == Lexer::Null);
+    TEST_CASE(Lexer::tokenType("ABC") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("ABC9") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("ABC09sds") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("ABC_3") == Lexer::Symbol);
 }
 
 // -------------------------------------------------------------
@@ -1628,11 +1628,11 @@ bool parserTest(Parser &parser, Environment::SharedPtr env, const std::string &e
         if (code.get()) {
             Value result = code->eval(env);
             if (result.type() != value.type()) {
-                std::cerr << "Parse - " << expr << ": type expected=" << value.typeToString() << " actual=" << result.typeToString() << '\n';
+                std::cerr << "Parser - " << expr << ": type expected=" << value.typeToString() << " actual=" << result.typeToString() << '\n';
                 return false;
             }
             if (result != value) {
-                std::cerr << "Parse - " << expr << ": value expected=" << value << " actual=" << result << '\n';
+                std::cerr << "Parser - " << expr << ": value expected=" << value << " actual=" << result << '\n';
                 return false;
             }
             return true;
@@ -1802,7 +1802,7 @@ void UnitTest::testParserLoop() {
     TEST_CASE(parserTest(parser, env, "(block (var sum 0) (loop (< sum 5) (= sum (+ sum 2))))",                       Value(6ll),  true));
     TEST_CASE(parserTest(parser, env, "(loop true (break))",                                                          Value::Null, true));
     TEST_CASE(parserTest(parser, env, "(block (var sum 0) (loop true (progn (= sum 3) (break))))",                    Value::Null, true));
-    TEST_CASE(parserTest(parser, env, "(block (var sum 0) (loop true (progn (= sum 3) (break))) sum)))",              Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(block (var sum 0) (loop true (progn (= sum 3) (break))) sum)",                Value(3ll),  true));
     TEST_CASE(parserTest(parser, env, "(loop (var i 1) (< i 4) (= i (+ i 1)))",                                       Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(loop (var i 1))",                                                             Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(loop)",                                                                       Value::Null, false));

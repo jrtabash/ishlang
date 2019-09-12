@@ -8,6 +8,7 @@
 #include "instance.h"
 #include "byte_code.h"
 #include "parser.h"
+#include "lexer.h"
 
 #include <string>
 #include <map>

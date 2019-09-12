@@ -120,6 +120,13 @@ namespace Int {
             : Exception(format("Unknown member '%s:%s'", sName.c_str(), mName.c_str()))
         {}
     };
+
+    class BadInternalAccess : public Exception {
+    public:
+        BadInternalAccess(const std::string &from)
+            : Exception(format("Bad internal access from '%s'", from.c_str()))
+        {}
+    };
 }
 
 #endif	// EXCEPTION_H

@@ -14,12 +14,10 @@
 
 * Rework 'break' implementation to avoid using Break::Except
 
-* Add multi-line expression support to REPL
-
 * Add support for comments
 
 * Command line updates:
   - Default interpreter to interactive mode if no options are specified
   - Default interpreter to batch mode if -f option is used with no other options
 
-* Rework parser to use streams. Rework interpreter readFile implementation.
+* Rework interpreter readFile implementation.

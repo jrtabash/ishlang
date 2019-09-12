@@ -17,9 +17,11 @@ Interpreter::ParserCB::ParserCB(Environment::SharedPtr env, std::string &lastRes
 
 // -------------------------------------------------------------
 void Interpreter::ParserCB::operator()(ByteCode::SharedPtr &code) {
-    Value result = code->eval(env);
-    if (!batch) { std::cout << result << '\n'; }
-    env->set(lastResult, result);
+    if (code.get()) {
+        Value result = code->eval(env);
+        if (!batch) { std::cout << result << '\n'; }
+        env->set(lastResult, result);
+    }
 }
 
 // -------------------------------------------------------------

@@ -11,6 +11,7 @@ OBJS=\
 	struct.o \
 	instance.o \
 	byte_code.o \
+	lexer.o \
 	parser.o \
 	unit_test.o \
 	interpreter.o
@@ -45,7 +46,10 @@ instance.o: instance.cpp instance.h value.h exception.h
 byte_code.o: byte_code.cpp byte_code.h value.h parser.h environment.h lambda.h util.h exception.h
 	$(CPP) -c byte_code.cpp
 
-parser.o: parser.cpp parser.h byte_code.h util.h
+lexer.o: lexer.cpp lexer.h util.h exception.h
+	$(CPP) -c lexer.cpp
+
+parser.o: parser.cpp parser.h lexer.h byte_code.h util.h exception.h
 	$(CPP) -c parser.cpp
 
 unit_test.o: unit_test.cpp unit_test.h value.h environment.h lambda.h util.h exception.h
