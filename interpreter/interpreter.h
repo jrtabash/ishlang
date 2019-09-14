@@ -35,6 +35,7 @@ namespace Int {
         Environment::SharedPtr env_;
 
         std::string prompt_;
+        std::string contPrompt_;
         std::string lastResult_;
 
         ParserCB parserCB_;

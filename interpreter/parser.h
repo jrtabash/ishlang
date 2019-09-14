@@ -22,6 +22,8 @@ namespace Int {
         ByteCode::SharedPtr readLiteral(const std::string &expr);
         void readMulti(const std::string &expr, CallBack callback);
 
+        bool hasIncompleteExpr() const { return !lexer_.empty(); }
+
     private:
         ByteCode::SharedPtr readExpr();
         ByteCode::SharedPtr makeLiteral(Lexer::TokenType type, const std::string &text);

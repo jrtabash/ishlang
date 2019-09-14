@@ -33,6 +33,7 @@ Interpreter::Interpreter(bool batch)
     : parser_()
     , env_(std::make_shared<Environment>())
     , prompt_(">>")
+    , contPrompt_("..")
     , lastResult_("*")
     , parserCB_(env_, lastResult_, batch)
 {
@@ -44,7 +45,7 @@ bool Interpreter::readEvalPrintLoop() {
     std::string expr;
     for (;;) {
         try {
-            std::cout << prompt_ << ' ';
+            std::cout << (parser_.hasIncompleteExpr() ? contPrompt_ : prompt_) << ' ';
             std::getline(std::cin, expr);
             if (std::cin.eof()) {
                 std::cout << '\n';
