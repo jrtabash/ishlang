@@ -23,6 +23,7 @@ namespace Int {
         void readMulti(const std::string &expr, CallBack callback);
 
         bool hasIncompleteExpr() const { return !lexer_.empty(); }
+        void clearIncompleteExpr() { lexer_.clear(); }
 
     private:
         ByteCode::SharedPtr readExpr();

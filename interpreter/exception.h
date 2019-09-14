@@ -127,6 +127,13 @@ namespace Int {
             : Exception(format("Bad internal access from '%s'", from.c_str()))
         {}
     };
+
+    class InvalidCommand : public Exception {
+    public:
+        InvalidCommand(const std::string &cmd, const std::string &msg)
+            : Exception(format("Invalid command '%s': %s", cmd.c_str(), msg.c_str()))
+        {}
+    };
 }
 
 #endif	// EXCEPTION_H

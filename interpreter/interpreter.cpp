@@ -1,6 +1,8 @@
 #include "interpreter.h"
+#include "util.h"
 
 #include <fstream>
+#include <cstdlib>
 
 using namespace Int;
 
@@ -51,15 +53,15 @@ bool Interpreter::readEvalPrintLoop() {
                 std::cout << '\n';
                 break;
             }
-            else if (expr == "exit" || expr == "quit") {
-                break;
+            else if (isREPLCommand(expr)) {
+                handleREPLCommand(expr);
             }
-
-            parser_.readMulti(
-                expr.substr(0, 4) == "load" ? readFile(expr.substr(5)) : expr,
-                parserCB_);
+            else {
+                parser_.readMulti(expr, parserCB_);
+            }
         }
         catch (const Exception &ex) {
+            parser_.clearIncompleteExpr();
             std::cerr << "Error: " << ex.what() << std::endl;
         }
         catch (const std::exception &ex) {
@@ -106,4 +108,39 @@ std::string Interpreter::readFile(const std::string &filename) {
         throw;
     }
     return result;
+}
+
+bool Interpreter::isREPLCommand(const std::string &expr) const {
+    return expr[0] == ':' && !parser_.hasIncompleteExpr();
+}
+
+void Interpreter::handleREPLCommand(const std::string &expr) {
+    Util::TokenList cmdTokens;
+
+    const auto size = Util::tokenize(expr, cmdTokens);
+    if (size < 1) {
+        throw InvalidCommand("", "missing command");
+    }
+
+    const auto cmd = cmdTokens.front();
+    cmdTokens.pop_front();
+
+    if (cmd == ":exit" || cmd == ":quit") {
+        if (size > 1) {
+            throw InvalidCommand(cmd, "too many arguments");
+        }
+        std::exit(0);
+    }
+    else if (cmd == ":load") {
+        if (size == 1) {
+            throw InvalidCommand(cmd, "missing filename");
+        }
+        else if (size > 2) {
+            throw InvalidCommand(cmd, "too many arguments");
+        }
+        parser_.readMulti(readFile(cmdTokens.front()), parserCB_);
+    }
+    else {
+        throw InvalidCommand(cmd, "unknown command");
+    }
 }

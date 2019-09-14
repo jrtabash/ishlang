@@ -48,6 +48,8 @@ namespace Int {
         size_t size() const { return tokens_.size(); }
         bool empty() const { return tokens_.empty(); }
 
+        void clear() { tokens_.clear(); }
+
     public:
         static TokenType tokenType(const std::string &token);
 

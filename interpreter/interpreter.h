@@ -20,6 +20,10 @@ namespace Int {
         std::string readFile(const std::string &filename);
 
     private:
+        bool isREPLCommand(const std::string &expr) const;
+        void handleREPLCommand(const std::string &expr);
+
+    private:
         struct ParserCB {
             ParserCB(Environment::SharedPtr env, std::string &lastResult, bool batch);
             void operator()(ByteCode::SharedPtr &code);
