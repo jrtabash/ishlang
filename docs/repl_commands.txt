@@ -12,3 +12,16 @@ The following command loads an Ishlang source file:
   load <filename>
 
 Example: load hello.ish
+
+Access Last Result
+------------------
+Use * to access the result of the last evaulation.
+
+Example:
+  >> (+ 5 10)
+  15
+  >> (+ * 10)
+  25
+  >> *
+  25
+  >> 
