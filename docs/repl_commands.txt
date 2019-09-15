@@ -11,7 +11,7 @@ The following command loads an Ishlang source file:
 
   :load <filename>
 
-Example: load hello.ish
+Example: :load hello.ish
 
 Access Last Result
 ------------------
