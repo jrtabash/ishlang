@@ -134,6 +134,13 @@ namespace Int {
             : Exception(format("Invalid command '%s': %s", cmd.c_str(), msg.c_str()))
         {}
     };
+
+    class IncompleteExpression : public Exception {
+    public:
+        IncompleteExpression(const std::string &msg)
+            : Exception(format("Incomplete expression: %s", msg.c_str()))
+        {}
+    };
 }
 
 #endif	// EXCEPTION_H

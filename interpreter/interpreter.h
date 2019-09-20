@@ -14,10 +14,10 @@ namespace Int {
         const Interpreter &operator=(const Interpreter &) = delete;
 
         bool readEvalPrintLoop();
-        void loadFile(const std::string &filename);
+        bool loadFile(const std::string &filename);
 
     private:
-        std::string readFile(const std::string &filename);
+        void readFile(const std::string &filename);
 
     private:
         bool isREPLCommand(const std::string &expr) const;

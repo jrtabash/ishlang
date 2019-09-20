@@ -73,33 +73,32 @@ bool Interpreter::readEvalPrintLoop() {
 }
 
 // -------------------------------------------------------------
-void Interpreter::loadFile(const std::string &filename) {
+bool Interpreter::loadFile(const std::string &filename) {
     try {
-        parser_.readMulti(readFile(filename), parserCB_);
+        readFile(filename);
     }
     catch (const Exception &ex) {
         std::cerr << "Error: " << ex.what() << std::endl;
+        return false;
     }
     catch (const std::exception &ex) {
         std::cerr << "System error: " << ex.what() << std::endl;
+        return false;
     }
+    return true;
 }
 
 // -------------------------------------------------------------
-std::string Interpreter::readFile(const std::string &filename) {
-    // TODO - Hacky and inefficient... 
-    // redo with stream, which will require a rework of the parser.
-    
+void Interpreter::readFile(const std::string &filename) {
     std::ifstream ifs(filename.c_str());
     if (!ifs.is_open()) {
         throw UnknownFile(filename);
     }
 
-    std::string result;
     try {
         std::string line;
         while (std::getline(ifs, line)) {
-            result += line;
+            parser_.readMulti(line, parserCB_);
         }
         ifs.close();
     }
@@ -107,7 +106,11 @@ std::string Interpreter::readFile(const std::string &filename) {
         ifs.close();
         throw;
     }
-    return result;
+
+    if (parser_.hasIncompleteExpr()) {
+        parser_.clearIncompleteExpr();
+        throw IncompleteExpression("Incomplete code at end of file");
+    }
 }
 
 bool Interpreter::isREPLCommand(const std::string &expr) const {
@@ -138,7 +141,7 @@ void Interpreter::handleREPLCommand(const std::string &expr) {
         else if (size > 2) {
             throw InvalidCommand(cmd, "too many arguments");
         }
-        parser_.readMulti(readFile(cmdTokens.front()), parserCB_);
+        readFile(cmdTokens.front());
     }
     else {
         throw InvalidCommand(cmd, "unknown command");
