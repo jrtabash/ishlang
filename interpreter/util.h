@@ -23,6 +23,9 @@ namespace Int {
 
         static std::string nextToken(const std::string &str, size_t &pos);
         static size_t tokenize(const std::string &str, TokenList &tokens);
+
+    public:
+        static bool setBoolFromString(bool &out, const std::string &str);
     };
 
 }

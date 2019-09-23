@@ -138,3 +138,17 @@ size_t Util::tokenize(const std::string &str, TokenList &tokens) {
     }
     return size;
 }
+
+// -------------------------------------------------------------
+bool Util::setBoolFromString(bool &out, const std::string &str) {
+    if (str == "true") {
+        out = true;
+    }
+    else if (str == "false") {
+        out = false;
+    }
+    else {
+        return false;
+    }
+    return true;
+}

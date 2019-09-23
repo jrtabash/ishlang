@@ -11,7 +11,7 @@ using namespace Int;
 // -------------------------------------------------------------
 
 // -------------------------------------------------------------
-Interpreter::ParserCB::ParserCB(Environment::SharedPtr env, std::string &lastResult, bool batch)
+Interpreter::ParserCB::ParserCB(Environment::SharedPtr env, std::string &lastResult, bool &batch)
     : env(env)
     , lastResult(lastResult)
     , batch(batch)
@@ -37,7 +37,8 @@ Interpreter::Interpreter(bool batch)
     , prompt_(">>")
     , contPrompt_("..")
     , lastResult_("*")
-    , parserCB_(env_, lastResult_, batch)
+    , batch_(batch)
+    , parserCB_(env_, lastResult_, batch_)
 {
     env_->def(lastResult_, Value::Null);
 }
@@ -142,6 +143,19 @@ void Interpreter::handleREPLCommand(const std::string &expr) {
             throw InvalidCommand(cmd, "too many arguments");
         }
         readFile(cmdTokens.front());
+    }
+    else if (cmd == ":batch") {
+        if (size == 1) {
+            batch_ = !batch_;
+        }
+        else if (size == 2) {
+            if (!Util::setBoolFromString(batch_, cmdTokens.front())) {
+                throw InvalidCommand(cmd, "expecting true or false");
+            }
+        }
+        else {
+            throw InvalidCommand(cmd, "too many arguments");
+        }
     }
     else {
         throw InvalidCommand(cmd, "unknown command");

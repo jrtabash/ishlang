@@ -25,13 +25,13 @@ namespace Int {
 
     private:
         struct ParserCB {
-            ParserCB(Environment::SharedPtr env, std::string &lastResult, bool batch);
+            ParserCB(Environment::SharedPtr env, std::string &lastResult, bool &batch);
             void operator()(ByteCode::SharedPtr &code);
 
         private:
             Environment::SharedPtr  env;
             std::string            &lastResult;
-            bool                    batch;
+            const bool             &batch;
         };
 
     private:
@@ -41,6 +41,7 @@ namespace Int {
         std::string prompt_;
         std::string contPrompt_;
         std::string lastResult_;
+        bool        batch_;
 
         ParserCB parserCB_;
     };
