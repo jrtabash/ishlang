@@ -106,12 +106,15 @@ int main(int argc, char** argv) {
         }
     }
     else {
-        Int::Interpreter interpreter(args.batch);
+        bool const forceInteractive = (args.filename.empty() && !args.interactive);
+        bool const forceBatch = (!args.filename.empty() && !args.interactive);
+
+        Int::Interpreter interpreter(args.batch || forceBatch);
         if (!args.filename.empty()) {
             interpreter.loadFile(args.filename);
         }
 
-        if (args.interactive) {
+        if (args.interactive || forceInteractive) {
             if (!interpreter.readEvalPrintLoop()) {
                 return 1;
             }
