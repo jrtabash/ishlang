@@ -1,0 +1,12 @@
+(def test (num)
+ (cond
+  ((< num 0)
+   (println "negative"))
+  ((> num 0)
+   (println "positive"))
+  (true
+   (println "zero"))))
+
+(test -1)
+(test 0)
+(test 1)
