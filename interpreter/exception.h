@@ -5,16 +5,37 @@
 #include <sstream>
 #include <stdexcept>
 #include <cstdarg>
+#include <optional>
 
 namespace Int {
+
+    class FileContext {
+    public:
+        FileContext(const std::string filename, unsigned lineNo);
+
+        const std::string &filename() const noexcept;
+        unsigned lineNo() const noexcept;
+
+    private:
+        const std::string filename_;
+        const unsigned lineNo_;
+    };
 
     class Exception : public std::runtime_error {
     public:
         Exception(const std::string &msg);
         Exception(const std::string &msg, const std::string &variable);
 
+        const std::optional<FileContext> &fileContext() const noexcept;
+        void setFileContext(const std::string &filename, unsigned lineNo);
+
+        void printError() const;
+
     public:
         static std::string format(const char *fmt, ...);
+
+    private:
+        std::optional<FileContext> fileContext_ = std::nullopt;
     };
     
     class NullEnvironment : public Exception {

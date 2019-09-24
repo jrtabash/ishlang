@@ -63,7 +63,7 @@ bool Interpreter::readEvalPrintLoop() {
         }
         catch (const Exception &ex) {
             parser_.clearIncompleteExpr();
-            std::cerr << "Error: " << ex.what() << std::endl;
+            ex.printError();
         }
         catch (const std::exception &ex) {
             std::cerr << "System error: " << ex.what() << std::endl;
@@ -79,7 +79,7 @@ bool Interpreter::loadFile(const std::string &filename) {
         readFile(filename);
     }
     catch (const Exception &ex) {
-        std::cerr << "Error: " << ex.what() << std::endl;
+        ex.printError();
         return false;
     }
     catch (const std::exception &ex) {
@@ -96,21 +96,29 @@ void Interpreter::readFile(const std::string &filename) {
         throw UnknownFile(filename);
     }
 
+    unsigned lineNo = 0;
     try {
         std::string line;
         while (std::getline(ifs, line)) {
+            ++lineNo;
             parser_.readMulti(line, parserCB_);
         }
+
+        if (parser_.hasIncompleteExpr()) {
+            parser_.clearIncompleteExpr();
+            throw IncompleteExpression("Incomplete code at end of file");
+        }
+
         ifs.close();
+    }
+    catch (Exception &ex) {
+        ifs.close();
+        ex.setFileContext(filename, lineNo);
+        throw;
     }
     catch (...) {
         ifs.close();
         throw;
-    }
-
-    if (parser_.hasIncompleteExpr()) {
-        parser_.clearIncompleteExpr();
-        throw IncompleteExpression("Incomplete code at end of file");
     }
 }
 
