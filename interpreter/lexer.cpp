@@ -30,7 +30,7 @@ void Lexer::read(const std::string & expr) {
 // -------------------------------------------------------------
 Lexer::Token Lexer::next() {
     if (tokens_.empty()) {
-        throw BadInternalAccess("Lexer next");
+        throw InvalidExpression("incomplete form");
     }
     auto token = tokens_.front();
     tokens_.pop_front();

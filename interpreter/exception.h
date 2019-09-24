@@ -121,13 +121,6 @@ namespace Int {
         {}
     };
 
-    class BadInternalAccess : public Exception {
-    public:
-        BadInternalAccess(const std::string &from)
-            : Exception(format("Bad internal access from '%s'", from.c_str()))
-        {}
-    };
-
     class InvalidCommand : public Exception {
     public:
         InvalidCommand(const std::string &cmd, const std::string &msg)
