@@ -449,3 +449,29 @@ Value StringLen::exec(Environment::SharedPtr env) {
     }
     return Value::Zero;
 }
+
+// -------------------------------------------------------------
+GetCharAt::GetCharAt(ByteCode::SharedPtr str, ByteCode::SharedPtr pos)
+    : ByteCode()
+    , str_(str)
+    , pos_(pos)
+{}
+
+Value GetCharAt::exec(Environment::SharedPtr env) {
+    if (str_.get() && pos_.get()) {
+        Value str = str_->exec(env);
+        Value pos = pos_->exec(env);
+
+        if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
+        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
+
+        auto const rawStr = str.text();
+        auto const rawPos = pos.integer();
+        if (rawPos < 0 || rawPos >= rawStr.size()) {
+            throw OutOfRange("string charat access");
+        }
+
+        return Value(str.text()[pos.integer()]);
+    }
+    return Value::Null;
+}

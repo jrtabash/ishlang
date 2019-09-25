@@ -269,7 +269,9 @@ Example:
 String Operations
 -----------------
 strlen: compute string length
+charat: return character at position
 
 Examples:
   (var str "Hello World!")
-  (strlen str)
+  (println (strlen str))
+  (println (charat str 3))

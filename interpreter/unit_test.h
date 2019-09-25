@@ -62,6 +62,7 @@ namespace Int {
         void testByteCodeIsInstanceOf();
         void testByteCodeGetSetMember();
         void testByteCodeStringLen();
+        void testByteCodeCharAt();
         void testParserBasic();
         void testParserIsType();
         void testParserVar();
@@ -78,6 +79,7 @@ namespace Int {
         void testParserMakeInstance();
         void testParserIsInstanceOf();
         void testParserStringLen();
+        void testParserCharAt();
         
     private:
         bool  success_;

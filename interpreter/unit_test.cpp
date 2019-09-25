@@ -46,6 +46,7 @@ UnitTest::UnitTest()
     ADD_TEST(testByteCodeGetSetMember);
     ADD_TEST(testTokenType);
     ADD_TEST(testByteCodeStringLen);
+    ADD_TEST(testByteCodeCharAt);
     ADD_TEST(testParserBasic);
     ADD_TEST(testParserIsType);
     ADD_TEST(testParserVar);
@@ -62,6 +63,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserMakeInstance);
     ADD_TEST(testParserIsInstanceOf);
     ADD_TEST(testParserStringLen);
+    ADD_TEST(testParserCharAt);
 }
 #undef ADD_TEST
 
@@ -1607,7 +1609,55 @@ void UnitTest::testByteCodeStringLen() {
             ->exec(env);
         TEST_CASE(false);
     }
-    catch (InvalidOperandType const & ex) {}
+    catch (InvalidOperandType const &) {}
+    catch (...) { TEST_CASE(false); }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testByteCodeCharAt() {
+    Environment::SharedPtr env(new Environment());
+
+    Value value =
+        std::make_shared<GetCharAt>(
+            std::make_shared<Literal>(Value("abc")),
+            std::make_shared<Literal>(Value(0ll)))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value('a'), "actual=" << value);
+
+    value =
+        std::make_shared<GetCharAt>(
+            std::make_shared<Literal>(Value("abc")),
+            std::make_shared<Literal>(Value(1ll)))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value('b'), "actual=" << value);
+
+    value =
+        std::make_shared<GetCharAt>(
+            std::make_shared<Literal>(Value("abc")),
+            std::make_shared<Literal>(Value(2ll)))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value('c'), "actual=" << value);
+
+    try {
+        value =
+            std::make_shared<GetCharAt>(
+                std::make_shared<Literal>(Value("abc")),
+                std::make_shared<Literal>(Value(3ll)))
+            ->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) { TEST_CASE(false); }
+
+    try {
+        value =
+            std::make_shared<GetCharAt>(
+                std::make_shared<Literal>(Value("abc")),
+                std::make_shared<Literal>(Value(-1ll)))
+            ->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
     catch (...) { TEST_CASE(false); }
 }
 
@@ -1933,4 +1983,14 @@ void UnitTest::testParserStringLen() {
     TEST_CASE(parserTest(parser, env, "(strlen \"a\")",      Value(1ll),  true));
     TEST_CASE(parserTest(parser, env, "(strlen \"string\")", Value(6ll),  true));
     TEST_CASE(parserTest(parser, env, "(strlen 10)",         Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserCharAt() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(charat \"By\" 0)", Value('B'),  true));
+    TEST_CASE(parserTest(parser, env, "(charat \"By\" 1)", Value('y'),  true));
+    TEST_CASE(parserTest(parser, env, "(charat \"By\" 2)", Value::Null, false));
 }

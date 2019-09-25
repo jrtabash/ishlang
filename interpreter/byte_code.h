@@ -430,6 +430,19 @@ namespace Int {
     private:
         ByteCode::SharedPtr expr_;
     };
+
+    // -------------------------------------------------------------
+    class GetCharAt : public ByteCode {
+    public:
+        GetCharAt(ByteCode::SharedPtr str, ByteCode::SharedPtr pos);
+        virtual ~GetCharAt() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr str_;
+        ByteCode::SharedPtr pos_;
+    };
 }
 
 #endif	// BYTE_CODE_H

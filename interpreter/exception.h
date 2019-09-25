@@ -155,6 +155,13 @@ namespace Int {
             : Exception(format("Incomplete expression: %s", msg.c_str()))
         {}
     };
+
+    class OutOfRange : public Exception {
+    public:
+        OutOfRange(const std::string &msg)
+            : Exception(format("Out of range: %s", msg.c_str()))
+        {}
+    };
 }
 
 #endif	// EXCEPTION_H

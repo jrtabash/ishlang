@@ -1,0 +1,14 @@
+(def countSpaces (str)
+  (progn
+   (var count 0)
+   (loop (var i 0) (< i (strlen str)) (= i (+ i 1))
+     (cond
+      ((== (charat str i) ' ')
+       (= count (+ count 1)))))
+   count))
+
+(var s "Test char at op on str")
+(print "Number of spaces in '")
+(print s)
+(print "' is ")
+(println (countSpaces s))
