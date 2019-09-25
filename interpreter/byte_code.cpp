@@ -254,7 +254,8 @@ Value LambdaExpr::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 LambdaApp::LambdaApp(ByteCode::SharedPtr closure, SharedPtrList args)
-    : closure_(closure)
+    : ByteCode()
+    , closure_(closure)
     , argExprs_(args)
     , closureVar_(Value::Null)
 {}
@@ -304,7 +305,8 @@ Value FunctionApp::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 Print::Print(bool newline, ByteCode::SharedPtr expr)
-    : newline_(newline)
+    : ByteCode()
+    , newline_(newline)
     , expr_(expr)
 {}
 
@@ -316,6 +318,7 @@ Value Print::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 Read::Read()
+    : ByteCode()
 {
 }
 
@@ -328,7 +331,8 @@ Value Read::exec(Environment::SharedPtr env)
 
 // -------------------------------------------------------------
 StructExpr::StructExpr(const std::string &name, const Struct::MemberList &members)
-    : struct_(name, members)
+    : ByteCode()
+    , struct_(name, members)
 {}
 
 Value StructExpr::exec(Environment::SharedPtr env) {
@@ -338,7 +342,8 @@ Value StructExpr::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 IsStructName::IsStructName(ByteCode::SharedPtr expr, const std::string &name)
-    : expr_(expr)
+    : ByteCode()
+    , expr_(expr)
     , name_(name)
 {}
 
@@ -354,7 +359,8 @@ Value IsStructName::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 MakeInstance::MakeInstance(const std::string &name)
-    : name_(name)
+    : ByteCode()
+    , name_(name)
 {}
 
 Value MakeInstance::exec(Environment::SharedPtr env) {
@@ -367,7 +373,8 @@ Value MakeInstance::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 IsInstanceOf::IsInstanceOf(ByteCode::SharedPtr expr, const std::string &name)
-    : expr_(expr)
+    : ByteCode()
+    , expr_(expr)
     , name_(name)
 {}
 
@@ -383,7 +390,8 @@ Value IsInstanceOf::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 GetMember::GetMember(ByteCode::SharedPtr expr, const std::string &name)
-    : expr_(expr)
+    : ByteCode()
+    , expr_(expr)
     , name_(name)
 {}
 
@@ -402,7 +410,8 @@ Value GetMember::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 SetMember::SetMember(ByteCode::SharedPtr expr, const std::string &name, ByteCode::SharedPtr newValExpr)
-    : expr_(expr)
+    : ByteCode()
+    , expr_(expr)
     , name_(name)
     , newValExpr_(newValExpr)
 {}
@@ -426,7 +435,8 @@ Value SetMember::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 StringLen::StringLen(ByteCode::SharedPtr expr)
-    : expr_(expr)
+    : ByteCode()
+    , expr_(expr)
 {}
 
 Value StringLen::exec(Environment::SharedPtr env) {
