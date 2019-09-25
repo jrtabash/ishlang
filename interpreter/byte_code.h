@@ -419,6 +419,17 @@ namespace Int {
         ByteCode::SharedPtr newValExpr_;
     };
 
+    // -------------------------------------------------------------
+    class StringLen : public ByteCode {
+    public:
+        StringLen(ByteCode::SharedPtr expr);
+        virtual ~StringLen() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr expr_;
+    };
 }
 
 #endif	// BYTE_CODE_H

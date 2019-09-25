@@ -282,6 +282,11 @@ ByteCode::SharedPtr Parser::readApp(const std::string &expected) {
                 ignoreRightP();
                 return std::make_shared<SetMember>(instExpr, name, valueExpr);
             }
+            else if (token.text == "strlen") {
+                ByteCode::SharedPtr strExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<StringLen>(strExpr);
+            }
             else {
                 if (token.type == Lexer::Symbol) {
                     const std::string & name(token.text);

@@ -265,3 +265,11 @@ Example:
   (set p (name "John"))
   (set p (age 25))
   (var q (clone p))
+
+String Operations
+-----------------
+strlen: compute string length
+
+Examples:
+  (var str "Hello World!")
+  (strlen str)

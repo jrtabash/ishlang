@@ -1,0 +1,10 @@
+(def test (str)
+  (progn
+   (print "length of '")
+   (print str)
+   (print "': ")
+   (println (strlen str))))
+
+(test "")
+(test "a")
+(test "foobar")

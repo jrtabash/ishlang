@@ -45,6 +45,7 @@ UnitTest::UnitTest()
     ADD_TEST(testByteCodeIsInstanceOf);
     ADD_TEST(testByteCodeGetSetMember);
     ADD_TEST(testTokenType);
+    ADD_TEST(testByteCodeStringLen);
     ADD_TEST(testParserBasic);
     ADD_TEST(testParserIsType);
     ADD_TEST(testParserVar);
@@ -60,6 +61,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserIsStructName);
     ADD_TEST(testParserMakeInstance);
     ADD_TEST(testParserIsInstanceOf);
+    ADD_TEST(testParserStringLen);
 }
 #undef ADD_TEST
 
@@ -1577,6 +1579,39 @@ void UnitTest::testByteCodeGetSetMember() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testByteCodeStringLen() {
+    Environment::SharedPtr env(new Environment());
+
+    Value value =
+        std::make_shared<StringLen>(
+            std::make_shared<Literal>(Value("")))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value::Zero, "actual=" << value);
+
+    value =
+        std::make_shared<StringLen>(
+            std::make_shared<Literal>("a"))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value(1ll), "actual=" << value);
+
+    value =
+        std::make_shared<StringLen>(
+            std::make_shared<Literal>("abcde"))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value(5ll), "actual=" << value);
+
+    try {
+        value =
+            std::make_shared<StringLen>(
+                std::make_shared<Literal>(Value::Zero))
+            ->exec(env);
+        TEST_CASE(false);
+    }
+    catch (InvalidOperandType const & ex) {}
+    catch (...) { TEST_CASE(false); }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -1887,4 +1922,15 @@ void UnitTest::testParserIsInstanceOf() {
     TEST_CASE(parserTest(parser, env, "(struct Person (name age))",    Value(stest), true));
     TEST_CASE(parserTest(parser, env, "(var p (makeinstance Person))", Value(itest), true));
     TEST_CASE(parserTest(parser, env, "(isinstanceof p Person)",       Value::True,  true));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserStringLen() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(strlen \"\")",       Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(strlen \"a\")",      Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strlen \"string\")", Value(6ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strlen 10)",         Value::Null, false));
 }

@@ -6,11 +6,11 @@
   - Hash table
 
 * Add string functions:
-  - Length of string
   - Get char at position
   - Set char at position
   - Concatenate
   - Substring
+  - find
 
 * Rework 'break' implementation to avoid using Break::Except
 

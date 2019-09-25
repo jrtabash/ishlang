@@ -423,3 +423,19 @@ Value SetMember::exec(Environment::SharedPtr env) {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+StringLen::StringLen(ByteCode::SharedPtr expr)
+    : expr_(expr)
+{}
+
+Value StringLen::exec(Environment::SharedPtr env) {
+    if (expr_.get()) {
+        Value str = expr_->exec(env);
+
+        if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
+
+        return Value(Value::Long(str.text().size()));
+    }
+    return Value::Zero;
+}
