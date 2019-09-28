@@ -465,8 +465,8 @@ Value GetCharAt::exec(Environment::SharedPtr env) {
         if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
         if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
 
-        auto const rawStr = str.text();
-        auto const rawPos = pos.integer();
+        const auto &rawStr = str.text();
+        const auto rawPos = pos.integer();
         if (rawPos < 0 || rawPos >= rawStr.size()) {
             throw OutOfRange("string charat access");
         }
