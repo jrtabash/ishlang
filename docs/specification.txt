@@ -269,11 +269,20 @@ Example:
 String Operations
 -----------------
 strlen: compute string length
+        (strlen <string>)
+
 getchar: return character at position
+        (getchar <string> <position>)
+
 setchar: set character at position
+        (setchar <string> <position> <character>)
+
+strcat: Concatenate string or character to string
+        (strcat <string> <other>)
 
 Examples:
-  (var str "Hello World!")
+  (var str "Hello!")
   (println (strlen str))
   (println (getchar str 3))
-  (setchar str 5 '_')
+  (setchar str 5 ' ')
+  (strcat str "World!")

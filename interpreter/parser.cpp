@@ -300,6 +300,12 @@ ByteCode::SharedPtr Parser::readApp(const std::string &expected) {
                 ignoreRightP();
                 return std::make_shared<SetCharAt>(strExpr, posExpr, valExpr);
             }
+            else if (token.text == "strcat") {
+                ByteCode::SharedPtr strExpr(readExpr());
+                ByteCode::SharedPtr otherExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<StringCat>(strExpr, otherExpr);
+            }
             else {
                 if (token.type == Lexer::Symbol) {
                     const std::string & name(token.text);

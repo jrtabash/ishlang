@@ -505,3 +505,32 @@ Value SetCharAt::exec(Environment::SharedPtr env) {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+StringCat::StringCat(ByteCode::SharedPtr str, ByteCode::SharedPtr other)
+    : ByteCode()
+    , str_(str)
+    , other_(other)
+{}
+
+Value StringCat::exec(Environment::SharedPtr env) {
+    if (str_.get() && other_.get()) {
+        Value str = str_->exec(env);
+        Value other = other_->exec(env);
+
+        if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
+        if (!other.isString() and !other.isChar()) { throw InvalidOperandType("(String or Character)", other.typeToString()); }
+
+        auto &rawStr = str.text();
+
+        if (other.isString()) {
+            rawStr.append(other.text());
+        }
+        else {
+            rawStr.append(1, other.character());
+        }
+
+        return str;
+    }
+    return Value::Null;
+}

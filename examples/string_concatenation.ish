@@ -1,0 +1,8 @@
+(def makeHelloMsg ()
+ (progn
+  (var str "Hello ")
+  (print "What is your name? ")
+  (strcat str (read))
+  (strcat str ", welcome to Ishlang!")))
+
+(println (makeHelloMsg))

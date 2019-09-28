@@ -457,6 +457,19 @@ namespace Int {
         ByteCode::SharedPtr pos_;
         ByteCode::SharedPtr val_;
     };
+
+    // -------------------------------------------------------------
+    class StringCat : public ByteCode {
+    public:
+        StringCat(ByteCode::SharedPtr str, ByteCode::SharedPtr other);
+        virtual ~StringCat() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr str_;
+        ByteCode::SharedPtr other_;
+    };
 }
 
 #endif	// BYTE_CODE_H

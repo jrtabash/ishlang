@@ -44,6 +44,7 @@ UnitTest::UnitTest()
     ADD_TEST(testByteCodeMakeInstance);
     ADD_TEST(testByteCodeIsInstanceOf);
     ADD_TEST(testByteCodeGetSetMember);
+    ADD_TEST(testByteCodeStringCat);
     ADD_TEST(testTokenType);
     ADD_TEST(testByteCodeStringLen);
     ADD_TEST(testByteCodeCharAt);
@@ -66,6 +67,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserStringLen);
     ADD_TEST(testParserGetChar);
     ADD_TEST(testParserSetChar);
+    ADD_TEST(testParserStringCat);
 }
 #undef ADD_TEST
 
@@ -1732,6 +1734,48 @@ void UnitTest::testByteCodeSetCharAt() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testByteCodeStringCat() {
+    Environment::SharedPtr env(new Environment());
+    env->def("str", Value("abc"));
+
+    ByteCode::SharedPtr var = std::make_shared<Variable>("str");
+
+    Value value =
+        std::make_shared<StringCat>(
+            var,
+            std::make_shared<Literal>(Value("de")))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value("abcde"), "actual=" << value);
+
+    value = var->exec(env);
+    TEST_CASE_MSG(value == Value("abcde"), "actual=" << value);
+
+    value =
+        std::make_shared<StringCat>(
+            var,
+            std::make_shared<Literal>(Value('f')))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value("abcdef"), "actual=" << value);
+
+    value = var->exec(env);
+    TEST_CASE_MSG(value == Value("abcdef"), "actual=" << value);
+
+    try {
+        value =
+            std::make_shared<StringCat>(
+                var,
+                std::make_shared<Literal>(Value::Zero))
+            ->exec(env);
+        TEST_CASE(false);
+    }
+    catch (InvalidOperandType const &) {}
+    catch (...) { TEST_CASE(false); }
+
+    value = var->exec(env);
+    TEST_CASE_MSG(value == Value("abcdef"), "actual=" << value);
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -2075,4 +2119,21 @@ void UnitTest::testParserSetChar() {
     TEST_CASE(parserTest(parser, env, "(setchar str 0 'a')", Value('a'),  true));
     TEST_CASE(parserTest(parser, env, "(setchar str 2 'C')", Value('C'),  true));
     TEST_CASE(parserTest(parser, env, "(setchar str 6 'b')", Value::Null, false));
+
+    TEST_CASE(parserTest(parser, env, "str", Value("a2C45"), true));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserStringCat() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("str", Value("abc"));
+
+    TEST_CASE(parserTest(parser, env, "(strcat str \"def\")", Value("abcdef"),    true));
+    TEST_CASE(parserTest(parser, env, "(strcat str \"gh\")",  Value("abcdefgh"),  true));
+    TEST_CASE(parserTest(parser, env, "(strcat str 'i')",     Value("abcdefghi"), true));
+    TEST_CASE(parserTest(parser, env, "(strcat str 5)",       Value::Null,        false));
+
+    TEST_CASE(parserTest(parser, env, "str", Value("abcdefghi"), true));
 }
