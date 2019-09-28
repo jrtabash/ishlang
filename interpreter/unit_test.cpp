@@ -47,6 +47,7 @@ UnitTest::UnitTest()
     ADD_TEST(testTokenType);
     ADD_TEST(testByteCodeStringLen);
     ADD_TEST(testByteCodeCharAt);
+    ADD_TEST(testByteCodeSetCharAt);
     ADD_TEST(testParserBasic);
     ADD_TEST(testParserIsType);
     ADD_TEST(testParserVar);
@@ -63,7 +64,8 @@ UnitTest::UnitTest()
     ADD_TEST(testParserMakeInstance);
     ADD_TEST(testParserIsInstanceOf);
     ADD_TEST(testParserStringLen);
-    ADD_TEST(testParserCharAt);
+    ADD_TEST(testParserGetChar);
+    ADD_TEST(testParserSetChar);
 }
 #undef ADD_TEST
 
@@ -1662,6 +1664,74 @@ void UnitTest::testByteCodeCharAt() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testByteCodeSetCharAt() {
+    Environment::SharedPtr env(new Environment());
+    env->def("str", Value("abc"));
+
+    ByteCode::SharedPtr var = std::make_shared<Variable>("str");
+
+    Value value =
+        std::make_shared<SetCharAt>(
+            var,
+            std::make_shared<Literal>(Value(0ll)),
+            std::make_shared<Literal>(Value('A')))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value('A'), "actual=" << value);
+
+    value = var->exec(env);
+    TEST_CASE_MSG(value == Value("Abc"), "actual=" << value);
+
+    value =
+        std::make_shared<SetCharAt>(
+            var,
+            std::make_shared<Literal>(Value(1ll)),
+            std::make_shared<Literal>(Value('B')))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value('B'), "actual=" << value);
+
+    value = var->exec(env);
+    TEST_CASE_MSG(value == Value("ABc"), "actual=" << value);
+
+    value =
+        std::make_shared<SetCharAt>(
+            var,
+            std::make_shared<Literal>(Value(2ll)),
+            std::make_shared<Literal>(Value('C')))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value('C'), "actual=" << value);
+
+    value = var->exec(env);
+    TEST_CASE_MSG(value == Value("ABC"), "actual=" << value);
+
+    try {
+        value =
+            std::make_shared<SetCharAt>(
+                var,
+                std::make_shared<Literal>(Value(-1ll)),
+                std::make_shared<Literal>(Value('X')))
+            ->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) { TEST_CASE(false); }
+
+    try {
+        value =
+            std::make_shared<SetCharAt>(
+                var,
+                std::make_shared<Literal>(Value(3ll)),
+                std::make_shared<Literal>(Value('Y')))
+            ->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) { TEST_CASE(false); }
+
+    value = var->exec(env);
+    TEST_CASE_MSG(value == Value("ABC"), "actual=" << value);
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -1986,11 +2056,23 @@ void UnitTest::testParserStringLen() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testParserCharAt() {
+void UnitTest::testParserGetChar() {
     Environment::SharedPtr env(new Environment());
     Parser parser;
 
-    TEST_CASE(parserTest(parser, env, "(charat \"By\" 0)", Value('B'),  true));
-    TEST_CASE(parserTest(parser, env, "(charat \"By\" 1)", Value('y'),  true));
-    TEST_CASE(parserTest(parser, env, "(charat \"By\" 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(getchar \"By\" 0)", Value('B'),  true));
+    TEST_CASE(parserTest(parser, env, "(getchar \"By\" 1)", Value('y'),  true));
+    TEST_CASE(parserTest(parser, env, "(getchar \"By\" 2)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserSetChar() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("str", Value("12345"));
+
+    TEST_CASE(parserTest(parser, env, "(setchar str 0 'a')", Value('a'),  true));
+    TEST_CASE(parserTest(parser, env, "(setchar str 2 'C')", Value('C'),  true));
+    TEST_CASE(parserTest(parser, env, "(setchar str 6 'b')", Value::Null, false));
 }

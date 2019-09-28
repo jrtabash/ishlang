@@ -6,7 +6,6 @@
   - Hash table
 
 * Add string functions:
-  - Set char at position
   - Concatenate
   - Substring
   - find

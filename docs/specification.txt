@@ -269,9 +269,11 @@ Example:
 String Operations
 -----------------
 strlen: compute string length
-charat: return character at position
+getchar: return character at position
+setchar: set character at position
 
 Examples:
   (var str "Hello World!")
   (println (strlen str))
-  (println (charat str 3))
+  (println (getchar str 3))
+  (setchar str 5 '_')

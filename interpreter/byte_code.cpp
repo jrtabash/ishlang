@@ -468,10 +468,40 @@ Value GetCharAt::exec(Environment::SharedPtr env) {
         const auto &rawStr = str.text();
         const auto rawPos = pos.integer();
         if (rawPos < 0 || rawPos >= rawStr.size()) {
-            throw OutOfRange("string charat access");
+            throw OutOfRange("string getchar access");
         }
 
         return Value(rawStr[rawPos]);
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+SetCharAt::SetCharAt(ByteCode::SharedPtr str, ByteCode::SharedPtr pos, ByteCode::SharedPtr val)
+    : ByteCode()
+    , str_(str)
+    , pos_(pos)
+    , val_(val)
+{}
+
+Value SetCharAt::exec(Environment::SharedPtr env) {
+    if (str_.get() && pos_.get() && val_.get()) {
+        Value str = str_->exec(env);
+        Value pos = pos_->exec(env);
+        Value val = val_->exec(env);
+
+        if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
+        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
+        if (!val.isChar()) { throw InvalidOperandType("Character", val.typeToString()); }
+
+        auto &rawStr = str.text();
+        const auto rawPos = pos.integer();
+        if (rawPos < 0 || rawPos >= rawStr.size()) {
+            throw OutOfRange("string setchar access");
+        }
+
+        rawStr[rawPos] = val.character();
+        return val;
     }
     return Value::Null;
 }

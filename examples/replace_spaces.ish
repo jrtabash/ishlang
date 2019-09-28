@@ -1,0 +1,11 @@
+(def replaceSpaces (str c)
+  (progn
+   (var count 0)
+   (loop (var i 0) (< i (strlen str)) (= i (+ i 1))
+     (cond
+      ((== (getchar str i) ' ')
+       (setchar str i c))))))
+
+(var s "Test set char at op")
+(replaceSpaces s '-')
+(println s)

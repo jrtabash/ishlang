@@ -443,6 +443,20 @@ namespace Int {
         ByteCode::SharedPtr str_;
         ByteCode::SharedPtr pos_;
     };
+
+    // -------------------------------------------------------------
+    class SetCharAt : public ByteCode {
+    public:
+        SetCharAt(ByteCode::SharedPtr str, ByteCode::SharedPtr pos, ByteCode::SharedPtr val);
+        virtual ~SetCharAt() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr str_;
+        ByteCode::SharedPtr pos_;
+        ByteCode::SharedPtr val_;
+    };
 }
 
 #endif	// BYTE_CODE_H

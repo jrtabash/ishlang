@@ -82,6 +82,7 @@ namespace Int {
         Char character()               const { return isChar()       ? std::get<Char>(value_)  : '\0'; }
         Bool boolean()                 const { return isBool()       ? std::get<Bool>(value_)  : false; }
         const Text &text()             const { return isString()     ? *std::get<StringPtr>(value_) : NullText; }
+        Text &text()                         { return isString()     ? *std::get<StringPtr>(value_) : NullText; }
         const Func &closure()          const { return isClosure()    ? *std::get<LambdaPtr>(value_) : NullFunc; }
         const UserType &userType()     const { return isUserType()   ? *std::get<StructPtr>(value_) : NullUserType; }
         const UserObject &userObject() const { return isUserObject() ? *std::get<InstancePtr>(value_) : NullObject; }

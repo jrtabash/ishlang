@@ -287,11 +287,18 @@ ByteCode::SharedPtr Parser::readApp(const std::string &expected) {
                 ignoreRightP();
                 return std::make_shared<StringLen>(strExpr);
             }
-            else if (token.text == "charat") {
+            else if (token.text == "getchar") {
                 ByteCode::SharedPtr strExpr(readExpr());
                 ByteCode::SharedPtr posExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<GetCharAt>(strExpr, posExpr);
+            }
+            else if (token.text == "setchar") {
+                ByteCode::SharedPtr strExpr(readExpr());
+                ByteCode::SharedPtr posExpr(readExpr());
+                ByteCode::SharedPtr valExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<SetCharAt>(strExpr, posExpr, valExpr);
             }
             else {
                 if (token.type == Lexer::Symbol) {
