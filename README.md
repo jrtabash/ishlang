@@ -17,14 +17,14 @@ List of todos available in [docs/todo.txt](docs/todo.txt)
 ```
 
 ## Basic Interpreter Commands:
-Run source file, batch mode:
+Run source file:
 ```bash
-ishlang -b -f <filename>
+ishlang -f <filename>
 ```
 
 Run ishlang REPL:
 ```bash
-ishlang -i
+ishlang
 ```
 
 Run ishlang unit tests:
