@@ -471,7 +471,7 @@ Value GetCharAt::exec(Environment::SharedPtr env) {
             throw OutOfRange("string charat access");
         }
 
-        return Value(str.text()[pos.integer()]);
+        return Value(rawStr[rawPos]);
     }
     return Value::Null;
 }
