@@ -87,6 +87,10 @@ bool UnitTest::run(const std::string &test) {
         }
         runTest(iter->first, iter->second);
     }
+
+    std::cout << "\n***** Ran " << (test.empty() ? tests_.size() : 1ul) << " test" << (test.empty() ? "s" : "")
+              << "\n***** " << (success_ ? "Success" : "Failure")
+              << std::endl;
     return success_;
 }
 
