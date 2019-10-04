@@ -7,6 +7,7 @@
 #include <string>
 #include <forward_list>
 #include <unordered_set>
+#include <unordered_map>
 #include <functional>
 
 namespace Int {
@@ -38,14 +39,11 @@ namespace Int {
 
     private:
         bool haveSExpression() const;
-
-    private:
-        static ArithOp::Type str2ArithOp(const std::string &token);
-        static CompOp::Type str2CompOp(const std::string &token);
-        static LogicOp::Type str2LogicOp(const std::string &token);
+        void initAppFtns();
 
     private:
         Lexer lexer_;
+        std::unordered_map<std::string, std::function<ByteCode::SharedPtr ()>> appFtns_;
     };
 
 } // Int

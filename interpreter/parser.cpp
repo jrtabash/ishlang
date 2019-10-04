@@ -12,7 +12,9 @@ using namespace Int;
 // -------------------------------------------------------------
 Parser::Parser()
     : lexer_()
-{}
+{
+    initAppFtns();
+}
 
 // -------------------------------------------------------------
 ByteCode::SharedPtr Parser::read(const std::string &expr) {
@@ -127,184 +129,9 @@ ByteCode::SharedPtr Parser::readApp(const std::string &expected) {
                 throw UnexpectedExpression("lambda", token.text);
             }
 
-            if (token.text == "var") {
-                const std::string name(readName());
-                ByteCode::SharedPtr code(readExpr());
-                ignoreRightP();
-                return std::make_shared<Define>(name, code);
-            }
-            else if (token.text == "=") {
-                const std::string name(readName());
-                ByteCode::SharedPtr code(readExpr());
-                ignoreRightP();
-                return std::make_shared<Assign>(name, code);
-            }
-            else if (token.text == "?") {
-                const std::string name(readName());
-                ignoreRightP();
-                return std::make_shared<Exists>(name);
-            }
-            else if (token.text == "clone") {
-                ByteCode::SharedPtr code(readExpr());
-                ignoreRightP();
-                return std::make_shared<Clone>(code);
-            }
-            else if (token.text == "+" || token.text == "-" || token.text == "*" || token.text == "/" || token.text == "%") {
-                const ArithOp::Type op(str2ArithOp(token.text));
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArithOp>(op, lhs, rhs);
-            }
-            else if (token.text == "==" || token.text == "!=" || token.text == "<" || token.text == ">" || token.text == "<=" || token.text == ">=") {
-                const CompOp::Type op(str2CompOp(token.text));
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<CompOp>(op, lhs, rhs);
-            }
-            else if (token.text == "and" || token.text == "or") {
-                const LogicOp::Type op(str2LogicOp(token.text));
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<LogicOp>(op, lhs, rhs);
-            }
-            else if (token.text == "progn") {
-                ByteCode::SharedPtrList exprs(readExprList());
-                return std::make_shared<ProgN>(exprs);
-            }
-            else if (token.text == "block") {
-                ByteCode::SharedPtrList exprs(readExprList());
-                return std::make_shared<Block>(exprs);
-            }
-            else if (token.text == "if") {
-                ByteCode::SharedPtr pred(readExpr());
-                ByteCode::SharedPtr tCode(readExpr());
-                ByteCode::SharedPtr fCode(readExpr());
-                ignoreRightP();
-                return std::make_shared<If>(pred, tCode, fCode);
-            }
-            else if (token.text == "cond") {
-                ByteCode::SharedPtrPairs pairs(readExprPairs());
-                return std::make_shared<Cond>(pairs);
-            }
-            else if (token.text == "break") {
-                ignoreRightP();
-                return std::make_shared<Break>();
-            }
-            else if (token.text == "loop") {
-                ByteCode::SharedPtrList forms(readExprList());
-                if (forms.size() == 4) {
-                    ByteCode::SharedPtrList::iterator iter = forms.begin();
-                    ByteCode::SharedPtr decl(*iter++);
-                    ByteCode::SharedPtr cond(*iter++);
-                    ByteCode::SharedPtr next(*iter++);
-                    ByteCode::SharedPtr body(*iter++);
-                    return std::make_shared<Loop>(decl, cond, next, body);
-                }
-                else if (forms.size() == 2) {
-                    ByteCode::SharedPtrList::iterator iter = forms.begin();
-                    ByteCode::SharedPtr cond(*iter++);
-                    ByteCode::SharedPtr body(*iter++);
-                    return std::make_shared<Loop>(cond, body);
-                }
-                else {
-                    throw InvalidExpression("Too many/few forms in loop");
-                }
-            }
-            else if (token.text == "lambda") {
-                ByteCode::ParamList params(readParams());
-                ByteCode::SharedPtr body(readExpr());
-                ignoreRightP();
-                return std::make_shared<LambdaExpr>(params, body);
-            }
-            else if (token.text == "def") {
-                const std::string name(readName());
-                ByteCode::ParamList params(readParams());
-                ByteCode::SharedPtr body(readExpr());
-                ignoreRightP();
-                return std::make_shared<FunctionExpr>(name, params, body);
-            }
-            else if (token.text == "(") {
-                ByteCode::SharedPtr lambda(readApp("lambda"));
-                ByteCode::SharedPtrList args(readExprList());
-                return std::make_shared<LambdaApp>(lambda, args);
-            }
-            else if (token.text == "istypeof") {
-                ByteCode::SharedPtr form(readExpr());
-                Value::Type type(Value::stringToType(readName()));
-                ignoreRightP();
-                return std::make_shared<IsType>(form, type);
-            }
-            else if (token.text == "print" || token.text == "println") {
-                ByteCode::SharedPtr pExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<Print>(token.text == "println", pExpr);
-            }
-            else if (token.text == "read") {
-                ignoreRightP();
-                return std::make_shared<Read>();
-            }
-            else if (token.text == "struct") {
-                const std::string name(readName());
-                const Struct::MemberList members(readParams());
-                ignoreRightP();
-                return std::make_shared<StructExpr>(name, members);
-            }
-            else if (token.text == "isstructname") {
-                ByteCode::SharedPtr snExpr(readExpr());
-                const std::string name(readName());
-                ignoreRightP();
-                return std::make_shared<IsStructName>(snExpr, name);
-            }
-            else if (token.text == "makeinstance") {
-                const std::string name(readName());
-                ignoreRightP();
-                return std::make_shared<MakeInstance>(name);
-            }
-            else if (token.text == "isinstanceof") {
-                ByteCode::SharedPtr ioExpr(readExpr());
-                const std::string name(readName());
-                ignoreRightP();
-                return std::make_shared<IsInstanceOf>(ioExpr, name);
-            }
-            else if (token.text == "get") {
-                ByteCode::SharedPtr instExpr(readExpr());
-                const std::string name(readName());
-                ignoreRightP();
-                return std::make_shared<GetMember>(instExpr, name);
-            }
-            else if (token.text == "set") {
-                ByteCode::SharedPtr instExpr(readExpr());
-                const std::string name(readName());
-                ByteCode::SharedPtr valueExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<SetMember>(instExpr, name, valueExpr);
-            }
-            else if (token.text == "strlen") {
-                ByteCode::SharedPtr strExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<StringLen>(strExpr);
-            }
-            else if (token.text == "getchar") {
-                ByteCode::SharedPtr strExpr(readExpr());
-                ByteCode::SharedPtr posExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<GetCharAt>(strExpr, posExpr);
-            }
-            else if (token.text == "setchar") {
-                ByteCode::SharedPtr strExpr(readExpr());
-                ByteCode::SharedPtr posExpr(readExpr());
-                ByteCode::SharedPtr valExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<SetCharAt>(strExpr, posExpr, valExpr);
-            }
-            else if (token.text == "strcat") {
-                ByteCode::SharedPtr strExpr(readExpr());
-                ByteCode::SharedPtr otherExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<StringCat>(strExpr, otherExpr);
+            auto iter = appFtns_.find(token.text);
+            if (iter != appFtns_.end()) {
+                return iter->second();
             }
             else {
                 if (token.type == Lexer::Symbol) {
@@ -418,27 +245,367 @@ bool Parser::haveSExpression() const {
 }
 
 // -------------------------------------------------------------
-ArithOp::Type Parser::str2ArithOp(const std::string &token) {
-    ArithOp::Type type(ArithOp::Add);
-    if      (token == "-") { type = ArithOp::Sub; }
-    else if (token == "*") { type = ArithOp::Mul; }
-    else if (token == "/") { type = ArithOp::Div; }
-    else if (token == "%") { type = ArithOp::Mod; }
-    return type;
-}
+void Parser::initAppFtns() {
+    appFtns_ = {
+        { "var",
+          [this]() {
+                const std::string name(readName());
+                ByteCode::SharedPtr code(readExpr());
+                ignoreRightP();
+                return std::make_shared<Define>(name, code);
+          }
+        },
 
-// -------------------------------------------------------------
-CompOp::Type Parser::str2CompOp(const std::string &token) {
-    CompOp::Type type(CompOp::EQ);
-    if      (token == "!=") { type = CompOp::NE; }
-    else if (token == "<")  { type = CompOp::LT; }
-    else if (token == ">")  { type = CompOp::GT; }
-    else if (token == "<=") { type = CompOp::LE; }
-    else if (token == ">=") { type = CompOp::GE; }
-    return type;
-}
+        { "=",
+          [this]() {
+                const std::string name(readName());
+                ByteCode::SharedPtr code(readExpr());
+                ignoreRightP();
+                return std::make_shared<Assign>(name, code);
+          }
+        },
 
-// -------------------------------------------------------------
-LogicOp::Type Parser::str2LogicOp(const std::string &token) {
-    return token == "and" ? LogicOp::Conjunction : LogicOp::Disjunction;
+        { "?",
+          [this]() {
+                const std::string name(readName());
+                ignoreRightP();
+                return std::make_shared<Exists>(name);
+          }
+        },
+
+        { "clone",
+          [this]() {
+                ByteCode::SharedPtr code(readExpr());
+                ignoreRightP();
+                return std::make_shared<Clone>(code);
+          }
+        },
+
+        { "+",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<ArithOp>(ArithOp::Add, lhs, rhs);
+          }
+        },
+
+        { "-",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<ArithOp>(ArithOp::Sub, lhs, rhs);
+          }
+        },
+
+        { "*",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<ArithOp>(ArithOp::Mul, lhs, rhs);
+          }
+        },
+
+        { "/",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<ArithOp>(ArithOp::Div, lhs, rhs);
+          }
+        },
+
+        { "%",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<ArithOp>(ArithOp::Mod, lhs, rhs);
+          }
+        },
+
+        { "==",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<CompOp>(CompOp::EQ, lhs, rhs);
+          }
+        },
+
+        { "!=",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<CompOp>(CompOp::NE, lhs, rhs);
+          }
+        },
+
+        { "<",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<CompOp>(CompOp::LT, lhs, rhs);
+          }
+        },
+
+        { ">",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<CompOp>(CompOp::GT, lhs, rhs);
+          }
+        },
+
+        { "<=",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<CompOp>(CompOp::LE, lhs, rhs);
+          }
+        },
+
+        { ">=",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<CompOp>(CompOp::GE, lhs, rhs);
+          }
+        },
+
+        { "and",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<LogicOp>(LogicOp::Conjunction, lhs, rhs);
+          }
+        },
+
+        { "or",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<LogicOp>(LogicOp::Disjunction, lhs, rhs);
+          }
+        },
+
+        { "progn",
+          [this]() {
+                ByteCode::SharedPtrList exprs(readExprList());
+                return std::make_shared<ProgN>(exprs);
+          }
+        },
+
+        { "block",
+          [this]() {
+                ByteCode::SharedPtrList exprs(readExprList());
+                return std::make_shared<Block>(exprs);
+          }
+        },
+
+        { "if",
+          [this]() {
+                ByteCode::SharedPtr pred(readExpr());
+                ByteCode::SharedPtr tCode(readExpr());
+                ByteCode::SharedPtr fCode(readExpr());
+                ignoreRightP();
+                return std::make_shared<If>(pred, tCode, fCode);
+          }
+        },
+
+        { "cond",
+          [this]() {
+                ByteCode::SharedPtrPairs pairs(readExprPairs());
+                return std::make_shared<Cond>(pairs);
+          }
+        },
+
+        { "break",
+          [this]() {
+                ignoreRightP();
+                return std::make_shared<Break>();
+          }
+        },
+
+        { "loop",
+          [this]() {
+                ByteCode::SharedPtrList forms(readExprList());
+                if (forms.size() == 4) {
+                    ByteCode::SharedPtrList::iterator iter = forms.begin();
+                    ByteCode::SharedPtr decl(*iter++);
+                    ByteCode::SharedPtr cond(*iter++);
+                    ByteCode::SharedPtr next(*iter++);
+                    ByteCode::SharedPtr body(*iter++);
+                    return std::make_shared<Loop>(decl, cond, next, body);
+                }
+                else if (forms.size() == 2) {
+                    ByteCode::SharedPtrList::iterator iter = forms.begin();
+                    ByteCode::SharedPtr cond(*iter++);
+                    ByteCode::SharedPtr body(*iter++);
+                    return std::make_shared<Loop>(cond, body);
+                }
+                else {
+                    throw InvalidExpression("Too many/few forms in loop");
+                }
+          }
+        },
+
+        { "lambda",
+          [this]() {
+                ByteCode::ParamList params(readParams());
+                ByteCode::SharedPtr body(readExpr());
+                ignoreRightP();
+                return std::make_shared<LambdaExpr>(params, body);
+          }
+        },
+
+        { "def",
+          [this]() {
+                const std::string name(readName());
+                ByteCode::ParamList params(readParams());
+                ByteCode::SharedPtr body(readExpr());
+                ignoreRightP();
+                return std::make_shared<FunctionExpr>(name, params, body);
+          }
+        },
+
+        { "(",
+          [this]() {
+                ByteCode::SharedPtr lambda(readApp("lambda"));
+                ByteCode::SharedPtrList args(readExprList());
+                return std::make_shared<LambdaApp>(lambda, args);
+          }
+        },
+
+        { "istypeof",
+          [this]() {
+                ByteCode::SharedPtr form(readExpr());
+                Value::Type type(Value::stringToType(readName()));
+                ignoreRightP();
+                return std::make_shared<IsType>(form, type);
+          }
+        },
+
+        { "print",
+          [this]() {
+                ByteCode::SharedPtr pExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<Print>(false, pExpr);
+          }
+        },
+
+        { "println",
+          [this]() {
+                ByteCode::SharedPtr pExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<Print>(true, pExpr);
+          }
+        },
+
+        { "read",
+          [this]() {
+                ignoreRightP();
+                return std::make_shared<Read>();
+          }
+        },
+
+        { "struct",
+          [this]() {
+                const std::string name(readName());
+                const Struct::MemberList members(readParams());
+                ignoreRightP();
+                return std::make_shared<StructExpr>(name, members);
+          }
+        },
+
+        { "isstructname",
+          [this]() {
+                ByteCode::SharedPtr snExpr(readExpr());
+                const std::string name(readName());
+                ignoreRightP();
+                return std::make_shared<IsStructName>(snExpr, name);
+          }
+        },
+
+        { "makeinstance",
+          [this]() {
+                const std::string name(readName());
+                ignoreRightP();
+                return std::make_shared<MakeInstance>(name);
+          }
+        },
+
+        { "isinstanceof",
+          [this]() {
+                ByteCode::SharedPtr ioExpr(readExpr());
+                const std::string name(readName());
+                ignoreRightP();
+                return std::make_shared<IsInstanceOf>(ioExpr, name);
+          }
+        },
+
+        { "get",
+          [this]() {
+                ByteCode::SharedPtr instExpr(readExpr());
+                const std::string name(readName());
+                ignoreRightP();
+                return std::make_shared<GetMember>(instExpr, name);
+          }
+        },
+
+        { "set",
+          [this]() {
+                ByteCode::SharedPtr instExpr(readExpr());
+                const std::string name(readName());
+                ByteCode::SharedPtr valueExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<SetMember>(instExpr, name, valueExpr);
+          }
+        },
+
+        { "strlen",
+          [this]() {
+                ByteCode::SharedPtr strExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<StringLen>(strExpr);
+          }
+        },
+
+        { "getchar",
+          [this]() {
+                ByteCode::SharedPtr strExpr(readExpr());
+                ByteCode::SharedPtr posExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<GetCharAt>(strExpr, posExpr);
+          }
+        },
+
+        { "setchar",
+          [this]() {
+                ByteCode::SharedPtr strExpr(readExpr());
+                ByteCode::SharedPtr posExpr(readExpr());
+                ByteCode::SharedPtr valExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<SetCharAt>(strExpr, posExpr, valExpr);
+          }
+        },
+
+        { "strcat",
+          [this]() {
+                ByteCode::SharedPtr strExpr(readExpr());
+                ByteCode::SharedPtr otherExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<StringCat>(strExpr, otherExpr);
+          }
+        }
+    };
 }
