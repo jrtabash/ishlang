@@ -3,7 +3,6 @@
 
 #include <string>
 #include <forward_list>
-#include <istream>
 
 namespace Int {
 
@@ -19,8 +18,6 @@ namespace Int {
         static bool isEqual(double lhs, double rhs);
 
     public:
-        static std::string nextToken(std::istream &is);
-
         static std::string nextToken(const std::string &str, size_t &pos);
         static size_t tokenize(const std::string &str, TokenList &tokens);
 

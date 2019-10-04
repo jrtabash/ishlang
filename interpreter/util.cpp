@@ -15,55 +15,6 @@ bool Util::isZero(double val) { return std::fabs(val) <= RealThreshold; }
 bool Util::isEqual(double lhs, double rhs) { return std::fabs(lhs - rhs) <= RealThreshold; }
 
 // -------------------------------------------------------------
-std::string nextToken(std::istream &is) {
-    std::string token;
-    while (is.good()) {
-        const char c = static_cast<char>(is.peek());
-        if (isspace(c)) {
-            if (!token.empty()) {
-                is.get();
-                break;
-            }
-            else { continue; }
-        }
-        else if (c == '\'') {
-            if (token.empty()) {
-                token += static_cast<char>(is.get());
-                token += static_cast<char>(is.get());
-                if (!is.good() || static_cast<char>(is.peek()) != '\'') {
-                    throw InvalidExpression("character closing tick expected");
-                }
-                token += static_cast<char>(is.get());
-            }
-            break;
-        }
-        else if (c == '"') {
-            if (token.empty()) {
-                token += static_cast<char>(is.get());
-                while (is.good() && static_cast<char>(is.peek()) != '"') {
-                    token += static_cast<char>(is.get());
-                }
-                if (!is.good()) {
-                    throw InvalidExpression("incomplete string");
-                }
-                token += static_cast<char>(is.get());
-            }
-            break;
-        }
-        else if (c == '(' || c == ')') {
-            if (token.empty()) {
-                token += static_cast<char>(is.get());
-            }
-            break;
-        }
-        else {
-            token += static_cast<char>(is.get());
-        }
-    }
-    return token;
-}
-
-// -------------------------------------------------------------
 std::string Util::nextToken(const std::string &str, size_t &pos) {
     std::string token;
     for (; pos < str.size(); ++pos) {
