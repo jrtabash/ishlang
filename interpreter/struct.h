@@ -9,7 +9,7 @@ namespace Int {
 
     class Struct {
     public:
-        typedef std::vector<std::string> MemberList;
+        using MemberList = std::vector<std::string>;
 
         Struct();
         Struct(const std::string &name, const MemberList &members);

@@ -13,7 +13,7 @@ namespace Int {
 
     class Parser {
     public:
-        typedef std::function<void (ByteCode::SharedPtr &code)> CallBack;
+        using CallBack = std::function<void (ByteCode::SharedPtr &code)>;
 
     public:
         Parser();

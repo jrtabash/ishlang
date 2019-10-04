@@ -13,8 +13,8 @@ namespace Int {
 
     class Lambda {
     public:
-        typedef std::vector<std::string> ParamList;
-        typedef std::vector<Value>       ArgList;
+        using ParamList = std::vector<std::string>;
+        using ArgList   = std::vector<Value>;
 
     public:
         Lambda();

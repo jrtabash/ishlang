@@ -18,8 +18,8 @@ namespace Int {
 
     class UnitTest {
     public:
-        typedef std::function<void ()>          Function;
-        typedef std::map<std::string, Function> Tests;
+        using Function = std::function<void ()>;
+        using Tests    = std::map<std::string, Function>;
         
     public:
         UnitTest();

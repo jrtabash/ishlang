@@ -12,7 +12,7 @@ namespace Int {
 
     class Instance {
     public:
-        typedef std::unordered_map<std::string, Value> MemberTable;
+        using MemberTable = std::unordered_map<std::string, Value>;
 
         Instance();
         Instance(const Struct &type);

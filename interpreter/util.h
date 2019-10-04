@@ -12,7 +12,7 @@ namespace Int {
         static const double RealThreshold;
 
     public:
-        typedef std::forward_list<std::string> TokenList;
+        using TokenList = std::forward_list<std::string>;
 
     public:
         static bool isZero(double val);

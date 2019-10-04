@@ -13,11 +13,11 @@ namespace Int {
     // -------------------------------------------------------------
     class ByteCode {
     public:
-        typedef std::shared_ptr<ByteCode>       SharedPtr;
-        typedef std::vector<SharedPtr>          SharedPtrList;
-        typedef std::pair<SharedPtr, SharedPtr> SharedPtrPair;
-        typedef std::vector<SharedPtrPair>      SharedPtrPairs;
-        typedef std::vector<std::string>        ParamList;
+        using SharedPtr      = std::shared_ptr<ByteCode>;
+        using SharedPtrList  = std::vector<SharedPtr>;
+        using SharedPtrPair  = std::pair<SharedPtr, SharedPtr>;
+        using SharedPtrPairs = std::vector<SharedPtrPair>;
+        using ParamList      = std::vector<std::string>;
         
     public:
         ByteCode() {}

@@ -12,7 +12,7 @@ namespace Int {
     
     class Environment {
     public:
-        typedef std::shared_ptr<Environment> SharedPtr;
+        using SharedPtr = std::shared_ptr<Environment>;
         
     public:
         Environment(SharedPtr parent=SharedPtr());
