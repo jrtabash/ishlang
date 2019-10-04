@@ -3,5 +3,5 @@
       1
     (* n (fact (- n 1)))))
 
-(print "Factory of 5: ")
+(print "Factorial of 5: ")
 (println (fact 5))
