@@ -65,6 +65,7 @@ namespace Int {
         void testByteCodeCharAt();
         void testByteCodeSetCharAt();
         void testByteCodeStringCat();
+        void testByteCodeSubString();
         void testParserBasic();
         void testParserIsType();
         void testParserVar();
@@ -84,6 +85,7 @@ namespace Int {
         void testParserGetChar();
         void testParserSetChar();
         void testParserStringCat();
+        void testParserSubString();
         
     private:
         bool  success_;

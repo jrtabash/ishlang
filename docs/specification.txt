@@ -273,9 +273,13 @@ setchar: set character at position
 strcat: Concatenate string or character to string
         (strcat <string> <other>)
 
+substr: Return substring from given string
+        (substr <string> <position> [<length>]
+
 Examples:
   (var str "Hello!")
   (println (strlen str))
   (println (getchar str 3))
   (setchar str 5 ' ')
   (strcat str "World!")
+  (println (substr str 0 5))

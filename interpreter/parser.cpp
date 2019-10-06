@@ -606,6 +606,21 @@ void Parser::initAppFtns() {
                 ignoreRightP();
                 return std::make_shared<StringCat>(strExpr, otherExpr);
           }
+        },
+
+        { "substr",
+          [this]() {
+                ByteCode::SharedPtrList exprs(readExprList());
+                if (exprs.size() == 2) {
+                    return std::make_shared<SubString>(exprs[0], exprs[1]);
+                }
+                else if (exprs.size() == 3) {
+                    return std::make_shared<SubString>(exprs[0], exprs[1], exprs[2]);
+                }
+                else {
+                    throw InvalidExpression("Too many/few arguments to substr");
+                }
+          }
         }
     };
 }

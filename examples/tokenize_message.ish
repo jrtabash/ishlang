@@ -1,0 +1,40 @@
+(struct TokenizerState
+  (string
+   length
+   position))
+
+(def makeTokenizerState (str)
+  (var state (makeinstance TokenizerState))
+  (set state string str)
+  (set state length (strlen str))
+  (set state position 0)
+  state)
+
+(def findNextSpace (tokState)
+  (var ret -1)
+  (var str (get tokState string))
+  (loop (var i (get tokState position)) (< i (get tokState length)) (= i (+ i 1))
+   (cond
+    ((== (getchar str i) ' ')
+     (progn
+      (= ret i)
+      (break)))))
+  (if (> ret 0)
+      ret
+    (get tokState length)))
+
+(def nextToken (tokState)
+  (var nextPos (findNextSpace tokState))
+  (var pos (get tokState position))
+  (var token (substr (get tokState string) pos (- nextPos pos)))
+  (set tokState position (+ nextPos 1))
+  token)
+
+(var message "This is a message")
+(print "Tokenizing '")
+(print message)
+(println "'")
+
+(var tokState (makeTokenizerState message))
+(loop (< (get tokState position) (get tokState length))
+  (println (nextToken tokState))))

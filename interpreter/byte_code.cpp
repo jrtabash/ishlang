@@ -534,3 +534,54 @@ Value StringCat::exec(Environment::SharedPtr env) {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+SubString::SubString(ByteCode::SharedPtr str, ByteCode::SharedPtr pos)
+    : ByteCode()
+    , str_(str)
+    , pos_(pos)
+    , len_()
+{
+}
+
+SubString::SubString(ByteCode::SharedPtr str, ByteCode::SharedPtr pos, ByteCode::SharedPtr len)
+    : ByteCode()
+    , str_(str)
+    , pos_(pos)
+    , len_(len)
+{
+}
+
+Value SubString::exec(Environment::SharedPtr env) {
+    if (str_.get() && pos_.get()) {
+        Value str = str_->exec(env);
+        Value pos = pos_->exec(env);
+
+        if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
+        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
+
+        const auto &rawStr = str.text();
+
+        const auto rawPos = pos.integer();
+        if (rawPos < 0 || rawPos >= rawStr.size()) {
+            throw OutOfRange("substring position access");
+        }
+
+        if (len_) {
+            Value len = len_->exec(env);
+
+            if (!len.isInt()) { throw InvalidOperandType("Integer", len.typeToString()); }
+
+            const auto rawLen = len.integer();
+            if (rawLen < 0 || rawLen > rawStr.size()) {
+                throw OutOfRange("substring length access");
+            }
+
+            return Value(rawStr.substr(rawPos, len.integer()));
+        }
+        else {
+            return Value(rawStr.substr(rawPos));
+        }
+    }
+    return Value::Null;
+}

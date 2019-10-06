@@ -45,6 +45,7 @@ UnitTest::UnitTest()
     ADD_TEST(testByteCodeIsInstanceOf);
     ADD_TEST(testByteCodeGetSetMember);
     ADD_TEST(testByteCodeStringCat);
+    ADD_TEST(testByteCodeSubString);
     ADD_TEST(testTokenType);
     ADD_TEST(testByteCodeStringLen);
     ADD_TEST(testByteCodeCharAt);
@@ -68,6 +69,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserGetChar);
     ADD_TEST(testParserSetChar);
     ADD_TEST(testParserStringCat);
+    ADD_TEST(testParserSubString);
 }
 #undef ADD_TEST
 
@@ -1780,6 +1782,72 @@ void UnitTest::testByteCodeStringCat() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testByteCodeSubString() {
+    Environment::SharedPtr env(new Environment());
+    env->def("str", Value("0123456789"));
+
+    ByteCode::SharedPtr var = std::make_shared<Variable>("str");
+    ByteCode::SharedPtr minus1 = std::make_shared<Literal>(Value(-1ll));
+    ByteCode::SharedPtr zero = std::make_shared<Literal>(Value::Zero);
+    ByteCode::SharedPtr three = std::make_shared<Literal>(Value(3ll));
+    ByteCode::SharedPtr four = std::make_shared<Literal>(Value(4ll));
+    ByteCode::SharedPtr five = std::make_shared<Literal>(Value(5ll));
+    ByteCode::SharedPtr ten = std::make_shared<Literal>(Value(10ll));
+    ByteCode::SharedPtr eleven = std::make_shared<Literal>(Value(11ll));
+
+    Value value = std::make_shared<SubString>(var, zero)->exec(env);
+    TEST_CASE_MSG(value == Value("0123456789"), "actual=" << value);
+
+    value = std::make_shared<SubString>(var, five)->exec(env);
+    TEST_CASE_MSG(value == Value("56789"), "actual=" << value);
+
+    value = std::make_shared<SubString>(var, zero, ten)->exec(env);
+    TEST_CASE_MSG(value == Value("0123456789"), "actual=" << value);
+
+    value = std::make_shared<SubString>(var, zero, five)->exec(env);
+    TEST_CASE_MSG(value == Value("01234"), "actual=" << value);
+
+    value = std::make_shared<SubString>(var, four, three)->exec(env);
+    TEST_CASE_MSG(value == Value("456"), "actual=" << value);
+
+    try {
+        std::make_shared<SubString>(var, minus1)->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<SubString>(var, ten)->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<SubString>(var, zero, minus1)->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<SubString>(var, zero, eleven)->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -2140,4 +2208,23 @@ void UnitTest::testParserStringCat() {
     TEST_CASE(parserTest(parser, env, "(strcat str 5)",       Value::Null,        false));
 
     TEST_CASE(parserTest(parser, env, "str", Value("abcdefghi"), true));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserSubString() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("str", Value("0123456789"));
+
+    TEST_CASE(parserTest(parser, env, "(substr str 0)",    Value("0123456789"), true));
+    TEST_CASE(parserTest(parser, env, "(substr str 5)",    Value("56789"),      true));
+    TEST_CASE(parserTest(parser, env, "(substr str 0 10)", Value("0123456789"), true));
+    TEST_CASE(parserTest(parser, env, "(substr str 0 5)",  Value("01234"),      true));
+    TEST_CASE(parserTest(parser, env, "(substr str 5 5)",  Value("56789"),      true));
+    TEST_CASE(parserTest(parser, env, "(substr str 3 5)",  Value("34567"),      true));
+    TEST_CASE(parserTest(parser, env, "(sbustr str -1)",   Value::Null,         false));
+    TEST_CASE(parserTest(parser, env, "(sbustr str 11)",   Value::Null,         false));
+    TEST_CASE(parserTest(parser, env, "(sbustr str 0 -1)", Value::Null,         false));
+    TEST_CASE(parserTest(parser, env, "(sbustr str 0 10)", Value::Null,         false));
 }

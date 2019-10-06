@@ -470,6 +470,21 @@ namespace Int {
         ByteCode::SharedPtr str_;
         ByteCode::SharedPtr other_;
     };
+
+    // -------------------------------------------------------------
+    class SubString : public ByteCode {
+    public:
+        SubString(ByteCode::SharedPtr str, ByteCode::SharedPtr pos);
+        SubString(ByteCode::SharedPtr str, ByteCode::SharedPtr pos, ByteCode::SharedPtr len);
+        virtual ~SubString() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr str_;
+        ByteCode::SharedPtr pos_;
+        ByteCode::SharedPtr len_;
+    };
 }
 
 #endif	// BYTE_CODE_H

@@ -6,7 +6,6 @@
   - Hash table
 
 * Add string functions:
-  - Substring
   - find
 
 * Rework 'break' implementation to avoid using Break::Except
