@@ -6,19 +6,17 @@
   (isinstanceof p Person))
 
 (def makePerson (newName newAge)
-  (progn
-    (var newPerson (makeinstance Person))
-    (set newPerson name newName)
-    (set newPerson age newAge)
-    newPerson))
+  (var newPerson (makeinstance Person))
+  (set newPerson name newName)
+  (set newPerson age newAge)
+  newPerson)
 
 (def printPerson (p)
-  (progn
-    (print "[Person: name='")
-    (print (get person name))
-    (print "' age=")
-    (print (get person age))
-    (println "]")))
+  (print "[Person: name='")
+  (print (get person name))
+  (print "' age=")
+  (print (get person age))
+  (println "]"))
 
 (var person (makePerson "Jon" 31))
 (printPerson person)

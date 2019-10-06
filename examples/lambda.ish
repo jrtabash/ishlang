@@ -1,0 +1,13 @@
+(def test (name ftn arg)
+  (print (strcat (clone name) ": "))
+  (println (ftn arg)))
+
+(var mul2 (lambda (x) (* 2 x)))
+
+(var myftn (lambda (x)
+  (var z (+ x 3))
+  (* 2 z)))
+
+(test "mul2(10)" mul2 10)
+(test "myftn(2)" myftn 2)
+(test "lambda(4)" (lambda (x) (+ x 1)) 4)

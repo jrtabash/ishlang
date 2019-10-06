@@ -462,8 +462,8 @@ void Parser::initAppFtns() {
         { "lambda",
           [this]() {
                 ByteCode::ParamList params(readParams());
-                ByteCode::SharedPtr body(readExpr());
-                ignoreRightP();
+                ByteCode::SharedPtrList exprs(readExprList());
+                ByteCode::SharedPtr body(exprs.size() == 1 ? exprs[0] : std::make_shared<ProgN>(exprs));
                 return std::make_shared<LambdaExpr>(params, body);
           }
         },
@@ -472,8 +472,8 @@ void Parser::initAppFtns() {
           [this]() {
                 const std::string name(readName());
                 ByteCode::ParamList params(readParams());
-                ByteCode::SharedPtr body(readExpr());
-                ignoreRightP();
+                ByteCode::SharedPtrList exprs(readExprList());
+                ByteCode::SharedPtr body(exprs.size() == 1 ? exprs[0] : std::make_shared<ProgN>(exprs));
                 return std::make_shared<FunctionExpr>(name, params, body);
           }
         },

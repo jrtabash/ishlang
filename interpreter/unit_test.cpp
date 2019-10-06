@@ -2030,9 +2030,9 @@ void UnitTest::testParserFtn() {
     TEST_CASE(parserTest(parser, env, "(block (var x 3) (var y 2) (def sum () (+ x y)) (block (var x 4) (var y 5) (sum)))", Value(5ll),  true));
     TEST_CASE(parserTest(parser, env, "(block (def inc (x) (+ x 1)) (def add3 (x) (inc (inc (inc x)))) (add3 5))",          Value(8ll),  true));
 
-    TEST_CASE(parserTest(parser, env, "(progn (def add3 (x) (progn (def inc (y) (+ y 1)) (inc (inc (inc x))))) (add3 4))",  Value(7ll),  true));
-    TEST_CASE(parserTest(parser, env, "(add3 1)",                                                                           Value(4ll),  true));
-    TEST_CASE(parserTest(parser, env, "(inc 2)",                                                                            Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(progn (def add3 (x) (def inc (y) (+ y 1)) (inc (inc (inc x)))) (add3 4))",  Value(7ll),  true));
+    TEST_CASE(parserTest(parser, env, "(add3 1)",                                                                   Value(4ll),  true));
+    TEST_CASE(parserTest(parser, env, "(inc 2)",                                                                    Value::Null, false));
 }
 
 // -------------------------------------------------------------

@@ -1,8 +1,7 @@
 (def cels (f)
-  (progn
-    (var c (- f 32))
-    (= c (* c 5))
-    (/ c 9)))
+  (var c (- f 32))
+  (= c (* c 5))
+  (/ c 9))
 
 (print "Enter Fahrenheit: ")
 (var f (read))

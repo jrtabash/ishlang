@@ -156,7 +156,7 @@ Functions
 ---------
 User defined functions:
   (def <name> <param_list>
-    <expression>)
+    <body>)
 
 Functions can be nested, i.e defined inside other functions.
 
@@ -170,23 +170,16 @@ Example:
     (+ x y))
 
   (def foobar (x y)
-    (progn
-      (var z (+ x y))
-      (if (> z 10)
-          (/ z 2)
-        z)))
-
-  Note that body function is a single expression, so must use progn to make a multi-expression
-  function body.
+    (var z (+ x y))
+    (if (> z 10)
+        (/ z 2)
+      z)))
 
 Lambda
 ------
 The lambda expression defines a closure.
   (lambda <param_list>
-    <expression>)
-
-  Same as functions, lambda body is a single expression, so to create a multi-expression
-  lambda, must use progn.
+    <body>)
 
   The closure environment is the enclosing environment where the lambda is defined.
 

@@ -1,24 +1,22 @@
 (def incrementN (x n)
-  (progn
-    (def add1 (x)
-      (+ x 1))
+  (def add1 (x)
+    (+ x 1))
 
-    (var sum x)
-    (loop (var i 0) (< i n) (= i (+ i 1))
-      (= sum (add1 sum)))
-    sum))
+  (var sum x)
+  (loop (var i 0) (< i n) (= i (+ i 1))
+    (= sum (add1 sum)))
+  sum)
 
 (def incrementN2 (x n)
-  (progn
-   (var sum x)
+ (var sum x)
 
-   (def inc ()
-     (= sum (+ sum 1)))
+ (def inc ()
+   (= sum (+ sum 1)))
 
-   (loop (var i 0) (< i n) (= i (+ i 1))
-     (inc))
+ (loop (var i 0) (< i n) (= i (+ i 1))
+   (inc))
 
-   sum))
+ sum)
 
 (print "incrementN(10, 5): ")
 (println (incrementN 10 5))
