@@ -556,9 +556,11 @@ Value SubString::exec(Environment::SharedPtr env) {
     if (str_.get() && pos_.get()) {
         Value str = str_->exec(env);
         Value pos = pos_->exec(env);
+        Value len = len_ ? len_->exec(env) : Value::Zero;
 
         if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
         if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
+        if (!len.isInt()) { throw InvalidOperandType("Integer", len.typeToString()); }
 
         const auto &rawStr = str.text();
 
@@ -567,21 +569,12 @@ Value SubString::exec(Environment::SharedPtr env) {
             throw OutOfRange("substring position access");
         }
 
-        if (len_) {
-            Value len = len_->exec(env);
-
-            if (!len.isInt()) { throw InvalidOperandType("Integer", len.typeToString()); }
-
-            const auto rawLen = len.integer();
-            if (rawLen < 0 || rawLen > rawStr.size()) {
-                throw OutOfRange("substring length access");
-            }
-
-            return Value(rawStr.substr(rawPos, len.integer()));
+        const auto rawLen = (len_ ? len.integer() : Value::Long(rawStr.size()));
+        if (rawLen < 0 || rawLen > rawStr.size()) {
+            throw OutOfRange("substring length access");
         }
-        else {
-            return Value(rawStr.substr(rawPos));
-        }
+
+        return Value(rawStr.substr(rawPos, rawLen));
     }
     return Value::Null;
 }
