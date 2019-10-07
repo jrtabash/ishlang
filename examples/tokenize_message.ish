@@ -14,11 +14,10 @@
   (var ret -1)
   (var str (get tokState string))
   (loop (var i (get tokState position)) (< i (get tokState length)) (= i (+ i 1))
-   (cond
-    ((== (getchar str i) ' ')
-     (progn
-      (= ret i)
-      (break)))))
+    (if (== (getchar str i) ' ')
+        (progn
+         (= ret i)
+         (break))))
   (if (> ret 0)
       ret
     (get tokState length)))

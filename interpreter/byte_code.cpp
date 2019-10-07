@@ -152,6 +152,13 @@ Value Block::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+If::If(ByteCode::SharedPtr pred, ByteCode::SharedPtr tCode)
+    : ByteCode()
+    , pred_(pred)
+    , tCode_(tCode)
+    , fCode_()
+{}
+
 If::If(ByteCode::SharedPtr pred, ByteCode::SharedPtr tCode, ByteCode::SharedPtr fCode)
     : ByteCode()
     , pred_(pred)

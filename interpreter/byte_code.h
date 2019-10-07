@@ -216,6 +216,7 @@ namespace Int {
     // -------------------------------------------------------------
     class If : public ByteCode {
     public:
+        If(ByteCode::SharedPtr pred, ByteCode::SharedPtr tCode);
         If(ByteCode::SharedPtr pred, ByteCode::SharedPtr tCode, ByteCode::SharedPtr fCode);
         virtual ~If() {}
         

@@ -1,9 +1,8 @@
 (def countSpaces (str)
  (var count 0)
  (loop (var i 0) (< i (strlen str)) (= i (+ i 1))
-   (cond
-    ((== (getchar str i) ' ')
-     (= count (+ count 1)))))
+   (if (== (getchar str i) ' ')
+       (= count (+ count 1))))
  count)
 
 (var s "Test char at op on str")

@@ -1159,8 +1159,17 @@ void UnitTest::testByteCodeCond() {
             ByteCode::SharedPtr iLit1(new Literal(Value(1ll)));
             ByteCode::SharedPtr iLit2(new Literal(Value(2ll)));
 
-            ByteCode::SharedPtr cond(new If(bLitT, iLit1, iLit2));
+            ByteCode::SharedPtr cond(new If(bLitT, iLit1));
             Value result = cond->eval(env);
+            TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+            TEST_CASE_MSG(result.integer() == 1ll, "actual=" << result);
+
+            cond.reset(new If(bLitF, iLit1));
+            result = cond->eval(env);
+            TEST_CASE_MSG(result.isNull(), "actual=" << result.typeToString());
+
+            cond.reset(new If(bLitT, iLit1, iLit2));
+            result = cond->eval(env);
             TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
             TEST_CASE_MSG(result.integer() == 1ll, "actual=" << result);
 
@@ -2048,6 +2057,8 @@ void UnitTest::testParserCond() {
     Environment::SharedPtr env(new Environment());
     Parser parser;
 
+    TEST_CASE(parserTest(parser, env, "(if true 1)",                   Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(if false 1)",                  Value::Null, true));
     TEST_CASE(parserTest(parser, env, "(if true 1 2)",                 Value(1ll),  true));
     TEST_CASE(parserTest(parser, env, "(if false 1 2)",                Value(2ll),  true));
     TEST_CASE(parserTest(parser, env, "(if (== 1 1) (+ 1 1) (+ 2 2))", Value(2ll),  true));

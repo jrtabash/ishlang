@@ -414,11 +414,16 @@ void Parser::initAppFtns() {
 
         { "if",
           [this]() {
-                ByteCode::SharedPtr pred(readExpr());
-                ByteCode::SharedPtr tCode(readExpr());
-                ByteCode::SharedPtr fCode(readExpr());
-                ignoreRightP();
-                return std::make_shared<If>(pred, tCode, fCode);
+                ByteCode::SharedPtrList exprs(readExprList());
+                if (exprs.size() == 2) {
+                    return std::make_shared<If>(exprs[0], exprs[1]);
+                }
+                else if (exprs.size() == 3) {
+                    return std::make_shared<If>(exprs[0], exprs[1], exprs[2]);
+                }
+                else {
+                    throw InvalidExpression("Too many/few forms in if");
+                }
           }
         },
 

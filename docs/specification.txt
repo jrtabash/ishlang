@@ -74,7 +74,7 @@ Examples:
 
 If Statement
 ------------
-(if <condition_expression> <true_expression> <false_expression>)
+(if <condition_expression> <true_expression> [<false_expression>])
 
 Example:
   (if (> x 0) 1 0)
