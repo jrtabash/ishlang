@@ -603,3 +603,43 @@ Value SubString::exec(Environment::SharedPtr env) {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+StringFind::StringFind(ByteCode::SharedPtr str, ByteCode::SharedPtr chr)
+    : ByteCode()
+    , str_(str)
+    , chr_(chr)
+    , pos_()
+{
+}
+
+StringFind::StringFind(ByteCode::SharedPtr str, ByteCode::SharedPtr chr, ByteCode::SharedPtr pos)
+    : ByteCode()
+    , str_(str)
+    , chr_(chr)
+    , pos_(pos)
+{
+}
+
+Value StringFind::exec(Environment::SharedPtr env) {
+    if (str_.get() && chr_.get()) {
+        Value str = str_->exec(env);
+        Value chr = chr_->exec(env);
+        Value pos = pos_ ? pos_->exec(env) : Value::Zero;
+
+        if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
+        if (!chr.isChar()) { throw InvalidOperandType("Character", chr.typeToString()); }
+        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
+
+        const auto &rawStr = str.text();
+
+        const auto rawPos = pos.integer();
+        if (rawPos < 0 || rawPos >= rawStr.size()) {
+            throw OutOfRange("strfind position access");
+        }
+
+        auto result = rawStr.find(chr.character(), rawPos);
+        return result != std::string::npos ? Value(Value::Long(result)) : Value(-1ll);
+    }
+    return Value::Null;
+}

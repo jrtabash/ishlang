@@ -634,6 +634,21 @@ void Parser::initAppFtns() {
                     throw InvalidExpression("Too many/few arguments to substr");
                 }
           }
+        },
+
+        { "strfind",
+          [this]() {
+                ByteCode::SharedPtrList exprs(readExprList());
+                if (exprs.size() == 2) {
+                    return std::make_shared<StringFind>(exprs[0], exprs[1]);
+                }
+                else if (exprs.size() == 3) {
+                    return std::make_shared<StringFind>(exprs[0], exprs[1], exprs[2]);
+                }
+                else {
+                    throw InvalidExpression("Too many/few arguments to strfind");
+                }
+          }
         }
     };
 }

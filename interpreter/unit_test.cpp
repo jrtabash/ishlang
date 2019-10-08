@@ -47,6 +47,7 @@ UnitTest::UnitTest()
     ADD_TEST(testByteCodeGetSetMember);
     ADD_TEST(testByteCodeStringCat);
     ADD_TEST(testByteCodeSubString);
+    ADD_TEST(testByteCodeStringFind);
     ADD_TEST(testTokenType);
     ADD_TEST(testByteCodeStringLen);
     ADD_TEST(testByteCodeCharAt);
@@ -71,6 +72,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserSetChar);
     ADD_TEST(testParserStringCat);
     ADD_TEST(testParserSubString);
+    ADD_TEST(testParserStringFind);
 }
 #undef ADD_TEST
 
@@ -1123,7 +1125,7 @@ void UnitTest::testByteCodeNot() {
             ->exec(env);
         TEST_CASE(false);
     }
-    catch (InvalidOperandType const &) {}
+    catch (const InvalidOperandType &) {}
     catch (...) {
         TEST_CASE(false);
     }
@@ -1657,7 +1659,7 @@ void UnitTest::testByteCodeStringLen() {
             ->exec(env);
         TEST_CASE(false);
     }
-    catch (InvalidOperandType const &) {}
+    catch (const InvalidOperandType &) {}
     catch (...) { TEST_CASE(false); }
 }
 
@@ -1812,7 +1814,7 @@ void UnitTest::testByteCodeStringCat() {
             ->exec(env);
         TEST_CASE(false);
     }
-    catch (InvalidOperandType const &) {}
+    catch (const InvalidOperandType &) {}
     catch (...) { TEST_CASE(false); }
 
     value = var->exec(env);
@@ -1880,6 +1882,78 @@ void UnitTest::testByteCodeSubString() {
         TEST_CASE(false);
     }
     catch (OutOfRange const &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testByteCodeStringFind() {
+    Environment::SharedPtr env(new Environment());
+    env->def("str", Value("0123456789"));
+
+    ByteCode::SharedPtr var = std::make_shared<Variable>("str");
+
+    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
+    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
+    auto find = [env, var, clit, ilit](Value::Char c, std::optional<Value::Long> i = std::nullopt) {
+        return (i
+                ? std::make_shared<StringFind>(var, clit(c), ilit(*i))
+                : std::make_shared<StringFind>(var, clit(c)));
+    };
+
+    Value value;
+
+    value = find('0')->exec(env); TEST_CASE_MSG(value == Value::Zero, "actual=" << value);
+    value = find('5')->exec(env); TEST_CASE_MSG(value == Value(5ll),  "actual=" << value);
+    value = find('9')->exec(env); TEST_CASE_MSG(value == Value(9ll),  "actual=" << value);
+
+    value = find('0', 0)->exec(env); TEST_CASE_MSG(value == Value::Zero, "actual=" << value);
+    value = find('5', 0)->exec(env); TEST_CASE_MSG(value == Value(5ll),  "actual=" << value);
+    value = find('9', 0)->exec(env); TEST_CASE_MSG(value == Value(9ll),  "actual=" << value);
+
+    value = find('5', 3)->exec(env); TEST_CASE_MSG(value == Value(5ll), "actual=" << value);
+    value = find('8', 6)->exec(env); TEST_CASE_MSG(value == Value(8ll), "actual=" << value);
+    value = find('9', 9)->exec(env); TEST_CASE_MSG(value == Value(9ll), "actual=" << value);
+
+    value = find('0', 1)->exec(env); TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
+    value = find('5', 6)->exec(env); TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
+
+    value = find('A', 0)->exec(env); TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
+    value = find('B', 5)->exec(env); TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
+
+    try {
+        std::make_shared<StringFind>(var, ilit(0))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<StringFind>(var, clit('0'), clit('0'))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<StringFind>(var, clit('0'), ilit(10))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (const OutOfRange &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<StringFind>(var, clit('0'), ilit(-1))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (const OutOfRange &) {}
     catch (...) {
         TEST_CASE(false);
     }
@@ -2279,4 +2353,24 @@ void UnitTest::testParserSubString() {
     TEST_CASE(parserTest(parser, env, "(sbustr str 11)",   Value::Null,         false));
     TEST_CASE(parserTest(parser, env, "(sbustr str 0 -1)", Value::Null,         false));
     TEST_CASE(parserTest(parser, env, "(sbustr str 0 10)", Value::Null,         false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserStringFind() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("str", Value("0123456789"));
+
+    TEST_CASE(parserTest(parser, env, "(strfind str '0')",     Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(strfind str '4')",     Value(4ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strfind str '9')",     Value(9ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strfind str '0' 0)",   Value(0ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strfind str '4' 0)",   Value(4ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strfind str '9' 0)",   Value(9ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strfind str '4' 2)",   Value(4ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strfind str '9' 6)",   Value(9ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strfind str 'A')",     Value(-1ll), true));
+    TEST_CASE(parserTest(parser, env, "(strfind str 1)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strfind str '0' '0')", Value::Null, false));
 }

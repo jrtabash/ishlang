@@ -5,9 +5,6 @@
   - Array
   - Hash table
 
-* Add string functions:
-  - find
-
 * Rework 'break' implementation to avoid using Break::Except
 
 * Add support for comments

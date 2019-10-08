@@ -498,6 +498,21 @@ namespace Int {
         ByteCode::SharedPtr pos_;
         ByteCode::SharedPtr len_;
     };
+
+    // -------------------------------------------------------------
+    class StringFind : public ByteCode {
+    public:
+        StringFind(ByteCode::SharedPtr str, ByteCode::SharedPtr chr);
+        StringFind(ByteCode::SharedPtr str, ByteCode::SharedPtr chr, ByteCode::SharedPtr pos);
+        virtual ~StringFind() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr str_;
+        ByteCode::SharedPtr chr_;
+        ByteCode::SharedPtr pos_;
+    };
 }
 
 #endif	// BYTE_CODE_H

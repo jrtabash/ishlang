@@ -280,6 +280,9 @@ strcat: Concatenate string or character to string
 substr: Return substring from given string
         (substr <string> <position> [<length>]
 
+strfind: Find position of character in string
+         (strfind <string> <character> [<position>])
+
 Examples:
   (var str "Hello!")
   (println (strlen str))
@@ -287,3 +290,4 @@ Examples:
   (setchar str 5 ' ')
   (strcat str "World!")
   (println (substr str 0 5))
+  (println (strfind str 'W'))

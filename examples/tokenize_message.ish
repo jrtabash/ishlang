@@ -10,22 +10,13 @@
   (set state position 0)
   state)
 
-(def findNextSpace (tokState)
-  (var ret -1)
-  (var str (get tokState string))
-  (loop (var i (get tokState position)) (< i (get tokState length)) (= i (+ i 1))
-    (if (== (getchar str i) ' ')
-        (progn
-         (= ret i)
-         (break))))
-  (if (> ret 0)
-      ret
-    (get tokState length)))
-
 (def nextToken (tokState)
-  (var nextPos (findNextSpace tokState))
+  (var str (get tokState string))
   (var pos (get tokState position))
-  (var token (substr (get tokState string) pos (- nextPos pos)))
+  (var nextPos (strfind str ' ' pos))
+  (if (== nextPos -1)
+    (= nextPos (get tokState length)))
+  (var token (substr str pos (- nextPos pos)))
   (set tokState position (+ nextPos 1))
   token)
 
