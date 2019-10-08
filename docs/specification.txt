@@ -65,12 +65,16 @@ Examples:
 
 Logical
 -------
-Supported operations: == != < > <= >= and or
+Binary operations: == != < > <= >= and or
   (op <expression> <expression>)
+
+Unary operation:
+  (not <expression>)
 
 Examples:
   (== x y)
   (or (== x y) (> y 10))
+  (not true)
 
 If Statement
 ------------

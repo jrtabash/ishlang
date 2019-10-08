@@ -125,6 +125,24 @@ Value LogicOp::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+Not::Not(ByteCode::SharedPtr operand)
+    : ByteCode()
+    , operand_(operand)
+{
+}
+
+Value Not::exec(Environment::SharedPtr env) {
+    if (operand_.get()) {
+        Value operand = operand_->exec(env);
+
+        if (!operand.isBool()) { throw InvalidOperandType("Boolean", operand.typeToString()); }
+
+        return !operand.boolean();
+    }
+    return Value::False;
+}
+
+// -------------------------------------------------------------
 ProgN::ProgN(ByteCode::SharedPtrList exprs)
     : ByteCode()
     , exprs_(exprs)

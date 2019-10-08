@@ -49,6 +49,7 @@ namespace Int {
         void testByteCodeArithOp();
         void testByteCodeCompOp();
         void testByteCodeLogicOp();
+        void testByteCodeNot();
         void testByteCodeSequence();
         void testByteCodeCond();
         void testByteCodeLoop();
@@ -72,6 +73,7 @@ namespace Int {
         void testParserArith();
         void testParserComp();
         void testParserLogic();
+        void testParserNot();
         void testParserBlock();
         void testParserCond();
         void testParserLoop();

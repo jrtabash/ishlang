@@ -398,6 +398,14 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "not",
+          [this]() {
+                ByteCode::SharedPtr operand(readExpr());
+                ignoreRightP();
+                return std::make_shared<Not>(operand);
+          }
+        },
+
         { "progn",
           [this]() {
                 ByteCode::SharedPtrList exprs(readExprList());

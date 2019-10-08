@@ -191,7 +191,19 @@ namespace Int {
     private:
         Type type_;
     };
-    
+
+    // -------------------------------------------------------------
+    class Not : public ByteCode {
+    public:
+        Not(ByteCode::SharedPtr operand);
+        virtual ~Not() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr operand_;
+    };
+
     // -------------------------------------------------------------
     class ProgN : public ByteCode {
     public:

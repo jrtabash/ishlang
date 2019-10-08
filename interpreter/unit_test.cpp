@@ -32,6 +32,7 @@ UnitTest::UnitTest()
     ADD_TEST(testByteCodeArithOp);
     ADD_TEST(testByteCodeCompOp);
     ADD_TEST(testByteCodeLogicOp);
+    ADD_TEST(testByteCodeNot);
     ADD_TEST(testByteCodeSequence);
     ADD_TEST(testByteCodeCond);
     ADD_TEST(testByteCodeLoop);
@@ -1088,7 +1089,7 @@ void UnitTest::testByteCodeLogicOp() {
             ByteCode::SharedPtr logic(new LogicOp(c.type, lhsLit, rhsLit));
             Value result = logic->eval(env);
             if (!c.error) {
-                TEST_CASE_MSG(result.isBool(), "actual" << result.typeToString() << " (" << c.toString() << ')');
+                TEST_CASE_MSG(result.isBool(), "actual=" << result.typeToString() << " (" << c.toString() << ')');
                 TEST_CASE_MSG(result.boolean() == c.result, "actual=" << result << " (" << c.toString() << ')');
             }
             else {
@@ -1097,6 +1098,34 @@ void UnitTest::testByteCodeLogicOp() {
         }
         catch (const InvalidOperandType &ex) { if (!c.error) { TEST_CASE_MSG(false, c.toString()); } }
         catch (...) { TEST_CASE_MSG(false, c.toString()); }
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testByteCodeNot() {
+    Environment::SharedPtr env(new Environment());
+
+    Value value =
+        std::make_shared<Not>(std::make_shared<Literal>(Value::True))
+        ->exec(env);
+    TEST_CASE_MSG(value.isBool(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value == Value::False, "actual=" << value);
+
+    value =
+        std::make_shared<Not>(std::make_shared<Literal>(Value::False))
+        ->exec(env);
+    TEST_CASE_MSG(value.isBool(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value == Value::True, "actual=" << value);
+
+    try {
+        value =
+            std::make_shared<Not>(std::make_shared<Literal>(Value::Zero))
+            ->exec(env);
+        TEST_CASE(false);
+    }
+    catch (InvalidOperandType const &) {}
+    catch (...) {
+        TEST_CASE(false);
     }
 }
 
@@ -2039,6 +2068,18 @@ void UnitTest::testParserLogic() {
     TEST_CASE(parserTest(parser, env, "(or true false)",    Value::True,  true));
     TEST_CASE(parserTest(parser, env, "(or false true)",    Value::True,  true));
     TEST_CASE(parserTest(parser, env, "(or false false)",   Value::False, true));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserNot() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(not true)",     Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(not false)",    Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(not (== 1 1))", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(not (== 1 2))", Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(not 3)",        Value::False, false));
 }
 
 // -------------------------------------------------------------
