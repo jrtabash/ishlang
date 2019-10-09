@@ -35,6 +35,7 @@ namespace Int {
         
     private:
         void testToken();
+        void testComment();
         void testTokenType();
         void testValue();
         void testEnvironment();

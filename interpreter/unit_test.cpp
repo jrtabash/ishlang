@@ -19,6 +19,7 @@ UnitTest::UnitTest()
     , tests_()
 {
     ADD_TEST(testToken);
+    ADD_TEST(testComment);
     ADD_TEST(testValue);
     ADD_TEST(testEnvironment);
     ADD_TEST(testLambda);
@@ -321,6 +322,66 @@ void UnitTest::testToken() {
             TEST_CASE(*iter++ == ")");
             TEST_CASE(iter == tokens.end());
         }
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testComment() {
+    std::string str;
+    size_t pos = 0;
+
+    {
+        str = ";; This is s comment";
+        pos = 0;
+        TEST_CASE(Util::nextToken(str, pos) == "");
+        TEST_CASE(pos == std::string::npos);
+    }
+
+    {
+        str = ";; This is line one\n;; This is another line\n;; And here line 3";
+        pos = 0;
+        TEST_CASE(Util::nextToken(str, pos) == "");
+        TEST_CASE(pos == std::string::npos);
+    }
+
+    {
+        str = "(+ 1 2) ;; Adding 2 numbers";
+        pos = 0;
+        TEST_CASE(Util::nextToken(str, pos) == "(");
+        TEST_CASE(pos == 1);
+        TEST_CASE(Util::nextToken(str, pos) == "+");
+        TEST_CASE(pos == 3);
+        TEST_CASE(Util::nextToken(str, pos) == "1");
+        TEST_CASE(pos == 5);
+        TEST_CASE(Util::nextToken(str, pos) == "2");
+        TEST_CASE(pos == 6);
+        TEST_CASE(Util::nextToken(str, pos) == ")");
+        TEST_CASE(pos == 7);
+        TEST_CASE(Util::nextToken(str, pos) == "");
+        TEST_CASE(pos == std::string::npos);
+    }
+
+    {
+        str = "(+ 1 2) ;; Adding then print\n(println x)";
+        pos = 0;
+        TEST_CASE(Util::nextToken(str, pos) == "(");
+        TEST_CASE(pos == 1);
+        TEST_CASE(Util::nextToken(str, pos) == "+");
+        TEST_CASE(pos == 3);
+        TEST_CASE(Util::nextToken(str, pos) == "1");
+        TEST_CASE(pos == 5);
+        TEST_CASE(Util::nextToken(str, pos) == "2");
+        TEST_CASE(pos == 6);
+        TEST_CASE(Util::nextToken(str, pos) == ")");
+        TEST_CASE(pos == 7);
+        TEST_CASE(Util::nextToken(str, pos) == "(");
+        TEST_CASE(pos == 30);
+        TEST_CASE(Util::nextToken(str, pos) == "println");
+        TEST_CASE(pos == 38);
+        TEST_CASE(Util::nextToken(str, pos) == "x");
+        TEST_CASE(pos == 39);
+        TEST_CASE(Util::nextToken(str, pos) == ")");
+        TEST_CASE(pos == std::string::npos);
     }
 }
 

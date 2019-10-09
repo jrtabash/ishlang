@@ -25,6 +25,18 @@ std::string Util::nextToken(const std::string &str, size_t &pos) {
             }
             else { continue; }
         }
+        else if (str[pos] == ';') {
+            if (token.empty()) {
+                if (++pos >= str.size() || str[pos] != ';') {
+                    throw InvalidExpression("Incomplete comment");
+                }
+                while (str[pos] != '\n' && pos < str.size()) {
+                    ++pos;
+                }
+                continue;
+            }
+            break;
+        }
         else if (str[pos] == '\'') {
             if (token.empty()) {
                 token += str[pos++];

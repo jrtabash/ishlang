@@ -291,3 +291,15 @@ Examples:
   (strcat str "World!")
   (println (substr str 0 5))
   (println (strfind str 'W'))
+
+Comments
+--------
+Comments start with ;; and continue for the remainder of the line.
+Comments can be occupy full or partial lines.
+
+  ;; <comment text>
+
+Examples:
+  ;; This is a function
+  (def x2 (x) ;; Double x
+    (* 2 x))
