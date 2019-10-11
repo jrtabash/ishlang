@@ -649,6 +649,54 @@ void Parser::initAppFtns() {
                     throw InvalidExpression("Too many/few arguments to strfind");
                 }
           }
+        },
+
+        { "array",
+          [this]() {
+                ByteCode::SharedPtrList valueExprs(readExprList());
+                if (valueExprs.size() == 0) {
+                    return std::make_shared<MakeArray>();
+                }
+                else {
+                    return std::make_shared<MakeArray>(valueExprs);
+                }
+          }
+        },
+
+        { "arrlen",
+          [this]() {
+                ByteCode::SharedPtr strExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<ArrayLen>(strExpr);
+          }
+        },
+
+        { "arrget",
+          [this]() {
+                ByteCode::SharedPtr arrExpr(readExpr());
+                ByteCode::SharedPtr posExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<ArrayGet>(arrExpr, posExpr);
+          }
+        },
+
+        { "arrset",
+          [this]() {
+                ByteCode::SharedPtr arrExpr(readExpr());
+                ByteCode::SharedPtr posExpr(readExpr());
+                ByteCode::SharedPtr valExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<ArraySet>(arrExpr, posExpr, valExpr);
+          }
+        },
+
+        { "arradd",
+          [this]() {
+                ByteCode::SharedPtr arrExpr(readExpr());
+                ByteCode::SharedPtr valExpr(readExpr());
+                ignoreRightP();
+                return std::make_shared<ArrayAdd>(arrExpr, valExpr);
+          }
         }
     };
 }

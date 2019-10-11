@@ -3,6 +3,7 @@
 
 #include <map>
 #include <iostream>
+#include <sstream>
 #include <functional>
 #include <array>
 
@@ -27,6 +28,9 @@ UnitTest::UnitTest()
     ADD_TEST(testStructValue);
     ADD_TEST(testInstance);
     ADD_TEST(testInstanceValue);
+    ADD_TEST(testSequence);
+    ADD_TEST(testSequenceValue);
+    ADD_TEST(testSequencePrint);
     ADD_TEST(testByteCodeBasic);
     ADD_TEST(testByteCodeClone);
     ADD_TEST(testByteCodeIsType);
@@ -49,6 +53,11 @@ UnitTest::UnitTest()
     ADD_TEST(testByteCodeStringCat);
     ADD_TEST(testByteCodeSubString);
     ADD_TEST(testByteCodeStringFind);
+    ADD_TEST(testByteCodeMakeArray);
+    ADD_TEST(testByteCodeArrayLen);
+    ADD_TEST(testByteCodeArrayGet);
+    ADD_TEST(testByteCodeArraySet);
+    ADD_TEST(testByteCodeArrayAdd);
     ADD_TEST(testTokenType);
     ADD_TEST(testByteCodeStringLen);
     ADD_TEST(testByteCodeCharAt);
@@ -74,6 +83,11 @@ UnitTest::UnitTest()
     ADD_TEST(testParserStringCat);
     ADD_TEST(testParserSubString);
     ADD_TEST(testParserStringFind);
+    ADD_TEST(testParserMakeArray);
+    ADD_TEST(testParserArrayLen);
+    ADD_TEST(testParserArrayGet);
+    ADD_TEST(testParserArraySet);
+    ADD_TEST(testParserArrayAdd);
 }
 #undef ADD_TEST
 
@@ -509,6 +523,7 @@ void UnitTest::testValue() {
         TEST_CASE(Value::stringToType("closure")    == Value::eClosure);
         TEST_CASE(Value::stringToType("usertype")   == Value::eUserType);
         TEST_CASE(Value::stringToType("userobject") == Value::eUserObject);
+        TEST_CASE(Value::stringToType("array")      == Value::eArray);
 
         try {
             Value::stringToType("foobar");
@@ -755,6 +770,98 @@ void UnitTest::testInstanceValue() {
     }
     catch (const Int::Exception &ex) {
         TEST_CASE_MSG(false, "Caught exception: " << ex.what());
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testSequence() {
+    Sequence seq;
+
+    TEST_CASE_MSG(seq.size() == 0lu, "actual=" << seq.size());
+
+    seq.add(Value(1ll));
+    TEST_CASE_MSG(seq.size() == 1lu, "actual=" << seq.size());
+    TEST_CASE_MSG(seq.get(0lu) == Value(1ll), "actual=" << seq.get(0lu));
+
+    seq.set(0lu, Value(2ll));
+    TEST_CASE_MSG(seq.size() == 1lu, "actual=" << seq.size());
+    TEST_CASE_MSG(seq.get(0lu) == Value(2ll), "actual=" << seq.get(0lu));
+
+    seq.add(Value(3ll));
+    TEST_CASE_MSG(seq.size() == 2lu, "actual=" << seq.size());
+    TEST_CASE_MSG(seq.get(0lu) == Value(2ll), "actual=" << seq.get(0lu));
+    TEST_CASE_MSG(seq.get(1lu) == Value(3ll), "actual=" << seq.get(1lu));
+
+    Sequence seq2(std::vector({Value('a'), Value('b'), Value('c')}));
+    TEST_CASE_MSG(seq2.size() == 3lu, "actual=" << seq2.size());
+    TEST_CASE_MSG(seq2.get(0lu) == Value('a'), "actual=" << seq2.get(0lu));
+    TEST_CASE_MSG(seq2.get(1lu) == Value('b'), "actual=" << seq2.get(1lu));
+    TEST_CASE_MSG(seq2.get(2lu) == Value('c'), "actual=" << seq2.get(2lu));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testSequenceValue() {
+    Sequence seq;
+    seq.add(1ll);
+    seq.add(2ll);
+
+    try {
+        Value sValue(seq);
+        TEST_CASE_MSG(sValue.isArray(), "actual=" << sValue.typeToString());
+
+        const Sequence &s = sValue.array();
+        TEST_CASE_MSG(s.size() == 2lu, "actual=" << s.size());
+        TEST_CASE_MSG(s.get(0lu) == Value(1ll), "actual=" << s.get(0lu));
+        TEST_CASE_MSG(s.get(1lu) == Value(2ll), "actual=" << s.get(1lu));
+    }
+    catch (const Int::Exception &ex) {
+        TEST_CASE_MSG(false, "Caught exception: " << ex.what());
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testSequencePrint() {
+    const Value v1(1ll);
+    const Value v2(2ll);
+    const Value v3(3ll);
+    const Value v4(4ll);
+    const Value v5(5ll);
+    const Value v6(6ll);
+    const Value v7(7ll);
+    const Value v8(8ll);
+    const Value v9(9ll);
+    const Value v10(10ll);
+    const Value v11(11ll);
+    const Value v12(12ll);
+
+    {
+        std::ostringstream oss;
+        oss << Sequence();
+        TEST_CASE_MSG(oss.str() == "[]", "actual=" << oss.str());
+    }
+
+    {
+        std::ostringstream oss;
+        oss << Sequence({v1, v2, v3});
+        TEST_CASE_MSG(oss.str() == "[1 2 3]", "actual=" << oss.str());
+    }
+
+    {
+        std::ostringstream oss;
+        oss << Sequence({v1, v2, v3, v4, v5, v6, v7, v8, v9, v10});
+        TEST_CASE_MSG(oss.str() == "[1 2 3 4 5 6 7 8 9 10]", "actual=" << oss.str());
+    }
+
+    {
+        std::ostringstream oss;
+        oss << Sequence({v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11});
+        TEST_CASE_MSG(oss.str() == "[1 2 3 4 5 6 7 8 9 10 ...]", "actual=" << oss.str());
+    }
+
+    {
+        std::ostringstream oss;
+        oss << Sequence({v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12});
+        TEST_CASE_MSG(oss.str() == "[1 2 3 4 5 6 7 8 9 10 ...]", "actual=" << oss.str());
     }
 }
 
@@ -2021,6 +2128,171 @@ void UnitTest::testByteCodeStringFind() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testByteCodeMakeArray() {
+    Environment::SharedPtr env(new Environment());
+
+    Value value = std::make_shared<MakeArray>()->exec(env);
+    TEST_CASE_MSG(value.isArray(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value.array().size() == 0lu, "actual=" << value.array().size());
+
+    value =
+        std::make_shared<MakeArray>(
+            ByteCode::SharedPtrList(
+                { std::make_shared<Literal>(Value('a')),
+                  std::make_shared<Literal>(Value('b')),
+                  std::make_shared<Literal>(Value('c')) }))
+        ->exec(env);
+    TEST_CASE_MSG(value.isArray(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value.array().size() == 3lu, "actual=" << value.array().size());
+    TEST_CASE_MSG(value.array().get(0lu) == Value('a'), "actual=" << value.array().get(0lu));
+    TEST_CASE_MSG(value.array().get(1lu) == Value('b'), "actual=" << value.array().get(1lu));
+    TEST_CASE_MSG(value.array().get(2lu) == Value('c'), "actual=" << value.array().get(2lu));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testByteCodeArrayLen() {
+    Environment::SharedPtr env(new Environment());
+
+    Value value =
+        std::make_shared<ArrayLen>(
+            std::make_shared<Literal>(Value(Sequence())))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value::Zero, "actual=" << value);
+
+    value =
+        std::make_shared<ArrayLen>(
+            std::make_shared<Literal>(Value(Sequence({Value::Zero}))))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value(1ll), "actual=" << value);
+
+    value =
+        std::make_shared<ArrayLen>(
+            std::make_shared<Literal>(Value(Sequence({Value::Zero, Value::True, Value::False}))))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value(3ll), "actual=" << value);
+
+    try {
+        value =
+            std::make_shared<ArrayLen>(
+                std::make_shared<Literal>(Value::Zero))
+            ->exec(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) { TEST_CASE(false); }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testByteCodeArrayGet() {
+    Environment::SharedPtr env(new Environment());
+    env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
+
+    const ByteCode::SharedPtr var = std::make_shared<Variable>("arr");
+
+    auto ilit = [](Value::Long i) {
+        return std::make_shared<Literal>(Value(i));
+    };
+
+    Value value = std::make_shared<ArrayGet>(var, ilit(0))->exec(env);
+    TEST_CASE_MSG(value == Value('a'), "actual=" << value);
+
+    value = std::make_shared<ArrayGet>(var, ilit(1))->exec(env);
+    TEST_CASE_MSG(value == Value('b'), "actual=" << value);
+
+    value = std::make_shared<ArrayGet>(var, ilit(2))->exec(env);
+    TEST_CASE_MSG(value == Value('c'), "actual=" << value);
+
+    try {
+        std::make_shared<ArrayGet>(var, ilit(3))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) { TEST_CASE(false); }
+
+    try {
+        std::make_shared<ArrayGet>(var, ilit(-1))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) { TEST_CASE(false); }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testByteCodeArraySet() {
+    Environment::SharedPtr env(new Environment());
+    env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
+
+    ByteCode::SharedPtr var = std::make_shared<Variable>("arr");
+
+    Value expectedValue(Sequence({Value('a'), Value('b'), Value('c')}));
+    auto &expected = expectedValue.array();
+
+    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
+    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
+
+    Value value = std::make_shared<ArraySet>(var, ilit(0), clit('A'))->exec(env);
+    TEST_CASE_MSG(value == Value('A'), "actual=" << value);
+
+    value = var->exec(env);
+    expected.set(0, 'A');
+    TEST_CASE_MSG(value == expectedValue, "actual=" << value);
+
+    value = std::make_shared<ArraySet>(var, ilit(1), clit('B'))->exec(env);
+    TEST_CASE_MSG(value == Value('B'), "actual=" << value);
+
+    value = var->exec(env);
+    expected.set(1, 'B');
+    TEST_CASE_MSG(value == expectedValue, "actual=" << value);
+
+    value = std::make_shared<ArraySet>(var, ilit(2), clit('C'))->exec(env);
+    TEST_CASE_MSG(value == Value('C'), "actual=" << value);
+
+    value = var->exec(env);
+    expected.set(2, 'C');
+    TEST_CASE_MSG(value == expectedValue, "actual=" << value);
+
+    try {
+        std::make_shared<ArraySet>(var, ilit(-1), clit('X'))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) { TEST_CASE(false); }
+
+    try {
+        std::make_shared<ArraySet>(var, ilit(3), clit('Y'))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const &) {}
+    catch (...) { TEST_CASE(false); }
+
+    value = var->exec(env);
+    TEST_CASE_MSG(value == expectedValue, "actual=" << value);
+}
+
+// -------------------------------------------------------------
+void UnitTest::testByteCodeArrayAdd() {
+    Environment::SharedPtr env(new Environment());
+    env->def("arr", Value(Sequence()));
+
+    ByteCode::SharedPtr var = std::make_shared<Variable>("arr");
+
+    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
+    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
+
+    Value value = std::make_shared<ArrayAdd>(var, ilit(10))->exec(env);
+    Value expected = Value(Sequence({Value(10ll)}));
+    TEST_CASE_MSG(value == expected, "actual=" << value);
+
+    value = std::make_shared<ArrayAdd>(var, clit('b'))->exec(env);
+    expected = Value(Sequence({Value(10ll), Value('b')}));
+    TEST_CASE_MSG(value == expected, "actual=" << value);
+
+    value = std::make_shared<ArrayAdd>(var, ilit(25ll))->exec(env);
+    expected = Value(Sequence({Value(10ll), Value('b'), Value(25ll)}));
+    TEST_CASE_MSG(value == expected, "actual=" << value);
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -2434,4 +2706,69 @@ void UnitTest::testParserStringFind() {
     TEST_CASE(parserTest(parser, env, "(strfind str 'A')",     Value(-1ll), true));
     TEST_CASE(parserTest(parser, env, "(strfind str 1)",       Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(strfind str '0' '0')", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserMakeArray() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    const Value v1(1ll);
+    const Value v2(2ll);
+    const Value v3(3ll);
+
+    TEST_CASE(parserTest(parser, env, "(array)",       Value(Sequence()),             true));
+    TEST_CASE(parserTest(parser, env, "(array 1)",     Value(Sequence({v1})),         true));
+    TEST_CASE(parserTest(parser, env, "(array 1 2)",   Value(Sequence({v1, v2})),     true));
+    TEST_CASE(parserTest(parser, env, "(array 1 2 3)", Value(Sequence({v1, v2, v3})), true));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserArrayLen() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(arrlen (array))",         Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(arrlen (array 1))",       Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(arrlen (array 1 2 3 4))", Value(4ll),  true));
+    TEST_CASE(parserTest(parser, env, "(arrlen 10)",              Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserArrayGet() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(arrget (array 'B' 'y') 0)", Value('B'),  true));
+    TEST_CASE(parserTest(parser, env, "(arrget (array 'B' 'y') 1)", Value('y'),  true));
+    TEST_CASE(parserTest(parser, env, "(arrget (array 'B' 'y') 2)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserArraySet() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("arr", Value(Sequence({Value(1ll), Value(2ll), Value(3ll), Value(4ll), Value(5ll)})));
+
+    TEST_CASE(parserTest(parser, env, "(arrset arr 0 'a')", Value('a'),  true));
+    TEST_CASE(parserTest(parser, env, "(arrset arr 2 'C')", Value('C'),  true));
+    TEST_CASE(parserTest(parser, env, "(arrset arr 6 'b')", Value::Null, false));
+
+    Value expected(Sequence({Value('a'), Value(2ll), Value('C'), Value(4ll), Value(5ll)}));
+    TEST_CASE(parserTest(parser, env, "arr", expected, true));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserArrayAdd() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("arr", Value(Sequence()));
+
+    Value expected = Value(Sequence({Value(1ll)}));
+    TEST_CASE(parserTest(parser, env, "(arradd arr 1)", expected, true));
+
+    expected = Value(Sequence({Value(1ll), Value(2ll)}));
+    TEST_CASE(parserTest(parser, env, "(arradd arr 2)", expected, true));
 }

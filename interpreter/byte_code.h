@@ -513,6 +513,71 @@ namespace Int {
         ByteCode::SharedPtr chr_;
         ByteCode::SharedPtr pos_;
     };
+
+    // -------------------------------------------------------------
+    class MakeArray : public ByteCode {
+    public:
+        MakeArray();
+        MakeArray(ByteCode::SharedPtrList values);
+        virtual ~MakeArray() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtrList values_;
+    };
+
+    // -------------------------------------------------------------
+    class ArrayLen : public ByteCode {
+    public:
+        ArrayLen(ByteCode::SharedPtr expr);
+        virtual ~ArrayLen() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr expr_;
+    };
+
+    // -------------------------------------------------------------
+    class ArrayGet : public ByteCode {
+    public:
+        ArrayGet(ByteCode::SharedPtr arr, ByteCode::SharedPtr pos);
+        virtual ~ArrayGet() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr arr_;
+        ByteCode::SharedPtr pos_;
+    };
+
+    // -------------------------------------------------------------
+    class ArraySet : public ByteCode {
+    public:
+        ArraySet(ByteCode::SharedPtr arr, ByteCode::SharedPtr pos, ByteCode::SharedPtr val);
+        virtual ~ArraySet() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr arr_;
+        ByteCode::SharedPtr pos_;
+        ByteCode::SharedPtr val_;
+    };
+
+    // -------------------------------------------------------------
+    class ArrayAdd : public ByteCode {
+    public:
+        ArrayAdd(ByteCode::SharedPtr arr, ByteCode::SharedPtr val);
+        virtual ~ArrayAdd() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr arr_;
+        ByteCode::SharedPtr val_;
+    };
 }
 
 #endif	// BYTE_CODE_H

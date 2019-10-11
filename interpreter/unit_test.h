@@ -6,6 +6,7 @@
 #include "lambda.h"
 #include "struct.h"
 #include "instance.h"
+#include "sequence.h"
 #include "byte_code.h"
 #include "parser.h"
 #include "lexer.h"
@@ -44,6 +45,9 @@ namespace Int {
         void testStructValue();
         void testInstance();
         void testInstanceValue();
+        void testSequence();
+        void testSequenceValue();
+        void testSequencePrint();
         void testByteCodeBasic();
         void testByteCodeClone();
         void testByteCodeIsType();
@@ -69,6 +73,11 @@ namespace Int {
         void testByteCodeStringCat();
         void testByteCodeSubString();
         void testByteCodeStringFind();
+        void testByteCodeMakeArray();
+        void testByteCodeArrayLen();
+        void testByteCodeArrayGet();
+        void testByteCodeArraySet();
+        void testByteCodeArrayAdd();
         void testParserBasic();
         void testParserIsType();
         void testParserVar();
@@ -91,6 +100,11 @@ namespace Int {
         void testParserStringCat();
         void testParserSubString();
         void testParserStringFind();
+        void testParserMakeArray();
+        void testParserArrayLen();
+        void testParserArrayGet();
+        void testParserArraySet();
+        void testParserArrayAdd();
         
     private:
         bool  success_;

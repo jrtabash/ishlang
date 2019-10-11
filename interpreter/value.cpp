@@ -2,6 +2,7 @@
 #include "lambda.h"
 #include "struct.h"
 #include "instance.h"
+#include "sequence.h"
 #include "exception.h"
 
 using namespace Int;
@@ -17,6 +18,7 @@ std::string Value::NullText;
 Lambda      Value::NullFunc;
 Struct      Value::NullUserType;
 Instance    Value::NullObject;
+Sequence    Value::NullSequence;
 
 // -------------------------------------------------------------
 Value::Value(const char *t)
@@ -49,6 +51,12 @@ Value::Value(const Instance &o)
 {}
 
 // -------------------------------------------------------------
+Value::Value(const Sequence &s)
+    : type_(eArray)
+    , value_(std::make_shared<Sequence>(s))
+{}
+
+// -------------------------------------------------------------
 bool Value::operator==(const Value &rhs) const {
     if (type_ == rhs.type_) {
         switch (type_) {
@@ -60,6 +68,7 @@ bool Value::operator==(const Value &rhs) const {
         case eClosure:    return *std::get<LambdaPtr>(value_) == *std::get<LambdaPtr>(rhs.value_);
         case eUserType:   return *std::get<StructPtr>(value_) == *std::get<StructPtr>(rhs.value_);
         case eUserObject: return *std::get<InstancePtr>(value_) == *std::get<InstancePtr>(rhs.value_);
+        case eArray:      return *std::get<SequencePtr>(value_) == *std::get<SequencePtr>(rhs.value_);
         case eNone:       return true;
         }
     }
@@ -81,6 +90,7 @@ bool Value::operator!=(const Value &rhs) const {
         case eClosure:    return *std::get<LambdaPtr>(value_) != *std::get<LambdaPtr>(rhs.value_);
         case eUserType:   return *std::get<StructPtr>(value_) != *std::get<StructPtr>(rhs.value_);
         case eUserObject: return *std::get<InstancePtr>(value_) != *std::get<InstancePtr>(rhs.value_);
+        case eArray:      return *std::get<SequencePtr>(value_) != *std::get<SequencePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -102,6 +112,7 @@ bool Value::operator<(const Value &rhs) const {
         case eClosure:    return false;
         case eUserType:   return false;
         case eUserObject: return false;
+        case eArray:      return *std::get<SequencePtr>(value_) < *std::get<SequencePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -123,6 +134,7 @@ bool Value::operator>(const Value &rhs) const {
         case eClosure:    return false;
         case eUserType:   return false;
         case eUserObject: return false;
+        case eArray:      return *std::get<SequencePtr>(value_) > *std::get<SequencePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -144,6 +156,7 @@ bool Value::operator<=(const Value &rhs) const {
         case eClosure:    return false;
         case eUserType:   return false;
         case eUserObject: return false;
+        case eArray:      return *std::get<SequencePtr>(value_) <= *std::get<SequencePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -165,6 +178,7 @@ bool Value::operator>=(const Value &rhs) const {
         case eClosure:    return false;
         case eUserType:   return false;
         case eUserObject: return false;
+        case eArray:      return *std::get<SequencePtr>(value_) >= *std::get<SequencePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -186,6 +200,7 @@ std::string Value::typeToString(Type type) {
         case eClosure:    return "Closure";
         case eUserType:   return "UserType";
         case eUserObject: return "UserObject";
+        case eArray:      return "Array";
     }
     return "Unknown";
 }
@@ -201,6 +216,7 @@ Value::Type Value::stringToType(const std::string &str) {
     else if (str == "closure")    { return Value::eClosure; }
     else if (str == "usertype")   { return Value::eUserType; }
     else if (str == "userobject") { return Value::eUserObject; }
+    else if (str == "array")      { return Value::eArray; }
     throw InvalidExpression("unknown value type", str);
     return Value::eNone;
 }
@@ -226,9 +242,28 @@ Value Value::clone() const {
 
     case eUserObject:
         return Value(*std::get<InstancePtr>(value_));
+
+    case eArray:
+        return Value(*std::get<SequencePtr>(value_));
     }
 
     return Value::Null;
+}
+
+// -------------------------------------------------------------
+void Value::printC(std::ostream &out, const Value &value) {
+    switch (value.type_) {
+    case Value::eNone:       out << "null";                                            break;
+    case Value::eInteger:    out << std::get<Long>(value.value_);                      break;
+    case Value::eReal:       out << std::get<Double>(value.value_);                    break;
+    case Value::eCharacter:  out << '\'' << std::get<Char>(value.value_) << '\'';      break;
+    case Value::eBoolean:    out << (std::get<Bool>(value.value_) ? "true" : "false"); break;
+    case Value::eString:     out << '"' << *std::get<StringPtr>(value.value_) << '"';  break;
+    case Value::eClosure:    out << "[Lambda]";                                        break;
+    case Value::eUserType:   out << "[Struct]";                                        break;
+    case Value::eUserObject: out << "[Instance]";                                      break;
+    case Value::eArray:      out << *std::get<SequencePtr>(value.value_);              break;
+    }
 }
 
 // -------------------------------------------------------------
@@ -243,5 +278,6 @@ void Value::print(const Value &value) {
     case Value::eClosure:    std::cout << "[Lambda]";                                        break;
     case Value::eUserType:   std::cout << "[Struct]";                                        break;
     case Value::eUserObject: std::cout << "[Instance]";                                      break;
+    case Value::eArray:      std::cout << *std::get<SequencePtr>(value.value_);              break;
     }
 }

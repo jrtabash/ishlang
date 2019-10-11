@@ -10,11 +10,13 @@ namespace Int {
     class Lambda;
     class Struct;
     class Instance;
+    class Sequence;
 
     using StringPtr = std::shared_ptr<std::string>;
     using LambdaPtr = std::shared_ptr<Lambda>;
     using StructPtr = std::shared_ptr<Struct>;
     using InstancePtr = std::shared_ptr<Instance>;
+    using SequencePtr = std::shared_ptr<Sequence>;
 
     struct Value {
     public:
@@ -28,6 +30,7 @@ namespace Int {
         static Lambda      NullFunc;
         static Struct      NullUserType;
         static Instance    NullObject;
+        static Sequence    NullSequence;
         
     public:
         enum Type {
@@ -40,6 +43,7 @@ namespace Int {
             eClosure    = 'F',
             eUserType   = 'U',
             eUserObject = 'O',
+            eArray      = 'A',
         };
 
         using Long       = long long int;
@@ -50,6 +54,7 @@ namespace Int {
         using Func       = Lambda;
         using UserType   = Struct;
         using UserObject = Instance;
+        using Array      = Sequence;
         
     public:
         Value()         : type_(eNone) {}
@@ -62,6 +67,7 @@ namespace Int {
         Value(const Lambda &f);
         Value(const Struct &s);
         Value(const Instance &o);
+        Value(const Sequence &s);
 
         Type type() const { return type_; }
         
@@ -74,6 +80,7 @@ namespace Int {
         bool isClosure() const    { return type_ == eClosure; }
         bool isUserType() const   { return type_ == eUserType; }
         bool isUserObject() const { return type_ == eUserObject; }
+        bool isArray() const      { return type_ == eArray; }
         
         bool isNumber() const { return type_ == eInteger || type_ == eReal; }
         
@@ -87,6 +94,8 @@ namespace Int {
         const UserType &userType()     const { return isUserType()   ? *std::get<StructPtr>(value_) : NullUserType; }
         const UserObject &userObject() const { return isUserObject() ? *std::get<InstancePtr>(value_) : NullObject; }
         UserObject &userObject()             { return isUserObject() ? *std::get<InstancePtr>(value_) : NullObject; }
+        const Array &array()           const { return isArray()      ? *std::get<SequencePtr>(value_) : NullSequence; }
+        Array &array()                       { return isArray()      ? *std::get<SequencePtr>(value_) : NullSequence; }
         
         bool operator==(const Value &rhs) const;
         bool operator!=(const Value &rhs) const;
@@ -103,22 +112,13 @@ namespace Int {
         Value clone() const;
 
         friend std::ostream &operator<<(std::ostream &out, const Value &value) {
-            switch (value.type_) {
-            case Value::eNone:       out << "null";                                            break;
-            case Value::eInteger:    out << std::get<Long>(value.value_);                      break;
-            case Value::eReal:       out << std::get<Double>(value.value_);                    break;
-            case Value::eCharacter:  out << '\'' << std::get<Char>(value.value_) << '\'';      break;
-            case Value::eBoolean:    out << (std::get<Bool>(value.value_) ? "true" : "false"); break;
-            case Value::eString:     out << '"' << *std::get<StringPtr>(value.value_) << '"';  break;
-            case Value::eClosure:    out << "[Lambda]";                                        break;
-            case Value::eUserType:   out << "[Struct]";                                        break;
-            case Value::eUserObject: out << "[Instance]";                                      break;
-            }
+            printC(out, value);
             return out;
         }
 
     public:
         static void print(const Value &value);
+        static void printC(std::ostream &out, const Value &value);
 
     private:
         using VariantValue = std::variant<Long,
@@ -128,7 +128,8 @@ namespace Int {
                                           StringPtr,
                                           LambdaPtr,
                                           StructPtr,
-                                          InstancePtr>;
+                                          InstancePtr,
+                                          SequencePtr>;
 
         Type type_;
         VariantValue value_;

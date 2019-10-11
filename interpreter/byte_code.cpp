@@ -1,6 +1,7 @@
 #include "byte_code.h"
 #include "lambda.h"
 #include "instance.h"
+#include "sequence.h"
 #include "parser.h"
 #include "exception.h"
 #include "util.h"
@@ -640,6 +641,122 @@ Value StringFind::exec(Environment::SharedPtr env) {
 
         auto result = rawStr.find(chr.character(), rawPos);
         return result != std::string::npos ? Value(Value::Long(result)) : Value(-1ll);
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+MakeArray::MakeArray()
+    : ByteCode()
+    , values_()
+{}
+
+MakeArray::MakeArray(ByteCode::SharedPtrList values)
+    : ByteCode()
+    , values_(values)
+{}
+
+Value MakeArray::exec(Environment::SharedPtr env) {
+    if (values_.empty()) {
+        return Value(Sequence());
+    }
+    else {
+        std::vector<Value> values;
+        for (auto & valueCode : values_) {
+            values.push_back(valueCode->exec(env));
+        }
+        return Value(Sequence(std::move(values)));
+    }
+}
+
+// -------------------------------------------------------------
+ArrayLen::ArrayLen(ByteCode::SharedPtr expr)
+    : ByteCode()
+    , expr_(expr)
+{}
+
+Value ArrayLen::exec(Environment::SharedPtr env) {
+    if (expr_.get()) {
+        Value arr = expr_->exec(env);
+
+        if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
+
+        return Value(Value::Long(arr.array().size()));
+    }
+    return Value::Zero;
+}
+
+// -------------------------------------------------------------
+ArrayGet::ArrayGet(ByteCode::SharedPtr arr, ByteCode::SharedPtr pos)
+    : ByteCode()
+    , arr_(arr)
+    , pos_(pos)
+{}
+
+Value ArrayGet::exec(Environment::SharedPtr env) {
+    if (arr_.get() && pos_.get()) {
+        Value arr = arr_->exec(env);
+        Value pos = pos_->exec(env);
+
+        if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
+        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
+
+        const auto &rawArr = arr.array();
+        const auto rawPos = pos.integer();
+        if (rawPos < 0 || rawPos >= rawArr.size()) {
+            throw OutOfRange("array get access");
+        }
+
+        return Value(rawArr.get(rawPos));
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+ArraySet::ArraySet(ByteCode::SharedPtr arr, ByteCode::SharedPtr pos, ByteCode::SharedPtr val)
+    : ByteCode()
+    , arr_(arr)
+    , pos_(pos)
+    , val_(val)
+{}
+
+Value ArraySet::exec(Environment::SharedPtr env) {
+    if (arr_.get() && pos_.get() && val_.get()) {
+        Value arr = arr_->exec(env);
+        Value pos = pos_->exec(env);
+        Value val = val_->exec(env);
+
+        if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
+        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
+
+        auto &rawArr = arr.array();
+        const auto rawPos = pos.integer();
+        if (rawPos < 0 || rawPos >= rawArr.size()) {
+            throw OutOfRange("array set access");
+        }
+
+        rawArr.set(rawPos, val);
+        return val;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+ArrayAdd::ArrayAdd(ByteCode::SharedPtr arr, ByteCode::SharedPtr val)
+    : ByteCode()
+    , arr_(arr)
+    , val_(val)
+{}
+
+Value ArrayAdd::exec(Environment::SharedPtr env) {
+    if (arr_.get() && val_.get()) {
+        Value arr = arr_->exec(env);
+        Value val = val_->exec(env);
+
+        if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
+
+        arr.array().add(val);
+        return arr;
     }
     return Value::Null;
 }
