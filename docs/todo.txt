@@ -2,7 +2,6 @@
 
 * Implement built-in data structures:
   - List
-  - Array
   - Hash table
 
 * Rework 'break' implementation to avoid using Break::Except
