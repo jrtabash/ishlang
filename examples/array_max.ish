@@ -1,0 +1,13 @@
+(def array_max (arr)
+  (var amax 0)
+  (if (> (arrlen arr) 0)
+    (loop (var i 1) (< i (arrlen arr)) (= i (+ i 1))
+      (if (> (arrget arr i) amax)
+        (= amax (arrget arr i)))))
+  amax)
+
+(var ints (array -5 1 10 -8 2 9 5 3 -2 4))
+(print "arr: ")
+(println ints)
+(print "max: ")
+(println (array_max ints))
