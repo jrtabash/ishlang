@@ -16,11 +16,11 @@ Example: Hello world Program
 Values
 ------
 Every expression in ishlang evaluates to a value. A value can hold any of the following types:
-  none, int, real, char, string, bool, closure, usertype, userobject, array
+  none, int, real, char, bool, string, array, closure, usertype, userobject
 
 Literals
 --------
-Can be none, char, int, real, string, and bool. Examples:
+Can be none, char, int, real, bool, and string. Examples:
 - none:   null
 - char:   'a'
 - string: "hello"
