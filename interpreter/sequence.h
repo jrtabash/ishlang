@@ -15,6 +15,7 @@ namespace Int {
     public:
         Sequence();
         Sequence(Vector && vec);
+        Sequence(std::size_t size, const Value &value);
 
         bool operator==(const Sequence &rhs) const { return vectorEqual(vector_, rhs.vector_); }
         bool operator!=(const Sequence &rhs) const { return !vectorEqual(vector_, rhs.vector_); }

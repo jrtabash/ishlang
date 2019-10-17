@@ -670,6 +670,24 @@ Value MakeArray::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+MakeArraySV::MakeArraySV(ByteCode::SharedPtr size, ByteCode::SharedPtr initValue)
+    : ByteCode()
+    , size_(size)
+    , initValue_(initValue)
+{}
+
+Value MakeArraySV::exec(Environment::SharedPtr env) {
+    if (size_.get()) {
+        Value size = size_->exec(env);
+        Value initValue = initValue_.get() ? initValue_->exec(env) : Value::Null;
+
+        if (!size.isInt()) { throw InvalidOperandType("Integer", size.typeToString()); }
+
+        return Value(Sequence(size.integer(), initValue));
+    }
+}
+
+// -------------------------------------------------------------
 ArrayLen::ArrayLen(ByteCode::SharedPtr expr)
     : ByteCode()
     , expr_(expr)

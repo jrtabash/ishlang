@@ -528,6 +528,20 @@ namespace Int {
     };
 
     // -------------------------------------------------------------
+    // Make array from size and value
+    class MakeArraySV : public ByteCode {
+    public:
+        MakeArraySV(ByteCode::SharedPtr size, ByteCode::SharedPtr initValue = ByteCode::SharedPtr());
+        virtual ~MakeArraySV() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        ByteCode::SharedPtr size_;
+        ByteCode::SharedPtr initValue_;
+    };
+
+    // -------------------------------------------------------------
     class ArrayLen : public ByteCode {
     public:
         ArrayLen(ByteCode::SharedPtr expr);

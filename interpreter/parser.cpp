@@ -663,6 +663,21 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "arraysv",
+          [this]() {
+                ByteCode::SharedPtrList exprs(readExprList());
+                if (exprs.size() == 1) {
+                    return std::make_shared<MakeArraySV>(exprs[0]);
+                }
+                else if (exprs.size() == 2) {
+                    return std::make_shared<MakeArraySV>(exprs[0], exprs[1]);
+                }
+                else {
+                    throw InvalidExpression("Too many/few arguments to arraysv");
+                }
+          }
+        },
+
         { "arrlen",
           [this]() {
                 ByteCode::SharedPtr strExpr(readExpr());

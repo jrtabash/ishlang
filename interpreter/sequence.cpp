@@ -16,6 +16,11 @@ Sequence::Sequence(Vector && vec)
 {}
 
 // -------------------------------------------------------------
+Sequence::Sequence(std::size_t size, const Value &value)
+    : vector_(size, value)
+{}
+
+// -------------------------------------------------------------
 std::ostream &Sequence::print(std::ostream &out) const {
     out << '[';
     std::size_t count = 0;

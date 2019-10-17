@@ -54,6 +54,7 @@ UnitTest::UnitTest()
     ADD_TEST(testByteCodeSubString);
     ADD_TEST(testByteCodeStringFind);
     ADD_TEST(testByteCodeMakeArray);
+    ADD_TEST(testByteCodeMakeArraySV);
     ADD_TEST(testByteCodeArrayLen);
     ADD_TEST(testByteCodeArrayGet);
     ADD_TEST(testByteCodeArraySet);
@@ -84,6 +85,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserSubString);
     ADD_TEST(testParserStringFind);
     ADD_TEST(testParserMakeArray);
+    ADD_TEST(testParserMakeArraySV);
     ADD_TEST(testParserArrayLen);
     ADD_TEST(testParserArrayGet);
     ADD_TEST(testParserArraySet);
@@ -797,6 +799,12 @@ void UnitTest::testSequence() {
     TEST_CASE_MSG(seq2.get(0lu) == Value('a'), "actual=" << seq2.get(0lu));
     TEST_CASE_MSG(seq2.get(1lu) == Value('b'), "actual=" << seq2.get(1lu));
     TEST_CASE_MSG(seq2.get(2lu) == Value('c'), "actual=" << seq2.get(2lu));
+
+    Sequence seq3(3, Value::Zero);
+    TEST_CASE_MSG(seq3.size() == 3lu, "actual=" << seq3.size());
+    TEST_CASE_MSG(seq3.get(0lu) == Value::Zero, "actual=" << seq3.get(0lu));
+    TEST_CASE_MSG(seq3.get(1lu) == Value::Zero, "actual=" << seq3.get(1lu));
+    TEST_CASE_MSG(seq3.get(2lu) == Value::Zero, "actual=" << seq3.get(2lu));
 }
 
 // -------------------------------------------------------------
@@ -2150,6 +2158,33 @@ void UnitTest::testByteCodeMakeArray() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testByteCodeMakeArraySV() {
+    Environment::SharedPtr env(new Environment());
+
+    Value value =
+        std::make_shared<MakeArraySV>(
+            std::make_shared<Literal>(Value(3ll)),
+            std::make_shared<Literal>(Value('0')))
+        ->exec(env);
+
+    TEST_CASE_MSG(value.isArray(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value.array().size() == 3lu, "actual=" << value.array().size());
+    TEST_CASE_MSG(value.array().get(0lu) == Value('0'), "actual=" << value.array().get(0lu));
+    TEST_CASE_MSG(value.array().get(1lu) == Value('0'), "actual=" << value.array().get(1lu));
+    TEST_CASE_MSG(value.array().get(2lu) == Value('0'), "actual=" << value.array().get(2lu));
+
+    value =
+        std::make_shared<MakeArraySV>(
+            std::make_shared<Literal>(Value(2ll)))
+        ->exec(env);
+
+    TEST_CASE_MSG(value.isArray(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value.array().size() == 2lu, "actual=" << value.array().size());
+    TEST_CASE_MSG(value.array().get(0lu) == Value::Null, "actual=" << value.array().get(0lu));
+    TEST_CASE_MSG(value.array().get(1lu) == Value::Null, "actual=" << value.array().get(1lu));
+}
+
+// -------------------------------------------------------------
 void UnitTest::testByteCodeArrayLen() {
     Environment::SharedPtr env(new Environment());
 
@@ -2721,6 +2756,23 @@ void UnitTest::testParserMakeArray() {
     TEST_CASE(parserTest(parser, env, "(array 1)",     Value(Sequence({v1})),         true));
     TEST_CASE(parserTest(parser, env, "(array 1 2)",   Value(Sequence({v1, v2})),     true));
     TEST_CASE(parserTest(parser, env, "(array 1 2 3)", Value(Sequence({v1, v2, v3})), true));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserMakeArraySV() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    const Value v0(0ll);
+    const Value v1(1ll);
+    const Value v2(2ll);
+
+    TEST_CASE(parserTest(parser, env, "(arraysv 1 0)",   Value(Sequence({v0})),          true));
+    TEST_CASE(parserTest(parser, env, "(arraysv 2 1)",   Value(Sequence({v1, v1})),      true));
+    TEST_CASE(parserTest(parser, env, "(arraysv 3 2)",   Value(Sequence({v2, v2, v2})),  true));
+    TEST_CASE(parserTest(parser, env, "(arraysv 1)",     Value(Sequence({Value::Null})), true));
+    TEST_CASE(parserTest(parser, env, "(arraysv)",       Value::Null,                    false));
+    TEST_CASE(parserTest(parser, env, "(arraysv 'a' 0)", Value::Null,                    false));
 }
 
 // -------------------------------------------------------------

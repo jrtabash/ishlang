@@ -74,6 +74,7 @@ namespace Int {
         void testByteCodeSubString();
         void testByteCodeStringFind();
         void testByteCodeMakeArray();
+        void testByteCodeMakeArraySV();
         void testByteCodeArrayLen();
         void testByteCodeArrayGet();
         void testByteCodeArraySet();
@@ -101,6 +102,7 @@ namespace Int {
         void testParserSubString();
         void testParserStringFind();
         void testParserMakeArray();
+        void testParserMakeArraySV();
         void testParserArrayLen();
         void testParserArrayGet();
         void testParserArraySet();
