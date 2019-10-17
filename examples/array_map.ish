@@ -1,0 +1,16 @@
+(def array_map (ftn arr)
+  (var ret (array))
+  (loop (var i 0) (< i (arrlen arr)) (= i (+ i 1))
+    (arradd ret (ftn (arrget arr i))))
+  ret)
+
+(def triple (x)
+  (* 3 x))
+
+(var ints (array 1 2 3 4 5))
+(print "numbers: ")
+(println ints)
+(print "doubles: ")
+(println (array_map (lambda (x) (* 2 x)) ints))
+(print "triples: ")
+(println (array_map triple ints))
