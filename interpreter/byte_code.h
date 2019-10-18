@@ -140,6 +140,7 @@ namespace Int {
             Mul = '*',
             Div = '/',
             Mod = '%',
+            Pow = '^',
         };
         
     public:

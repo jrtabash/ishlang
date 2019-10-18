@@ -326,6 +326,15 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "^",
+          [this]() {
+                ByteCode::SharedPtr lhs(readExpr());
+                ByteCode::SharedPtr rhs(readExpr());
+                ignoreRightP();
+                return std::make_shared<ArithOp>(ArithOp::Pow, lhs, rhs);
+          }
+        },
+
         { "==",
           [this]() {
                 ByteCode::SharedPtr lhs(readExpr());

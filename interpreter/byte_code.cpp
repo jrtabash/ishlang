@@ -6,6 +6,8 @@
 #include "exception.h"
 #include "util.h"
 
+#include <cmath>
+
 using namespace Int;
 
 // -------------------------------------------------------------
@@ -68,6 +70,10 @@ Value ArithOp::exec(Environment::SharedPtr env) {
         case Mod:
             if (real) { throw InvalidOperandType("Real", "Integer"); }
             return Value(lhsVal.integer() % rhsVal.integer());
+            break;
+
+        case Pow:
+            return std::pow(lhsVal.real(), rhsVal.isReal() ? rhsVal.real() : rhsVal.integer());
             break;
         }
     }

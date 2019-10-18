@@ -983,6 +983,8 @@ void UnitTest::testByteCodeArithOp() {
     ByteCode::SharedPtr rLit1(new Literal(Value(1.2)));
     ByteCode::SharedPtr rLit2(new Literal(Value(1.3)));
     ByteCode::SharedPtr rLit3(new Literal(Value(0.0)));
+    ByteCode::SharedPtr rLit4(new Literal(Value(9.0)));
+    ByteCode::SharedPtr rLit5(new Literal(Value(0.5)));
     ByteCode::SharedPtr cLit(new Literal(Value('c')));
     ByteCode::SharedPtr bLit(new Literal(Value(true)));
     
@@ -1019,13 +1021,33 @@ void UnitTest::testByteCodeArithOp() {
     arith.reset(new ArithOp(ArithOp::Mod, iLit4, iLit2));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
-    TEST_CASE_MSG(Util::isEqual(result.integer(), 0), "actual" << result);
+    TEST_CASE_MSG(Util::isEqual(result.integer(), 0), "actual=" << result);
 
     arith.reset(new ArithOp(ArithOp::Mod, iLit5, iLit2));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
-    TEST_CASE_MSG(Util::isEqual(result.integer(), 1), "actual" << result);
+    TEST_CASE_MSG(Util::isEqual(result.integer(), 1), "actual=" << result);
+
+    arith.reset(new ArithOp(ArithOp::Pow, iLit4, iLit2));
+    result = arith->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(Util::isEqual(result.real(), 16.0), "actual=" << result);
     
+    arith.reset(new ArithOp(ArithOp::Pow, iLit4, iLit3));
+    result = arith->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(Util::isEqual(result.real(), 1.0), "actual=" << result);
+
+    arith.reset(new ArithOp(ArithOp::Pow, iLit4, iLit1));
+    result = arith->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(Util::isEqual(result.real(), 4.0), "actual=" << result);
+
+    arith.reset(new ArithOp(ArithOp::Pow, rLit4, rLit5));
+    result = arith->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(Util::isEqual(result.real(), 3.0), "actual=" << result);
+
     try {
         arith.reset(new ArithOp(ArithOp::Div, iLit1, iLit3));
         arith->eval(env);
@@ -2474,6 +2496,8 @@ void UnitTest::testParserArith() {
     TEST_CASE(parserTest(parser, env, "(/ 2 0)",     Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(% 4 2)",     Value(0ll),  true));
     TEST_CASE(parserTest(parser, env, "(% 2.4 2)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(^ 3.0 2)",   Value(9.0),  true));
+    TEST_CASE(parserTest(parser, env, "(^ 9.0 0.5)", Value(3.0),  true));
 }
 
 // -------------------------------------------------------------
