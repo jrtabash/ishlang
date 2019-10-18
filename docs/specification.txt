@@ -297,6 +297,10 @@ Array Operations
 array: make an array
        (array [<element> [<element ...]])
 
+arraysv: make an array from size and inital value
+         default initial value is null
+         (arraysv <size> [<inital_value>])
+
 arrlen: return array length
         (arrlen <array>)
 
@@ -318,6 +322,8 @@ Examples:
   (arrset a 1 20)
   (println (arrget a 0))
   (println (arrget a 1))
+  (println (arraysv 5))
+  (println (arraysv 10 0))
 
 Comments
 --------
