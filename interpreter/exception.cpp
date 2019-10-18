@@ -53,7 +53,7 @@ std::string Exception::format(const char *fmt, ...) {
     char buf[256] = { 0 };
     va_list vaList;
     va_start(vaList, fmt);
-    auto const size = std::vsnprintf(buf, sizeof(buf), fmt, vaList);
+    const unsigned size = std::vsnprintf(buf, sizeof(buf), fmt, vaList);
     va_end(vaList);
 
     if (size >= sizeof(buf)) {

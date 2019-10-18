@@ -493,7 +493,7 @@ Value GetCharAt::exec(Environment::SharedPtr env) {
 
         const auto &rawStr = str.text();
         const auto rawPos = pos.integer();
-        if (rawPos < 0 || rawPos >= rawStr.size()) {
+        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawStr.size()) {
             throw OutOfRange("string getchar access");
         }
 
@@ -522,7 +522,7 @@ Value SetCharAt::exec(Environment::SharedPtr env) {
 
         auto &rawStr = str.text();
         const auto rawPos = pos.integer();
-        if (rawPos < 0 || rawPos >= rawStr.size()) {
+        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawStr.size()) {
             throw OutOfRange("string setchar access");
         }
 
@@ -591,12 +591,12 @@ Value SubString::exec(Environment::SharedPtr env) {
         const auto &rawStr = str.text();
 
         const auto rawPos = pos.integer();
-        if (rawPos < 0 || rawPos >= rawStr.size()) {
+        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawStr.size()) {
             throw OutOfRange("substring position access");
         }
 
         const auto rawLen = (len_ ? len.integer() : Value::Long(rawStr.size()));
-        if (rawLen < 0 || rawLen > rawStr.size()) {
+        if (rawLen < 0 || static_cast<std::size_t>(rawLen) > rawStr.size()) {
             throw OutOfRange("substring length access");
         }
 
@@ -635,7 +635,7 @@ Value StringFind::exec(Environment::SharedPtr env) {
         const auto &rawStr = str.text();
 
         const auto rawPos = pos.integer();
-        if (rawPos < 0 || rawPos >= rawStr.size()) {
+        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawStr.size()) {
             throw OutOfRange("strfind position access");
         }
 
@@ -728,7 +728,7 @@ Value ArrayGet::exec(Environment::SharedPtr env) {
 
         const auto &rawArr = arr.array();
         const auto rawPos = pos.integer();
-        if (rawPos < 0 || rawPos >= rawArr.size()) {
+        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawArr.size()) {
             throw OutOfRange("array get access");
         }
 
@@ -756,7 +756,7 @@ Value ArraySet::exec(Environment::SharedPtr env) {
 
         auto &rawArr = arr.array();
         const auto rawPos = pos.integer();
-        if (rawPos < 0 || rawPos >= rawArr.size()) {
+        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawArr.size()) {
             throw OutOfRange("array set access");
         }
 

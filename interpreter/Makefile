@@ -1,4 +1,5 @@
-CPP=g++ -std=c++17
+CPP=g++
+CFLAGS=-std=c++17 -Wall -Wextra -Wformat -Werror
 RM=rm -f
 
 OBJS=\
@@ -21,46 +22,46 @@ ishlang: $(OBJS)
 	$(CPP) -o ishlang $(OBJS)
 
 main.o: main.cpp util.h value.h exception.h environment.h lambda.h instance.h sequence.h byte_code.h unit_test.h interpreter.h
-	$(CPP) -c main.cpp
+	$(CPP) $(CFLAGS) -c main.cpp
 
 exception.o: exception.h exception.cpp
-	$(CPP) -c exception.cpp
+	$(CPP) $(CFLAGS) -c exception.cpp
 
 util.o: util.h util.cpp exception.h
-	$(CPP) -c util.cpp
+	$(CPP) $(CFLAGS) -c util.cpp
 
 value.o: value.h value.cpp lambda.h instance.h sequence.h exception.h
-	$(CPP) -c value.cpp
+	$(CPP) $(CFLAGS) -c value.cpp
 
 environment.o: environment.cpp environment.h value.h exception.h
-	$(CPP) -c environment.cpp
+	$(CPP) $(CFLAGS) -c environment.cpp
 
 lambda.o: lambda.cpp lambda.h value.h environment.h byte_code.h exception.h
-	$(CPP) -c lambda.cpp
+	$(CPP) $(CFLAGS) -c lambda.cpp
 
 struct.o: struct.cpp struct.h
-	$(CPP) -c struct.cpp
+	$(CPP) $(CFLAGS) -c struct.cpp
 
 instance.o: instance.cpp instance.h value.h exception.h
-	$(CPP) -c instance.cpp
+	$(CPP) $(CFLAGS) -c instance.cpp
 
 sequence.o: sequence.cpp sequence.h value.h exception.h
-	$(CPP) -c sequence.cpp
+	$(CPP) $(CFLAGS) -c sequence.cpp
 
 byte_code.o: byte_code.cpp byte_code.h value.h parser.h environment.h lambda.h util.h exception.h
-	$(CPP) -c byte_code.cpp
+	$(CPP) $(CFLAGS) -c byte_code.cpp
 
 lexer.o: lexer.cpp lexer.h util.h exception.h
-	$(CPP) -c lexer.cpp
+	$(CPP) $(CFLAGS) -c lexer.cpp
 
 parser.o: parser.cpp parser.h lexer.h byte_code.h util.h exception.h
-	$(CPP) -c parser.cpp
+	$(CPP) $(CFLAGS) -c parser.cpp
 
 unit_test.o: unit_test.cpp unit_test.h value.h environment.h lambda.h instance.h sequence.h util.h exception.h
-	$(CPP) -c unit_test.cpp
+	$(CPP) $(CFLAGS) -c unit_test.cpp
 
 interpreter.o: interpreter.cpp interpreter.h environment.h parser.h exception.h
-	$(CPP) -c interpreter.cpp
+	$(CPP) $(CFLAGS) -c interpreter.cpp
 
 clean: 
 	$(RM) *.o

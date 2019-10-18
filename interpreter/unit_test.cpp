@@ -417,7 +417,7 @@ void UnitTest::testValue() {
                       { Value('a'),  false, false, false, true,  false, false, 0, 0.0, 'a',  false },
                       { Value(true), false, false, false, false, true,  false, 0, 0.0, '\0', true  } };
         const size_t numCases = sizeof(cases)/sizeof(cases[0]);
-        for (int i = 0; i < numCases; ++i) {
+        for (size_t i = 0; i < numCases; ++i) {
             Case &c = cases[i];
             TEST_CASE_MSG(c.v.isNull() == c.nFlag, c.v << " isNull? expect=" << c.nFlag << " actual=" << c.v.isNull());
             TEST_CASE_MSG(c.v.isInt()  == c.iFlag, c.v << " isInt? expect="  << c.iFlag << " actual=" << c.v.isInt());
@@ -1258,7 +1258,7 @@ void UnitTest::testByteCodeLogicOp() {
         { LogicOp::Disjunction, true,  true,  false, true,  true }
     };
     const size_t size = sizeof(cases)/sizeof(cases[0]);
-    for (int i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         const Case &c = cases[i];
         
         try {

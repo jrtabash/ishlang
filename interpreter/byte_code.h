@@ -37,7 +37,7 @@ namespace Int {
         Literal(const Value &value) : ByteCode(), value_(value) {}
         virtual ~Literal() {}
 
-        virtual Value exec(Environment::SharedPtr env) { return value_; }
+        virtual Value exec(Environment::SharedPtr /*env*/) { return value_; }
 
     private:
         Value value_;
@@ -261,7 +261,7 @@ namespace Int {
         Break() {}
         virtual ~Break() {}
         
-        virtual Value exec(Environment::SharedPtr env) { throw Except(); }
+        virtual Value exec(Environment::SharedPtr /*env*/) { throw Except(); }
     };
 
     // -------------------------------------------------------------
