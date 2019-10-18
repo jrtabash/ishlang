@@ -691,6 +691,7 @@ Value MakeArraySV::exec(Environment::SharedPtr env) {
 
         return Value(Sequence(size.integer(), initValue));
     }
+    return Value::Null;
 }
 
 // -------------------------------------------------------------
