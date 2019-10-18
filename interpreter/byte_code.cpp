@@ -670,6 +670,12 @@ Value MakeArray::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+MakeArraySV::MakeArraySV(ByteCode::SharedPtr size)
+    : ByteCode()
+    , size_(size)
+    , initValue_()
+{}
+
 MakeArraySV::MakeArraySV(ByteCode::SharedPtr size, ByteCode::SharedPtr initValue)
     : ByteCode()
     , size_(size)

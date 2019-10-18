@@ -531,7 +531,8 @@ namespace Int {
     // Make array from size and value
     class MakeArraySV : public ByteCode {
     public:
-        MakeArraySV(ByteCode::SharedPtr size, ByteCode::SharedPtr initValue = ByteCode::SharedPtr());
+        MakeArraySV(ByteCode::SharedPtr size);
+        MakeArraySV(ByteCode::SharedPtr size, ByteCode::SharedPtr initValue);
         virtual ~MakeArraySV() {}
 
         virtual Value exec(Environment::SharedPtr env);
