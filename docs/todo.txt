@@ -1,7 +1,25 @@
-* Add more examples
+* Add power ArithOp operator and parser support
+  E.g. (^ 3 2)
+
+* Add array / string operations
+  - arrfind  : Find position of value in array
+  - arrcount : Count occurences of value in array
+  - strcount : Count occurences of character in string
+
+* Cleanup and unification:
+  - Rename def to defun
+  - Rename member get and set functions to memget and memset
+  - Rename string setchar and getchar to strget and strset
+  - Add generic get / set functions that work with instances, strings and arrays
+  - Add generic len function for strings and arrays
+  - Add generic find function for strings and arrays
+  - Add generic count function for strings and arrays
 
 * Implement built-in data structures:
   - List
   - Hash table
+  - Ordered table
+
+* Add support for modules
 
 * Rework 'break' implementation to avoid using Break::Except
