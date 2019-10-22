@@ -1,3 +1,16 @@
+* Add additional type operators
+  - typename := return builtin type name of operand
+    E.g. (typename 3) will return "int"
+  - structname := return struct name of operand
+    E.g. Assume a Person struct, and an instance p of Person
+         (structname p) will return "Person"
+
+* Add support for type conversion
+  - real <-> integer
+  - character <-> integer (characer ascii value)
+  - string <-> numeric (e.g. "123" <-> 123)
+  - string <-> character array (e.g. "12" <-> [1 2])
+
 * Add array / string operations
   - arrfind  : Find position of value in array
   - arrcount : Count occurences of value in array
