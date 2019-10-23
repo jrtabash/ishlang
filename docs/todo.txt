@@ -16,6 +16,8 @@
   - arrcount : Count occurences of value in array
   - strcount : Count occurences of character in string
 
+* Add support for file IO
+
 * Cleanup and unification:
   - Rename def to defun
   - Rename member get and set functions to memget and memset
