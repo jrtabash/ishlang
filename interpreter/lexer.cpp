@@ -40,7 +40,7 @@ Lexer::Token Lexer::next() {
 // -------------------------------------------------------------
 Lexer::TokenType Lexer::tokenType(const std::string &token) {
     static const std::unordered_set<char> singles({
-            '-', '+', '*', '/', '%', '^', '=', '<', '>'});
+            '-', '+', '*', '/', '%', '^', '=', '<', '>', '?'});
 
     static const std::unordered_set<char> notAllowed({
             '(', ')', '-', '+', '[', ']', '{', '}', '~', '!', '@',
