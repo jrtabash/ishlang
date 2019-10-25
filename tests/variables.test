@@ -1,0 +1,18 @@
+__CODE__
+(var x 1)
+(var y "foobar")
+
+(println (? x))
+(println (? y))
+(println (? z))
+
+(println x)
+(println y)
+
+__EXPECT__
+true
+true
+false
+
+1
+foobar

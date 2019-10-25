@@ -1,0 +1,27 @@
+__CODE__
+(println (and true true))
+(println (and true false))
+(println (and false true))
+(println (and false false))
+
+(println (or true true))
+(println (or true false))
+(println (or false true))
+(println (or false false))
+
+(println (not true))
+(println (not false))
+
+__EXPECT__
+true
+false
+false
+false
+
+true
+true
+true
+false
+
+false
+true

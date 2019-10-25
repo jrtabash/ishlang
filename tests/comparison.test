@@ -1,0 +1,41 @@
+__CODE__
+(println (== 1 1))
+(println (== 1 2))
+
+(println (!= 'a' 'b'))
+(println (!= 'a' 'a'))
+
+(println (> 2 1))
+(println (> 2 2))
+
+(println (>= 3 2))
+(println (>= 3 3))
+(println (>= 2 3))
+
+(println (< 2 3))
+(println (< 2 2))
+
+(println (<= 2 3))
+(println (<= 2 2))
+(println (<= 3 2))
+
+__EXPECT__
+true
+false
+
+true
+false
+
+true
+false
+
+true
+true
+false
+
+true
+false
+
+true
+true
+false

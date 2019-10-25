@@ -1,0 +1,5 @@
+__CODE__
+(println "Hello World")
+
+__EXPECT__
+Hello World
