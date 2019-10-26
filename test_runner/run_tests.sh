@@ -1,16 +1,45 @@
 #!/bin/bash
 
-# Assumes script is run from ishlang/test_runner/
-# Assumes make_test_files binary is in ishlang/test_runner/
+if [ $# -ne 3 ]; then
+    echo "Usage"
+    echo ""
+    echo "    $0 <ishlang> <make_test_files> <tests>"
+    echo ""
+    echo "         ishlang := ishlang binary"
+    echo " make_test_files := make_test_files binary"
+    echo "           tests := tests/scenarios folder"
+    echo ""
+    echo "Error: Invalid arguments"
+    exit 1
+fi
 
-scenarios=$(ls ../tests/*.test)
+ishlang=${1}
+make_test_files=${2}
+tests=${3}
+
+if [ ! -f ${ishlang} ]; then
+    echo "Terminating tests ... cannot find ishlang binary ${ishlang}"
+    exit 1
+fi
+
+if [ ! -f ${make_test_files} ]; then
+    echo "Terminating tests ... cannot find make_test_files binary ${make_test_files}"
+    exit 1
+fi
+
+if [ ! -d ${tests} ]; then
+    echo "Terminating tests ... cannot find tests folder ${tests}"
+    exit 1
+fi
+
+scenarios=$(ls ${tests}/*.test)
 if [ "${scenarios}" == "" ]; then
     echo "Terminating tests ... no scenarios "
 fi
 
 for scenario in ${scenarios}
 do
-    ./make_test_files ${scenario}
+    ${make_test_files} ${scenario}
     if [ ${?} -ne 0 ]; then
         echo "Terminating tests ... failed to create test files for ${scenario}"
         exit 1
@@ -20,7 +49,7 @@ do
     expect_file=$(echo "${scenario}.expect")
     out_file=$(echo "${scenario}.out")
 
-    ishlang -f ${code_file} > ${out_file}
+    ${ishlang} -f ${code_file} > ${out_file}
     if [ ${?} -ne 0 ]; then
         echo "Terminating tests ... failed running ${code_file}"
         exit 1
