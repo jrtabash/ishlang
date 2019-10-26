@@ -13,3 +13,7 @@ make_test_files.o: make_test_files.cpp
 clean:
 	$(RM) *.o
 	$(RM) make_test_files
+
+install:
+	cp make_test_files ~/bin/
+	cp run_tests.sh ~/bin/
