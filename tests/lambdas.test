@@ -1,0 +1,22 @@
+__CODE__
+(println ((lambda () 5)))
+(println ((lambda (x) (* 2 x)) 5))
+(println ((lambda (x y) (+ x y)) 5 10))
+
+(var adder
+  (lambda (x y)
+    (+ x y)))
+(println (adder 10 10))
+
+(var nested
+  (lambda (x)
+    (var add5 (lambda (n) (+ n 5)))
+    (add5 x)))
+(println (nested 20))
+
+__EXPECT__
+5
+10
+15
+20
+25

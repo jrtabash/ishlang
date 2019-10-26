@@ -36,6 +36,20 @@ __CODE__
   ((<= y 0) (println "??? cond 5"))
   (true (println "default")))
 
+;; Conditional Value
+;; -----------------
+(var desc
+  (if (== (% y 2) 0)
+      "even"
+    "odd"))
+(println desc)
+
+(= desc
+  (cond
+   ((== (% x 2) 0) "even")
+   (true "odd")))
+(println desc)
+
 __EXPECT__
 trueFlag
 falseFlag
@@ -43,3 +57,5 @@ x is 5
 x is 5
 y is even
 default
+even
+odd
