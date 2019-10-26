@@ -1,0 +1,26 @@
+__CODE__
+(def double (x)
+  (* 2 x))
+(println (double 10))
+
+(def addAndDouble (x y)
+  (* 2 (+ x y)))
+(println (addAndDouble 5 10))
+
+(def nestedAddAndDouble (x y)
+  (def times2 (arg)
+    (* 2 arg))
+  (times2 (+ x y)))
+(println (nestedAddAndDouble 10 20))
+
+(def callbackAddAndDouble (x y doubleFtn)
+  (doubleFtn (+ x y)))
+(println (callbackAddAndDouble 20 40 double))
+(println (callbackAddAndDouble 40 80 (lambda (x) (* 2 x))))
+
+__EXPECT__
+20
+30
+60
+120
+240

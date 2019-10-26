@@ -1,0 +1,31 @@
+__CODE__
+(struct Square
+  (side))
+(var s (makeinstance Square))
+(println (isinstanceof s Square))
+
+(set s side 5)
+(println (get s side))
+
+(var ss Square)
+(println (isstructname ss Square))
+
+(var s2 (makeinstance ss))
+(println (isinstanceof s2 Square))
+
+(struct Person
+  (name
+   age))
+(var p (makeinstance Person))
+(set p name "Albert")
+(set p age 25)
+(println (get p name))
+(println (get p age))
+
+__EXPECT__
+true
+5
+true
+true
+Albert
+25

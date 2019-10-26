@@ -22,9 +22,11 @@ __CODE__
 (println (istypeof f closure))
 (println (istypeof t usertype))
 (println (istypeof o userobject))
+(println (isstructname t MyStruct))
 (println (isinstanceof o MyStruct))
 
 __EXPECT__
+true
 true
 true
 true
