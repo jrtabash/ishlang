@@ -17,13 +17,13 @@ Parser::Parser()
 }
 
 // -------------------------------------------------------------
-ByteCode::SharedPtr Parser::read(const std::string &expr) {
+CodeNode::SharedPtr Parser::read(const std::string &expr) {
     lexer_.read(expr);
     return readExpr();
 }
 
 // -------------------------------------------------------------
-ByteCode::SharedPtr Parser::readLiteral(const std::string &expr) {
+CodeNode::SharedPtr Parser::readLiteral(const std::string &expr) {
     const auto tokTyp = Lexer::tokenType(expr);
     switch (tokTyp) {
     case Lexer::Char:
@@ -49,7 +49,7 @@ void Parser::readMulti(const std::string &expr, CallBack callback) {
             return;
         }
 
-        ByteCode::SharedPtr code = readExpr();
+        CodeNode::SharedPtr code = readExpr();
         if (code.get()) {
             callback(code);
         }
@@ -57,10 +57,10 @@ void Parser::readMulti(const std::string &expr, CallBack callback) {
 }
 
 // -------------------------------------------------------------
-ByteCode::SharedPtr Parser::readExpr() {
+CodeNode::SharedPtr Parser::readExpr() {
     while (!lexer_.empty()) {
         if (!haveSExpression()) {
-            return ByteCode::SharedPtr();
+            return CodeNode::SharedPtr();
         }
 
         auto token = lexer_.next();
@@ -71,7 +71,7 @@ ByteCode::SharedPtr Parser::readExpr() {
                 return readApp();
 
             case Lexer::RightP:
-                return ByteCode::SharedPtr();
+                return CodeNode::SharedPtr();
 
             case Lexer::Char:
             case Lexer::String:
@@ -95,7 +95,7 @@ ByteCode::SharedPtr Parser::readExpr() {
 }
 
 // -------------------------------------------------------------
-ByteCode::SharedPtr Parser::makeLiteral(Lexer::TokenType type, const std::string &text) {
+CodeNode::SharedPtr Parser::makeLiteral(Lexer::TokenType type, const std::string &text) {
     switch (type) {
     case Lexer::Char:
         return std::make_shared<Literal>(Value(text[1]));
@@ -120,7 +120,7 @@ ByteCode::SharedPtr Parser::makeLiteral(Lexer::TokenType type, const std::string
 }
 
 // -------------------------------------------------------------
-ByteCode::SharedPtr Parser::readApp(const std::string &expected) {
+CodeNode::SharedPtr Parser::readApp(const std::string &expected) {
     if (!lexer_.empty()) {
         auto token = lexer_.next();
 
@@ -136,7 +136,7 @@ ByteCode::SharedPtr Parser::readApp(const std::string &expected) {
             else {
                 if (token.type == Lexer::Symbol) {
                     const std::string & name(token.text);
-                    ByteCode::SharedPtrList args(readExprList());
+                    CodeNode::SharedPtrList args(readExprList());
                     return std::make_shared<FunctionApp>(name, args);
                 }
                 else {
@@ -149,9 +149,9 @@ ByteCode::SharedPtr Parser::readApp(const std::string &expected) {
 }
 
 // -------------------------------------------------------------
-ByteCode::SharedPtrList Parser::readExprList() {
-    ByteCode::SharedPtrList forms;
-    ByteCode::SharedPtr form = readExpr();
+CodeNode::SharedPtrList Parser::readExprList() {
+    CodeNode::SharedPtrList forms;
+    CodeNode::SharedPtr form = readExpr();
     while (form.get()) {
         forms.push_back(form);
         form = readExpr();
@@ -160,9 +160,9 @@ ByteCode::SharedPtrList Parser::readExprList() {
 }
 
 // -------------------------------------------------------------
-ByteCode::SharedPtrPairs Parser::readExprPairs() {
-    ByteCode::SharedPtrPairs pairs;
-    ByteCode::SharedPtrPair cons;
+CodeNode::SharedPtrPairs Parser::readExprPairs() {
+    CodeNode::SharedPtrPairs pairs;
+    CodeNode::SharedPtrPair cons;
     ignoreLeftP(false);
     cons.first = readExpr();
     cons.second = readExpr();
@@ -187,8 +187,8 @@ std::string Parser::readName() {
 }
 
 // -------------------------------------------------------------
-ByteCode::ParamList Parser::readParams() {
-    ByteCode::ParamList params;
+CodeNode::ParamList Parser::readParams() {
+    CodeNode::ParamList params;
     auto token = lexer_.next();
     if (token.type != Lexer::LeftP) {
         throw InvalidExpression("Expecting ( beginning of param list");
@@ -250,7 +250,7 @@ void Parser::initAppFtns() {
         { "var",
           [this]() {
                 const std::string name(readName());
-                ByteCode::SharedPtr code(readExpr());
+                CodeNode::SharedPtr code(readExpr());
                 ignoreRightP();
                 return std::make_shared<Define>(name, code);
           }
@@ -259,7 +259,7 @@ void Parser::initAppFtns() {
         { "=",
           [this]() {
                 const std::string name(readName());
-                ByteCode::SharedPtr code(readExpr());
+                CodeNode::SharedPtr code(readExpr());
                 ignoreRightP();
                 return std::make_shared<Assign>(name, code);
           }
@@ -275,7 +275,7 @@ void Parser::initAppFtns() {
 
         { "clone",
           [this]() {
-                ByteCode::SharedPtr code(readExpr());
+                CodeNode::SharedPtr code(readExpr());
                 ignoreRightP();
                 return std::make_shared<Clone>(code);
           }
@@ -283,8 +283,8 @@ void Parser::initAppFtns() {
 
         { "+",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<ArithOp>(ArithOp::Add, lhs, rhs);
           }
@@ -292,8 +292,8 @@ void Parser::initAppFtns() {
 
         { "-",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<ArithOp>(ArithOp::Sub, lhs, rhs);
           }
@@ -301,8 +301,8 @@ void Parser::initAppFtns() {
 
         { "*",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<ArithOp>(ArithOp::Mul, lhs, rhs);
           }
@@ -310,8 +310,8 @@ void Parser::initAppFtns() {
 
         { "/",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<ArithOp>(ArithOp::Div, lhs, rhs);
           }
@@ -319,8 +319,8 @@ void Parser::initAppFtns() {
 
         { "%",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<ArithOp>(ArithOp::Mod, lhs, rhs);
           }
@@ -328,8 +328,8 @@ void Parser::initAppFtns() {
 
         { "^",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<ArithOp>(ArithOp::Pow, lhs, rhs);
           }
@@ -337,8 +337,8 @@ void Parser::initAppFtns() {
 
         { "==",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<CompOp>(CompOp::EQ, lhs, rhs);
           }
@@ -346,8 +346,8 @@ void Parser::initAppFtns() {
 
         { "!=",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<CompOp>(CompOp::NE, lhs, rhs);
           }
@@ -355,8 +355,8 @@ void Parser::initAppFtns() {
 
         { "<",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<CompOp>(CompOp::LT, lhs, rhs);
           }
@@ -364,8 +364,8 @@ void Parser::initAppFtns() {
 
         { ">",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<CompOp>(CompOp::GT, lhs, rhs);
           }
@@ -373,8 +373,8 @@ void Parser::initAppFtns() {
 
         { "<=",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<CompOp>(CompOp::LE, lhs, rhs);
           }
@@ -382,8 +382,8 @@ void Parser::initAppFtns() {
 
         { ">=",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<CompOp>(CompOp::GE, lhs, rhs);
           }
@@ -391,8 +391,8 @@ void Parser::initAppFtns() {
 
         { "and",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<LogicOp>(LogicOp::Conjunction, lhs, rhs);
           }
@@ -400,8 +400,8 @@ void Parser::initAppFtns() {
 
         { "or",
           [this]() {
-                ByteCode::SharedPtr lhs(readExpr());
-                ByteCode::SharedPtr rhs(readExpr());
+                CodeNode::SharedPtr lhs(readExpr());
+                CodeNode::SharedPtr rhs(readExpr());
                 ignoreRightP();
                 return std::make_shared<LogicOp>(LogicOp::Disjunction, lhs, rhs);
           }
@@ -409,7 +409,7 @@ void Parser::initAppFtns() {
 
         { "not",
           [this]() {
-                ByteCode::SharedPtr operand(readExpr());
+                CodeNode::SharedPtr operand(readExpr());
                 ignoreRightP();
                 return std::make_shared<Not>(operand);
           }
@@ -417,21 +417,21 @@ void Parser::initAppFtns() {
 
         { "progn",
           [this]() {
-                ByteCode::SharedPtrList exprs(readExprList());
+                CodeNode::SharedPtrList exprs(readExprList());
                 return std::make_shared<ProgN>(exprs);
           }
         },
 
         { "block",
           [this]() {
-                ByteCode::SharedPtrList exprs(readExprList());
+                CodeNode::SharedPtrList exprs(readExprList());
                 return std::make_shared<Block>(exprs);
           }
         },
 
         { "if",
           [this]() {
-                ByteCode::SharedPtrList exprs(readExprList());
+                CodeNode::SharedPtrList exprs(readExprList());
                 if (exprs.size() == 2) {
                     return std::make_shared<If>(exprs[0], exprs[1]);
                 }
@@ -446,7 +446,7 @@ void Parser::initAppFtns() {
 
         { "cond",
           [this]() {
-                ByteCode::SharedPtrPairs pairs(readExprPairs());
+                CodeNode::SharedPtrPairs pairs(readExprPairs());
                 return std::make_shared<Cond>(pairs);
           }
         },
@@ -460,19 +460,19 @@ void Parser::initAppFtns() {
 
         { "loop",
           [this]() {
-                ByteCode::SharedPtrList forms(readExprList());
+                CodeNode::SharedPtrList forms(readExprList());
                 if (forms.size() == 4) {
-                    ByteCode::SharedPtrList::iterator iter = forms.begin();
-                    ByteCode::SharedPtr decl(*iter++);
-                    ByteCode::SharedPtr cond(*iter++);
-                    ByteCode::SharedPtr next(*iter++);
-                    ByteCode::SharedPtr body(*iter++);
+                    CodeNode::SharedPtrList::iterator iter = forms.begin();
+                    CodeNode::SharedPtr decl(*iter++);
+                    CodeNode::SharedPtr cond(*iter++);
+                    CodeNode::SharedPtr next(*iter++);
+                    CodeNode::SharedPtr body(*iter++);
                     return std::make_shared<Loop>(decl, cond, next, body);
                 }
                 else if (forms.size() == 2) {
-                    ByteCode::SharedPtrList::iterator iter = forms.begin();
-                    ByteCode::SharedPtr cond(*iter++);
-                    ByteCode::SharedPtr body(*iter++);
+                    CodeNode::SharedPtrList::iterator iter = forms.begin();
+                    CodeNode::SharedPtr cond(*iter++);
+                    CodeNode::SharedPtr body(*iter++);
                     return std::make_shared<Loop>(cond, body);
                 }
                 else {
@@ -483,9 +483,9 @@ void Parser::initAppFtns() {
 
         { "lambda",
           [this]() {
-                ByteCode::ParamList params(readParams());
-                ByteCode::SharedPtrList exprs(readExprList());
-                ByteCode::SharedPtr body(exprs.size() == 1 ? exprs[0] : std::make_shared<ProgN>(exprs));
+                CodeNode::ParamList params(readParams());
+                CodeNode::SharedPtrList exprs(readExprList());
+                CodeNode::SharedPtr body(exprs.size() == 1 ? exprs[0] : std::make_shared<ProgN>(exprs));
                 return std::make_shared<LambdaExpr>(params, body);
           }
         },
@@ -493,24 +493,24 @@ void Parser::initAppFtns() {
         { "def",
           [this]() {
                 const std::string name(readName());
-                ByteCode::ParamList params(readParams());
-                ByteCode::SharedPtrList exprs(readExprList());
-                ByteCode::SharedPtr body(exprs.size() == 1 ? exprs[0] : std::make_shared<ProgN>(exprs));
+                CodeNode::ParamList params(readParams());
+                CodeNode::SharedPtrList exprs(readExprList());
+                CodeNode::SharedPtr body(exprs.size() == 1 ? exprs[0] : std::make_shared<ProgN>(exprs));
                 return std::make_shared<FunctionExpr>(name, params, body);
           }
         },
 
         { "(",
           [this]() {
-                ByteCode::SharedPtr lambda(readApp("lambda"));
-                ByteCode::SharedPtrList args(readExprList());
+                CodeNode::SharedPtr lambda(readApp("lambda"));
+                CodeNode::SharedPtrList args(readExprList());
                 return std::make_shared<LambdaApp>(lambda, args);
           }
         },
 
         { "istypeof",
           [this]() {
-                ByteCode::SharedPtr form(readExpr());
+                CodeNode::SharedPtr form(readExpr());
                 Value::Type type(Value::stringToType(readName()));
                 ignoreRightP();
                 return std::make_shared<IsType>(form, type);
@@ -519,7 +519,7 @@ void Parser::initAppFtns() {
 
         { "print",
           [this]() {
-                ByteCode::SharedPtr pExpr(readExpr());
+                CodeNode::SharedPtr pExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<Print>(false, pExpr);
           }
@@ -527,7 +527,7 @@ void Parser::initAppFtns() {
 
         { "println",
           [this]() {
-                ByteCode::SharedPtr pExpr(readExpr());
+                CodeNode::SharedPtr pExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<Print>(true, pExpr);
           }
@@ -551,7 +551,7 @@ void Parser::initAppFtns() {
 
         { "isstructname",
           [this]() {
-                ByteCode::SharedPtr snExpr(readExpr());
+                CodeNode::SharedPtr snExpr(readExpr());
                 const std::string name(readName());
                 ignoreRightP();
                 return std::make_shared<IsStructName>(snExpr, name);
@@ -568,7 +568,7 @@ void Parser::initAppFtns() {
 
         { "isinstanceof",
           [this]() {
-                ByteCode::SharedPtr ioExpr(readExpr());
+                CodeNode::SharedPtr ioExpr(readExpr());
                 const std::string name(readName());
                 ignoreRightP();
                 return std::make_shared<IsInstanceOf>(ioExpr, name);
@@ -577,7 +577,7 @@ void Parser::initAppFtns() {
 
         { "get",
           [this]() {
-                ByteCode::SharedPtr instExpr(readExpr());
+                CodeNode::SharedPtr instExpr(readExpr());
                 const std::string name(readName());
                 ignoreRightP();
                 return std::make_shared<GetMember>(instExpr, name);
@@ -586,9 +586,9 @@ void Parser::initAppFtns() {
 
         { "set",
           [this]() {
-                ByteCode::SharedPtr instExpr(readExpr());
+                CodeNode::SharedPtr instExpr(readExpr());
                 const std::string name(readName());
-                ByteCode::SharedPtr valueExpr(readExpr());
+                CodeNode::SharedPtr valueExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<SetMember>(instExpr, name, valueExpr);
           }
@@ -596,7 +596,7 @@ void Parser::initAppFtns() {
 
         { "strlen",
           [this]() {
-                ByteCode::SharedPtr strExpr(readExpr());
+                CodeNode::SharedPtr strExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<StringLen>(strExpr);
           }
@@ -604,8 +604,8 @@ void Parser::initAppFtns() {
 
         { "getchar",
           [this]() {
-                ByteCode::SharedPtr strExpr(readExpr());
-                ByteCode::SharedPtr posExpr(readExpr());
+                CodeNode::SharedPtr strExpr(readExpr());
+                CodeNode::SharedPtr posExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<GetCharAt>(strExpr, posExpr);
           }
@@ -613,9 +613,9 @@ void Parser::initAppFtns() {
 
         { "setchar",
           [this]() {
-                ByteCode::SharedPtr strExpr(readExpr());
-                ByteCode::SharedPtr posExpr(readExpr());
-                ByteCode::SharedPtr valExpr(readExpr());
+                CodeNode::SharedPtr strExpr(readExpr());
+                CodeNode::SharedPtr posExpr(readExpr());
+                CodeNode::SharedPtr valExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<SetCharAt>(strExpr, posExpr, valExpr);
           }
@@ -623,8 +623,8 @@ void Parser::initAppFtns() {
 
         { "strcat",
           [this]() {
-                ByteCode::SharedPtr strExpr(readExpr());
-                ByteCode::SharedPtr otherExpr(readExpr());
+                CodeNode::SharedPtr strExpr(readExpr());
+                CodeNode::SharedPtr otherExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<StringCat>(strExpr, otherExpr);
           }
@@ -632,7 +632,7 @@ void Parser::initAppFtns() {
 
         { "substr",
           [this]() {
-                ByteCode::SharedPtrList exprs(readExprList());
+                CodeNode::SharedPtrList exprs(readExprList());
                 if (exprs.size() == 2) {
                     return std::make_shared<SubString>(exprs[0], exprs[1]);
                 }
@@ -647,7 +647,7 @@ void Parser::initAppFtns() {
 
         { "strfind",
           [this]() {
-                ByteCode::SharedPtrList exprs(readExprList());
+                CodeNode::SharedPtrList exprs(readExprList());
                 if (exprs.size() == 2) {
                     return std::make_shared<StringFind>(exprs[0], exprs[1]);
                 }
@@ -662,7 +662,7 @@ void Parser::initAppFtns() {
 
         { "array",
           [this]() {
-                ByteCode::SharedPtrList valueExprs(readExprList());
+                CodeNode::SharedPtrList valueExprs(readExprList());
                 if (valueExprs.size() == 0) {
                     return std::make_shared<MakeArray>();
                 }
@@ -674,7 +674,7 @@ void Parser::initAppFtns() {
 
         { "arraysv",
           [this]() {
-                ByteCode::SharedPtrList exprs(readExprList());
+                CodeNode::SharedPtrList exprs(readExprList());
                 if (exprs.size() == 1) {
                     return std::make_shared<MakeArraySV>(exprs[0]);
                 }
@@ -689,7 +689,7 @@ void Parser::initAppFtns() {
 
         { "arrlen",
           [this]() {
-                ByteCode::SharedPtr strExpr(readExpr());
+                CodeNode::SharedPtr strExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<ArrayLen>(strExpr);
           }
@@ -697,8 +697,8 @@ void Parser::initAppFtns() {
 
         { "arrget",
           [this]() {
-                ByteCode::SharedPtr arrExpr(readExpr());
-                ByteCode::SharedPtr posExpr(readExpr());
+                CodeNode::SharedPtr arrExpr(readExpr());
+                CodeNode::SharedPtr posExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<ArrayGet>(arrExpr, posExpr);
           }
@@ -706,9 +706,9 @@ void Parser::initAppFtns() {
 
         { "arrset",
           [this]() {
-                ByteCode::SharedPtr arrExpr(readExpr());
-                ByteCode::SharedPtr posExpr(readExpr());
-                ByteCode::SharedPtr valExpr(readExpr());
+                CodeNode::SharedPtr arrExpr(readExpr());
+                CodeNode::SharedPtr posExpr(readExpr());
+                CodeNode::SharedPtr valExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<ArraySet>(arrExpr, posExpr, valExpr);
           }
@@ -716,8 +716,8 @@ void Parser::initAppFtns() {
 
         { "arradd",
           [this]() {
-                ByteCode::SharedPtr arrExpr(readExpr());
-                ByteCode::SharedPtr valExpr(readExpr());
+                CodeNode::SharedPtr arrExpr(readExpr());
+                CodeNode::SharedPtr valExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<ArrayAdd>(arrExpr, valExpr);
           }

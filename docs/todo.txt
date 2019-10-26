@@ -1,5 +1,3 @@
-* Rename ByteCode to CodeNode
-
 * Restructure ishlang file/code heirarchy:
   - ishlang
     - docs

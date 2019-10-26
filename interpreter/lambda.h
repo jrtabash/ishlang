@@ -3,7 +3,7 @@
 
 #include "value.h"
 #include "environment.h"
-#include "byte_code.h"
+#include "code_node.h"
 
 #include <string>
 #include <vector>
@@ -18,7 +18,7 @@ namespace Int {
 
     public:
         Lambda();
-        Lambda(const ParamList &params, ByteCode::SharedPtr body, Environment::SharedPtr env);
+        Lambda(const ParamList &params, CodeNode::SharedPtr body, Environment::SharedPtr env);
 
         Value exec(const ArgList &args) const;
 
@@ -42,7 +42,7 @@ namespace Int {
 
     private:
         ParamList                      params_;
-        ByteCode::SharedPtr            body_;
+        CodeNode::SharedPtr            body_;
         mutable Environment::SharedPtr env_;
     };
 

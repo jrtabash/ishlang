@@ -26,7 +26,7 @@ namespace Int {
     private:
         struct ParserCB {
             ParserCB(Environment::SharedPtr env, std::string &lastResult, bool &batch);
-            void operator()(ByteCode::SharedPtr &code);
+            void operator()(CodeNode::SharedPtr &code);
 
         private:
             Environment::SharedPtr  env;

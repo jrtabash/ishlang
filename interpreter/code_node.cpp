@@ -1,4 +1,4 @@
-#include "byte_code.h"
+#include "code_node.h"
 #include "lambda.h"
 #include "instance.h"
 #include "sequence.h"
@@ -11,8 +11,8 @@
 using namespace Int;
 
 // -------------------------------------------------------------
-IsType::IsType(ByteCode::SharedPtr expr, Value::Type type)
-  : ByteCode()
+IsType::IsType(CodeNode::SharedPtr expr, Value::Type type)
+  : CodeNode()
   , expr_(expr)
   , type_(type)
 {}
@@ -26,7 +26,7 @@ Value IsType::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-ArithOp::ArithOp(Type type, ByteCode::SharedPtr lhs, ByteCode::SharedPtr rhs)
+ArithOp::ArithOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
     : BinaryOp(lhs, rhs)
     , type_(type)
 {}
@@ -81,7 +81,7 @@ Value ArithOp::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-CompOp::CompOp(Type type, ByteCode::SharedPtr lhs, ByteCode::SharedPtr rhs)
+CompOp::CompOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
     : BinaryOp(lhs, rhs)
     , type_(type)
 {}
@@ -110,7 +110,7 @@ Value CompOp::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-LogicOp::LogicOp(Type type, ByteCode::SharedPtr lhs, ByteCode::SharedPtr rhs)
+LogicOp::LogicOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
     : BinaryOp(lhs, rhs)
     , type_(type)
 {}
@@ -132,8 +132,8 @@ Value LogicOp::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-Not::Not(ByteCode::SharedPtr operand)
-    : ByteCode()
+Not::Not(CodeNode::SharedPtr operand)
+    : CodeNode()
     , operand_(operand)
 {
 }
@@ -150,15 +150,15 @@ Value Not::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-ProgN::ProgN(ByteCode::SharedPtrList exprs)
-    : ByteCode()
+ProgN::ProgN(CodeNode::SharedPtrList exprs)
+    : CodeNode()
     , exprs_(exprs)
 {}
 
 Value ProgN::exec(Environment::SharedPtr env) {
     if (!exprs_.empty()) {
         Value result;
-        for (ByteCode::SharedPtrList::iterator iter = exprs_.begin(); iter != exprs_.end(); ++iter) {
+        for (CodeNode::SharedPtrList::iterator iter = exprs_.begin(); iter != exprs_.end(); ++iter) {
             result = (*iter)->exec(env);
         }
         return result;
@@ -167,7 +167,7 @@ Value ProgN::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-Block::Block(ByteCode::SharedPtrList exprs)
+Block::Block(CodeNode::SharedPtrList exprs)
     : ProgN(exprs)
 {}
 
@@ -177,15 +177,15 @@ Value Block::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-If::If(ByteCode::SharedPtr pred, ByteCode::SharedPtr tCode)
-    : ByteCode()
+If::If(CodeNode::SharedPtr pred, CodeNode::SharedPtr tCode)
+    : CodeNode()
     , pred_(pred)
     , tCode_(tCode)
     , fCode_()
 {}
 
-If::If(ByteCode::SharedPtr pred, ByteCode::SharedPtr tCode, ByteCode::SharedPtr fCode)
-    : ByteCode()
+If::If(CodeNode::SharedPtr pred, CodeNode::SharedPtr tCode, CodeNode::SharedPtr fCode)
+    : CodeNode()
     , pred_(pred)
     , tCode_(tCode)
     , fCode_(fCode)
@@ -209,15 +209,15 @@ Value If::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-Cond::Cond(ByteCode::SharedPtrPairs cases)
-    : ByteCode()
+Cond::Cond(CodeNode::SharedPtrPairs cases)
+    : CodeNode()
     , cases_(cases)
 {}
 
 Value Cond::exec(Environment::SharedPtr env) {
     const size_t numCases = cases_.size();
     if (numCases > 0) {
-        for (ByteCode::SharedPtrPairs::iterator iter = cases_.begin(); iter != cases_.end(); ++iter) {
+        for (CodeNode::SharedPtrPairs::iterator iter = cases_.begin(); iter != cases_.end(); ++iter) {
             if (!iter->first.get()) { throw InvalidExpressionType("Boolean", "Null"); }
 
             const Value pred = iter->first->eval(env);
@@ -231,16 +231,16 @@ Value Cond::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-Loop::Loop(ByteCode::SharedPtr decl, ByteCode::SharedPtr cond, ByteCode::SharedPtr next, ByteCode::SharedPtr body)
-    : ByteCode()
+Loop::Loop(CodeNode::SharedPtr decl, CodeNode::SharedPtr cond, CodeNode::SharedPtr next, CodeNode::SharedPtr body)
+    : CodeNode()
     , decl_(decl)
     , cond_(cond)
     , next_(next)
     , body_(body)
 {}
 
-Loop::Loop(ByteCode::SharedPtr cond, ByteCode::SharedPtr body)
-    : ByteCode()
+Loop::Loop(CodeNode::SharedPtr cond, CodeNode::SharedPtr body)
+    : CodeNode()
     , decl_()
     , cond_(cond)
     , next_()
@@ -274,8 +274,8 @@ Value Loop::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-LambdaExpr::LambdaExpr(const ParamList &params, ByteCode::SharedPtr body)
-  : ByteCode()
+LambdaExpr::LambdaExpr(const ParamList &params, CodeNode::SharedPtr body)
+  : CodeNode()
   , params_(params)
   , body_(body)
 {}
@@ -285,8 +285,8 @@ Value LambdaExpr::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-LambdaApp::LambdaApp(ByteCode::SharedPtr closure, SharedPtrList args)
-    : ByteCode()
+LambdaApp::LambdaApp(CodeNode::SharedPtr closure, SharedPtrList args)
+    : CodeNode()
     , closure_(closure)
     , argExprs_(args)
     , closureVar_(Value::Null)
@@ -311,7 +311,7 @@ Value LambdaApp::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-FunctionExpr::FunctionExpr(const std::string &name, const ParamList &params, ByteCode::SharedPtr body)
+FunctionExpr::FunctionExpr(const std::string &name, const ParamList &params, CodeNode::SharedPtr body)
     : LambdaExpr(params, body)
     , name_(name)
 {}
@@ -326,7 +326,7 @@ Value FunctionExpr::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 FunctionApp::FunctionApp(const std::string &name, SharedPtrList args)
-    : LambdaApp(ByteCode::SharedPtr(), args)
+    : LambdaApp(CodeNode::SharedPtr(), args)
     , name_(name)
 {}
 
@@ -336,8 +336,8 @@ Value FunctionApp::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-Print::Print(bool newline, ByteCode::SharedPtr expr)
-    : ByteCode()
+Print::Print(bool newline, CodeNode::SharedPtr expr)
+    : CodeNode()
     , newline_(newline)
     , expr_(expr)
 {}
@@ -350,7 +350,7 @@ Value Print::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 Read::Read()
-    : ByteCode()
+    : CodeNode()
 {
 }
 
@@ -363,7 +363,7 @@ Value Read::exec(Environment::SharedPtr env)
 
 // -------------------------------------------------------------
 StructExpr::StructExpr(const std::string &name, const Struct::MemberList &members)
-    : ByteCode()
+    : CodeNode()
     , struct_(name, members)
 {}
 
@@ -373,8 +373,8 @@ Value StructExpr::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-IsStructName::IsStructName(ByteCode::SharedPtr expr, const std::string &name)
-    : ByteCode()
+IsStructName::IsStructName(CodeNode::SharedPtr expr, const std::string &name)
+    : CodeNode()
     , expr_(expr)
     , name_(name)
 {}
@@ -391,7 +391,7 @@ Value IsStructName::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 MakeInstance::MakeInstance(const std::string &name)
-    : ByteCode()
+    : CodeNode()
     , name_(name)
 {}
 
@@ -404,8 +404,8 @@ Value MakeInstance::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-IsInstanceOf::IsInstanceOf(ByteCode::SharedPtr expr, const std::string &name)
-    : ByteCode()
+IsInstanceOf::IsInstanceOf(CodeNode::SharedPtr expr, const std::string &name)
+    : CodeNode()
     , expr_(expr)
     , name_(name)
 {}
@@ -421,8 +421,8 @@ Value IsInstanceOf::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-GetMember::GetMember(ByteCode::SharedPtr expr, const std::string &name)
-    : ByteCode()
+GetMember::GetMember(CodeNode::SharedPtr expr, const std::string &name)
+    : CodeNode()
     , expr_(expr)
     , name_(name)
 {}
@@ -441,8 +441,8 @@ Value GetMember::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-SetMember::SetMember(ByteCode::SharedPtr expr, const std::string &name, ByteCode::SharedPtr newValExpr)
-    : ByteCode()
+SetMember::SetMember(CodeNode::SharedPtr expr, const std::string &name, CodeNode::SharedPtr newValExpr)
+    : CodeNode()
     , expr_(expr)
     , name_(name)
     , newValExpr_(newValExpr)
@@ -466,8 +466,8 @@ Value SetMember::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-StringLen::StringLen(ByteCode::SharedPtr expr)
-    : ByteCode()
+StringLen::StringLen(CodeNode::SharedPtr expr)
+    : CodeNode()
     , expr_(expr)
 {}
 
@@ -483,8 +483,8 @@ Value StringLen::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-GetCharAt::GetCharAt(ByteCode::SharedPtr str, ByteCode::SharedPtr pos)
-    : ByteCode()
+GetCharAt::GetCharAt(CodeNode::SharedPtr str, CodeNode::SharedPtr pos)
+    : CodeNode()
     , str_(str)
     , pos_(pos)
 {}
@@ -509,8 +509,8 @@ Value GetCharAt::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-SetCharAt::SetCharAt(ByteCode::SharedPtr str, ByteCode::SharedPtr pos, ByteCode::SharedPtr val)
-    : ByteCode()
+SetCharAt::SetCharAt(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr val)
+    : CodeNode()
     , str_(str)
     , pos_(pos)
     , val_(val)
@@ -539,8 +539,8 @@ Value SetCharAt::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-StringCat::StringCat(ByteCode::SharedPtr str, ByteCode::SharedPtr other)
-    : ByteCode()
+StringCat::StringCat(CodeNode::SharedPtr str, CodeNode::SharedPtr other)
+    : CodeNode()
     , str_(str)
     , other_(other)
 {}
@@ -568,16 +568,16 @@ Value StringCat::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-SubString::SubString(ByteCode::SharedPtr str, ByteCode::SharedPtr pos)
-    : ByteCode()
+SubString::SubString(CodeNode::SharedPtr str, CodeNode::SharedPtr pos)
+    : CodeNode()
     , str_(str)
     , pos_(pos)
     , len_()
 {
 }
 
-SubString::SubString(ByteCode::SharedPtr str, ByteCode::SharedPtr pos, ByteCode::SharedPtr len)
-    : ByteCode()
+SubString::SubString(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr len)
+    : CodeNode()
     , str_(str)
     , pos_(pos)
     , len_(len)
@@ -612,16 +612,16 @@ Value SubString::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-StringFind::StringFind(ByteCode::SharedPtr str, ByteCode::SharedPtr chr)
-    : ByteCode()
+StringFind::StringFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr)
+    : CodeNode()
     , str_(str)
     , chr_(chr)
     , pos_()
 {
 }
 
-StringFind::StringFind(ByteCode::SharedPtr str, ByteCode::SharedPtr chr, ByteCode::SharedPtr pos)
-    : ByteCode()
+StringFind::StringFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr, CodeNode::SharedPtr pos)
+    : CodeNode()
     , str_(str)
     , chr_(chr)
     , pos_(pos)
@@ -653,12 +653,12 @@ Value StringFind::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 MakeArray::MakeArray()
-    : ByteCode()
+    : CodeNode()
     , values_()
 {}
 
-MakeArray::MakeArray(ByteCode::SharedPtrList values)
-    : ByteCode()
+MakeArray::MakeArray(CodeNode::SharedPtrList values)
+    : CodeNode()
     , values_(values)
 {}
 
@@ -676,14 +676,14 @@ Value MakeArray::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-MakeArraySV::MakeArraySV(ByteCode::SharedPtr size)
-    : ByteCode()
+MakeArraySV::MakeArraySV(CodeNode::SharedPtr size)
+    : CodeNode()
     , size_(size)
     , initValue_()
 {}
 
-MakeArraySV::MakeArraySV(ByteCode::SharedPtr size, ByteCode::SharedPtr initValue)
-    : ByteCode()
+MakeArraySV::MakeArraySV(CodeNode::SharedPtr size, CodeNode::SharedPtr initValue)
+    : CodeNode()
     , size_(size)
     , initValue_(initValue)
 {}
@@ -701,8 +701,8 @@ Value MakeArraySV::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-ArrayLen::ArrayLen(ByteCode::SharedPtr expr)
-    : ByteCode()
+ArrayLen::ArrayLen(CodeNode::SharedPtr expr)
+    : CodeNode()
     , expr_(expr)
 {}
 
@@ -718,8 +718,8 @@ Value ArrayLen::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-ArrayGet::ArrayGet(ByteCode::SharedPtr arr, ByteCode::SharedPtr pos)
-    : ByteCode()
+ArrayGet::ArrayGet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos)
+    : CodeNode()
     , arr_(arr)
     , pos_(pos)
 {}
@@ -744,8 +744,8 @@ Value ArrayGet::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-ArraySet::ArraySet(ByteCode::SharedPtr arr, ByteCode::SharedPtr pos, ByteCode::SharedPtr val)
-    : ByteCode()
+ArraySet::ArraySet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeNode::SharedPtr val)
+    : CodeNode()
     , arr_(arr)
     , pos_(pos)
     , val_(val)
@@ -773,8 +773,8 @@ Value ArraySet::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-ArrayAdd::ArrayAdd(ByteCode::SharedPtr arr, ByteCode::SharedPtr val)
-    : ByteCode()
+ArrayAdd::ArrayAdd(CodeNode::SharedPtr arr, CodeNode::SharedPtr val)
+    : CodeNode()
     , arr_(arr)
     , val_(val)
 {}

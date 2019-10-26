@@ -7,7 +7,7 @@
 #include "struct.h"
 #include "instance.h"
 #include "sequence.h"
-#include "byte_code.h"
+#include "code_node.h"
 #include "parser.h"
 #include "lexer.h"
 
@@ -48,37 +48,37 @@ namespace Int {
         void testSequence();
         void testSequenceValue();
         void testSequencePrint();
-        void testByteCodeBasic();
-        void testByteCodeClone();
-        void testByteCodeIsType();
-        void testByteCodeArithOp();
-        void testByteCodeCompOp();
-        void testByteCodeLogicOp();
-        void testByteCodeNot();
-        void testByteCodeSequence();
-        void testByteCodeCond();
-        void testByteCodeLoop();
-        void testByteCodeLambdaExpr();
-        void testByteCodeLambdaApp();
-        void testByteCodeFunctionExpr();
-        void testByteCodeFunctionApp();
-        void testByteCodeStruct();
-        void testByteCodeIsStructName();
-        void testByteCodeMakeInstance();
-        void testByteCodeIsInstanceOf();
-        void testByteCodeGetSetMember();
-        void testByteCodeStringLen();
-        void testByteCodeCharAt();
-        void testByteCodeSetCharAt();
-        void testByteCodeStringCat();
-        void testByteCodeSubString();
-        void testByteCodeStringFind();
-        void testByteCodeMakeArray();
-        void testByteCodeMakeArraySV();
-        void testByteCodeArrayLen();
-        void testByteCodeArrayGet();
-        void testByteCodeArraySet();
-        void testByteCodeArrayAdd();
+        void testCodeNodeBasic();
+        void testCodeNodeClone();
+        void testCodeNodeIsType();
+        void testCodeNodeArithOp();
+        void testCodeNodeCompOp();
+        void testCodeNodeLogicOp();
+        void testCodeNodeNot();
+        void testCodeNodeSequence();
+        void testCodeNodeCond();
+        void testCodeNodeLoop();
+        void testCodeNodeLambdaExpr();
+        void testCodeNodeLambdaApp();
+        void testCodeNodeFunctionExpr();
+        void testCodeNodeFunctionApp();
+        void testCodeNodeStruct();
+        void testCodeNodeIsStructName();
+        void testCodeNodeMakeInstance();
+        void testCodeNodeIsInstanceOf();
+        void testCodeNodeGetSetMember();
+        void testCodeNodeStringLen();
+        void testCodeNodeCharAt();
+        void testCodeNodeSetCharAt();
+        void testCodeNodeStringCat();
+        void testCodeNodeSubString();
+        void testCodeNodeStringFind();
+        void testCodeNodeMakeArray();
+        void testCodeNodeMakeArraySV();
+        void testCodeNodeArrayLen();
+        void testCodeNodeArrayGet();
+        void testCodeNodeArraySet();
+        void testCodeNodeArrayAdd();
         void testParserBasic();
         void testParserIsType();
         void testParserVar();

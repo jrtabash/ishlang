@@ -11,17 +11,17 @@
 namespace Int {
 
     // -------------------------------------------------------------
-    class ByteCode {
+    class CodeNode {
     public:
-        using SharedPtr      = std::shared_ptr<ByteCode>;
+        using SharedPtr      = std::shared_ptr<CodeNode>;
         using SharedPtrList  = std::vector<SharedPtr>;
         using SharedPtrPair  = std::pair<SharedPtr, SharedPtr>;
         using SharedPtrPairs = std::vector<SharedPtrPair>;
         using ParamList      = std::vector<std::string>;
         
     public:
-        ByteCode() {}
-        virtual ~ByteCode() {}
+        CodeNode() {}
+        virtual ~CodeNode() {}
         
         Value eval(Environment::SharedPtr env) {
             if (!env.get()) { throw NullEnvironment(); }
@@ -32,9 +32,9 @@ namespace Int {
     };
     
     // -------------------------------------------------------------
-    class Literal : public ByteCode {
+    class Literal : public CodeNode {
     public:
-        Literal(const Value &value) : ByteCode(), value_(value) {}
+        Literal(const Value &value) : CodeNode(), value_(value) {}
         virtual ~Literal() {}
 
         virtual Value exec(Environment::SharedPtr /*env*/) { return value_; }
@@ -44,22 +44,22 @@ namespace Int {
     };
 
     // -------------------------------------------------------------
-    class IsType : public ByteCode {
+    class IsType : public CodeNode {
     public:
-        IsType(ByteCode::SharedPtr expr, Value::Type type);
+        IsType(CodeNode::SharedPtr expr, Value::Type type);
         virtual ~IsType() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr expr_;
+        CodeNode::SharedPtr expr_;
         Value::Type         type_;
     };
 
     // -------------------------------------------------------------
-    class Variable : public ByteCode {
+    class Variable : public CodeNode {
     public:
-        Variable(const std::string &name) : ByteCode(), name_(name) {}
+        Variable(const std::string &name) : CodeNode(), name_(name) {}
         virtual ~Variable() {}
 
         virtual Value exec(Environment::SharedPtr env) { return env->get(name_); }
@@ -69,33 +69,33 @@ namespace Int {
     };
 
     // -------------------------------------------------------------
-    class Define : public ByteCode {
+    class Define : public CodeNode {
     public:
-        Define(const std::string &name, ByteCode::SharedPtr code) : ByteCode(), name_(name), code_(code) {}
+        Define(const std::string &name, CodeNode::SharedPtr code) : CodeNode(), name_(name), code_(code) {}
         virtual ~Define() {}
         
         virtual Value exec(Environment::SharedPtr env) { return env->def(name_, code_ ? code_->exec(env) : Value::Null); }
 
     private:
         std::string         name_;
-        ByteCode::SharedPtr code_;
+        CodeNode::SharedPtr code_;
     };
     
     // -------------------------------------------------------------
-    class Assign : public ByteCode {
+    class Assign : public CodeNode {
     public:
-        Assign(const std::string &name, ByteCode::SharedPtr code) : ByteCode(), name_(name), code_(code) {}
+        Assign(const std::string &name, CodeNode::SharedPtr code) : CodeNode(), name_(name), code_(code) {}
         virtual ~Assign() {}
 
         virtual Value exec(Environment::SharedPtr env) { return env->set(name_, code_ ? code_->exec(env) : Value::Null); }
         
     private:
         std::string         name_;
-        ByteCode::SharedPtr code_;
+        CodeNode::SharedPtr code_;
     };
 
     // -------------------------------------------------------------
-    class Exists : public ByteCode {
+    class Exists : public CodeNode {
     public:
         Exists(const std::string &name) : name_(name) {}
         virtual ~Exists() {}
@@ -107,28 +107,28 @@ namespace Int {
     };
 
     // -------------------------------------------------------------
-    class Clone : public ByteCode {
+    class Clone : public CodeNode {
     public:
-        Clone(ByteCode::SharedPtr code) : ByteCode(), code_(code) {}
+        Clone(CodeNode::SharedPtr code) : CodeNode(), code_(code) {}
         virtual ~Clone() {}
 
         virtual Value exec(Environment::SharedPtr env) { return code_->exec(env).clone(); }
 
     private:
-        ByteCode::SharedPtr code_;
+        CodeNode::SharedPtr code_;
     };
 
     // -------------------------------------------------------------
-    class BinaryOp : public ByteCode {
+    class BinaryOp : public CodeNode {
     public:
-        BinaryOp(ByteCode::SharedPtr lhs, ByteCode::SharedPtr rhs) : lhs_(lhs), rhs_(rhs) {}
+        BinaryOp(CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs) : lhs_(lhs), rhs_(rhs) {}
         virtual ~BinaryOp() {}
         
         virtual Value exec(Environment::SharedPtr env) = 0;
         
     protected:
-        ByteCode::SharedPtr lhs_;
-        ByteCode::SharedPtr rhs_;
+        CodeNode::SharedPtr lhs_;
+        CodeNode::SharedPtr rhs_;
     };
     
     // -------------------------------------------------------------
@@ -144,7 +144,7 @@ namespace Int {
         };
         
     public:
-        ArithOp(Type type, ByteCode::SharedPtr lhs, ByteCode::SharedPtr rhs);
+        ArithOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs);
         virtual ~ArithOp() {}
         
         virtual Value exec(Environment::SharedPtr env);
@@ -166,7 +166,7 @@ namespace Int {
         };
         
     public:
-        CompOp(Type type, ByteCode::SharedPtr lhs, ByteCode::SharedPtr rhs);
+        CompOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs);
         virtual ~CompOp() {}
         
         virtual Value exec(Environment::SharedPtr env);
@@ -184,7 +184,7 @@ namespace Int {
         };
         
     public:
-        LogicOp(Type type, ByteCode::SharedPtr lhs, ByteCode::SharedPtr rhs);
+        LogicOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs);
         virtual ~LogicOp() {}
         
         virtual Value exec(Environment::SharedPtr env);
@@ -194,67 +194,67 @@ namespace Int {
     };
 
     // -------------------------------------------------------------
-    class Not : public ByteCode {
+    class Not : public CodeNode {
     public:
-        Not(ByteCode::SharedPtr operand);
+        Not(CodeNode::SharedPtr operand);
         virtual ~Not() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr operand_;
+        CodeNode::SharedPtr operand_;
     };
 
     // -------------------------------------------------------------
-    class ProgN : public ByteCode {
+    class ProgN : public CodeNode {
     public:
-        ProgN(ByteCode::SharedPtrList exprs);
+        ProgN(CodeNode::SharedPtrList exprs);
         virtual ~ProgN() {}
         
         virtual Value exec(Environment::SharedPtr env);
         
     private:
-        ByteCode::SharedPtrList exprs_;
+        CodeNode::SharedPtrList exprs_;
     };
 
     // -------------------------------------------------------------
     class Block : public ProgN {
     public:
-        Block(ByteCode::SharedPtrList exprs);
+        Block(CodeNode::SharedPtrList exprs);
         virtual ~Block() {}
         
         virtual Value exec(Environment::SharedPtr env);
     };
 
     // -------------------------------------------------------------
-    class If : public ByteCode {
+    class If : public CodeNode {
     public:
-        If(ByteCode::SharedPtr pred, ByteCode::SharedPtr tCode);
-        If(ByteCode::SharedPtr pred, ByteCode::SharedPtr tCode, ByteCode::SharedPtr fCode);
+        If(CodeNode::SharedPtr pred, CodeNode::SharedPtr tCode);
+        If(CodeNode::SharedPtr pred, CodeNode::SharedPtr tCode, CodeNode::SharedPtr fCode);
         virtual ~If() {}
         
         virtual Value exec(Environment::SharedPtr env);
         
     private:
-        ByteCode::SharedPtr pred_;
-        ByteCode::SharedPtr tCode_;
-        ByteCode::SharedPtr fCode_;
+        CodeNode::SharedPtr pred_;
+        CodeNode::SharedPtr tCode_;
+        CodeNode::SharedPtr fCode_;
     };
     
     // -------------------------------------------------------------
-    class Cond : public ByteCode {
+    class Cond : public CodeNode {
     public:
-        Cond(ByteCode::SharedPtrPairs cases);
+        Cond(CodeNode::SharedPtrPairs cases);
         virtual ~Cond() {}
         
         virtual Value exec(Environment::SharedPtr env);
         
     private:
-        ByteCode::SharedPtrPairs cases_;
+        CodeNode::SharedPtrPairs cases_;
     };
 
     // -------------------------------------------------------------
-    class Break : public ByteCode {
+    class Break : public CodeNode {
     public:
         struct Except {};
         
@@ -266,44 +266,44 @@ namespace Int {
     };
 
     // -------------------------------------------------------------
-    class Loop : public ByteCode {
+    class Loop : public CodeNode {
     public:
-        Loop(ByteCode::SharedPtr decl, ByteCode::SharedPtr cond, ByteCode::SharedPtr next, ByteCode::SharedPtr body);
-        Loop(ByteCode::SharedPtr cond, ByteCode::SharedPtr body);
+        Loop(CodeNode::SharedPtr decl, CodeNode::SharedPtr cond, CodeNode::SharedPtr next, CodeNode::SharedPtr body);
+        Loop(CodeNode::SharedPtr cond, CodeNode::SharedPtr body);
         virtual ~Loop() {}
         
         virtual Value exec(Environment::SharedPtr env);
         
     private:
-        ByteCode::SharedPtr decl_;
-        ByteCode::SharedPtr cond_;
-        ByteCode::SharedPtr next_;
-        ByteCode::SharedPtr body_;
+        CodeNode::SharedPtr decl_;
+        CodeNode::SharedPtr cond_;
+        CodeNode::SharedPtr next_;
+        CodeNode::SharedPtr body_;
     };
 
     // -------------------------------------------------------------
-    class LambdaExpr : public ByteCode {
+    class LambdaExpr : public CodeNode {
     public:
-        LambdaExpr(const ParamList &params, ByteCode::SharedPtr body);
+        LambdaExpr(const ParamList &params, CodeNode::SharedPtr body);
         virtual ~LambdaExpr() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
         ParamList           params_;
-        ByteCode::SharedPtr body_;
+        CodeNode::SharedPtr body_;
     };
 
     // -------------------------------------------------------------
-    class LambdaApp : public ByteCode {
+    class LambdaApp : public CodeNode {
     public:
-        LambdaApp(ByteCode::SharedPtr closure, SharedPtrList args);
+        LambdaApp(CodeNode::SharedPtr closure, SharedPtrList args);
         virtual ~LambdaApp() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr closure_;
+        CodeNode::SharedPtr closure_;
         SharedPtrList       argExprs_;
 
     protected:
@@ -313,7 +313,7 @@ namespace Int {
     // -------------------------------------------------------------
     class FunctionExpr : public LambdaExpr {
     public:
-        FunctionExpr(const std::string &name, const ParamList &params, ByteCode::SharedPtr body);
+        FunctionExpr(const std::string &name, const ParamList &params, CodeNode::SharedPtr body);
         virtual ~FunctionExpr() {}
 
         virtual Value exec(Environment::SharedPtr env);
@@ -335,20 +335,20 @@ namespace Int {
     };
 
     // -------------------------------------------------------------
-    class Print : public ByteCode {
+    class Print : public CodeNode {
     public:
-        Print(bool newline, ByteCode::SharedPtr expr);
+        Print(bool newline, CodeNode::SharedPtr expr);
         virtual ~Print() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
         bool                newline_;
-        ByteCode::SharedPtr expr_;
+        CodeNode::SharedPtr expr_;
     };
 
     // -------------------------------------------------------------
-    class Read : public ByteCode {
+    class Read : public CodeNode {
     public:
         Read();
         virtual ~Read() {};
@@ -357,7 +357,7 @@ namespace Int {
     };
 
     // -------------------------------------------------------------
-    class StructExpr : public ByteCode {
+    class StructExpr : public CodeNode {
     public:
         StructExpr(const std::string &name, const Struct::MemberList &members);
         virtual ~StructExpr() {}
@@ -369,20 +369,20 @@ namespace Int {
     };
 
     // -------------------------------------------------------------
-    class IsStructName : public ByteCode {
+    class IsStructName : public CodeNode {
     public:
-        IsStructName(ByteCode::SharedPtr expr, const std::string &name);
+        IsStructName(CodeNode::SharedPtr expr, const std::string &name);
         virtual ~IsStructName() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr expr_;
+        CodeNode::SharedPtr expr_;
         std::string         name_;
     };
 
     // -------------------------------------------------------------
-    class MakeInstance : public ByteCode {
+    class MakeInstance : public CodeNode {
     public:
         MakeInstance(const std::string &name);
         virtual ~MakeInstance() {}
@@ -394,205 +394,205 @@ namespace Int {
     };
 
     // -------------------------------------------------------------
-    class IsInstanceOf : public ByteCode {
+    class IsInstanceOf : public CodeNode {
     public:
-        IsInstanceOf(ByteCode::SharedPtr expr, const std::string &name);
+        IsInstanceOf(CodeNode::SharedPtr expr, const std::string &name);
         virtual ~IsInstanceOf() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr expr_;
+        CodeNode::SharedPtr expr_;
         std::string         name_;
     };
 
     // -------------------------------------------------------------
-    class GetMember : public ByteCode {
+    class GetMember : public CodeNode {
     public:
-        GetMember(ByteCode::SharedPtr expr, const std::string &name);
+        GetMember(CodeNode::SharedPtr expr, const std::string &name);
         virtual ~GetMember() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr expr_;
+        CodeNode::SharedPtr expr_;
         std::string         name_;
     };
 
     // -------------------------------------------------------------
-    class SetMember : public ByteCode {
+    class SetMember : public CodeNode {
     public:
-        SetMember(ByteCode::SharedPtr expr, const std::string &name, ByteCode::SharedPtr newValExpr);
+        SetMember(CodeNode::SharedPtr expr, const std::string &name, CodeNode::SharedPtr newValExpr);
         virtual ~SetMember() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr expr_;
+        CodeNode::SharedPtr expr_;
         std::string         name_;
-        ByteCode::SharedPtr newValExpr_;
+        CodeNode::SharedPtr newValExpr_;
     };
 
     // -------------------------------------------------------------
-    class StringLen : public ByteCode {
+    class StringLen : public CodeNode {
     public:
-        StringLen(ByteCode::SharedPtr expr);
+        StringLen(CodeNode::SharedPtr expr);
         virtual ~StringLen() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr expr_;
+        CodeNode::SharedPtr expr_;
     };
 
     // -------------------------------------------------------------
-    class GetCharAt : public ByteCode {
+    class GetCharAt : public CodeNode {
     public:
-        GetCharAt(ByteCode::SharedPtr str, ByteCode::SharedPtr pos);
+        GetCharAt(CodeNode::SharedPtr str, CodeNode::SharedPtr pos);
         virtual ~GetCharAt() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr str_;
-        ByteCode::SharedPtr pos_;
+        CodeNode::SharedPtr str_;
+        CodeNode::SharedPtr pos_;
     };
 
     // -------------------------------------------------------------
-    class SetCharAt : public ByteCode {
+    class SetCharAt : public CodeNode {
     public:
-        SetCharAt(ByteCode::SharedPtr str, ByteCode::SharedPtr pos, ByteCode::SharedPtr val);
+        SetCharAt(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr val);
         virtual ~SetCharAt() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr str_;
-        ByteCode::SharedPtr pos_;
-        ByteCode::SharedPtr val_;
+        CodeNode::SharedPtr str_;
+        CodeNode::SharedPtr pos_;
+        CodeNode::SharedPtr val_;
     };
 
     // -------------------------------------------------------------
-    class StringCat : public ByteCode {
+    class StringCat : public CodeNode {
     public:
-        StringCat(ByteCode::SharedPtr str, ByteCode::SharedPtr other);
+        StringCat(CodeNode::SharedPtr str, CodeNode::SharedPtr other);
         virtual ~StringCat() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr str_;
-        ByteCode::SharedPtr other_;
+        CodeNode::SharedPtr str_;
+        CodeNode::SharedPtr other_;
     };
 
     // -------------------------------------------------------------
-    class SubString : public ByteCode {
+    class SubString : public CodeNode {
     public:
-        SubString(ByteCode::SharedPtr str, ByteCode::SharedPtr pos);
-        SubString(ByteCode::SharedPtr str, ByteCode::SharedPtr pos, ByteCode::SharedPtr len);
+        SubString(CodeNode::SharedPtr str, CodeNode::SharedPtr pos);
+        SubString(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr len);
         virtual ~SubString() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr str_;
-        ByteCode::SharedPtr pos_;
-        ByteCode::SharedPtr len_;
+        CodeNode::SharedPtr str_;
+        CodeNode::SharedPtr pos_;
+        CodeNode::SharedPtr len_;
     };
 
     // -------------------------------------------------------------
-    class StringFind : public ByteCode {
+    class StringFind : public CodeNode {
     public:
-        StringFind(ByteCode::SharedPtr str, ByteCode::SharedPtr chr);
-        StringFind(ByteCode::SharedPtr str, ByteCode::SharedPtr chr, ByteCode::SharedPtr pos);
+        StringFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr);
+        StringFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr, CodeNode::SharedPtr pos);
         virtual ~StringFind() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr str_;
-        ByteCode::SharedPtr chr_;
-        ByteCode::SharedPtr pos_;
+        CodeNode::SharedPtr str_;
+        CodeNode::SharedPtr chr_;
+        CodeNode::SharedPtr pos_;
     };
 
     // -------------------------------------------------------------
-    class MakeArray : public ByteCode {
+    class MakeArray : public CodeNode {
     public:
         MakeArray();
-        MakeArray(ByteCode::SharedPtrList values);
+        MakeArray(CodeNode::SharedPtrList values);
         virtual ~MakeArray() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtrList values_;
+        CodeNode::SharedPtrList values_;
     };
 
     // -------------------------------------------------------------
     // Make array from size and value
-    class MakeArraySV : public ByteCode {
+    class MakeArraySV : public CodeNode {
     public:
-        MakeArraySV(ByteCode::SharedPtr size);
-        MakeArraySV(ByteCode::SharedPtr size, ByteCode::SharedPtr initValue);
+        MakeArraySV(CodeNode::SharedPtr size);
+        MakeArraySV(CodeNode::SharedPtr size, CodeNode::SharedPtr initValue);
         virtual ~MakeArraySV() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr size_;
-        ByteCode::SharedPtr initValue_;
+        CodeNode::SharedPtr size_;
+        CodeNode::SharedPtr initValue_;
     };
 
     // -------------------------------------------------------------
-    class ArrayLen : public ByteCode {
+    class ArrayLen : public CodeNode {
     public:
-        ArrayLen(ByteCode::SharedPtr expr);
+        ArrayLen(CodeNode::SharedPtr expr);
         virtual ~ArrayLen() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr expr_;
+        CodeNode::SharedPtr expr_;
     };
 
     // -------------------------------------------------------------
-    class ArrayGet : public ByteCode {
+    class ArrayGet : public CodeNode {
     public:
-        ArrayGet(ByteCode::SharedPtr arr, ByteCode::SharedPtr pos);
+        ArrayGet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos);
         virtual ~ArrayGet() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr arr_;
-        ByteCode::SharedPtr pos_;
+        CodeNode::SharedPtr arr_;
+        CodeNode::SharedPtr pos_;
     };
 
     // -------------------------------------------------------------
-    class ArraySet : public ByteCode {
+    class ArraySet : public CodeNode {
     public:
-        ArraySet(ByteCode::SharedPtr arr, ByteCode::SharedPtr pos, ByteCode::SharedPtr val);
+        ArraySet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeNode::SharedPtr val);
         virtual ~ArraySet() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr arr_;
-        ByteCode::SharedPtr pos_;
-        ByteCode::SharedPtr val_;
+        CodeNode::SharedPtr arr_;
+        CodeNode::SharedPtr pos_;
+        CodeNode::SharedPtr val_;
     };
 
     // -------------------------------------------------------------
-    class ArrayAdd : public ByteCode {
+    class ArrayAdd : public CodeNode {
     public:
-        ArrayAdd(ByteCode::SharedPtr arr, ByteCode::SharedPtr val);
+        ArrayAdd(CodeNode::SharedPtr arr, CodeNode::SharedPtr val);
         virtual ~ArrayAdd() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
     private:
-        ByteCode::SharedPtr arr_;
-        ByteCode::SharedPtr val_;
+        CodeNode::SharedPtr arr_;
+        CodeNode::SharedPtr val_;
     };
 }
 

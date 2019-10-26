@@ -31,38 +31,38 @@ UnitTest::UnitTest()
     ADD_TEST(testSequence);
     ADD_TEST(testSequenceValue);
     ADD_TEST(testSequencePrint);
-    ADD_TEST(testByteCodeBasic);
-    ADD_TEST(testByteCodeClone);
-    ADD_TEST(testByteCodeIsType);
-    ADD_TEST(testByteCodeArithOp);
-    ADD_TEST(testByteCodeCompOp);
-    ADD_TEST(testByteCodeLogicOp);
-    ADD_TEST(testByteCodeNot);
-    ADD_TEST(testByteCodeSequence);
-    ADD_TEST(testByteCodeCond);
-    ADD_TEST(testByteCodeLoop);
-    ADD_TEST(testByteCodeLambdaExpr);
-    ADD_TEST(testByteCodeLambdaApp);
-    ADD_TEST(testByteCodeFunctionExpr);
-    ADD_TEST(testByteCodeFunctionApp);
-    ADD_TEST(testByteCodeStruct);
-    ADD_TEST(testByteCodeIsStructName);
-    ADD_TEST(testByteCodeMakeInstance);
-    ADD_TEST(testByteCodeIsInstanceOf);
-    ADD_TEST(testByteCodeGetSetMember);
-    ADD_TEST(testByteCodeStringCat);
-    ADD_TEST(testByteCodeSubString);
-    ADD_TEST(testByteCodeStringFind);
-    ADD_TEST(testByteCodeMakeArray);
-    ADD_TEST(testByteCodeMakeArraySV);
-    ADD_TEST(testByteCodeArrayLen);
-    ADD_TEST(testByteCodeArrayGet);
-    ADD_TEST(testByteCodeArraySet);
-    ADD_TEST(testByteCodeArrayAdd);
+    ADD_TEST(testCodeNodeBasic);
+    ADD_TEST(testCodeNodeClone);
+    ADD_TEST(testCodeNodeIsType);
+    ADD_TEST(testCodeNodeArithOp);
+    ADD_TEST(testCodeNodeCompOp);
+    ADD_TEST(testCodeNodeLogicOp);
+    ADD_TEST(testCodeNodeNot);
+    ADD_TEST(testCodeNodeSequence);
+    ADD_TEST(testCodeNodeCond);
+    ADD_TEST(testCodeNodeLoop);
+    ADD_TEST(testCodeNodeLambdaExpr);
+    ADD_TEST(testCodeNodeLambdaApp);
+    ADD_TEST(testCodeNodeFunctionExpr);
+    ADD_TEST(testCodeNodeFunctionApp);
+    ADD_TEST(testCodeNodeStruct);
+    ADD_TEST(testCodeNodeIsStructName);
+    ADD_TEST(testCodeNodeMakeInstance);
+    ADD_TEST(testCodeNodeIsInstanceOf);
+    ADD_TEST(testCodeNodeGetSetMember);
+    ADD_TEST(testCodeNodeStringCat);
+    ADD_TEST(testCodeNodeSubString);
+    ADD_TEST(testCodeNodeStringFind);
+    ADD_TEST(testCodeNodeMakeArray);
+    ADD_TEST(testCodeNodeMakeArraySV);
+    ADD_TEST(testCodeNodeArrayLen);
+    ADD_TEST(testCodeNodeArrayGet);
+    ADD_TEST(testCodeNodeArraySet);
+    ADD_TEST(testCodeNodeArrayAdd);
     ADD_TEST(testTokenType);
-    ADD_TEST(testByteCodeStringLen);
-    ADD_TEST(testByteCodeCharAt);
-    ADD_TEST(testByteCodeSetCharAt);
+    ADD_TEST(testCodeNodeStringLen);
+    ADD_TEST(testCodeNodeCharAt);
+    ADD_TEST(testCodeNodeSetCharAt);
     ADD_TEST(testParserBasic);
     ADD_TEST(testParserIsType);
     ADD_TEST(testParserVar);
@@ -670,10 +670,10 @@ void UnitTest::testLambda() {
     env->def("x", Value::Zero);
 
     const Lambda::ParamList params({"x", "y"});    
-    ByteCode::SharedPtr body(
+    CodeNode::SharedPtr body(
         new ArithOp(ArithOp::Add,
-                    ByteCode::SharedPtr(new Variable("x")),
-                    ByteCode::SharedPtr(new Variable("y"))));
+                    CodeNode::SharedPtr(new Variable("x")),
+                    CodeNode::SharedPtr(new Variable("y"))));
 
     Lambda lambda(params, body, env);
 
@@ -874,34 +874,34 @@ void UnitTest::testSequencePrint() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeBasic() {
+void UnitTest::testCodeNodeBasic() {
     Environment::SharedPtr env(new Environment());
 
-    ByteCode::SharedPtr literal(new Literal(Value('c')));
+    CodeNode::SharedPtr literal(new Literal(Value('c')));
     Value result = literal->eval(env);
     TEST_CASE_MSG(result == Value('c'), "actual=" << result << " (" << result.typeToString() << ')');
     
-    ByteCode::SharedPtr definition(new Define("var", literal));
+    CodeNode::SharedPtr definition(new Define("var", literal));
     result = definition->eval(env);
     TEST_CASE_MSG(result == Value('c'), "actual=" << result << " (" << result.typeToString() << ')');
 
-    ByteCode::SharedPtr definition2(new Define("var2", ByteCode::SharedPtr(new Literal(Value(2ll)))));
+    CodeNode::SharedPtr definition2(new Define("var2", CodeNode::SharedPtr(new Literal(Value(2ll)))));
     result = definition2->eval(env);
     TEST_CASE_MSG(result == Value(2ll), "actual=" << result << " (" << result.typeToString() << ')');
     
-    ByteCode::SharedPtr variable(new Variable("var"));
+    CodeNode::SharedPtr variable(new Variable("var"));
     result = variable->eval(env);
     TEST_CASE_MSG(result == Value('c'), "actual=" << result << " (" << result.typeToString() << ')');
     
-    ByteCode::SharedPtr assignment(new Assign("var", ByteCode::SharedPtr(new Variable("var2"))));
+    CodeNode::SharedPtr assignment(new Assign("var", CodeNode::SharedPtr(new Variable("var2"))));
     result = assignment->eval(env);
     TEST_CASE_MSG(result == Value(2ll), "actual=" << result << " (" << result.typeToString() << ')');
 
-    ByteCode::SharedPtr exists(new Exists("var"));
+    CodeNode::SharedPtr exists(new Exists("var"));
     result = exists->eval(env);
     TEST_CASE_MSG(result == Value::True, "actual=" << result << " (" << result.typeToString() << ')');
 
-    ByteCode::SharedPtr doesNotExist(new Exists("novar"));
+    CodeNode::SharedPtr doesNotExist(new Exists("novar"));
     result = doesNotExist->eval(env);
     TEST_CASE_MSG(result == Value::False, "actual=" << result << " (" << result.typeToString() << ')');
     
@@ -911,13 +911,13 @@ void UnitTest::testByteCodeBasic() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeClone() {
+void UnitTest::testCodeNodeClone() {
     Environment::SharedPtr env(new Environment());
 
-    ByteCode::SharedPtr definition(new Define("var", ByteCode::SharedPtr(new Literal(Value("foobar")))));
+    CodeNode::SharedPtr definition(new Define("var", CodeNode::SharedPtr(new Literal(Value("foobar")))));
     Value result1 = definition->eval(env);
 
-    ByteCode::SharedPtr cloneExpr(new Clone(ByteCode::SharedPtr(new Variable("var"))));
+    CodeNode::SharedPtr cloneExpr(new Clone(CodeNode::SharedPtr(new Variable("var"))));
     Value result2 = cloneExpr->eval(env);
 
     TEST_CASE(result1 == result2);
@@ -930,12 +930,12 @@ void UnitTest::testByteCodeClone() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeIsType() {
+void UnitTest::testCodeNodeIsType() {
     Environment::SharedPtr env(new Environment());
 
     Value lambdaValue(
-        Lambda(ByteCode::ParamList(), 
-               ByteCode::SharedPtr(new Literal(Value::Zero)), 
+        Lambda(CodeNode::ParamList(), 
+               CodeNode::SharedPtr(new Literal(Value::Zero)), 
                env));
 
     Value structValue(Struct("Person", {"name", "age"}));
@@ -945,24 +945,24 @@ void UnitTest::testByteCodeIsType() {
     const std::array<Value::Type, 9> types = 
         { Value::eNone, Value::eInteger, Value::eReal, Value::eCharacter, Value::eBoolean, Value::eString, Value::eClosure, Value::eUserType, Value::eUserObject };
 
-    std::map<ByteCode::SharedPtr, Value::Type> valueTypes; {
-        valueTypes.insert(std::make_pair(ByteCode::SharedPtr(new Literal(Value::Null)), Value::eNone));
-        valueTypes.insert(std::make_pair(ByteCode::SharedPtr(new Literal(Value(1ll))), Value::eInteger));
-        valueTypes.insert(std::make_pair(ByteCode::SharedPtr(new Literal(Value(1.0))), Value::eReal));
-        valueTypes.insert(std::make_pair(ByteCode::SharedPtr(new Literal(Value('c'))),  Value::eCharacter));
-        valueTypes.insert(std::make_pair(ByteCode::SharedPtr(new Literal(Value::True)), Value::eBoolean));
-        valueTypes.insert(std::make_pair(ByteCode::SharedPtr(new Literal(Value("txt"))), Value::eString));
-        valueTypes.insert(std::make_pair(ByteCode::SharedPtr(new Literal(lambdaValue)), Value::eClosure));
-        valueTypes.insert(std::make_pair(ByteCode::SharedPtr(new Literal(structValue)), Value::eUserType));
-        valueTypes.insert(std::make_pair(ByteCode::SharedPtr(new Literal(instanceValue)), Value::eUserObject));
+    std::map<CodeNode::SharedPtr, Value::Type> valueTypes; {
+        valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(Value::Null)), Value::eNone));
+        valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(Value(1ll))), Value::eInteger));
+        valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(Value(1.0))), Value::eReal));
+        valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(Value('c'))),  Value::eCharacter));
+        valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(Value::True)), Value::eBoolean));
+        valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(Value("txt"))), Value::eString));
+        valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(lambdaValue)), Value::eClosure));
+        valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(structValue)), Value::eUserType));
+        valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(instanceValue)), Value::eUserObject));
     }
 
     for (auto valueType : valueTypes) {
-        ByteCode::SharedPtr expr = valueType.first;
+        CodeNode::SharedPtr expr = valueType.first;
         Value::Type exprType = valueType.second;
 
         for (auto type : types) {
-            ByteCode::SharedPtr isType(new IsType(expr, type));
+            CodeNode::SharedPtr isType(new IsType(expr, type));
             Value result = isType->exec(env);
             bool expected = exprType == type ? true : false;
             TEST_CASE_MSG(result.isBool() && result.boolean() == expected,
@@ -972,23 +972,23 @@ void UnitTest::testByteCodeIsType() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeArithOp() {
+void UnitTest::testCodeNodeArithOp() {
     Environment::SharedPtr env(new Environment());
     
-    ByteCode::SharedPtr iLit1(new Literal(Value(1ll)));
-    ByteCode::SharedPtr iLit2(new Literal(Value(2ll)));
-    ByteCode::SharedPtr iLit3(new Literal(Value(0ll)));
-    ByteCode::SharedPtr iLit4(new Literal(Value(4ll)));
-    ByteCode::SharedPtr iLit5(new Literal(Value(5ll)));
-    ByteCode::SharedPtr rLit1(new Literal(Value(1.2)));
-    ByteCode::SharedPtr rLit2(new Literal(Value(1.3)));
-    ByteCode::SharedPtr rLit3(new Literal(Value(0.0)));
-    ByteCode::SharedPtr rLit4(new Literal(Value(9.0)));
-    ByteCode::SharedPtr rLit5(new Literal(Value(0.5)));
-    ByteCode::SharedPtr cLit(new Literal(Value('c')));
-    ByteCode::SharedPtr bLit(new Literal(Value(true)));
+    CodeNode::SharedPtr iLit1(new Literal(Value(1ll)));
+    CodeNode::SharedPtr iLit2(new Literal(Value(2ll)));
+    CodeNode::SharedPtr iLit3(new Literal(Value(0ll)));
+    CodeNode::SharedPtr iLit4(new Literal(Value(4ll)));
+    CodeNode::SharedPtr iLit5(new Literal(Value(5ll)));
+    CodeNode::SharedPtr rLit1(new Literal(Value(1.2)));
+    CodeNode::SharedPtr rLit2(new Literal(Value(1.3)));
+    CodeNode::SharedPtr rLit3(new Literal(Value(0.0)));
+    CodeNode::SharedPtr rLit4(new Literal(Value(9.0)));
+    CodeNode::SharedPtr rLit5(new Literal(Value(0.5)));
+    CodeNode::SharedPtr cLit(new Literal(Value('c')));
+    CodeNode::SharedPtr bLit(new Literal(Value(true)));
     
-    ByteCode::SharedPtr arith(new ArithOp(ArithOp::Add, iLit1, iLit2));
+    CodeNode::SharedPtr arith(new ArithOp(ArithOp::Add, iLit1, iLit2));
     Value result = arith->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
     TEST_CASE_MSG(result.integer() == 3ll, "actual=" << result);
@@ -1119,19 +1119,19 @@ void UnitTest::testByteCodeArithOp() {
     result = comp->eval(env); \
     TEST_CASE_MSG(result.isBool(), "actual=" << result.typeToString()); \
     TEST_CASE_MSG(result.boolean() == RVALUE, "actual=" << result);
-void UnitTest::testByteCodeCompOp() {
+void UnitTest::testCodeNodeCompOp() {
     Environment::SharedPtr env(new Environment());
     
-    ByteCode::SharedPtr iLit0(new Literal(Value(0ll)));
-    ByteCode::SharedPtr iLit1(new Literal(Value(1ll)));
-    ByteCode::SharedPtr rLit0(new Literal(Value(0.0)));
-    ByteCode::SharedPtr rLit1(new Literal(Value(1.0)));
-    ByteCode::SharedPtr cLitA(new Literal(Value('a')));
-    ByteCode::SharedPtr cLitB(new Literal(Value('b')));
-    ByteCode::SharedPtr bLitT(new Literal(Value(true)));
-    ByteCode::SharedPtr bLitF(new Literal(Value(false)));
+    CodeNode::SharedPtr iLit0(new Literal(Value(0ll)));
+    CodeNode::SharedPtr iLit1(new Literal(Value(1ll)));
+    CodeNode::SharedPtr rLit0(new Literal(Value(0.0)));
+    CodeNode::SharedPtr rLit1(new Literal(Value(1.0)));
+    CodeNode::SharedPtr cLitA(new Literal(Value('a')));
+    CodeNode::SharedPtr cLitB(new Literal(Value('b')));
+    CodeNode::SharedPtr bLitT(new Literal(Value(true)));
+    CodeNode::SharedPtr bLitF(new Literal(Value(false)));
 
-    ByteCode::SharedPtr comp;
+    CodeNode::SharedPtr comp;
     Value result;
     
     TEST_COMP(EQ, iLit0, iLit0, true);
@@ -1246,7 +1246,7 @@ void UnitTest::testByteCodeCompOp() {
 #undef TEST_COMP
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeLogicOp() {
+void UnitTest::testCodeNodeLogicOp() {
     Environment::SharedPtr env(new Environment());
     
     struct Case {
@@ -1284,9 +1284,9 @@ void UnitTest::testByteCodeLogicOp() {
         const Case &c = cases[i];
         
         try {
-            ByteCode::SharedPtr lhsLit(new Literal(Value(c.lhs)));
-            ByteCode::SharedPtr rhsLit(new Literal(!c.other ? Value(c.rhs) : Value('a')));
-            ByteCode::SharedPtr logic(new LogicOp(c.type, lhsLit, rhsLit));
+            CodeNode::SharedPtr lhsLit(new Literal(Value(c.lhs)));
+            CodeNode::SharedPtr rhsLit(new Literal(!c.other ? Value(c.rhs) : Value('a')));
+            CodeNode::SharedPtr logic(new LogicOp(c.type, lhsLit, rhsLit));
             Value result = logic->eval(env);
             if (!c.error) {
                 TEST_CASE_MSG(result.isBool(), "actual=" << result.typeToString() << " (" << c.toString() << ')');
@@ -1302,7 +1302,7 @@ void UnitTest::testByteCodeLogicOp() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeNot() {
+void UnitTest::testCodeNodeNot() {
     Environment::SharedPtr env(new Environment());
 
     Value value =
@@ -1330,27 +1330,27 @@ void UnitTest::testByteCodeNot() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeSequence() {
+void UnitTest::testCodeNodeSequence() {
     Environment::SharedPtr env(new Environment());
     
     env->def("x", Value(1ll));
     env->def("y", Value(2ll));
 
     { // Block
-        ByteCode::SharedPtr def1(new Define("x", ByteCode::SharedPtr(new Literal(Value(1ll)))));
-        ByteCode::SharedPtr def2(new Define("y", ByteCode::SharedPtr(new Literal(Value(1ll)))));
-        ByteCode::SharedPtr assign1(new Assign("x", ByteCode::SharedPtr(new Variable("y"))));
-        ByteCode::SharedPtr assign2(new Assign("y", ByteCode::SharedPtr(new Literal(Value(3ll)))));
-        ByteCode::SharedPtr litT(new Literal(Value('T')));
+        CodeNode::SharedPtr def1(new Define("x", CodeNode::SharedPtr(new Literal(Value(1ll)))));
+        CodeNode::SharedPtr def2(new Define("y", CodeNode::SharedPtr(new Literal(Value(1ll)))));
+        CodeNode::SharedPtr assign1(new Assign("x", CodeNode::SharedPtr(new Variable("y"))));
+        CodeNode::SharedPtr assign2(new Assign("y", CodeNode::SharedPtr(new Literal(Value(3ll)))));
+        CodeNode::SharedPtr litT(new Literal(Value('T')));
 
-        ByteCode::SharedPtrList exprs;
+        CodeNode::SharedPtrList exprs;
         exprs.push_back(def1);
         exprs.push_back(def2);
         exprs.push_back(assign1);
         exprs.push_back(assign2);
         exprs.push_back(litT);
 
-        ByteCode::SharedPtr block(new Block(exprs));
+        CodeNode::SharedPtr block(new Block(exprs));
         Value result = block->eval(env);
         TEST_CASE_MSG(result.isChar(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.character() == 'T', "actual=" << result);
@@ -1359,16 +1359,16 @@ void UnitTest::testByteCodeSequence() {
     }
 
     { // ProgN
-        ByteCode::SharedPtr assign1(new Assign("x", ByteCode::SharedPtr(new Variable("y"))));
-        ByteCode::SharedPtr assign2(new Assign("y", ByteCode::SharedPtr(new Literal(Value(3ll)))));
-        ByteCode::SharedPtr litT(new Literal(Value('T')));
+        CodeNode::SharedPtr assign1(new Assign("x", CodeNode::SharedPtr(new Variable("y"))));
+        CodeNode::SharedPtr assign2(new Assign("y", CodeNode::SharedPtr(new Literal(Value(3ll)))));
+        CodeNode::SharedPtr litT(new Literal(Value('T')));
 
-        ByteCode::SharedPtrList exprs;
+        CodeNode::SharedPtrList exprs;
         exprs.push_back(assign1);
         exprs.push_back(assign2);
         exprs.push_back(litT);
 
-        ByteCode::SharedPtr progN(new ProgN(exprs));
+        CodeNode::SharedPtr progN(new ProgN(exprs));
         Value result = progN->eval(env);
         TEST_CASE_MSG(result.isChar(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.character() == 'T', "actual=" << result);
@@ -1378,17 +1378,17 @@ void UnitTest::testByteCodeSequence() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeCond() {
+void UnitTest::testCodeNodeCond() {
     { // If
         Environment::SharedPtr env(new Environment());
 
         {
-            ByteCode::SharedPtr bLitT(new Literal(Value::True));
-            ByteCode::SharedPtr bLitF(new Literal(Value::False));
-            ByteCode::SharedPtr iLit1(new Literal(Value(1ll)));
-            ByteCode::SharedPtr iLit2(new Literal(Value(2ll)));
+            CodeNode::SharedPtr bLitT(new Literal(Value::True));
+            CodeNode::SharedPtr bLitF(new Literal(Value::False));
+            CodeNode::SharedPtr iLit1(new Literal(Value(1ll)));
+            CodeNode::SharedPtr iLit2(new Literal(Value(2ll)));
 
-            ByteCode::SharedPtr cond(new If(bLitT, iLit1));
+            CodeNode::SharedPtr cond(new If(bLitT, iLit1));
             Value result = cond->eval(env);
             TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
             TEST_CASE_MSG(result.integer() == 1ll, "actual=" << result);
@@ -1412,12 +1412,12 @@ void UnitTest::testByteCodeCond() {
             env->def("x", Value(1ll));
             env->def("y", Value(2ll));
 
-            ByteCode::SharedPtr tPred(new Literal(Value::True));
-            ByteCode::SharedPtr fPred(new Literal(Value::False));
-            ByteCode::SharedPtr tCode(new Define("x", ByteCode::SharedPtr(new Literal(Value(3ll)))));
-            ByteCode::SharedPtr fCode(new Assign("y", ByteCode::SharedPtr(new Literal(Value(4ll)))));
+            CodeNode::SharedPtr tPred(new Literal(Value::True));
+            CodeNode::SharedPtr fPred(new Literal(Value::False));
+            CodeNode::SharedPtr tCode(new Define("x", CodeNode::SharedPtr(new Literal(Value(3ll)))));
+            CodeNode::SharedPtr fCode(new Assign("y", CodeNode::SharedPtr(new Literal(Value(4ll)))));
 
-            ByteCode::SharedPtr cond(new If(tPred, tCode, fCode));
+            CodeNode::SharedPtr cond(new If(tPred, tCode, fCode));
             Value result = cond->eval(env);
             TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
             TEST_CASE_MSG(result.integer() == 3ll, "actual=" << result);
@@ -1437,62 +1437,62 @@ void UnitTest::testByteCodeCond() {
         Environment::SharedPtr env(new Environment());
         
         {
-            ByteCode::SharedPtrPairs cases;
+            CodeNode::SharedPtrPairs cases;
             cases.push_back(
                 std::make_pair(
-                    ByteCode::SharedPtr(new Literal(Value::False)),
-                    ByteCode::SharedPtr(new Literal(Value(1ll)))));
+                    CodeNode::SharedPtr(new Literal(Value::False)),
+                    CodeNode::SharedPtr(new Literal(Value(1ll)))));
             cases.push_back(
                 std::make_pair(
-                    ByteCode::SharedPtr(new Literal(Value::True)),
-                    ByteCode::SharedPtr(new Literal(Value(2ll)))));
-            ByteCode::SharedPtr cond(new Cond(cases));
+                    CodeNode::SharedPtr(new Literal(Value::True)),
+                    CodeNode::SharedPtr(new Literal(Value(2ll)))));
+            CodeNode::SharedPtr cond(new Cond(cases));
             Value result = cond->eval(env);
             TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
             TEST_CASE_MSG(result.integer() == 2ll, "actual=" << result);
         }
 
         {
-            ByteCode::SharedPtrPairs cases;
+            CodeNode::SharedPtrPairs cases;
             cases.push_back(
                 std::make_pair(
-                    ByteCode::SharedPtr(new Literal(Value::False)),
-                    ByteCode::SharedPtr(new Literal(Value(1ll)))));
+                    CodeNode::SharedPtr(new Literal(Value::False)),
+                    CodeNode::SharedPtr(new Literal(Value(1ll)))));
             cases.push_back(
                 std::make_pair(
-                    ByteCode::SharedPtr(new Literal(Value::True)),
-                    ByteCode::SharedPtr()));
-            ByteCode::SharedPtr cond(new Cond(cases));
+                    CodeNode::SharedPtr(new Literal(Value::True)),
+                    CodeNode::SharedPtr()));
+            CodeNode::SharedPtr cond(new Cond(cases));
             Value result = cond->eval(env);
             TEST_CASE_MSG(result.isNull(), "actual=" << result.typeToString());
         }
         
         {
             env->def("x", Value(3ll));
-            ByteCode::SharedPtr var(new Variable("x"));
+            CodeNode::SharedPtr var(new Variable("x"));
             
-            ByteCode::SharedPtrPairs cases;
+            CodeNode::SharedPtrPairs cases;
             cases.push_back(
                 std::make_pair(
-                    ByteCode::SharedPtr(new CompOp(CompOp::EQ, var, ByteCode::SharedPtr(new Literal(Value(1ll))))),
-                    ByteCode::SharedPtr(new Literal(Value('a')))));
+                    CodeNode::SharedPtr(new CompOp(CompOp::EQ, var, CodeNode::SharedPtr(new Literal(Value(1ll))))),
+                    CodeNode::SharedPtr(new Literal(Value('a')))));
             cases.push_back(
                 std::make_pair(
-                    ByteCode::SharedPtr(new CompOp(CompOp::EQ, var, ByteCode::SharedPtr(new Literal(Value(2ll))))),
-                    ByteCode::SharedPtr(new Literal(Value('b')))));
+                    CodeNode::SharedPtr(new CompOp(CompOp::EQ, var, CodeNode::SharedPtr(new Literal(Value(2ll))))),
+                    CodeNode::SharedPtr(new Literal(Value('b')))));
             cases.push_back(
                 std::make_pair(
-                    ByteCode::SharedPtr(new CompOp(CompOp::EQ, var, ByteCode::SharedPtr(new Literal(Value(3ll))))),
-                    ByteCode::SharedPtr(new Literal(Value('c')))));
+                    CodeNode::SharedPtr(new CompOp(CompOp::EQ, var, CodeNode::SharedPtr(new Literal(Value(3ll))))),
+                    CodeNode::SharedPtr(new Literal(Value('c')))));
             cases.push_back(
                 std::make_pair(
-                    ByteCode::SharedPtr(new CompOp(CompOp::EQ, var, ByteCode::SharedPtr(new Literal(Value(4ll))))),
-                    ByteCode::SharedPtr(new Literal(Value('d')))));
+                    CodeNode::SharedPtr(new CompOp(CompOp::EQ, var, CodeNode::SharedPtr(new Literal(Value(4ll))))),
+                    CodeNode::SharedPtr(new Literal(Value('d')))));
             cases.push_back(
                 std::make_pair(
-                    ByteCode::SharedPtr(new Literal(Value::True)),
-                    ByteCode::SharedPtr(new Literal(Value('e')))));
-            ByteCode::SharedPtr cond(new Cond(cases));
+                    CodeNode::SharedPtr(new Literal(Value::True)),
+                    CodeNode::SharedPtr(new Literal(Value('e')))));
+            CodeNode::SharedPtr cond(new Cond(cases));
             Value result = cond->eval(env);
             TEST_CASE_MSG(result.isChar(), "actual=" << result.typeToString());
             TEST_CASE_MSG(result.character() == 'c', "actual=" << result);
@@ -1500,9 +1500,9 @@ void UnitTest::testByteCodeCond() {
         
         {
             try {
-                ByteCode::SharedPtrPairs cases;
-                cases.push_back(std::make_pair(ByteCode::SharedPtr(), ByteCode::SharedPtr()));
-                ByteCode::SharedPtr cond(new Cond(cases));
+                CodeNode::SharedPtrPairs cases;
+                cases.push_back(std::make_pair(CodeNode::SharedPtr(), CodeNode::SharedPtr()));
+                CodeNode::SharedPtr cond(new Cond(cases));
                 cond->eval(env);
                 TEST_CASE(false);
             }
@@ -1512,9 +1512,9 @@ void UnitTest::testByteCodeCond() {
         
         {
             try {
-                ByteCode::SharedPtrPairs cases;
-                cases.push_back(std::make_pair(ByteCode::SharedPtr(new Literal(Value::Zero)), ByteCode::SharedPtr()));
-                ByteCode::SharedPtr cond(new Cond(cases));
+                CodeNode::SharedPtrPairs cases;
+                cases.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(Value::Zero)), CodeNode::SharedPtr()));
+                CodeNode::SharedPtr cond(new Cond(cases));
                 cond->eval(env);
                 TEST_CASE(false);
             }
@@ -1525,30 +1525,30 @@ void UnitTest::testByteCodeCond() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeLoop() {
+void UnitTest::testCodeNodeLoop() {
     Environment::SharedPtr env(new Environment());
 
     { // For
         env->def("sum", Value(0ll));
 
-        ByteCode::SharedPtr loop(
+        CodeNode::SharedPtr loop(
             new Loop(
-                ByteCode::SharedPtr(
-                    new Define("i", ByteCode::SharedPtr(new Literal(Value(1ll))))),
-                ByteCode::SharedPtr(
+                CodeNode::SharedPtr(
+                    new Define("i", CodeNode::SharedPtr(new Literal(Value(1ll))))),
+                CodeNode::SharedPtr(
                     new CompOp(CompOp::LE, 
-                               ByteCode::SharedPtr(new Variable("i")),
-                               ByteCode::SharedPtr(new Literal(Value(10ll))))),
-                ByteCode::SharedPtr(
-                    new Assign("i", ByteCode::SharedPtr(
+                               CodeNode::SharedPtr(new Variable("i")),
+                               CodeNode::SharedPtr(new Literal(Value(10ll))))),
+                CodeNode::SharedPtr(
+                    new Assign("i", CodeNode::SharedPtr(
                                         new ArithOp(ArithOp::Add,
-                                                    ByteCode::SharedPtr(new Variable("i")),
-                                                    ByteCode::SharedPtr(new Literal(Value(1ll))))))),
-                ByteCode::SharedPtr(
-                    new Assign("sum", ByteCode::SharedPtr(
+                                                    CodeNode::SharedPtr(new Variable("i")),
+                                                    CodeNode::SharedPtr(new Literal(Value(1ll))))))),
+                CodeNode::SharedPtr(
+                    new Assign("sum", CodeNode::SharedPtr(
                                         new ArithOp(ArithOp::Add,
-                                                    ByteCode::SharedPtr(new Variable("sum")),
-                                                    ByteCode::SharedPtr(new Variable("i"))))))));
+                                                    CodeNode::SharedPtr(new Variable("sum")),
+                                                    CodeNode::SharedPtr(new Variable("i"))))))));
         Value result = loop->eval(env);
         TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.integer() == 55ll, "actual=" << result);
@@ -1564,17 +1564,17 @@ void UnitTest::testByteCodeLoop() {
     { // While
         env->def("count", Value(1ll));
         
-        ByteCode::SharedPtr loop(
+        CodeNode::SharedPtr loop(
                 new Loop(
-                    ByteCode::SharedPtr(
+                    CodeNode::SharedPtr(
                         new CompOp(CompOp::LT,
-                                   ByteCode::SharedPtr(new Variable("count")),
-                                   ByteCode::SharedPtr(new Literal(Value(32ll))))),
-                    ByteCode::SharedPtr(
-                        new Assign("count", ByteCode::SharedPtr(
+                                   CodeNode::SharedPtr(new Variable("count")),
+                                   CodeNode::SharedPtr(new Literal(Value(32ll))))),
+                    CodeNode::SharedPtr(
+                        new Assign("count", CodeNode::SharedPtr(
                                                 new ArithOp(ArithOp::Mul,
-                                                            ByteCode::SharedPtr(new Variable("count")),
-                                                            ByteCode::SharedPtr(new Literal(Value(2ll)))))))));
+                                                            CodeNode::SharedPtr(new Variable("count")),
+                                                            CodeNode::SharedPtr(new Literal(Value(2ll)))))))));
         Value result = loop->eval(env);
         TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.integer() == 32ll, "actual=" << result);
@@ -1583,26 +1583,26 @@ void UnitTest::testByteCodeLoop() {
     { // Break
         env->def("x", Value(0ll));
 
-        ByteCode::SharedPtrList exprs;
+        CodeNode::SharedPtrList exprs;
         exprs.push_back(
-            ByteCode::SharedPtr(
-                new Assign("x", ByteCode::SharedPtr(
+            CodeNode::SharedPtr(
+                new Assign("x", CodeNode::SharedPtr(
                                     new ArithOp(ArithOp::Add,
-                                                ByteCode::SharedPtr(new Variable("x")),
-                                                ByteCode::SharedPtr(new Literal(Value(1ll))))))));
+                                                CodeNode::SharedPtr(new Variable("x")),
+                                                CodeNode::SharedPtr(new Literal(Value(1ll))))))));
         exprs.push_back(
-            ByteCode::SharedPtr(
-                new If(ByteCode::SharedPtr(
+            CodeNode::SharedPtr(
+                new If(CodeNode::SharedPtr(
                            new CompOp(CompOp::EQ,
-                                      ByteCode::SharedPtr(new Variable("x")),
-                                      ByteCode::SharedPtr(new Literal(Value(2ll))))),
-                       ByteCode::SharedPtr(new Break()),
-                       ByteCode::SharedPtr())));
+                                      CodeNode::SharedPtr(new Variable("x")),
+                                      CodeNode::SharedPtr(new Literal(Value(2ll))))),
+                       CodeNode::SharedPtr(new Break()),
+                       CodeNode::SharedPtr())));
 
-        ByteCode::SharedPtr loop(
+        CodeNode::SharedPtr loop(
                 new Loop(
-                    ByteCode::SharedPtr(new Literal(Value::True)),
-                    ByteCode::SharedPtr(new ProgN(exprs))));
+                    CodeNode::SharedPtr(new Literal(Value::True)),
+                    CodeNode::SharedPtr(new ProgN(exprs))));
 
         Value result = loop->eval(env);
         TEST_CASE_MSG(result.isNull(), "actual=" << result.typeToString());
@@ -1611,21 +1611,21 @@ void UnitTest::testByteCodeLoop() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeLambdaExpr() {
+void UnitTest::testCodeNodeLambdaExpr() {
     Environment::SharedPtr env(new Environment());
     env->def("foo", Value(1ll));
 
     const Lambda::ParamList params({"x", "y"});
 
-    ByteCode::SharedPtr body(
+    CodeNode::SharedPtr body(
         new ArithOp(ArithOp::Add,
-                    ByteCode::SharedPtr(
+                    CodeNode::SharedPtr(
                         new ArithOp(ArithOp::Add,
-                                    ByteCode::SharedPtr(new Variable("x")),
-                                    ByteCode::SharedPtr(new Variable("y")))),
-                    ByteCode::SharedPtr(new Variable("foo"))));
+                                    CodeNode::SharedPtr(new Variable("x")),
+                                    CodeNode::SharedPtr(new Variable("y")))),
+                    CodeNode::SharedPtr(new Variable("foo"))));
 
-    ByteCode::SharedPtr lambdaExpr(new LambdaExpr(params, body));
+    CodeNode::SharedPtr lambdaExpr(new LambdaExpr(params, body));
     Value lambdaVal = lambdaExpr->exec(env);
     TEST_CASE_MSG(lambdaVal.isClosure(), "actual=" << lambdaVal.typeToString());
 
@@ -1640,22 +1640,22 @@ void UnitTest::testByteCodeLambdaExpr() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeLambdaApp() {
+void UnitTest::testCodeNodeLambdaApp() {
     Environment::SharedPtr env(new Environment());
 
     const Lambda::ParamList params({"x", "y"});
 
-    ByteCode::SharedPtr body(
+    CodeNode::SharedPtr body(
         new ArithOp(ArithOp::Add,
-                    ByteCode::SharedPtr(new Variable("x")),
-                    ByteCode::SharedPtr(new Variable("y"))));
+                    CodeNode::SharedPtr(new Variable("x")),
+                    CodeNode::SharedPtr(new Variable("y"))));
 
-    ByteCode::SharedPtr lambdaExpr(new LambdaExpr(params, body));
+    CodeNode::SharedPtr lambdaExpr(new LambdaExpr(params, body));
 
-    ByteCode::SharedPtrList args;
-    args.push_back(ByteCode::SharedPtr(new Literal(Value(3ll))));
-    args.push_back(ByteCode::SharedPtr(new Literal(Value(4ll))));
-    ByteCode::SharedPtr appExpr(new LambdaApp(lambdaExpr, args));
+    CodeNode::SharedPtrList args;
+    args.push_back(CodeNode::SharedPtr(new Literal(Value(3ll))));
+    args.push_back(CodeNode::SharedPtr(new Literal(Value(4ll))));
+    CodeNode::SharedPtr appExpr(new LambdaApp(lambdaExpr, args));
 
     Value result = appExpr->exec(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
@@ -1663,17 +1663,17 @@ void UnitTest::testByteCodeLambdaApp() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeFunctionExpr() {
+void UnitTest::testCodeNodeFunctionExpr() {
     Environment::SharedPtr env(new Environment());
 
     const Lambda::ParamList params({"x", "y"});
 
-    ByteCode::SharedPtr body(
+    CodeNode::SharedPtr body(
         new ArithOp(ArithOp::Add,
-                    ByteCode::SharedPtr(new Variable("x")),
-                    ByteCode::SharedPtr(new Variable("y"))));
+                    CodeNode::SharedPtr(new Variable("x")),
+                    CodeNode::SharedPtr(new Variable("y"))));
 
-    ByteCode::SharedPtr ftnExpr(new FunctionExpr("myfunc", params, body));
+    CodeNode::SharedPtr ftnExpr(new FunctionExpr("myfunc", params, body));
     Value ftnVal = ftnExpr->exec(env);
     TEST_CASE_MSG(ftnVal.isClosure(), "actual=" << ftnVal.typeToString());
 
@@ -1690,10 +1690,10 @@ void UnitTest::testByteCodeFunctionExpr() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeFunctionApp() {
+void UnitTest::testCodeNodeFunctionApp() {
     Environment::SharedPtr env(new Environment());
 
-    ByteCode::SharedPtr ftnExpr(
+    CodeNode::SharedPtr ftnExpr(
         std::make_shared<FunctionExpr>(
             "myfunc",
             Lambda::ParamList({"x", "y"}),
@@ -1704,10 +1704,10 @@ void UnitTest::testByteCodeFunctionApp() {
     Value ftnVal = ftnExpr->exec(env);
     TEST_CASE_MSG(ftnVal.isClosure(), "actual=" << ftnVal.typeToString());
 
-    ByteCode::SharedPtr ftnApp(
+    CodeNode::SharedPtr ftnApp(
         std::make_shared<FunctionApp>(
             "myfunc",
-            ByteCode::SharedPtrList({
+            CodeNode::SharedPtrList({
                     std::make_shared<Literal>(Value(3ll)),
                         std::make_shared<Literal>(Value(4ll))})));
 
@@ -1717,10 +1717,10 @@ void UnitTest::testByteCodeFunctionApp() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeStruct() {
+void UnitTest::testCodeNodeStruct() {
     Environment::SharedPtr env(new Environment());
 
-    ByteCode::SharedPtr structExpr(
+    CodeNode::SharedPtr structExpr(
         std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})));
     Value structVal = structExpr->exec(env);
     TEST_CASE_MSG(structVal.isUserType(), "actual=" << structVal.typeToString());
@@ -1733,10 +1733,10 @@ void UnitTest::testByteCodeStruct() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeIsStructName() {
+void UnitTest::testCodeNodeIsStructName() {
     Environment::SharedPtr env(new Environment());
 
-    ByteCode::SharedPtr isStructName(
+    CodeNode::SharedPtr isStructName(
         std::make_shared<IsStructName>(
             std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})),
             "Person"));
@@ -1747,17 +1747,17 @@ void UnitTest::testByteCodeIsStructName() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeMakeInstance() {
+void UnitTest::testCodeNodeMakeInstance() {
     Environment::SharedPtr env(new Environment());
 
-    ByteCode::SharedPtr structExpr(
+    CodeNode::SharedPtr structExpr(
         std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})));
 
     Value structValue = structExpr->exec(env);
     TEST_CASE_MSG(structValue.isUserType(), "actual=" << structValue.typeToString());
     TEST_CASE_MSG(structValue.userType().name() == "Person", "actual=" << structValue.userType().name());
 
-    ByteCode::SharedPtr makeInstance(
+    CodeNode::SharedPtr makeInstance(
         std::make_shared<MakeInstance>("Person"));
 
     Value instValue = makeInstance->exec(env);
@@ -1772,7 +1772,7 @@ void UnitTest::testByteCodeMakeInstance() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeIsInstanceOf() {
+void UnitTest::testCodeNodeIsInstanceOf() {
     Environment::SharedPtr env(new Environment());
 
     std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"}))
@@ -1787,7 +1787,7 @@ void UnitTest::testByteCodeIsInstanceOf() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeGetSetMember() {
+void UnitTest::testCodeNodeGetSetMember() {
     Environment::SharedPtr env(new Environment());
 
     std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"}))
@@ -1829,7 +1829,7 @@ void UnitTest::testByteCodeGetSetMember() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeStringLen() {
+void UnitTest::testCodeNodeStringLen() {
     Environment::SharedPtr env(new Environment());
 
     Value value =
@@ -1862,7 +1862,7 @@ void UnitTest::testByteCodeStringLen() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeCharAt() {
+void UnitTest::testCodeNodeCharAt() {
     Environment::SharedPtr env(new Environment());
 
     Value value =
@@ -1910,11 +1910,11 @@ void UnitTest::testByteCodeCharAt() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeSetCharAt() {
+void UnitTest::testCodeNodeSetCharAt() {
     Environment::SharedPtr env(new Environment());
     env->def("str", Value("abc"));
 
-    ByteCode::SharedPtr var = std::make_shared<Variable>("str");
+    CodeNode::SharedPtr var = std::make_shared<Variable>("str");
 
     Value value =
         std::make_shared<SetCharAt>(
@@ -1978,11 +1978,11 @@ void UnitTest::testByteCodeSetCharAt() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeStringCat() {
+void UnitTest::testCodeNodeStringCat() {
     Environment::SharedPtr env(new Environment());
     env->def("str", Value("abc"));
 
-    ByteCode::SharedPtr var = std::make_shared<Variable>("str");
+    CodeNode::SharedPtr var = std::make_shared<Variable>("str");
 
     Value value =
         std::make_shared<StringCat>(
@@ -2020,18 +2020,18 @@ void UnitTest::testByteCodeStringCat() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeSubString() {
+void UnitTest::testCodeNodeSubString() {
     Environment::SharedPtr env(new Environment());
     env->def("str", Value("0123456789"));
 
-    ByteCode::SharedPtr var = std::make_shared<Variable>("str");
-    ByteCode::SharedPtr minus1 = std::make_shared<Literal>(Value(-1ll));
-    ByteCode::SharedPtr zero = std::make_shared<Literal>(Value::Zero);
-    ByteCode::SharedPtr three = std::make_shared<Literal>(Value(3ll));
-    ByteCode::SharedPtr four = std::make_shared<Literal>(Value(4ll));
-    ByteCode::SharedPtr five = std::make_shared<Literal>(Value(5ll));
-    ByteCode::SharedPtr ten = std::make_shared<Literal>(Value(10ll));
-    ByteCode::SharedPtr eleven = std::make_shared<Literal>(Value(11ll));
+    CodeNode::SharedPtr var = std::make_shared<Variable>("str");
+    CodeNode::SharedPtr minus1 = std::make_shared<Literal>(Value(-1ll));
+    CodeNode::SharedPtr zero = std::make_shared<Literal>(Value::Zero);
+    CodeNode::SharedPtr three = std::make_shared<Literal>(Value(3ll));
+    CodeNode::SharedPtr four = std::make_shared<Literal>(Value(4ll));
+    CodeNode::SharedPtr five = std::make_shared<Literal>(Value(5ll));
+    CodeNode::SharedPtr ten = std::make_shared<Literal>(Value(10ll));
+    CodeNode::SharedPtr eleven = std::make_shared<Literal>(Value(11ll));
 
     Value value = std::make_shared<SubString>(var, zero)->exec(env);
     TEST_CASE_MSG(value == Value("0123456789"), "actual=" << value);
@@ -2086,11 +2086,11 @@ void UnitTest::testByteCodeSubString() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeStringFind() {
+void UnitTest::testCodeNodeStringFind() {
     Environment::SharedPtr env(new Environment());
     env->def("str", Value("0123456789"));
 
-    ByteCode::SharedPtr var = std::make_shared<Variable>("str");
+    CodeNode::SharedPtr var = std::make_shared<Variable>("str");
 
     auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
     auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
@@ -2158,7 +2158,7 @@ void UnitTest::testByteCodeStringFind() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeMakeArray() {
+void UnitTest::testCodeNodeMakeArray() {
     Environment::SharedPtr env(new Environment());
 
     Value value = std::make_shared<MakeArray>()->exec(env);
@@ -2167,7 +2167,7 @@ void UnitTest::testByteCodeMakeArray() {
 
     value =
         std::make_shared<MakeArray>(
-            ByteCode::SharedPtrList(
+            CodeNode::SharedPtrList(
                 { std::make_shared<Literal>(Value('a')),
                   std::make_shared<Literal>(Value('b')),
                   std::make_shared<Literal>(Value('c')) }))
@@ -2180,7 +2180,7 @@ void UnitTest::testByteCodeMakeArray() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeMakeArraySV() {
+void UnitTest::testCodeNodeMakeArraySV() {
     Environment::SharedPtr env(new Environment());
 
     Value value =
@@ -2207,7 +2207,7 @@ void UnitTest::testByteCodeMakeArraySV() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeArrayLen() {
+void UnitTest::testCodeNodeArrayLen() {
     Environment::SharedPtr env(new Environment());
 
     Value value =
@@ -2240,11 +2240,11 @@ void UnitTest::testByteCodeArrayLen() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeArrayGet() {
+void UnitTest::testCodeNodeArrayGet() {
     Environment::SharedPtr env(new Environment());
     env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
 
-    const ByteCode::SharedPtr var = std::make_shared<Variable>("arr");
+    const CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
 
     auto ilit = [](Value::Long i) {
         return std::make_shared<Literal>(Value(i));
@@ -2275,11 +2275,11 @@ void UnitTest::testByteCodeArrayGet() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeArraySet() {
+void UnitTest::testCodeNodeArraySet() {
     Environment::SharedPtr env(new Environment());
     env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
 
-    ByteCode::SharedPtr var = std::make_shared<Variable>("arr");
+    CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
 
     Value expectedValue(Sequence({Value('a'), Value('b'), Value('c')}));
     auto &expected = expectedValue.array();
@@ -2327,11 +2327,11 @@ void UnitTest::testByteCodeArraySet() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testByteCodeArrayAdd() {
+void UnitTest::testCodeNodeArrayAdd() {
     Environment::SharedPtr env(new Environment());
     env->def("arr", Value(Sequence()));
 
-    ByteCode::SharedPtr var = std::make_shared<Variable>("arr");
+    CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
 
     auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
     auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
@@ -2397,7 +2397,7 @@ void UnitTest::testTokenType() {
 // -------------------------------------------------------------
 bool parserTest(Parser &parser, Environment::SharedPtr env, const std::string &expr, const Value &value, bool success) {
     try {
-        ByteCode::SharedPtr code(parser.read(expr));
+        CodeNode::SharedPtr code(parser.read(expr));
         if (code.get()) {
             Value result = code->eval(env);
             if (result.type() != value.type()) {

@@ -10,7 +10,7 @@ Lambda::Lambda()
 {}
 
 // -------------------------------------------------------------
-Lambda::Lambda(const ParamList &params, ByteCode::SharedPtr body, Environment::SharedPtr env)
+Lambda::Lambda(const ParamList &params, CodeNode::SharedPtr body, Environment::SharedPtr env)
     : params_(params)
     , body_(body)
     , env_(env)

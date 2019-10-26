@@ -1,7 +1,7 @@
 #ifndef PARSER_H
 #define	PARSER_H
 
-#include "byte_code.h"
+#include "code_node.h"
 #include "lexer.h"
 
 #include <string>
@@ -14,24 +14,24 @@ namespace Int {
 
     class Parser {
     public:
-        using CallBack = std::function<void (ByteCode::SharedPtr &code)>;
+        using CallBack = std::function<void (CodeNode::SharedPtr &code)>;
 
     public:
         Parser();
 
-        ByteCode::SharedPtr read(const std::string &expr);
-        ByteCode::SharedPtr readLiteral(const std::string &expr);
+        CodeNode::SharedPtr read(const std::string &expr);
+        CodeNode::SharedPtr readLiteral(const std::string &expr);
         void readMulti(const std::string &expr, CallBack callback);
 
         bool hasIncompleteExpr() const { return !lexer_.empty(); }
         void clearIncompleteExpr() { lexer_.clear(); }
 
     private:
-        ByteCode::SharedPtr readExpr();
-        ByteCode::SharedPtr makeLiteral(Lexer::TokenType type, const std::string &text);
-        ByteCode::SharedPtr readApp(const std::string &expected="");
-        ByteCode::SharedPtrList readExprList();
-        ByteCode::SharedPtrPairs readExprPairs();
+        CodeNode::SharedPtr readExpr();
+        CodeNode::SharedPtr makeLiteral(Lexer::TokenType type, const std::string &text);
+        CodeNode::SharedPtr readApp(const std::string &expected="");
+        CodeNode::SharedPtrList readExprList();
+        CodeNode::SharedPtrPairs readExprPairs();
         std::string readName();
         std::vector<std::string> readParams();
         bool ignoreLeftP(bool allowRightP);
@@ -43,7 +43,7 @@ namespace Int {
 
     private:
         Lexer lexer_;
-        std::unordered_map<std::string, std::function<ByteCode::SharedPtr ()>> appFtns_;
+        std::unordered_map<std::string, std::function<CodeNode::SharedPtr ()>> appFtns_;
     };
 
 } // Int

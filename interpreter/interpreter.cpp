@@ -18,7 +18,7 @@ Interpreter::ParserCB::ParserCB(Environment::SharedPtr env, std::string &lastRes
 {}
 
 // -------------------------------------------------------------
-void Interpreter::ParserCB::operator()(ByteCode::SharedPtr &code) {
+void Interpreter::ParserCB::operator()(CodeNode::SharedPtr &code) {
     if (code.get()) {
         Value result = code->eval(env);
         if (!batch) { std::cout << result << '\n'; }

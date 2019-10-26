@@ -12,7 +12,7 @@ OBJS=\
 	struct.o \
 	instance.o \
 	sequence.o \
-	byte_code.o \
+	code_node.o \
 	lexer.o \
 	parser.o \
 	unit_test.o \
@@ -21,7 +21,7 @@ OBJS=\
 ishlang: $(OBJS)
 	$(CPP) -o ishlang $(OBJS)
 
-main.o: main.cpp util.h value.h exception.h environment.h lambda.h instance.h sequence.h byte_code.h unit_test.h interpreter.h
+main.o: main.cpp util.h value.h exception.h environment.h lambda.h instance.h sequence.h code_node.h unit_test.h interpreter.h
 	$(CPP) $(CFLAGS) -c main.cpp
 
 exception.o: exception.h exception.cpp
@@ -36,7 +36,7 @@ value.o: value.h value.cpp lambda.h instance.h sequence.h exception.h
 environment.o: environment.cpp environment.h value.h exception.h
 	$(CPP) $(CFLAGS) -c environment.cpp
 
-lambda.o: lambda.cpp lambda.h value.h environment.h byte_code.h exception.h
+lambda.o: lambda.cpp lambda.h value.h environment.h code_node.h exception.h
 	$(CPP) $(CFLAGS) -c lambda.cpp
 
 struct.o: struct.cpp struct.h
@@ -48,13 +48,13 @@ instance.o: instance.cpp instance.h value.h exception.h
 sequence.o: sequence.cpp sequence.h value.h exception.h
 	$(CPP) $(CFLAGS) -c sequence.cpp
 
-byte_code.o: byte_code.cpp byte_code.h value.h parser.h environment.h lambda.h util.h exception.h
-	$(CPP) $(CFLAGS) -c byte_code.cpp
+code_node.o: code_node.cpp code_node.h value.h parser.h environment.h lambda.h util.h exception.h
+	$(CPP) $(CFLAGS) -c code_node.cpp
 
 lexer.o: lexer.cpp lexer.h util.h exception.h
 	$(CPP) $(CFLAGS) -c lexer.cpp
 
-parser.o: parser.cpp parser.h lexer.h byte_code.h util.h exception.h
+parser.o: parser.cpp parser.h lexer.h code_node.h util.h exception.h
 	$(CPP) $(CFLAGS) -c parser.cpp
 
 unit_test.o: unit_test.cpp unit_test.h value.h environment.h lambda.h instance.h sequence.h util.h exception.h
