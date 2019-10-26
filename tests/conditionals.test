@@ -1,0 +1,45 @@
+__CODE__
+(var trueFlag true)
+(var falseFlag false)
+(var x 5)
+(var y 4)
+
+;; If statement
+;; ------------
+(if trueFlag
+    (println "trueFlag")
+  (println "??? if 1"))
+
+(if falseFlag
+    (println "??? if 2")
+  (println "falseFlag"))
+
+(if (== x 5)
+    (println "x is 5"))
+
+(if (!= x 5)
+    (println "??? if 3"))
+
+;; Cond statement
+;; --------------
+(cond
+  ((== x 5) (println "x is 5"))
+  (true (println "??? cond 1")))
+
+(cond
+  ((== (% x 2) 0) (println "??? cond 2"))
+  ((== (% y 2) 0) (println "y is even"))
+  (true (println "??? cond 3")))
+
+(cond
+  ((> x 10) (println "??? cond 4"))
+  ((<= y 0) (println "??? cond 5"))
+  (true (println "default")))
+
+__EXPECT__
+trueFlag
+falseFlag
+x is 5
+x is 5
+y is even
+default

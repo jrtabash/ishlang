@@ -1,0 +1,22 @@
+__CODE__
+(var x 5)
+
+;; Can define a new var x here because block creates an environment
+(block
+  (var x 1)
+  (= x 10)
+  (println x))
+(println x)
+
+;; Cannot define a new var x here because progn does not create an environment
+(progn
+  (= x 50)
+  (println x))
+
+(println x)
+
+__EXPECT__
+10
+5
+50
+50
