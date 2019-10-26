@@ -1,0 +1,18 @@
+__CODE__
+(var x 1)
+(= x 2)
+(println x)
+
+(= x (+ 10 5))
+(println x)
+
+(var y 2)
+(= y (= x (* 2 5)))
+(println x)
+(println y)
+
+__EXPECT__
+2
+15
+10
+10

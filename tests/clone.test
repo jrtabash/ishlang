@@ -1,0 +1,25 @@
+__CODE__
+(struct Point (x y))
+(var pt1 (makeinstance Point))
+(set pt1 x 10)
+(set pt1 y 20)
+
+(var pt2 (clone pt1))
+(println (== pt1 pt2))
+
+(set pt1 x 100)
+(set pt2 y 200)
+(println (== pt1 pt2))
+
+(var str1 "first")
+(var str2 (clone str1))
+(println (== str1 str2))
+
+(= str1 "second")
+(println (== str1 str2))
+
+__EXPECT__
+true
+false
+true
+false
