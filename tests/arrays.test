@@ -1,0 +1,19 @@
+__CODE__
+(def map_array (ftn arr)
+  (var ret (array))
+  (loop (var i 0) (< i (arrlen arr)) (= i (+ i 1))
+    (arradd ret (ftn (arrget arr i)))))
+
+(def triple (x) (* 3 x))
+
+(println
+  (map_array
+    (lambda (x) (* 2 x))
+    (array 1 2 3 4 5)))
+
+(var a (array 1 2 3))
+(println (map_array triple a))
+
+__EXPECT__
+[2 4 6 8 10]
+[3 6 9]

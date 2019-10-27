@@ -1,0 +1,30 @@
+__CODE__
+(println (array))
+(println (array 1 2 3))
+(println (arraysv 3 0))
+
+(var a (array 1 2 3 4 5))
+(println a)
+(println (arrlen a))
+
+(println (arrget a 0))
+(println (arrget a 2))
+(println (arrget a 4))
+
+(arrset a 0 2)
+(arrset a 1 4)
+(arrset a 2 6)
+(arrset a 3 8)
+(arrset a 4 10)
+(println a)
+
+__EXPECT__
+[]
+[1 2 3]
+[0 0 0]
+[1 2 3 4 5]
+5
+1
+3
+5
+[2 4 6 8 10]

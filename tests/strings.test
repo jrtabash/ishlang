@@ -1,0 +1,32 @@
+__CODE__
+(var str "I am text")
+
+;; strcat
+(strcat str '!')
+(var s (strcat str " Read me..."))
+(println str)
+(println (strlen str))
+(println (== s str))
+
+;; substr
+(println (substr str 0))
+(println (substr str 0 9))
+(println (substr str 11))
+(println (substr str 18 (strlen str)))
+
+;; strfind
+(println (strfind str 't'))
+(println (strfind str 't' 6))
+(println (strfind str 'T'))
+
+__EXPECT__
+I am text! Read me...
+21
+true
+I am text! Read me...
+I am text
+Read me...
+...
+5
+8
+-1

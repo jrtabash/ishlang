@@ -1,0 +1,28 @@
+__CODE__
+(var str "I am text")
+(println str)
+(println (istypeof str string))
+
+;; length
+(println (strlen str))
+
+;; get
+(println (getchar str 0))
+(println (getchar str 3))
+(println (getchar str 8))
+
+;; set
+(setchar str 5 'T')
+(setchar str 6 'E')
+(setchar str 7 'X')
+(setchar str 8 'T')
+(println str)
+
+__EXPECT__
+I am text
+true
+9
+I
+m
+t
+I am TEXT
