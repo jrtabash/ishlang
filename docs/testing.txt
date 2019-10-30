@@ -1,0 +1,33 @@
+Unit Tests
+----------
+Run all:
+  ishlang -t
+
+Run one test:
+  ishlang -t -n <test_name>
+
+List all unit tests:
+  ishlang -t -l
+
+The option -v can be added to all above commands for verbose mode.
+
+Test Runner Scenarios
+---------------------
+Run all scenarios in a given folder:
+  run_tests.sh <ishlang_binary> <make_test_files_binary> <scenarios_folder>
+
+To make the make_test_files binary, cd into test_runner and run make.
+
+Scenario files must have the extension .test, and should be divided into
+two sections, a __CODE__ section and an __EXPECT__ section. Add ishlang
+code to the __CODE__ section, and add exoected standard output to the
+__EXPECT__ section. Several scenarios are provided in the tests folder.
+
+Example scenario file (example.test)
+
+__CODE__
+(var x (+ 1 2))
+(println 3)
+
+__EXPECT__
+3
