@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
     Arguments args(argc, argv);
 
     if (args.test) {
-        Int::UnitTest unitTest;
+        Ishlang::UnitTest unitTest;
         unitTest.setVerbose(args.verboseTest);
         if (args.listTests) {
             unitTest.list();
@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
         bool const forceInteractive = (args.filename.empty() && !args.interactive);
         bool const forceBatch = (!args.filename.empty() && !args.interactive);
 
-        Int::Interpreter interpreter(args.batch || forceBatch);
+        Ishlang::Interpreter interpreter(args.batch || forceBatch);
         if (!args.filename.empty()) {
             interpreter.loadFile(args.filename);
         }

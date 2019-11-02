@@ -6,7 +6,7 @@
 #include <vector>
 #include <ostream>
 
-namespace Int {
+namespace Ishlang {
 
     class Sequence {
     public:

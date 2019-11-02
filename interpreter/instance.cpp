@@ -1,7 +1,7 @@
 #include "instance.h"
 #include "exception.h"
 
-using namespace Int;
+using namespace Ishlang;
 
 // -------------------------------------------------------------
 Instance::Instance()

@@ -1,6 +1,6 @@
 #include "environment.h"
 
-using namespace Int;
+using namespace Ishlang;
 
 Environment::Environment(SharedPtr parent)
     : parent_(parent)

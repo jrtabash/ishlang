@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <iostream>
 
-using namespace Int;
+using namespace Ishlang;
 
 // -------------------------------------------------------------
 FileContext::FileContext(const std::string filename, unsigned lineNo)

@@ -4,7 +4,7 @@
 #include "environment.h"
 #include "parser.h"
 
-namespace Int {
+namespace Ishlang {
 
     class Interpreter {
     public:

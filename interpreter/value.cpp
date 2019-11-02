@@ -5,7 +5,7 @@
 #include "sequence.h"
 #include "exception.h"
 
-using namespace Int;
+using namespace Ishlang;
 
 // -------------------------------------------------------------
 const Value Value::True(true);

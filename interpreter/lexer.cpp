@@ -2,7 +2,7 @@
 #include "util.h"
 #include "exception.h"
 
-using namespace Int;
+using namespace Ishlang;
 
 // -------------------------------------------------------------
 Lexer::Lexer()

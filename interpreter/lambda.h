@@ -9,7 +9,7 @@
 #include <vector>
 #include <algorithm>
 
-namespace Int {
+namespace Ishlang {
 
     class Lambda {
     public:

@@ -7,7 +7,7 @@
 #include <functional>
 #include <array>
 
-using namespace Int;
+using namespace Ishlang;
 
 #define TEST_CASE(EXPR) if (!(EXPR)) { std::cerr << '[' << __LINE__ << "] " << #EXPR << '\n'; success_ = false; }
 #define TEST_CASE_MSG(EXPR, MSG) if (!(EXPR)) { std::cerr << '[' << __LINE__ << "] " << #EXPR << ": " << MSG << '\n'; success_ = false; }
@@ -753,7 +753,7 @@ void UnitTest::testInstanceValue() {
         TEST_CASE_MSG(i.get("name") == Value::Null, "actual=" << i.get("name"));
         TEST_CASE_MSG(i.get("age") == Value::Null, "actual=" << i.get("age"));
     }
-    catch (const Int::Exception &ex) {
+    catch (const Ishlang::Exception &ex) {
         TEST_CASE_MSG(false, "Caught exception: " << ex.what());
     }
 
@@ -770,7 +770,7 @@ void UnitTest::testInstanceValue() {
         TEST_CASE_MSG(i.get("width") == Value::Null, "actual=" << i.get("width"));
         TEST_CASE_MSG(i.get("height") == Value::Null, "actual=" << i.get("height"));
     }
-    catch (const Int::Exception &ex) {
+    catch (const Ishlang::Exception &ex) {
         TEST_CASE_MSG(false, "Caught exception: " << ex.what());
     }
 }
@@ -822,7 +822,7 @@ void UnitTest::testSequenceValue() {
         TEST_CASE_MSG(s.get(0lu) == Value(1ll), "actual=" << s.get(0lu));
         TEST_CASE_MSG(s.get(1lu) == Value(2ll), "actual=" << s.get(1lu));
     }
-    catch (const Int::Exception &ex) {
+    catch (const Ishlang::Exception &ex) {
         TEST_CASE_MSG(false, "Caught exception: " << ex.what());
     }
 }

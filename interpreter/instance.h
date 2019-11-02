@@ -8,7 +8,7 @@
 #include <string>
 #include <algorithm>
 
-namespace Int {
+namespace Ishlang {
 
     class Instance {
     public:

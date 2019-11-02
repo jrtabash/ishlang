@@ -4,7 +4,7 @@
 #include <string>
 #include <forward_list>
 
-namespace Int {
+namespace Ishlang {
 
     class Util {
     public:

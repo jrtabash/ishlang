@@ -8,7 +8,7 @@
 
 #include <cmath>
 
-using namespace Int;
+using namespace Ishlang;
 
 // -------------------------------------------------------------
 IsType::IsType(CodeNode::SharedPtr expr, Value::Type type)

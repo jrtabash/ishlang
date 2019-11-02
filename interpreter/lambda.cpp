@@ -1,6 +1,6 @@
 #include "lambda.h"
 
-using namespace Int;
+using namespace Ishlang;
 
 // -------------------------------------------------------------
 Lambda::Lambda()

@@ -1,6 +1,6 @@
 #include "struct.h"
 
-using namespace Int;
+using namespace Ishlang;
 
 // -------------------------------------------------------------
 Struct::Struct()

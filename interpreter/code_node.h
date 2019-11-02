@@ -8,7 +8,7 @@
 #include <vector>
 #include <memory>
 
-namespace Int {
+namespace Ishlang {
 
     // -------------------------------------------------------------
     class CodeNode {

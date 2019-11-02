@@ -4,7 +4,7 @@
 #include <fstream>
 #include <cstdlib>
 
-using namespace Int;
+using namespace Ishlang;
 
 // -------------------------------------------------------------
 //                     PARSER CALLBACK

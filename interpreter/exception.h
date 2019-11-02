@@ -7,7 +7,7 @@
 #include <cstdarg>
 #include <optional>
 
-namespace Int {
+namespace Ishlang {
 
     class FileContext {
     public:

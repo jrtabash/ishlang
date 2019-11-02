@@ -1,7 +1,7 @@
 #include "sequence.h"
 #include "exception.h"
 
-using namespace Int;
+using namespace Ishlang;
 
 std::size_t Sequence::maxDisplaySize_ = 10;
 

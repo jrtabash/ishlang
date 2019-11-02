@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <functional>
 
-namespace Int {
+namespace Ishlang {
 
     class Lexer {
     public:

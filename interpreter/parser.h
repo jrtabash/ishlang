@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <functional>
 
-namespace Int {
+namespace Ishlang {
 
     class Parser {
     public:

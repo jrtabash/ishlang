@@ -8,7 +8,7 @@
 #include "value.h"
 #include "exception.h"
 
-namespace Int {
+namespace Ishlang {
     
     class Environment {
     public:

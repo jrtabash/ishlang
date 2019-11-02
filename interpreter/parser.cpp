@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <cstdlib>
 
-using namespace Int;
+using namespace Ishlang;
 
 // -------------------------------------------------------------
 Parser::Parser()

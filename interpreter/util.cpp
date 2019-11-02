@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cctype>
 
-using namespace Int;
+using namespace Ishlang;
 
 const double Util::RealThreshold = 0.0000000001;
 

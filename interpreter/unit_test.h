@@ -15,7 +15,7 @@
 #include <map>
 #include <functional>
 
-namespace Int {
+namespace Ishlang {
 
     class UnitTest {
     public:

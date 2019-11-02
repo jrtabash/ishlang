@@ -6,7 +6,7 @@
 #include <variant>
 #include <memory>
 
-namespace Int {
+namespace Ishlang {
     class Lambda;
     class Struct;
     class Instance;

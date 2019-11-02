@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-namespace Int {
+namespace Ishlang {
 
     class Struct {
     public:
