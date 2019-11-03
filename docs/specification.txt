@@ -159,21 +159,27 @@ Example - conditional form:
 Functions
 ---------
 User defined functions:
+  (defun <name> <param_list>
+    <body>)
+
   (def <name> <param_list>
     <body>)
+
+Note: Use of defun is preferred and recommended.
+Note: Ssupport for def will be removed at some future point.
 
 Functions can be nested, i.e defined inside other functions.
 
 Language supports recursion.
 
 Example:
-  (def hello ()
+  (defun hello ()
     (println "Hello world"))
 
-  (def add (x y)
+  (defun add (x y)
     (+ x y))
 
-  (def foobar (x y)
+  (defun foobar (x y)
     (var z (+ x y))
     (if (> z 10)
         (/ z 2)

@@ -33,7 +33,7 @@
 * Add support for file IO
 
 * Cleanup and unification:
-  - Rename def to defun
+  - Remove def support in favor of defun
   - Rename member get and set functions to memget and memset
   - Rename string setchar and getchar to strget and strset
   - Add generic get / set functions that work with instances, strings and arrays
