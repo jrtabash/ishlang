@@ -281,131 +281,22 @@ void Parser::initAppFtns() {
           }
         },
 
-        { "+",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArithOp>(ArithOp::Add, lhs, rhs);
-          }
-        },
+        { "+", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Add) },
+        { "-", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Sub) },
+        { "*", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Mul) },
+        { "/", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Div) },
+        { "%", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Mod) },
+        { "^", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Pow) },
 
-        { "-",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArithOp>(ArithOp::Sub, lhs, rhs);
-          }
-        },
+        { "==", MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::EQ) },
+        { "!=", MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::NE) },
+        { "<",  MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::LT) },
+        { ">",  MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::GT) },
+        { "<=", MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::LE) },
+        { ">=", MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::GE) },
 
-        { "*",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArithOp>(ArithOp::Mul, lhs, rhs);
-          }
-        },
-
-        { "/",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArithOp>(ArithOp::Div, lhs, rhs);
-          }
-        },
-
-        { "%",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArithOp>(ArithOp::Mod, lhs, rhs);
-          }
-        },
-
-        { "^",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArithOp>(ArithOp::Pow, lhs, rhs);
-          }
-        },
-
-        { "==",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<CompOp>(CompOp::EQ, lhs, rhs);
-          }
-        },
-
-        { "!=",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<CompOp>(CompOp::NE, lhs, rhs);
-          }
-        },
-
-        { "<",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<CompOp>(CompOp::LT, lhs, rhs);
-          }
-        },
-
-        { ">",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<CompOp>(CompOp::GT, lhs, rhs);
-          }
-        },
-
-        { "<=",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<CompOp>(CompOp::LE, lhs, rhs);
-          }
-        },
-
-        { ">=",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<CompOp>(CompOp::GE, lhs, rhs);
-          }
-        },
-
-        { "and",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<LogicOp>(LogicOp::Conjunction, lhs, rhs);
-          }
-        },
-
-        { "or",
-          [this]() {
-                CodeNode::SharedPtr lhs(readExpr());
-                CodeNode::SharedPtr rhs(readExpr());
-                ignoreRightP();
-                return std::make_shared<LogicOp>(LogicOp::Disjunction, lhs, rhs);
-          }
-        },
+        { "and", MakeBinaryExpression<LogicOp, LogicOp::Type>(*this, LogicOp::Conjunction) },
+        { "or",  MakeBinaryExpression<LogicOp, LogicOp::Type>(*this, LogicOp::Disjunction) },
 
         { "not",
           [this]() {

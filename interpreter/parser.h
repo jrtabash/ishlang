@@ -42,6 +42,26 @@ namespace Ishlang {
         void initAppFtns();
 
     private:
+        template <typename ExprType, typename ExprOp>
+        struct MakeBinaryExpression {
+            MakeBinaryExpression(Parser &parser, ExprOp exprOp)
+                : parser_(parser)
+                , exprOp_(exprOp)
+            {}
+
+            CodeNode::SharedPtr operator()() {
+                CodeNode::SharedPtr lhs(parser_.readExpr());
+                CodeNode::SharedPtr rhs(parser_.readExpr());
+                parser_.ignoreRightP();
+                return std::make_shared<ExprType>(exprOp_, lhs, rhs);
+            }
+
+        private:
+            Parser &parser_;
+            ExprOp exprOp_;
+        };
+
+    private:
         Lexer lexer_;
         std::unordered_map<std::string, std::function<CodeNode::SharedPtr ()>> appFtns_;
     };
