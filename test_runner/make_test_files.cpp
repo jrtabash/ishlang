@@ -55,7 +55,7 @@ bool checkBlock(const std::string & line, const std::string & block, bool & seen
     return false;
 }
 
-void checkSeenBocks() {
+void checkSeenBlocks() {
     if (!seenCodeBlock) {
         makeAndThrowException("Missing ", CodeBlock);
     }
@@ -106,7 +106,7 @@ int main(int argc, char ** argv) {
         openTestFile();
         readAndCopyBlock(testFilename + ".code");
         readAndCopyBlock(testFilename + ".expect");
-        checkSeenBocks();
+        checkSeenBlocks();
         closeTestFile();
     }
     catch (const std::exception & ex) {
