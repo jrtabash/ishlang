@@ -1,0 +1,54 @@
+(defun bisection (ftn a b tol maxIter)
+  (defun sign (x)
+    (if (>= x 0.0)
+        1
+      -1))
+
+  (defun abs (x)
+    (if (>= x 0.0)
+        x
+      (- 0.0 x)))
+
+  (defun withinTol (x)
+    (< (abs x) tol))
+
+  (var ret null)
+  (var m 0.0)
+  (var fm 0.0)
+
+  (loop (var i 0) (< i maxIter) (= i (+ i 1))
+    (progn
+      (= m (/ (+ a b) 2.0))
+      (= fm (ftn m))
+      (cond
+       ((or (withinTol fm) (withinTol (/ (- b a) 2.0)))
+        (progn
+          (= ret m)
+          (break)))
+       ((== (sign fm) (sign (ftn a)))
+        (= a m))
+       (true
+        (= b m)))))
+
+  (if (istypeof ret none)
+    (progn
+      (print "Bisection method failed to find root after ")
+      (println maxIter)))
+
+  ret)
+
+;; Solve x^2 - 25 = 0
+(defun f (x)
+  (- (^ x 2) 25))
+
+(println "Equation: x^2 - 25 = 0")
+(print "Solution: ")
+(println (bisection f 1.0 10.0 0.000001 100))
+
+;; Solve x^3 - x - 2 = 0
+(defun cubicF (x)
+  (- (- (^ x 3) x) 2))
+
+(println "Equation: x^3 - x - 2 = 0")
+(print "Solution: ")
+(println (bisection cubicF 1.0 2.0 0.000001 100))
