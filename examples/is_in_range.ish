@@ -1,8 +1,8 @@
-(def test (num)
- (print num)
- (if (and (>= num -10) (<= num 10))
-     (println " is in [10, 10]")
-   (println " is not in [10, 10]")))
+(defun test (num)
+  (print num)
+  (if (and (>= num -10) (<= num 10))
+      (println " is in [10, 10]")
+    (println " is not in [10, 10]")))
 
 (test -20)
 (test -10)

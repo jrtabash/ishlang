@@ -1,4 +1,4 @@
-(def array_max (arr)
+(defun array_max (arr)
   (var amax 0)
   (if (> (arrlen arr) 0)
     (loop (var i 1) (< i (arrlen arr)) (= i (+ i 1))

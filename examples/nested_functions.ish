@@ -1,5 +1,5 @@
-(def incrementN (x n)
-  (def add1 (x)
+(defun incrementN (x n)
+  (defun add1 (x)
     (+ x 1))
 
   (var sum x)
@@ -7,16 +7,16 @@
     (= sum (add1 sum)))
   sum)
 
-(def incrementN2 (x n)
- (var sum x)
+(defun incrementN2 (x n)
+  (var sum x)
 
- (def inc ()
-   (= sum (+ sum 1)))
+  (defun inc ()
+    (= sum (+ sum 1)))
 
- (loop (var i 0) (< i n) (= i (+ i 1))
-   (inc))
+  (loop (var i 0) (< i n) (= i (+ i 1))
+    (inc))
 
- sum)
+  sum)
 
 (print "incrementN(10, 5): ")
 (println (incrementN 10 5))

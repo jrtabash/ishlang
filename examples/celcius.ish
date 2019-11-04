@@ -1,4 +1,4 @@
-(def cels (f)
+(defun cels (f)
   (var c (- f 32))
   (= c (* c 5))
   (/ c 9))

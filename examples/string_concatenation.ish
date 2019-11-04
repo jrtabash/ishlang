@@ -1,4 +1,4 @@
-(def makeHelloMsg ()
+(defun makeHelloMsg ()
   (var str "Hello ")
   (print "What is your name? ")
   (strcat str (read))

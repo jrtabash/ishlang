@@ -1,4 +1,4 @@
-(def test (name ftn arg)
+(defun test (name ftn arg)
   (print (strcat (clone name) ": "))
   (println (ftn arg)))
 

@@ -3,14 +3,14 @@
    length
    position))
 
-(def makeTokenizerState (str)
+(defun makeTokenizerState (str)
   (var state (makeinstance TokenizerState))
   (set state string str)
   (set state length (strlen str))
   (set state position 0)
   state)
 
-(def nextToken (tokState)
+(defun nextToken (tokState)
   (var str (get tokState string))
   (var pos (get tokState position))
   (var nextPos (strfind str ' ' pos))

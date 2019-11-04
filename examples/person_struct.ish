@@ -2,16 +2,16 @@
   (name
    age))
 
-(def isPerson (p)
+(defun isPerson (p)
   (isinstanceof p Person))
 
-(def makePerson (newName newAge)
+(defun makePerson (newName newAge)
   (var newPerson (makeinstance Person))
   (set newPerson name newName)
   (set newPerson age newAge)
   newPerson)
 
-(def printPerson (p)
+(defun printPerson (p)
   (print "[Person: name='")
   (print (get person name))
   (print "' age=")
