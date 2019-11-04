@@ -30,6 +30,10 @@
   - arrcount : Count occurences of value in array
   - strcount : Count occurences of character in string
 
+* Add 'when' and 'unless' conditional statements
+  - (when <condition_expression> <true_expression>)
+  - (unless <condition_expression> <false_expression>)
+
 * Add support for file IO
 
 * Cleanup and unification:
