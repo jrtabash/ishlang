@@ -260,8 +260,8 @@ void Value::printC(std::ostream &out, const Value &value) {
     case Value::eBoolean:    out << (std::get<Bool>(value.value_) ? "true" : "false"); break;
     case Value::eString:     out << '"' << *std::get<StringPtr>(value.value_) << '"';  break;
     case Value::eClosure:    out << "[Lambda]";                                        break;
-    case Value::eUserType:   out << "[Struct]";                                        break;
-    case Value::eUserObject: out << "[Instance]";                                      break;
+    case Value::eUserType:   out << *std::get<StructPtr>(value.value_);                break;
+    case Value::eUserObject: out << *std::get<InstancePtr>(value.value_);              break;
     case Value::eArray:      out << *std::get<SequencePtr>(value.value_);              break;
     }
 }
@@ -276,8 +276,8 @@ void Value::print(const Value &value) {
     case Value::eBoolean:    std::cout << (std::get<Bool>(value.value_) ? "true" : "false"); break;
     case Value::eString:     std::cout << *std::get<StringPtr>(value.value_);                break;
     case Value::eClosure:    std::cout << "[Lambda]";                                        break;
-    case Value::eUserType:   std::cout << "[Struct]";                                        break;
-    case Value::eUserObject: std::cout << "[Instance]";                                      break;
+    case Value::eUserType:   std::cout << *std::get<StructPtr>(value.value_);                break;
+    case Value::eUserObject: std::cout << *std::get<InstancePtr>(value.value_);              break;
     case Value::eArray:      std::cout << *std::get<SequencePtr>(value.value_);              break;
     }
 }

@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <string>
 #include <algorithm>
+#include <ostream>
 
 namespace Ishlang {
 
@@ -29,6 +30,11 @@ namespace Ishlang {
 
         const Value &get(const std::string &name) const;
         void set(const std::string &name, const Value &value);
+
+        friend std::ostream &operator<<(std::ostream &out, const Instance &inst) {
+            out << "instance:" << inst.type().name();
+            return out;
+        }
 
     private:
         static bool membersEqual(const MemberTable &lhs, const MemberTable &rhs) {

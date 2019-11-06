@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <ostream>
 
 namespace Ishlang {
 
@@ -24,6 +25,11 @@ namespace Ishlang {
 
         const std::string &name() const { return name_; }
         const MemberList &members() const { return members_; }
+
+        friend std::ostream &operator<<(std::ostream &out, const Struct &s) {
+            out << "struct:" << s.name();
+            return out;
+        }
 
     private:
         static bool membersEqual(const MemberList &lhs, const MemberList &rhs) {
