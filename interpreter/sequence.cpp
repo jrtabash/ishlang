@@ -6,11 +6,6 @@ using namespace Ishlang;
 std::size_t Sequence::maxDisplaySize_ = 10;
 
 // -------------------------------------------------------------
-Sequence::Sequence()
-    : vector_()
-{}
-
-// -------------------------------------------------------------
 Sequence::Sequence(Vector && vec)
     : vector_(vec)
 {}

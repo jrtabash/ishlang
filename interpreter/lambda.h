@@ -17,7 +17,7 @@ namespace Ishlang {
         using ArgList   = std::vector<Value>;
 
     public:
-        Lambda();
+        Lambda() = default;
         Lambda(const ParamList &params, CodeNode::SharedPtr body, Environment::SharedPtr env);
 
         Value exec(const ArgList &args) const;

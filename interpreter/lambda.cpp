@@ -3,13 +3,6 @@
 using namespace Ishlang;
 
 // -------------------------------------------------------------
-Lambda::Lambda()
-    : params_()
-    , body_()
-    , env_()
-{}
-
-// -------------------------------------------------------------
 Lambda::Lambda(const ParamList &params, CodeNode::SharedPtr body, Environment::SharedPtr env)
     : params_(params)
     , body_(body)

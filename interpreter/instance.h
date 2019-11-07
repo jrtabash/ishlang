@@ -15,7 +15,7 @@ namespace Ishlang {
     public:
         using MemberTable = std::unordered_map<std::string, Value>;
 
-        Instance();
+        Instance() = default;
         Instance(const Struct &type);
 
         bool operator==(const Instance &rhs) const { return type_ == rhs.type_ && membersEqual(members_, rhs.members_); }

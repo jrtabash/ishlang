@@ -12,7 +12,7 @@ namespace Ishlang {
     public:
         using MemberList = std::vector<std::string>;
 
-        Struct();
+        Struct() = default;
         Struct(const std::string &name, const MemberList &members);
 
         bool operator==(const Struct &rhs) const { return name_ == rhs.name_ && membersEqual(members_, rhs.members_); }

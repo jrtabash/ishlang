@@ -4,12 +4,6 @@
 using namespace Ishlang;
 
 // -------------------------------------------------------------
-Instance::Instance()
-    : type_()
-    , members_()
-{}
-
-// -------------------------------------------------------------
 Instance::Instance(const Struct &type)
     : type_(type)
     , members_()

@@ -13,7 +13,7 @@ namespace Ishlang {
         using Vector = std::vector<Value>;
 
     public:
-        Sequence();
+        Sequence() = default;
         Sequence(Vector && vec);
         Sequence(std::size_t size, const Value &value);
 
