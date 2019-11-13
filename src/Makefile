@@ -1,12 +1,14 @@
+BUILD=build
+
 all:
-	mkdir -p binaries
+	mkdir -p $(BUILD)
 	make -C interpreter
 	make -C test_runner
 
 clean:
 	make clean -C interpreter
 	make clean -C test_runner
-	rmdir binaries
+	rmdir $(BUILD)
 
 install:
 	make install -C interpreter
