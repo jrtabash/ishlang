@@ -1,10 +1,12 @@
 all:
+	mkdir -p binaries
 	make -C interpreter
 	make -C test_runner
 
 clean:
 	make clean -C interpreter
 	make clean -C test_runner
+	rmdir binaries
 
 install:
 	make install -C interpreter
