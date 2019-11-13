@@ -1,16 +1,14 @@
-* Restructure ishlang file/code heirarchy:
-  - ishlang
-    - docs
-    - examples
-    - src
-      - util
-      - base: value, environment, lambda, sequence, struct, instance, exception
-      - codenode: separate codenodes into multiple files
-      - parser: lexer, parser
-      - interpreter
-      - unit_tests
-      - test_runner
-      - test_scenarios
+* Split src/interpreter folder into following:
+  - src
+    - util (lib)
+    - base (lib)
+      - value, environment, lambda, sequence, struct, instance, exception
+    - codenode (lib)
+      - separate codenodes into multiple files
+    - parser (lib)
+      - lexer, parser
+    - interpreter (binary)
+    - unit_tests (binary)
 
 * Add additional type operators
   - typename := return builtin type name of operand
