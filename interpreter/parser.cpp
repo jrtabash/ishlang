@@ -1,10 +1,10 @@
 #include "parser.h"
-#include "util.h"
-#include "struct.h"
 #include "exception.h"
+#include "struct.h"
+#include "util.h"
 
-#include <cctype>
 #include <algorithm>
+#include <cctype>
 #include <cstdlib>
 
 using namespace Ishlang;

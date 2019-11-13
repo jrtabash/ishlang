@@ -1,10 +1,10 @@
 #ifndef STRUCT_H
 #define	STRUCT_H
 
-#include <string>
-#include <vector>
 #include <algorithm>
 #include <ostream>
+#include <string>
+#include <vector>
 
 namespace Ishlang {
 

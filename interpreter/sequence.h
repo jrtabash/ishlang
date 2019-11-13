@@ -3,8 +3,8 @@
 
 #include "value.h"
 
-#include <vector>
 #include <ostream>
+#include <vector>
 
 namespace Ishlang {
 

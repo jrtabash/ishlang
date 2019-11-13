@@ -1,13 +1,13 @@
 #ifndef LAMBDA_H
 #define	LAMBDA_H
 
-#include "value.h"
-#include "environment.h"
 #include "code_node.h"
+#include "environment.h"
+#include "value.h"
 
+#include <algorithm>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 namespace Ishlang {
 

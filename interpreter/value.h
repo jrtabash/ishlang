@@ -1,10 +1,10 @@
 #ifndef VALUE_H
 #define	VALUE_H
 
-#include <string>
 #include <iostream>
-#include <variant>
 #include <memory>
+#include <string>
+#include <variant>
 
 namespace Ishlang {
     class Lambda;

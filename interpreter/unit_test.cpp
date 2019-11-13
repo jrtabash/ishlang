@@ -1,11 +1,11 @@
 #include "unit_test.h"
 #include "util.h"
 
-#include <map>
-#include <iostream>
-#include <sstream>
-#include <functional>
 #include <array>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <sstream>
 
 using namespace Ishlang;
 

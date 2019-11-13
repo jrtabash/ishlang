@@ -1,8 +1,8 @@
-#include <iostream>
 #include <fstream>
-#include <string>
 #include <functional>
+#include <iostream>
 #include <stdexcept>
+#include <string>
 
 namespace {
     const std::string CodeBlock = "__CODE__";

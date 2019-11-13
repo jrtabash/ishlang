@@ -1,19 +1,19 @@
 #ifndef UNIT_TEST_H
 #define	UNIT_TEST_H
 
-#include "value.h"
-#include "environment.h"
-#include "lambda.h"
-#include "struct.h"
-#include "instance.h"
-#include "sequence.h"
 #include "code_node.h"
-#include "parser.h"
+#include "environment.h"
+#include "instance.h"
+#include "lambda.h"
 #include "lexer.h"
+#include "parser.h"
+#include "sequence.h"
+#include "struct.h"
+#include "value.h"
 
-#include <string>
-#include <map>
 #include <functional>
+#include <map>
+#include <string>
 
 namespace Ishlang {
 

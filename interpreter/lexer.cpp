@@ -1,6 +1,6 @@
 #include "lexer.h"
-#include "util.h"
 #include "exception.h"
+#include "util.h"
 
 using namespace Ishlang;
 

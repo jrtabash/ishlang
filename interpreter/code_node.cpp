@@ -1,9 +1,9 @@
 #include "code_node.h"
-#include "lambda.h"
-#include "instance.h"
-#include "sequence.h"
-#include "parser.h"
 #include "exception.h"
+#include "instance.h"
+#include "lambda.h"
+#include "parser.h"
+#include "sequence.h"
 #include "util.h"
 
 #include <cmath>

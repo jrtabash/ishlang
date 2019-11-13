@@ -1,9 +1,9 @@
 #include "value.h"
-#include "lambda.h"
-#include "struct.h"
-#include "instance.h"
-#include "sequence.h"
 #include "exception.h"
+#include "instance.h"
+#include "lambda.h"
+#include "sequence.h"
+#include "struct.h"
 
 using namespace Ishlang;
 

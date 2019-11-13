@@ -1,8 +1,8 @@
 #include "util.h"
 #include "exception.h"
 
-#include <cmath>
 #include <cctype>
+#include <cmath>
 
 using namespace Ishlang;
 

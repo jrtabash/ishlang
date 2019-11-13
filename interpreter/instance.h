@@ -4,10 +4,10 @@
 #include "struct.h"
 #include "value.h"
 
-#include <unordered_map>
-#include <string>
 #include <algorithm>
 #include <ostream>
+#include <string>
+#include <unordered_map>
 
 namespace Ishlang {
 

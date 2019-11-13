@@ -1,10 +1,10 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include <string>
 #include <deque>
-#include <unordered_set>
 #include <functional>
+#include <string>
+#include <unordered_set>
 
 namespace Ishlang {
 

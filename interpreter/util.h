@@ -1,8 +1,8 @@
 #ifndef UTIL_H
 #define	UTIL_H
 
-#include <string>
 #include <forward_list>
+#include <string>
 
 namespace Ishlang {
 

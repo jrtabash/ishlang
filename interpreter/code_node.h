@@ -2,11 +2,11 @@
 #define	BYTE_CODE_H
 
 #include "environment.h"
-#include "value.h"
 #include "struct.h"
+#include "value.h"
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace Ishlang {
 
