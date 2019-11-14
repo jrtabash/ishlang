@@ -1,6 +1,7 @@
 CPP=g++
 CFLAGS=-std=c++17 -Wall -Wextra -Wformat -Werror
 RM=rm -f
+CP=cp
 BUILD=../build
 
 OBJS=make_test_files.o
@@ -16,5 +17,5 @@ clean:
 	$(RM) $(BUILD)/make_test_files
 
 install:
-	cp  $(BUILD)/make_test_files ~/bin/
-	cp  run_tests.sh ~/bin/
+	$(CP) $(BUILD)/make_test_files ~/bin/
+	$(CP) run_tests.sh ~/bin/

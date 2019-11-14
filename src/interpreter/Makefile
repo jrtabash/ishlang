@@ -1,6 +1,7 @@
 CPP=g++
 CFLAGS=-std=c++17 -Wall -Wextra -Wformat -Werror
 RM=rm -f
+CP=cp
 BUILD=../build
 
 OBJS=\
@@ -69,4 +70,4 @@ clean:
 	$(RM) $(BUILD)/ishlang
 
 install:
-	cp $(BUILD)/ishlang ~/bin/
+	$(CP) $(BUILD)/ishlang ~/bin/
