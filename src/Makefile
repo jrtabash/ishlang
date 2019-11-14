@@ -1,11 +1,16 @@
 BUILD=build
 MKDIR=mkdir -p
 RMDIR=rmdir
+DBGFLAG=1
+
+ifeq ($(DEBUG), 0)
+	DBGFLAG=0
+endif
 
 all:
 	$(MKDIR) $(BUILD)
-	make -C interpreter
-	make -C test_runner
+	make DEBUG=$(DBGFLAG) -C interpreter
+	make DEBUG=$(DBGFLAG) -C test_runner
 
 clean:
 	make clean -C interpreter

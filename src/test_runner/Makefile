@@ -6,6 +6,12 @@ BUILD=../build
 
 OBJS=make_test_files.o
 
+ifeq ($(DEBUG), 1)
+	CFLAGS += -DDEBUG
+else
+	CFLAGS += -DNDEBUG -O2
+endif
+
 make_test_files: $(OBJS)
 	$(CPP) -o $(BUILD)/make_test_files $(patsubst %, $(BUILD)/%, $(OBJS))
 

@@ -20,6 +20,12 @@ OBJS=\
 	unit_test.o \
 	interpreter.o
 
+ifeq ($(DEBUG), 1)
+	CFLAGS += -DDEBUG
+else
+	CFLAGS += -DNDEBUG -O2
+endif
+
 ishlang: $(OBJS)
 	$(CPP) -o $(BUILD)/ishlang $(patsubst %, $(BUILD)/%, $(OBJS))
 
