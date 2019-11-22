@@ -1,7 +1,7 @@
 (defun sumRange (start end)
   (var count 0)
   (loop (var i start) (<= i end) (= i (+ i 1))
-    (= count (+ count i))))
+        (= count (+ count i))))
 
 (print "sumRange(1, 10): ")
 (println (sumRange 1 10))

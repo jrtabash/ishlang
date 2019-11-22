@@ -15,7 +15,7 @@
   (var pos (get tokState position))
   (var nextPos (strfind str ' ' pos))
   (if (== nextPos -1)
-    (= nextPos (get tokState length)))
+      (= nextPos (get tokState length)))
   (var token (substr str pos (- nextPos pos)))
   (set tokState position (+ nextPos 1))
   token)
@@ -27,4 +27,4 @@
 
 (var tokState (makeTokenizerState message))
 (loop (< (get tokState position) (get tokState length))
-  (println (nextToken tokState))))
+      (println (nextToken tokState))))

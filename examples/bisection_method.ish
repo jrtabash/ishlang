@@ -17,23 +17,23 @@
   (var fm 0.0)
 
   (loop (var i 0) (< i maxIter) (= i (+ i 1))
-    (progn
-      (= m (/ (+ a b) 2.0))
-      (= fm (ftn m))
-      (cond
-       ((or (withinTol fm) (withinTol (/ (- b a) 2.0)))
         (progn
-          (= ret m)
-          (break)))
-       ((== (sign fm) (sign (ftn a)))
-        (= a m))
-       (true
-        (= b m)))))
+          (= m (/ (+ a b) 2.0))
+          (= fm (ftn m))
+          (cond
+           ((or (withinTol fm) (withinTol (/ (- b a) 2.0)))
+            (progn
+              (= ret m)
+              (break)))
+           ((== (sign fm) (sign (ftn a)))
+            (= a m))
+           (true
+            (= b m)))))
 
   (if (istypeof ret none)
-    (progn
-      (print "Bisection method failed to find root after ")
-      (println maxIter)))
+      (progn
+        (print "Bisection method failed to find root after ")
+        (println maxIter)))
 
   ret)
 
