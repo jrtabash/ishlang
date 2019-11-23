@@ -29,8 +29,10 @@
 (defun matrix_fromArray (n m arr)
   (defun row (i)
     (/ i m))
+
   (defun col (i)
     (% i m))
+
   (if (== (* n m) (arrlen arr))
       (progn
         (var mat (matrix n m))
@@ -58,8 +60,8 @@
   (defun aggregate (i j)
     (var agg 0)
     (loop (var k 0) (< k (matrix_n rhs)) (= k (+ k 1))
-          (= agg (+ agg (* (matrix_get lhs i k) (matrix_get rhs k j)))))
-    agg)
+          (= agg (+ agg (* (matrix_get lhs i k) (matrix_get rhs k j))))))
+
   (if (== (matrix_m lhs) (matrix_n rhs))
       (progn
         (var ret (matrix (matrix_n lhs) (matrix_m rhs)))
