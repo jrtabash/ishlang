@@ -30,10 +30,10 @@
            (true
             (= b m)))))
 
-  (if (istypeof ret none)
-      (progn
-        (print "Bisection method failed to find root after ")
-        (println maxIter)))
+  (when (istypeof ret none)
+    (progn
+      (print "Bisection method failed to find root after ")
+      (println maxIter)))
 
   ret)
 
