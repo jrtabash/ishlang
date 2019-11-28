@@ -1,14 +1,4 @@
-* Split src/interpreter folder into following:
-  - src
-    - util (lib)
-    - base (lib)
-      - value, environment, lambda, sequence, struct, instance, exception
-    - codenode (lib)
-      - separate codenodes into multiple files
-    - parser (lib)
-      - lexer, parser
-    - interpreter (binary)
-    - unit_tests (binary)
+* Split src/interpreter folder into src/interpreter and src/unit_tests
 
 * Add additional type operators
   - typename := return builtin type name of operand
