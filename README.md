@@ -18,7 +18,7 @@ Details on testing are provided in [docs/testing.txt](docs/testing.txt)
 (println "Hello World")
 ```
 
-## Basic Interpreter Commands:
+## Basic Commands:
 Run source file:
 ```bash
 ishlang -f <filename>
@@ -31,7 +31,7 @@ ishlang
 
 Run ishlang unit tests:
 ```bash
-ishlang_unit_test -t
+ishlang_unit_test
 ```
 
 See usage for more information:
