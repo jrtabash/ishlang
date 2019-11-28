@@ -1,6 +1,4 @@
 * Add additional type operators
-  - typename := return builtin type name of operand
-    E.g. (typename 3) will return "int"
   - structname := return struct name of operand
     E.g. Assume a Person struct, and an instance p of Person
          (structname p) will return "Person"

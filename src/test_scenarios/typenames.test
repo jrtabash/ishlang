@@ -1,0 +1,36 @@
+__CODE__
+(struct MyStruct (field1 field2))
+
+(var n null)
+(var i 1)
+(var r 1.5)
+(var b true)
+(var c 'a')
+(var s "foobar")
+(var a (array 1 2 3))
+(var f (lambda (x y) (+ x y)))
+(var t MyStruct)
+(var o (makeinstance MyStruct))
+
+(println (typename n))
+(println (typename i))
+(println (typename r))
+(println (typename b))
+(println (typename c))
+(println (typename s))
+(println (typename a))
+(println (typename f))
+(println (typename t))
+(println (typename o))
+
+__EXPECT__
+none
+int
+real
+bool
+char
+string
+array
+closure
+usertype
+userobject

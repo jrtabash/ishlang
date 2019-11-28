@@ -51,6 +51,7 @@ namespace Ishlang {
         void testCodeNodeBasic();
         void testCodeNodeClone();
         void testCodeNodeIsType();
+        void testCodeNodeTypeName();
         void testCodeNodeArithOp();
         void testCodeNodeCompOp();
         void testCodeNodeLogicOp();
@@ -81,6 +82,7 @@ namespace Ishlang {
         void testCodeNodeArrayAdd();
         void testParserBasic();
         void testParserIsType();
+        void testParserTypeName();
         void testParserVar();
         void testParserArith();
         void testParserComp();

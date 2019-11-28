@@ -425,6 +425,18 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "typename",
+          [this]() {
+                CodeNode::SharedPtrList exprs(readExprList());
+                if (exprs.size() == 1) {
+                    return std::make_shared<TypeName>(exprs[0]);
+                }
+                else {
+                    throw InvalidExpression("Too many/few arguments to typename");
+                }
+          }
+        },
+
         { "print",
           [this]() {
                 CodeNode::SharedPtr pExpr(readExpr());

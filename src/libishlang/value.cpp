@@ -191,18 +191,18 @@ bool Value::operator>=(const Value &rhs) const {
 // -------------------------------------------------------------
 std::string Value::typeToString(Type type) {
     switch (type) {
-        case eNone:       return "Null";
-        case eInteger:    return "Integer";
-        case eReal:       return "Real";
-        case eCharacter:  return "Character";
-        case eBoolean:    return "Boolean";
-        case eString:     return "String";
-        case eClosure:    return "Closure";
-        case eUserType:   return "UserType";
-        case eUserObject: return "UserObject";
-        case eArray:      return "Array";
+        case eNone:       return "none";
+        case eInteger:    return "int";
+        case eReal:       return "real";
+        case eCharacter:  return "char";
+        case eBoolean:    return "bool";
+        case eString:     return "string";
+        case eClosure:    return "closure";
+        case eUserType:   return "usertype";
+        case eUserObject: return "userobject";
+        case eArray:      return "array";
     }
-    return "Unknown";
+    return "unknown";
 }
 
 // -------------------------------------------------------------

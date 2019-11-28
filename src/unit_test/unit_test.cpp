@@ -34,6 +34,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeBasic);
     ADD_TEST(testCodeNodeClone);
     ADD_TEST(testCodeNodeIsType);
+    ADD_TEST(testCodeNodeTypeName);
     ADD_TEST(testCodeNodeArithOp);
     ADD_TEST(testCodeNodeCompOp);
     ADD_TEST(testCodeNodeLogicOp);
@@ -65,6 +66,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeSetCharAt);
     ADD_TEST(testParserBasic);
     ADD_TEST(testParserIsType);
+    ADD_TEST(testParserTypeName);
     ADD_TEST(testParserVar);
     ADD_TEST(testParserArith);
     ADD_TEST(testParserComp);
@@ -942,8 +944,20 @@ void UnitTest::testCodeNodeIsType() {
 
     Value instanceValue(Instance(structValue.userType()));
 
-    const std::array<Value::Type, 9> types = 
-        { Value::eNone, Value::eInteger, Value::eReal, Value::eCharacter, Value::eBoolean, Value::eString, Value::eClosure, Value::eUserType, Value::eUserObject };
+    Value arrayValue(Sequence(1, Value::Zero));
+
+    const std::array<Value::Type, 10> types = {
+        Value::eNone,
+        Value::eInteger,
+        Value::eReal,
+        Value::eCharacter,
+        Value::eBoolean,
+        Value::eString,
+        Value::eClosure,
+        Value::eUserType,
+        Value::eUserObject,
+        Value::eArray
+    };
 
     std::map<CodeNode::SharedPtr, Value::Type> valueTypes; {
         valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(Value::Null)), Value::eNone));
@@ -955,6 +969,7 @@ void UnitTest::testCodeNodeIsType() {
         valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(lambdaValue)), Value::eClosure));
         valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(structValue)), Value::eUserType));
         valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(instanceValue)), Value::eUserObject));
+        valueTypes.insert(std::make_pair(CodeNode::SharedPtr(new Literal(arrayValue)), Value::eArray));
     }
 
     for (auto valueType : valueTypes) {
@@ -968,6 +983,44 @@ void UnitTest::testCodeNodeIsType() {
             TEST_CASE_MSG(result.isBool() && result.boolean() == expected,
                           "actual=" << Value::typeToString(exprType) << " check=" << Value::typeToString(type));
         }
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeTypeName() {
+    Environment::SharedPtr env(new Environment());
+
+    Value lambdaValue(
+        Lambda(CodeNode::ParamList(),
+               CodeNode::SharedPtr(new Literal(Value::Zero)),
+               env));
+
+    Value structValue(Struct("Person", {"name", "age"}));
+
+    Value instanceValue(Instance(structValue.userType()));
+
+    Value arrayValue(Sequence(1, Value::Zero));
+
+    std::vector<std::pair<CodeNode::SharedPtr, std::string>> valueTypePairs; {
+        valueTypePairs.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(Value::Null)),   "none"));
+        valueTypePairs.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(Value(1ll))),    "int"));
+        valueTypePairs.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(Value(1.0))),    "real"));
+        valueTypePairs.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(Value('c'))),    "char"));
+        valueTypePairs.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(Value::True)),   "bool"));
+        valueTypePairs.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(Value("txt"))),  "string"));
+        valueTypePairs.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(lambdaValue)),   "closure"));
+        valueTypePairs.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(structValue)),   "usertype"));
+        valueTypePairs.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(instanceValue)), "userobject"));
+        valueTypePairs.push_back(std::make_pair(CodeNode::SharedPtr(new Literal(arrayValue)),    "array"));
+    }
+
+    for (auto const & valueType : valueTypePairs) {
+        auto expr = CodeNode::SharedPtr(new TypeName(valueType.first));
+        auto const & expectedName = valueType.second;
+
+        Value typeName = expr->exec(env);
+        TEST_CASE_MSG(typeName.isString() && typeName.text() == expectedName,
+                      "actual=" << Value::typeToString(typeName.type()) << " expected=" << expectedName);
     }
 }
 
@@ -2449,14 +2502,16 @@ void UnitTest::testParserIsType() {
     Environment::SharedPtr env(new Environment());
     Parser parser;
 
-    TEST_CASE(parserTest(parser, env, "(istypeof null none)",                   Value::True, true));
-    TEST_CASE(parserTest(parser, env, "(istypeof 3 int)",                       Value::True, true));
-    TEST_CASE(parserTest(parser, env, "(istypeof 1.0 real)",                    Value::True, true));
-    TEST_CASE(parserTest(parser, env, "(istypeof 'c' char)",                    Value::True, true));
-    TEST_CASE(parserTest(parser, env, "(istypeof true bool)",                   Value::True, true));
-    TEST_CASE(parserTest(parser, env, "(istypeof \"txt\" string)",              Value::True, true));
-    TEST_CASE(parserTest(parser, env, "(istypeof (lambda () 1) closure)",       Value::True, true));
-    TEST_CASE(parserTest(parser, env, "(istypeof (struct Foo (x y)) usertype)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof null none)",                     Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof 3 int)",                         Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof 1.0 real)",                      Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof 'c' char)",                      Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof true bool)",                     Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof \"txt\" string)",                Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof (lambda () 1) closure)",         Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof (struct Foo (x y)) usertype)",   Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof (makeinstance Foo) userobject)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof (array 1 1) array)",             Value::True, true));
 
     TEST_CASE(parserTest(parser, env, "(istypeof null int)",                   Value::False, true));
     TEST_CASE(parserTest(parser, env, "(istypeof 3 char)",                     Value::False, true));
@@ -2467,6 +2522,26 @@ void UnitTest::testParserIsType() {
     TEST_CASE(parserTest(parser, env, "(istypeof (struct Bar (y z)) closure)", Value::False, true));
 
     TEST_CASE(parserTest(parser, env, "(istypeof 3 three)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserTypeName() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(typename null)",                   Value("none"),       true));
+    TEST_CASE(parserTest(parser, env, "(typename 3)",                      Value("int"),        true));
+    TEST_CASE(parserTest(parser, env, "(typename 1.0)",                    Value("real"),       true));
+    TEST_CASE(parserTest(parser, env, "(typename 'c')",                    Value("char"),       true));
+    TEST_CASE(parserTest(parser, env, "(typename true)",                   Value("bool"),       true));
+    TEST_CASE(parserTest(parser, env, "(typename \"txt\")",                Value("string"),     true));
+    TEST_CASE(parserTest(parser, env, "(typename (lambda () 1))",          Value("closure"),    true));
+    TEST_CASE(parserTest(parser, env, "(typename (struct Foo (x y)))",     Value("usertype"),   true));
+    TEST_CASE(parserTest(parser, env, "(typename (makeinstance Foo))",     Value("userobject"), true));
+    TEST_CASE(parserTest(parser, env, "(typename (array 1 1))",            Value("array"),      true));
+
+    TEST_CASE(parserTest(parser, env, "(typename)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(typename 1 int)", Value::Null, false));
 }
 
 // -------------------------------------------------------------

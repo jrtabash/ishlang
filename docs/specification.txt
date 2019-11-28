@@ -276,6 +276,17 @@ Example:
   (var p (makeinstance Person))
   (isinstanceof p Person)
 
+Type Name
+---------
+Get type name of:
+  (typename <expression>)
+
+Returns the name of the type of the expression.
+
+Example:
+  (typename 10)
+  (typename Person)
+
 Cloning
 -------
 Clone a value:
