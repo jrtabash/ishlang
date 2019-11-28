@@ -83,6 +83,26 @@ If Statement
 Example:
   (if (> x 0) 1 0)
 
+When Statement
+--------------
+(when <condition_expression> <true_expression>)
+
+The when form is syntactic sugar for the following if/true statement:
+  (if <condition_expression> <true_expression>)
+
+Example:
+  (when (> x 0) 1)
+
+Unless Statement
+----------------
+(unless <condition_expression> <false_expression>)
+
+The unless form is syntactic sugar for the following if/not statement:
+  (if (not <condition_expression>) <true_expression>)
+
+Example:
+  (unless (<= x 0) 1)
+
 Cond Statement
 --------------
 (cond
