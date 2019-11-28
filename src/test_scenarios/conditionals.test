@@ -18,7 +18,7 @@ __CODE__
     (println "x is 5"))
 
 (if (!= x 5)
-    (println "??? if 3"))
+    (println "??? if 5"))
 
 ;; Cond statement
 ;; --------------
@@ -50,6 +50,22 @@ __CODE__
    (true "odd")))
 (println desc)
 
+;; When statement
+;; --------------
+(when (== x 5)
+  (println "x is 5"))
+
+(when (!= x 5)
+  (println "??? when 5"))
+
+;; When statement
+;; --------------
+(unless (== x 10)
+  (println "x is not 10"))
+
+(unless (!= x 10)
+  (println "??? unless 10"))
+
 __EXPECT__
 trueFlag
 falseFlag
@@ -59,3 +75,5 @@ y is even
 default
 even
 odd
+x is 5
+x is not 10

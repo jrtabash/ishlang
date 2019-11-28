@@ -335,6 +335,30 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "when",
+          [this]() {
+                CodeNode::SharedPtrList exprs(readExprList());
+                if (exprs.size() == 2) {
+                    return std::make_shared<If>(exprs[0], exprs[1]);
+                }
+                else {
+                    throw InvalidExpression("Too many/fiew forms in when");
+                }
+          }
+        },
+
+        { "unless",
+          [this]() {
+                CodeNode::SharedPtrList exprs(readExprList());
+                if (exprs.size() == 2) {
+                    return std::make_shared<If>(std::make_shared<Not>(exprs[0]), exprs[1]);
+                }
+                else {
+                    throw InvalidExpression("Too many/fiew forms in unless");
+                }
+          }
+        },
+
         { "cond",
           [this]() {
                 CodeNode::SharedPtrPairs pairs(readExprPairs());

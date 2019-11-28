@@ -2578,6 +2578,16 @@ void UnitTest::testParserCond() {
     TEST_CASE(parserTest(parser, env, "(cond ((== 1 2) 1) ((== 1 1) 2) (true 3))", Value(2ll),  true));
     TEST_CASE(parserTest(parser, env, "(cond ((== 1 2) 1) ((== 2 3) 2) (true 3))", Value(3ll),  true));
     TEST_CASE(parserTest(parser, env, "(cond)",                                    Value::Null, false));
+
+    TEST_CASE(parserTest(parser, env, "(when true 1)",   Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(when false 1)",  Value::Null, true));
+    TEST_CASE(parserTest(parser, env, "(when true)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(when true 1 2)", Value::Null, false));
+
+    TEST_CASE(parserTest(parser, env, "(unless true 1)",    Value::Null, true));
+    TEST_CASE(parserTest(parser, env, "(unless false 1)",   Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(unless false)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(unless false 1 2)", Value::Null, false));
 }
 
 // -------------------------------------------------------------
