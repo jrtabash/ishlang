@@ -1,13 +1,13 @@
 Unit Tests
 ----------
 Run all:
-  ishlang -t
+  ishlang_unit_test
 
 Run one test:
-  ishlang -t -n <test_name>
+  ishlang_unit_test -n <test_name>
 
 List all unit tests:
-  ishlang -t -l
+  ishlang_unit_test -l
 
 The option -v can be added to all above commands for verbose mode.
 

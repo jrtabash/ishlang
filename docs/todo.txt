@@ -1,5 +1,3 @@
-* Split src/interpreter folder into src/interpreter and src/unit_tests
-
 * Add additional type operators
   - typename := return builtin type name of operand
     E.g. (typename 3) will return "int"

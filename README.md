@@ -31,7 +31,7 @@ ishlang
 
 Run ishlang unit tests:
 ```bash
-ishlang -t
+ishlang_unit_test -t
 ```
 
 See usage for more information:

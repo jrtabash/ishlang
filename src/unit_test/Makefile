@@ -7,11 +7,11 @@ LIBS=-lishlang
 RM=rm -f
 CP=cp
 BUILD=../build
-TARGET=ishlang
+TARGET=ishlang_unit_test
 
 OBJS=\
-	ishlang_main.o \
-	interpreter.o
+	unit_test_main.o \
+	unit_test.o \
 
 ifeq ($(DEBUG), 1)
 	CFLAGS += -DDEBUG
@@ -22,13 +22,13 @@ endif
 $(TARGET): $(OBJS)
 	$(CPP) $(LFLAGS) $(LIBSPATH) -o $(BUILD)/$(TARGET) $(patsubst %, $(BUILD)/%, $(OBJS)) $(LIBS)
 
-ishlang_main.o: ishlang_main.cpp interpreter.h
-	$(CPP) $(CFLAGS) $(INCS) -c ishlang_main.cpp -o $(BUILD)/ishlang_main.o
+unit_test.o: unit_test.cpp unit_test.h
+	$(CPP) $(CFLAGS) $(INCS) -c unit_test.cpp -o $(BUILD)/unit_test.o
 
-interpreter.o: interpreter.cpp interpreter.h
-	$(CPP) $(CFLAGS) $(INCS) -c interpreter.cpp -o $(BUILD)/interpreter.o
+unit_test_main.o: unit_test_main.cpp unit_test.h
+	$(CPP) $(CFLAGS) $(INCS) -c unit_test_main.cpp -o $(BUILD)/unit_test_main.o
 
-clean: 
+clean:
 	$(RM) $(patsubst %, $(BUILD)/%, $(OBJS))
 	$(RM) $(BUILD)/$(TARGET)
 
