@@ -3,9 +3,9 @@ CFLAGS=-std=c++17 -Wall -Wextra -Wformat -Werror
 RM=rm -f
 CP=cp
 BUILD=../build
-TARGET=make_test_files
+TARGET=ishlang_test_files
 
-OBJS=make_test_files.o
+OBJS=ishlang_test_files.o
 
 ifeq ($(DEBUG), 1)
 	CFLAGS += -DDEBUG
@@ -16,8 +16,8 @@ endif
 $(TARGET): $(OBJS)
 	$(CPP) -o $(BUILD)/$(TARGET) $(patsubst %, $(BUILD)/%, $(OBJS))
 
-make_test_files.o: make_test_files.cpp
-	$(CPP) $(CFLAGS) -c make_test_files.cpp -o $(BUILD)/make_test_files.o
+ishlang_test_files.o: ishlang_test_files.cpp
+	$(CPP) $(CFLAGS) -c ishlang_test_files.cpp -o $(BUILD)/ishlang_test_files.o
 
 clean:
 	$(RM) $(patsubst %, $(BUILD)/%, $(OBJS))
@@ -25,4 +25,4 @@ clean:
 
 install:
 	$(CP) $(BUILD)/$(TARGET) ~/bin/
-	$(CP) run_tests.sh ~/bin/
+	$(CP) ishlang_run_tests.sh ~/bin/

@@ -14,7 +14,7 @@ The option -v can be added to all above commands for verbose mode.
 Test Runner Scenarios
 ---------------------
 Run all scenarios in a given folder:
-  run_tests.sh <ishlang_binary> <make_test_files_binary> <scenarios_folder>
+  ishlang_run_tests.sh <ishlang_binary> <ishlang_test_files_binary> <scenarios_folder>
 
 Scenario files must have the extension .test, and should be divided into
 two sections, a __CODE__ section and an __EXPECT__ section. Add ishlang

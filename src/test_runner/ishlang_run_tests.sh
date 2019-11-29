@@ -3,10 +3,10 @@
 if [ $# -ne 3 ]; then
     echo "Usage"
     echo ""
-    echo "    $0 <ishlang> <make_test_files> <tests>"
+    echo "    $0 <ishlang> <ishlang_test_files> <tests>"
     echo ""
     echo "         ishlang := ishlang binary"
-    echo " make_test_files := make_test_files binary"
+    echo " ishlang_test_files := ishlang_test_files binary"
     echo "           tests := tests/scenarios folder"
     echo ""
     echo "Error: Invalid arguments"
@@ -14,7 +14,7 @@ if [ $# -ne 3 ]; then
 fi
 
 ishlang=${1}
-make_test_files=${2}
+ishlang_test_files=${2}
 tests=${3}
 
 if [ ! -f ${ishlang} ]; then
@@ -22,8 +22,8 @@ if [ ! -f ${ishlang} ]; then
     exit 1
 fi
 
-if [ ! -f ${make_test_files} ]; then
-    echo "Terminating tests ... cannot find make_test_files binary ${make_test_files}"
+if [ ! -f ${ishlang_test_files} ]; then
+    echo "Terminating tests ... cannot find ishlang_test_files binary ${ishlang_test_files}"
     exit 1
 fi
 
@@ -39,7 +39,7 @@ fi
 
 for scenario in ${scenarios}
 do
-    ${make_test_files} ${scenario}
+    ${ishlang_test_files} ${scenario}
     if [ ${?} -ne 0 ]; then
         echo "Terminating tests ... failed to create test files for ${scenario}"
         exit 1
