@@ -50,6 +50,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeIsStructName);
     ADD_TEST(testCodeNodeMakeInstance);
     ADD_TEST(testCodeNodeIsInstanceOf);
+    ADD_TEST(testCodeNodeStructName);
     ADD_TEST(testCodeNodeGetSetMember);
     ADD_TEST(testCodeNodeStringCat);
     ADD_TEST(testCodeNodeSubString);
@@ -80,6 +81,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserIsStructName);
     ADD_TEST(testParserMakeInstance);
     ADD_TEST(testParserIsInstanceOf);
+    ADD_TEST(testParserStructName);
     ADD_TEST(testParserStringLen);
     ADD_TEST(testParserGetChar);
     ADD_TEST(testParserSetChar);
@@ -1840,6 +1842,38 @@ void UnitTest::testCodeNodeIsInstanceOf() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeStructName() {
+    Environment::SharedPtr env(new Environment());
+
+    std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"}))
+        ->exec(env);
+
+    Value value =
+        std::make_shared<StructName>(
+            std::make_shared<MakeInstance>("Person"))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value("Person"), "actual=" << value);
+
+    value =
+        std::make_shared<StructName>(
+            std::make_shared<Variable>("Person"))
+        ->exec(env);
+    TEST_CASE_MSG(value == Value("Person"), "actual" << value);
+
+    try {
+        value =
+            std::make_shared<StructName>(
+                std::make_shared<Literal>(Value::Zero))
+            ->exec(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidExpressionType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeGetSetMember() {
     Environment::SharedPtr env(new Environment());
 
@@ -2771,6 +2805,21 @@ void UnitTest::testParserIsInstanceOf() {
     TEST_CASE(parserTest(parser, env, "(struct Person (name age))",    Value(stest), true));
     TEST_CASE(parserTest(parser, env, "(var p (makeinstance Person))", Value(itest), true));
     TEST_CASE(parserTest(parser, env, "(isinstanceof p Person)",       Value::True,  true));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserStructName() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    const Struct stest("Person", {"name", "age"});
+    const Instance itest(stest);
+
+    TEST_CASE(parserTest(parser, env, "(struct Person (name age))",    Value(stest),    true));
+    TEST_CASE(parserTest(parser, env, "(var p (makeinstance Person))", Value(itest),    true));
+    TEST_CASE(parserTest(parser, env, "(structname Person)",           Value("Person"), true));
+    TEST_CASE(parserTest(parser, env, "(structname p)",                Value("Person"), true));
+    TEST_CASE(parserTest(parser, env, "(structname 5)",                Value::Null,     false));
 }
 
 // -------------------------------------------------------------

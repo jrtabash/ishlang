@@ -1,8 +1,3 @@
-* Add additional type operators
-  - structname := return struct name of operand
-    E.g. Assume a Person struct, and an instance p of Person
-         (structname p) will return "Person"
-
 * Add support for type conversion
   - Form: (astype <expr> <type>)
   - Example: (astype 5 real)

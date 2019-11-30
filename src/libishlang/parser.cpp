@@ -478,6 +478,18 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "structname",
+          [this]() {
+                CodeNode::SharedPtrList exprs(readExprList());
+                if (exprs.size() == 1) {
+                    return std::make_shared<StructName>(exprs[0]);
+                }
+                else {
+                    throw InvalidExpression("Too many/few arguments to structname");
+                }
+          }
+        },
+
         { "makeinstance",
           [this]() {
                 const std::string name(readName());

@@ -287,6 +287,16 @@ Example:
   (typename 10)
   (typename Person)
 
+Get struct name:
+  (structname <expression>)
+
+Returns struct name, expression must be an instance or a struct.
+
+Example:
+  (struct Person (name))
+  (var p (makeinstance Person))
+  (structname p)
+
 Cloning
 -------
 Clone a value:

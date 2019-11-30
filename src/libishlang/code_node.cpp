@@ -404,6 +404,29 @@ Value IsStructName::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+StructName::StructName(CodeNode::SharedPtr expr)
+    : CodeNode()
+    , expr_(expr)
+{
+}
+
+Value StructName::exec(Environment::SharedPtr env) {
+    if (expr_.get()) {
+        Value value = expr_->exec(env);
+        if (value.isUserObject()) {
+            return Value(value.userObject().type().name());
+        }
+        else if (value.isUserType()) {
+            return Value(value.userType().name());
+        }
+        else {
+            throw InvalidExpressionType("(UserObject or UserType)", value.typeToString());
+        }
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 MakeInstance::MakeInstance(const std::string &name)
     : CodeNode()
     , name_(name)
