@@ -171,10 +171,11 @@ Example - general form:
 Example - conditional form:
 
   (var count 0)
-  (var tem 0)
+  (var term 0)
   (loop (< count 55)
-    (= term (+ term 1))
-    (= count (+ count term)))
+    (progn
+      (= term (+ term 1))
+      (= count (+ count term))))
 
 Functions
 ---------
