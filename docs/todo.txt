@@ -1,12 +1,3 @@
-* Add support for type conversion
-  - Form: (astype <expr> <type>)
-  - Example: (astype 5 real)
-  - Support conversions:
-    - real <-> integer
-    - character <-> integer (characer ascii value)
-    - string <-> numeric (e.g. "123" <-> 123)
-    - string <-> character array (e.g. "12" <-> [1 2])
-
 * Add array / string operations
   - arrfind  : Find position of value in array
   - arrcount : Count occurences of value in array

@@ -298,6 +298,44 @@ Example:
   (var p (makeinstance Person))
   (structname p)
 
+Type Conversion
+---------------
+Convert value to value of another type:
+  (astype <expr> <type>)
+
+Supports the following type conversions:
+  From    To      Equivalent to
+  ----    --      -------------
+  int     real    float(from)
+  int     char    ascii(from)
+  int     bool    from != 0
+  int     string  string(from)
+  real    int     int(from)
+  real    char    ascii(int(from))
+  real    bool    int(from) != 0
+  real    string  string(from)
+  char    int     ascii_value(from)
+  char    real    ascii_value(int(from))
+  char    bool    from == 't' -> true, from == 'f' -> false
+  char    string  string(from)
+  bool    int     from == true -> 1, from == false -> 0
+  bool    real    from == true -> 1.0, from == false -> 0.0
+  bool    char    from == true -> 't', from == false -> 'f'
+  bool    string  from == true -> "true", from == false -> "false"
+  string  int     int(from)
+  string  real    real(from)
+  string  char    from[0] or '\0' if empty
+  string  bool    from == "true" -> true, from == "false" -> false
+
+Example:
+  (astype true int)
+  (astype 25.12 int)
+  (astype 25 real)
+  (astype "10" int)
+  (astype 't' bool)
+  (astype 99 char)
+  (astype 12.34 string)
+
 Cloning
 -------
 Clone a value:

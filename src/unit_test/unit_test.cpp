@@ -22,6 +22,7 @@ UnitTest::UnitTest()
     ADD_TEST(testToken);
     ADD_TEST(testComment);
     ADD_TEST(testValue);
+    ADD_TEST(testValueAsType);
     ADD_TEST(testEnvironment);
     ADD_TEST(testLambda);
     ADD_TEST(testStruct);
@@ -35,6 +36,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeClone);
     ADD_TEST(testCodeNodeIsType);
     ADD_TEST(testCodeNodeTypeName);
+    ADD_TEST(testCodeNodeAsType);
     ADD_TEST(testCodeNodeArithOp);
     ADD_TEST(testCodeNodeCompOp);
     ADD_TEST(testCodeNodeLogicOp);
@@ -68,6 +70,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserBasic);
     ADD_TEST(testParserIsType);
     ADD_TEST(testParserTypeName);
+    ADD_TEST(testParserAsType);
     ADD_TEST(testParserVar);
     ADD_TEST(testParserArith);
     ADD_TEST(testParserComp);
@@ -552,6 +555,173 @@ void UnitTest::testValue() {
 }
 
 // -------------------------------------------------------------
+#define TEST_VALUE_ASTYPE(VALUE, ASFTN, ASVALUE)                        \
+    TEST_CASE_MSG(VALUE.ASFTN == ASVALUE, "actual=" << VALUE.ASFTN)
+
+#define TEST_ASTYPE_EXCEPT(VALUE, ASFTN, ASTYPE)                        \
+    try {                                                               \
+        VALUE.ASFTN;                                                    \
+        TEST_CASE(false);                                               \
+    }                                                                   \
+    catch (InvalidAsType const & ex) {                                  \
+        TEST_CASE_MSG(                                                  \
+            ex.what() == (std::string("Invalid astype from '") + VALUE.typeToString() + "' to '" + ASTYPE + "'"), \
+            ex.what());                                                 \
+    }                                                                   \
+    catch (...) { TEST_CASE(false); }
+
+void UnitTest::testValueAsType() {
+    Value const null = Value::Null;
+    Value const int0 = Value::Zero;
+    Value const int1 = Value(1ll);
+    Value const int2 = Value(2ll);
+    Value const int25 = Value(25ll);
+    Value const int99 = Value(99ll);
+    Value const real0 = Value(0.0);
+    Value const real1 = Value(1.0);
+    Value const real2p5 = Value(2.5);
+    Value const real25 = Value(25.0);
+    Value const real25p72 = Value(25.72);
+    Value const real99 = Value(99.0);
+    Value const charC = Value('c');
+    Value const charT = Value('t');
+    Value const charF = Value('f');
+    Value const char2 = Value('2');
+    Value const charNull = Value('\0');
+    Value const boolTrue = Value::True;
+    Value const boolFalse = Value::False;
+    Value const string25 = Value("25");
+    Value const string25p72 = Value("25.72");
+    Value const stringEmpty = Value("");
+    Value const stringTrue = Value("true");
+    Value const stringFalse = Value("false");
+    Value const array1 = Value(Sequence(1, int1));
+
+    { // asInt
+        TEST_VALUE_ASTYPE(int1,        asInt(), int1);
+        TEST_VALUE_ASTYPE(real2p5,     asInt(), int2);
+        TEST_VALUE_ASTYPE(charC,       asInt(), int99);
+        TEST_VALUE_ASTYPE(boolTrue,    asInt(), int1);
+        TEST_VALUE_ASTYPE(boolFalse,   asInt(), int0);
+        TEST_VALUE_ASTYPE(string25,    asInt(), int25);
+        TEST_VALUE_ASTYPE(string25p72, asInt(), int25);
+
+        TEST_ASTYPE_EXCEPT(null,   asInt(), "int");
+        TEST_ASTYPE_EXCEPT(array1, asInt(), "int");
+    }
+
+    { // asReal
+        TEST_VALUE_ASTYPE(int1,        asReal(), real1);
+        TEST_VALUE_ASTYPE(real2p5,     asReal(), real2p5);
+        TEST_VALUE_ASTYPE(charC,       asReal(), real99);
+        TEST_VALUE_ASTYPE(boolTrue,    asReal(), real1);
+        TEST_VALUE_ASTYPE(boolFalse,   asReal(), real0);
+        TEST_VALUE_ASTYPE(string25,    asReal(), real25);
+        TEST_VALUE_ASTYPE(string25p72, asReal(), real25p72);
+
+        TEST_ASTYPE_EXCEPT(null,   asReal(), "real");
+        TEST_ASTYPE_EXCEPT(array1, asReal(), "real");
+    }
+
+    { // asChar
+        TEST_VALUE_ASTYPE(int99,       asChar(), charC);
+        TEST_VALUE_ASTYPE(real99,      asChar(), charC);
+        TEST_VALUE_ASTYPE(charC,       asChar(), charC);
+        TEST_VALUE_ASTYPE(boolTrue,    asChar(), charT);
+        TEST_VALUE_ASTYPE(boolFalse,   asChar(), charF);
+        TEST_VALUE_ASTYPE(string25,    asChar(), char2);
+        TEST_VALUE_ASTYPE(stringEmpty, asChar(), charNull);
+
+        TEST_ASTYPE_EXCEPT(null,   asChar(), "char");
+        TEST_ASTYPE_EXCEPT(array1, asChar(), "char");
+    }
+
+    { // asBool
+        TEST_VALUE_ASTYPE(int0,        asBool(), boolFalse);
+        TEST_VALUE_ASTYPE(int1,        asBool(), boolTrue);
+        TEST_VALUE_ASTYPE(real0,       asBool(), boolFalse);
+        TEST_VALUE_ASTYPE(real1,       asBool(), boolTrue);
+        TEST_VALUE_ASTYPE(charT,       asBool(), boolTrue);
+        TEST_VALUE_ASTYPE(charF,       asBool(), boolFalse);
+        TEST_VALUE_ASTYPE(boolTrue,    asBool(), boolTrue);
+        TEST_VALUE_ASTYPE(boolFalse,   asBool(), boolFalse);
+        TEST_VALUE_ASTYPE(stringTrue,  asBool(), boolTrue);
+        TEST_VALUE_ASTYPE(stringFalse, asBool(), boolFalse);
+
+        TEST_ASTYPE_EXCEPT(null,     asBool(), "bool");
+        TEST_ASTYPE_EXCEPT(charC,    asBool(), "bool");
+        TEST_ASTYPE_EXCEPT(string25, asBool(), "bool");
+        TEST_ASTYPE_EXCEPT(array1,   asBool(), "bool");
+    }
+
+    { // asString
+        TEST_VALUE_ASTYPE(int25,     asString(), string25);
+        TEST_VALUE_ASTYPE(real25p72, asString(), Value("25.720000"));
+        TEST_VALUE_ASTYPE(charC,     asString(), Value("c"));
+        TEST_VALUE_ASTYPE(boolTrue,  asString(), stringTrue);
+        TEST_VALUE_ASTYPE(boolFalse, asString(), stringFalse);
+        TEST_VALUE_ASTYPE(string25,  asString(), string25);
+
+        TEST_ASTYPE_EXCEPT(null,   asString(), "string");
+        TEST_ASTYPE_EXCEPT(array1, asString(), "string");
+    }
+
+    { // asType
+        TEST_VALUE_ASTYPE(int1,        asType(Value::eInteger), int1);
+        TEST_VALUE_ASTYPE(real2p5,     asType(Value::eInteger), int2);
+        TEST_VALUE_ASTYPE(charC,       asType(Value::eInteger), int99);
+        TEST_VALUE_ASTYPE(boolTrue,    asType(Value::eInteger), int1);
+        TEST_VALUE_ASTYPE(boolFalse,   asType(Value::eInteger), int0);
+        TEST_VALUE_ASTYPE(string25,    asType(Value::eInteger), int25);
+        TEST_VALUE_ASTYPE(string25p72, asType(Value::eInteger), int25);
+
+        TEST_VALUE_ASTYPE(int1,        asType(Value::eReal), real1);
+        TEST_VALUE_ASTYPE(real2p5,     asType(Value::eReal), real2p5);
+        TEST_VALUE_ASTYPE(charC,       asType(Value::eReal), real99);
+        TEST_VALUE_ASTYPE(boolTrue,    asType(Value::eReal), real1);
+        TEST_VALUE_ASTYPE(boolFalse,   asType(Value::eReal), real0);
+        TEST_VALUE_ASTYPE(string25,    asType(Value::eReal), real25);
+        TEST_VALUE_ASTYPE(string25p72, asType(Value::eReal), real25p72);
+
+        TEST_VALUE_ASTYPE(int99,       asType(Value::eCharacter), charC);
+        TEST_VALUE_ASTYPE(real99,      asType(Value::eCharacter), charC);
+        TEST_VALUE_ASTYPE(charC,       asType(Value::eCharacter), charC);
+        TEST_VALUE_ASTYPE(boolTrue,    asType(Value::eCharacter), charT);
+        TEST_VALUE_ASTYPE(boolFalse,   asType(Value::eCharacter), charF);
+        TEST_VALUE_ASTYPE(string25,    asType(Value::eCharacter), char2);
+        TEST_VALUE_ASTYPE(stringEmpty, asType(Value::eCharacter), charNull);
+
+        TEST_VALUE_ASTYPE(int0,        asType(Value::eBoolean), boolFalse);
+        TEST_VALUE_ASTYPE(int1,        asType(Value::eBoolean), boolTrue);
+        TEST_VALUE_ASTYPE(real0,       asType(Value::eBoolean), boolFalse);
+        TEST_VALUE_ASTYPE(real1,       asType(Value::eBoolean), boolTrue);
+        TEST_VALUE_ASTYPE(charF,       asType(Value::eBoolean), boolFalse);
+        TEST_VALUE_ASTYPE(charT,       asType(Value::eBoolean), boolTrue);
+        TEST_VALUE_ASTYPE(boolFalse,   asType(Value::eBoolean), boolFalse);
+        TEST_VALUE_ASTYPE(boolTrue,    asType(Value::eBoolean), boolTrue);
+        TEST_VALUE_ASTYPE(stringFalse, asType(Value::eBoolean), boolFalse);
+        TEST_VALUE_ASTYPE(stringTrue,  asType(Value::eBoolean), boolTrue);
+
+        TEST_VALUE_ASTYPE(int25,     asType(Value::eString), string25);
+        TEST_VALUE_ASTYPE(real25p72, asType(Value::eString), Value("25.720000"));
+        TEST_VALUE_ASTYPE(charC,     asType(Value::eString), Value("c"));
+        TEST_VALUE_ASTYPE(boolFalse, asType(Value::eString), stringFalse);
+        TEST_VALUE_ASTYPE(boolTrue,  asType(Value::eString), stringTrue);
+        TEST_VALUE_ASTYPE(string25,  asType(Value::eString), string25);
+
+        TEST_ASTYPE_EXCEPT(null,        asType(Value::eInteger),   "int");
+        TEST_ASTYPE_EXCEPT(null,        asType(Value::eReal),      "real");
+        TEST_ASTYPE_EXCEPT(null,        asType(Value::eCharacter), "char");
+        TEST_ASTYPE_EXCEPT(null,        asType(Value::eBoolean),   "bool");
+        TEST_ASTYPE_EXCEPT(null,        asType(Value::eString),    "string");
+        TEST_ASTYPE_EXCEPT(charC,       asType(Value::eBoolean),   "bool");
+        TEST_ASTYPE_EXCEPT(stringEmpty, asType(Value::eBoolean),   "bool");
+    }
+}
+#undef TEST_ASTYPE_EXCEPT
+#undef TEST_VALUE_ASTYPE
+
+// -------------------------------------------------------------
 void UnitTest::testEnvironment() {
     Environment::SharedPtr env(new Environment());
     try {
@@ -1023,6 +1193,55 @@ void UnitTest::testCodeNodeTypeName() {
         Value typeName = expr->exec(env);
         TEST_CASE_MSG(typeName.isString() && typeName.text() == expectedName,
                       "actual=" << Value::typeToString(typeName.type()) << " expected=" << expectedName);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeAsType() {
+    Environment::SharedPtr env(new Environment());
+
+    const Value int1(1ll);
+    const Value int98(98ll);
+    const Value real1(1.0);
+    const Value real1p5(1.5);
+    const Value real98(98.0);
+    const Value charB('b');
+    const Value charT('t');
+    const Value boolTrue(Value::True);
+    const Value string98("98");
+    const Value string1p5("1.500000");
+    const Value stringTrue("true");
+    const Value stringB("b");
+
+    std::vector<std::pair<Value, Value>> testCases = {
+        { int1,  real1 },
+        { int98, charB },
+        { int1,  boolTrue },
+        { int98,  string98 },
+        { real1p5, int1 },
+        { real98,  charB },
+        { real1,   boolTrue },
+        { real1p5, string1p5 },
+        { charB, int98 },
+        { charB, real98 },
+        { charT, boolTrue },
+        { charB, stringB },
+        { boolTrue, int1 },
+        { boolTrue, real1 },
+        { boolTrue, charT },
+        { boolTrue, stringTrue },
+        { string98, int98 },
+        { string98, real98 },
+        { stringB, charB },
+        { stringTrue, boolTrue }
+    };
+
+    for (auto const & fromAndTo : testCases) {
+        CodeNode::SharedPtr asType =
+            std::make_shared<AsType>(
+                std::make_shared<Literal>(fromAndTo.first), fromAndTo.second.type());
+        Value value = asType->eval(env);
+        TEST_CASE_MSG(value == fromAndTo.second, "actual=" << value << " expected=" << fromAndTo.second);
     }
 }
 
@@ -2576,6 +2795,36 @@ void UnitTest::testParserTypeName() {
 
     TEST_CASE(parserTest(parser, env, "(typename)",       Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(typename 1 int)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserAsType() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(astype 1 real)",        Value(1.0),        true));
+    TEST_CASE(parserTest(parser, env, "(astype 98 char)",       Value('b'),        true));
+    TEST_CASE(parserTest(parser, env, "(astype 1 bool)",        Value::True,       true));
+    TEST_CASE(parserTest(parser, env, "(astype 98 string)",     Value("98"),       true));
+    TEST_CASE(parserTest(parser, env, "(astype 1.5 int)",       Value(1ll),        true));
+    TEST_CASE(parserTest(parser, env, "(astype 98.0 char)",     Value('b'),        true));
+    TEST_CASE(parserTest(parser, env, "(astype 1.0 bool)",      Value::True,       true));
+    TEST_CASE(parserTest(parser, env, "(astype 1.5 string)",    Value("1.500000"), true));
+    TEST_CASE(parserTest(parser, env, "(astype 'b' int)",       Value(98ll),       true));
+    TEST_CASE(parserTest(parser, env, "(astype 'b' real)",      Value(98.0),       true));
+    TEST_CASE(parserTest(parser, env, "(astype 't' bool)",      Value::True,       true));
+    TEST_CASE(parserTest(parser, env, "(astype 'b' string)",    Value("b"),        true));
+    TEST_CASE(parserTest(parser, env, "(astype true int)",      Value(1ll),        true));
+    TEST_CASE(parserTest(parser, env, "(astype true real)",     Value(1.0),        true));
+    TEST_CASE(parserTest(parser, env, "(astype true char)",     Value('t'),        true));
+    TEST_CASE(parserTest(parser, env, "(astype true string)",   Value("true"),     true));
+    TEST_CASE(parserTest(parser, env, "(astype \"98\" int)",    Value(98ll),       true));
+    TEST_CASE(parserTest(parser, env, "(astype \"98\" real)",   Value(98.0),       true));
+    TEST_CASE(parserTest(parser, env, "(astype \"b\" char)",    Value('b'),        true));
+    TEST_CASE(parserTest(parser, env, "(astype \"true\" bool)", Value::True,       true));
+
+    TEST_CASE(parserTest(parser, env, "(astype null int)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(astype 'b' bool)", Value::Null, false));
 }
 
 // -------------------------------------------------------------

@@ -69,6 +69,19 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class AsType : public CodeNode {
+    public:
+        AsType(CodeNode::SharedPtr expr, Value::Type type);
+        virtual ~AsType() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        CodeNode::SharedPtr expr_;
+        Value::Type         type_;
+    };
+
+    // -------------------------------------------------------------
     class Variable : public CodeNode {
     public:
         Variable(const std::string &name) : CodeNode(), name_(name) {}

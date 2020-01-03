@@ -40,6 +40,21 @@ Value TypeName::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+AsType::AsType(CodeNode::SharedPtr expr, Value::Type type)
+  : CodeNode()
+  , expr_(expr)
+  , type_(type)
+{}
+
+Value AsType::exec(Environment::SharedPtr env) {
+    if (expr_.get()) {
+        Value exprValue = expr_->exec(env);
+        return exprValue.asType(type_);
+    }
+    return Value::False;
+}
+
+// -------------------------------------------------------------
 ArithOp::ArithOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
     : BinaryOp(lhs, rhs)
     , type_(type)

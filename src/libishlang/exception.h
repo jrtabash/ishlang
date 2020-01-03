@@ -162,6 +162,13 @@ namespace Ishlang {
             : Exception(format("Out of range: %s", msg.c_str()))
         {}
     };
+
+    class InvalidAsType : public Exception {
+    public:
+        InvalidAsType(const std::string &from, const std::string &to)
+            : Exception(format("Invalid astype from '%s' to '%s'", from.c_str(), to.c_str()))
+        {}
+    };
 }
 
 #endif	// EXCEPTION_H

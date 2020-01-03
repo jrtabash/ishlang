@@ -1,0 +1,81 @@
+__CODE__
+(println "***** Int")
+(println (astype 99 int))
+(println (astype 99.5 int))
+(println (astype 'c' int))
+(println (astype true int))
+(println (astype false int))
+(println (astype "99.5" int))
+
+(println "***** Real")
+(println (astype 99 real))
+(println (astype 99.5 real))
+(println (astype 'c' real))
+(println (astype true real))
+(println (astype false real))
+(println (astype "99.5" real))
+
+(println "***** Char")
+(println (astype 99 char))
+(println (astype 99.5 char))
+(println (astype 'c' char))
+(println (astype true char))
+(println (astype false char))
+(println (astype "str" char))
+
+(println "***** Bool")
+(println (astype 99 bool))
+(println (astype 99.5 bool))
+(println (astype 't' bool))
+(println (astype 'f' bool))
+(println (astype true bool))
+(println (astype false bool))
+(println (astype "true" bool))
+(println (astype "false" bool))
+
+(println "***** String")
+(println (astype 99 string))
+(println (astype 99.5 string))
+(println (astype 'c' string))
+(println (astype true string))
+(println (astype false string))
+(println (astype "str" string))
+
+__EXPECT__
+***** Int
+99
+99
+99
+1
+0
+99
+***** Real
+99
+99.5
+99
+1
+0
+99.5
+***** Char
+c
+c
+c
+t
+f
+s
+***** Bool
+true
+true
+true
+false
+true
+false
+true
+false
+***** String
+99
+99.500000
+c
+true
+false
+str

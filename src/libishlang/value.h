@@ -96,6 +96,12 @@ namespace Ishlang {
         UserObject &userObject()             { return isUserObject() ? *std::get<InstancePtr>(value_) : NullObject; }
         const Array &array()           const { return isArray()      ? *std::get<SequencePtr>(value_) : NullSequence; }
         Array &array()                       { return isArray()      ? *std::get<SequencePtr>(value_) : NullSequence; }
+
+        Value asInt() const;
+        Value asReal() const;
+        Value asChar() const;
+        Value asBool() const;
+        Value asString() const;
         
         bool operator==(const Value &rhs) const;
         bool operator!=(const Value &rhs) const;
@@ -110,6 +116,7 @@ namespace Ishlang {
         std::string typeToString() const { return typeToString(type_); }
 
         Value clone() const;
+        Value asType(Type otherType) const;
 
         friend std::ostream &operator<<(std::ostream &out, const Value &value) {
             printC(out, value);

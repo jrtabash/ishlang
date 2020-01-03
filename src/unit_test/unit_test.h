@@ -39,6 +39,7 @@ namespace Ishlang {
         void testComment();
         void testTokenType();
         void testValue();
+        void testValueAsType();
         void testEnvironment();
         void testLambda();
         void testStruct();
@@ -52,6 +53,7 @@ namespace Ishlang {
         void testCodeNodeClone();
         void testCodeNodeIsType();
         void testCodeNodeTypeName();
+        void testCodeNodeAsType();
         void testCodeNodeArithOp();
         void testCodeNodeCompOp();
         void testCodeNodeLogicOp();
@@ -84,6 +86,7 @@ namespace Ishlang {
         void testParserBasic();
         void testParserIsType();
         void testParserTypeName();
+        void testParserAsType();
         void testParserVar();
         void testParserArith();
         void testParserComp();

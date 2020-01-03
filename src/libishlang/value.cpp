@@ -57,6 +57,101 @@ Value::Value(const Sequence &s)
 {}
 
 // -------------------------------------------------------------
+Value Value::asInt() const {
+    switch (type_) {
+    case eInteger:   return *this;
+    case eReal:      return Value(static_cast<Long>(real()));
+    case eCharacter: return Value(static_cast<Long>(character()));
+    case eBoolean:   return Value(boolean() ? 1ll : 0ll);
+    case eString:    return Value(std::stoll(text()));
+    default:
+        break;
+    }
+
+    throw InvalidAsType(typeToString(), "int");
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+Value Value::asReal() const {
+    switch (type_) {
+    case eInteger:   return Value(static_cast<Double>(integer()));
+    case eReal:      return *this;
+    case eCharacter: return Value(static_cast<Double>(static_cast<Long>(character())));
+    case eBoolean:   return Value(boolean() ? 1.0 : 0.0);
+    case eString:    return Value(std::stod(text()));
+    default:
+        break;
+    }
+
+    throw InvalidAsType(typeToString(), "real");
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+Value Value::asChar() const {
+    switch (type_) {
+    case eInteger:   return Value(static_cast<Char>(integer()));
+    case eReal:      return Value(static_cast<Char>(static_cast<Long>(real())));
+    case eCharacter: return *this;
+    case eBoolean:   return Value(boolean() ? 't' : 'f');
+    case eString: {
+        auto const & txt = text();
+        return Value(txt.size() > 0 ? txt[0] : '\0');
+    }
+    default:
+        break;
+    }
+
+    throw InvalidAsType(typeToString(), "char");
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+Value Value::asBool() const {
+    switch (type_) {
+    case eInteger:   return Value(integer() != 0ll);
+    case eReal:      return Value(static_cast<Long>(real()) != 0ll);
+    case eCharacter: {
+        auto const c = character();
+        if (c == 't' || c == 'f') {
+            return Value(c == 't');
+        }
+        break;
+    }
+    case eBoolean:   return *this;
+    case eString: {
+        auto const & txt = text();
+        if (txt == "true" || txt == "false") {
+            return Value(txt == "true");
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    throw InvalidAsType(typeToString(), "bool");
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+Value Value::asString() const {
+    switch (type_) {
+    case eInteger:   return Value(std::to_string(integer()));
+    case eReal:      return Value(std::to_string(real()));
+    case eCharacter: return Value(std::string(1, character()));
+    case eBoolean:   return Value(boolean() ? "true" : "false");
+    case eString:    return *this;
+    default:
+        break;
+    }
+
+    throw InvalidAsType(typeToString(), "string");
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 bool Value::operator==(const Value &rhs) const {
     if (type_ == rhs.type_) {
         switch (type_) {
@@ -247,6 +342,31 @@ Value Value::clone() const {
         return Value(*std::get<SequencePtr>(value_));
     }
 
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+Value Value::asType(Type otherType) const {
+    if (type_ == otherType) {
+        return *this;
+    }
+
+    switch (otherType) {
+    case eInteger:   return asInt();
+    case eReal:      return asReal();
+    case eCharacter: return asChar();
+    case eBoolean:   return asBool();
+    case eString:    return asString();
+
+    case eNone:
+    case eClosure:
+    case eUserType:
+    case eUserObject:
+    case eArray:
+        break;
+    }
+
+    throw InvalidAsType(typeToString(), typeToString(otherType));
     return Value::Null;
 }
 

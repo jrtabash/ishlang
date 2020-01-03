@@ -437,6 +437,15 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "astype",
+          [this]() {
+                CodeNode::SharedPtr form(readExpr());
+                Value::Type type(Value::stringToType(readName()));
+                ignoreRightP();
+                return std::make_shared<AsType>(form, type);
+          }
+        },
+
         { "print",
           [this]() {
                 CodeNode::SharedPtr pExpr(readExpr());
