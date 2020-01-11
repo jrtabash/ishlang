@@ -396,7 +396,7 @@ arrget: return value at position
 arrset: set value at position
         (arrset <array> <position> <value>)
 
-addadd: Add element to end of array
+arradd: Add element to end of array
         (arradd <array> <value>)
 
 Examples:
