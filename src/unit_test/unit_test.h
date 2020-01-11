@@ -102,6 +102,7 @@ namespace Ishlang {
         void testParserMakeInstance();
         void testParserIsInstanceOf();
         void testParserStructName();
+        void testParserGetSetMember();
         void testParserStringLen();
         void testParserGetChar();
         void testParserSetChar();

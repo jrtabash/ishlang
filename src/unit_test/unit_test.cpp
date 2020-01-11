@@ -85,6 +85,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserMakeInstance);
     ADD_TEST(testParserIsInstanceOf);
     ADD_TEST(testParserStructName);
+    ADD_TEST(testParserGetSetMember);
     ADD_TEST(testParserStringLen);
     ADD_TEST(testParserGetChar);
     ADD_TEST(testParserSetChar);
@@ -3069,6 +3070,24 @@ void UnitTest::testParserStructName() {
     TEST_CASE(parserTest(parser, env, "(structname Person)",           Value("Person"), true));
     TEST_CASE(parserTest(parser, env, "(structname p)",                Value("Person"), true));
     TEST_CASE(parserTest(parser, env, "(structname 5)",                Value::Null,     false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserGetSetMember() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    const Struct stest("Person", {"name", "age"});
+    const Instance itest(stest);
+
+    TEST_CASE(parserTest(parser, env, "(struct Person (name age))",    Value(stest),  true));
+    TEST_CASE(parserTest(parser, env, "(var p (makeinstance Person))", Value(itest),  true));
+    TEST_CASE(parserTest(parser, env, "(get p name)",                  Value::Null,   true));
+    TEST_CASE(parserTest(parser, env, "(get p age)",                   Value::Null,   true));
+    TEST_CASE(parserTest(parser, env, "(set p name \"John\")",         Value("John"), true));
+    TEST_CASE(parserTest(parser, env, "(set p age 25)",                Value(25ll),   true));
+    TEST_CASE(parserTest(parser, env, "(get p name)",                  Value("John"), true));
+    TEST_CASE(parserTest(parser, env, "(get p age)",                   Value(25ll),   true));
 }
 
 // -------------------------------------------------------------
