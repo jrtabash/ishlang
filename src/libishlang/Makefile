@@ -19,10 +19,10 @@ OBJS=\
 	lexer.o \
 	parser.o
 
-ifeq ($(DEBUG), 1)
-	CFLAGS += -DDEBUG
-else
+ifeq ($(DEBUG), 0)
 	CFLAGS += -DNDEBUG -O2
+else
+	CFLAGS += -DDEBUG
 endif
 
 $(TARGET): $(OBJS)
