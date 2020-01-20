@@ -3082,12 +3082,12 @@ void UnitTest::testParserGetSetMember() {
 
     TEST_CASE(parserTest(parser, env, "(struct Person (name age))",    Value(stest),  true));
     TEST_CASE(parserTest(parser, env, "(var p (makeinstance Person))", Value(itest),  true));
-    TEST_CASE(parserTest(parser, env, "(get p name)",                  Value::Null,   true));
-    TEST_CASE(parserTest(parser, env, "(get p age)",                   Value::Null,   true));
-    TEST_CASE(parserTest(parser, env, "(set p name \"John\")",         Value("John"), true));
-    TEST_CASE(parserTest(parser, env, "(set p age 25)",                Value(25ll),   true));
-    TEST_CASE(parserTest(parser, env, "(get p name)",                  Value("John"), true));
-    TEST_CASE(parserTest(parser, env, "(get p age)",                   Value(25ll),   true));
+    TEST_CASE(parserTest(parser, env, "(memget p name)",               Value::Null,   true));
+    TEST_CASE(parserTest(parser, env, "(memget p age)",                Value::Null,   true));
+    TEST_CASE(parserTest(parser, env, "(memset p name \"John\")",      Value("John"), true));
+    TEST_CASE(parserTest(parser, env, "(memset p age 25)",             Value(25ll),   true));
+    TEST_CASE(parserTest(parser, env, "(memget p name)",               Value("John"), true));
+    TEST_CASE(parserTest(parser, env, "(memget p age)",                Value(25ll),   true));
 }
 
 // -------------------------------------------------------------

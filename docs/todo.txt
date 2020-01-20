@@ -7,7 +7,6 @@
 
 * Cleanup and unification:
   - Remove def support in favor of defun
-  - Rename member get and set functions to memget and memset
   - Rename string setchar and getchar to strget and strset
   - Add generic get / set functions that work with instances, strings and arrays
   - Add generic len function for strings and arrays

@@ -5,19 +5,19 @@
 
 (defun makeTokenizerState (str)
   (var state (makeinstance TokenizerState))
-  (set state string str)
-  (set state length (strlen str))
-  (set state position 0)
+  (memset state string str)
+  (memset state length (strlen str))
+  (memset state position 0)
   state)
 
 (defun nextToken (tokState)
-  (var str (get tokState string))
-  (var pos (get tokState position))
+  (var str (memget tokState string))
+  (var pos (memget tokState position))
   (var nextPos (strfind str ' ' pos))
   (when (== nextPos -1)
-    (= nextPos (get tokState length)))
+    (= nextPos (memget tokState length)))
   (var token (substr str pos (- nextPos pos)))
-  (set tokState position (+ nextPos 1))
+  (memset tokState position (+ nextPos 1))
   token)
 
 (var message "This is a message")
@@ -26,5 +26,5 @@
 (println "'")
 
 (var tokState (makeTokenizerState message))
-(loop (< (get tokState position) (get tokState length))
+(loop (< (memget tokState position) (memget tokState length))
       (println (nextToken tokState))))

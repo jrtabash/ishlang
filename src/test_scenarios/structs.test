@@ -4,8 +4,8 @@ __CODE__
 (var s (makeinstance Square))
 (println (isinstanceof s Square))
 
-(set s side 5)
-(println (get s side))
+(memset s side 5)
+(println (memget s side))
 
 (var ss Square)
 (println (isstructname ss Square))
@@ -17,10 +17,10 @@ __CODE__
   (name
    age))
 (var p (makeinstance Person))
-(set p name "Albert")
-(set p age 25)
-(println (get p name))
-(println (get p age))
+(memset p name "Albert")
+(memset p age 25)
+(println (memget p name))
+(println (memget p age))
 
 __EXPECT__
 true

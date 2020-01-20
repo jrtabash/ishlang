@@ -516,7 +516,7 @@ void Parser::initAppFtns() {
           }
         },
 
-        { "get",
+        { "memget",
           [this]() {
                 CodeNode::SharedPtr instExpr(readExpr());
                 const std::string name(readName());
@@ -525,7 +525,7 @@ void Parser::initAppFtns() {
           }
         },
 
-        { "set",
+        { "memset",
           [this]() {
                 CodeNode::SharedPtr instExpr(readExpr());
                 const std::string name(readName());

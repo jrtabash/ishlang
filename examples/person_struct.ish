@@ -7,18 +7,18 @@
 
 (defun makePerson (newName newAge)
   (var newPerson (makeinstance Person))
-  (set newPerson name newName)
-  (set newPerson age newAge)
+  (memset newPerson name newName)
+  (memset newPerson age newAge)
   newPerson)
 
 (defun printPerson (p)
   (print "[Person: name='")
-  (print (get person name))
+  (print (memget person name))
   (print "' age=")
-  (print (get person age))
+  (print (memget person age))
   (println "]"))
 
 (var person (makePerson "Jon" 31))
 (printPerson person)
-(set person age 32)
+(memset person age 32)
 (printPerson person)
