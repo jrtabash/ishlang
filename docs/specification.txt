@@ -183,12 +183,6 @@ User defined functions:
   (defun <name> <param_list>
     <body>)
 
-  (def <name> <param_list>
-    <body>)
-
-Note: Use of defun is preferred and recommended.
-Note: Ssupport for def will be removed at some future point.
-
 Functions can be nested, i.e defined inside other functions.
 
 Language supports recursion.
@@ -238,8 +232,8 @@ Creating an instance:
   (makeinstance <name>)
 
 Setting / Getting member fields:
-  (get <instance_expression> <member_name>)
-  (set <instance_expression> <member_name> <expression>)
+  (memget <instance_expression> <member_name>)
+  (memset <instance_expression> <member_name> <expression>)
 
 Example:
   (struct Person
@@ -247,10 +241,10 @@ Example:
      age))
 
   (var p (makeinstance Person))
-  (set p name "John")
-  (set p age 25)
-  (println (get p name))
-  (println (get p age))
+  (memset p name "John")
+  (memset p age 25)
+  (println (memget p name))
+  (println (memget p age))
 
 Type Checking
 -------------
@@ -345,8 +339,8 @@ Clone a value:
 
 Example:
   (var p (makeinstance Person))
-  (set p (name "John"))
-  (set p (age 25))
+  (memset p name "John")
+  (memset p age 25)
   (var q (clone p))
 
 String Operations
@@ -420,5 +414,5 @@ Comments can be occupy full or partial lines.
 
 Examples:
   ;; This is a function
-  (def x2 (x) ;; Double x
+  (defun x2 (x) ;; Double x
     (* 2 x))
