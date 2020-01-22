@@ -1,10 +1,10 @@
 __CODE__
-(def map_array (ftn arr)
+(defun map_array (ftn arr)
   (var ret (array))
   (loop (var i 0) (< i (arrlen arr)) (= i (+ i 1))
     (arradd ret (ftn (arrget arr i)))))
 
-(def triple (x) (* 3 x))
+(defun triple (x) (* 3 x))
 
 (println
   (map_array

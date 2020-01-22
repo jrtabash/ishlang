@@ -1,19 +1,19 @@
 __CODE__
-(def double (x)
+(defun double (x)
   (* 2 x))
 (println (double 10))
 
-(def addAndDouble (x y)
+(defun addAndDouble (x y)
   (* 2 (+ x y)))
 (println (addAndDouble 5 10))
 
-(def nestedAddAndDouble (x y)
-  (def times2 (arg)
+(defun nestedAddAndDouble (x y)
+  (defun times2 (arg)
     (* 2 arg))
   (times2 (+ x y)))
 (println (nestedAddAndDouble 10 20))
 
-(def callbackAddAndDouble (x y doubleFtn)
+(defun callbackAddAndDouble (x y doubleFtn)
   (doubleFtn (+ x y)))
 (println (callbackAddAndDouble 20 40 double))
 (println (callbackAddAndDouble 40 80 (lambda (x) (* 2 x))))

@@ -61,23 +61,6 @@ namespace Ishlang {
             ExprOp exprOp_;
         };
 
-        struct MakeFunctionExpression {
-            MakeFunctionExpression(Parser &parser)
-                : parser_(parser)
-            {}
-
-            CodeNode::SharedPtr operator()() {
-                const std::string name(parser_.readName());
-                CodeNode::ParamList params(parser_.readParams());
-                CodeNode::SharedPtrList exprs(parser_.readExprList());
-                CodeNode::SharedPtr body(exprs.size() == 1 ? exprs[0] : std::make_shared<ProgN>(exprs));
-                return std::make_shared<FunctionExpr>(name, params, body);
-            }
-
-        private:
-            Parser &parser_;
-        };
-
     private:
         Lexer lexer_;
         std::unordered_map<std::string, std::function<CodeNode::SharedPtr ()>> appFtns_;

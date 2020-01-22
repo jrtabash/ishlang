@@ -405,8 +405,15 @@ void Parser::initAppFtns() {
           }
         },
 
-        { "defun", MakeFunctionExpression(*this) },
-        { "def",   MakeFunctionExpression(*this) },
+        { "defun",
+          [this]() {
+                const std::string name(readName());
+                CodeNode::ParamList params(readParams());
+                CodeNode::SharedPtrList exprs(readExprList());
+                CodeNode::SharedPtr body(exprs.size() == 1 ? exprs[0] : std::make_shared<ProgN>(exprs));
+                return std::make_shared<FunctionExpr>(name, params, body);
+          }
+        },
 
         { "(",
           [this]() {

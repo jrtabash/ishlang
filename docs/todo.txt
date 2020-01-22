@@ -6,7 +6,7 @@
 * Add support for file IO
 
 * [InProgress] Cleanup and unification:
-  - [TODO] Remove def support in favor of defun
+  - [DONE] Remove def support in favor of defun
   - [DONE] Rename member get and set functions to memget and memset
   - [TODO] Rename string setchar and getchar to strget and strset
   - [TODO] Add generic get / set functions that work with instances, strings and arrays

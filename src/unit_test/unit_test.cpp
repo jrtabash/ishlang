@@ -2981,16 +2981,6 @@ void UnitTest::testParserFtn() {
     Environment::SharedPtr env(new Environment());
     Parser parser;
 
-    // def
-    TEST_CASE(parserTest(parser, env, "(block (def add (x y) (+ x y)) (add 1 2))",                                          Value(3ll),  true));
-    TEST_CASE(parserTest(parser, env, "(block (var x 3) (var y 2) (def sum () (+ x y)) (block (var x 4) (var y 5) (sum)))", Value(5ll),  true));
-    TEST_CASE(parserTest(parser, env, "(block (def inc (x) (+ x 1)) (def add3 (x) (inc (inc (inc x)))) (add3 5))",          Value(8ll),  true));
-
-    TEST_CASE(parserTest(parser, env, "(progn (def add3 (x) (def inc (y) (+ y 1)) (inc (inc (inc x)))) (add3 4))",  Value(7ll),  true));
-    TEST_CASE(parserTest(parser, env, "(add3 1)",                                                                   Value(4ll),  true));
-    TEST_CASE(parserTest(parser, env, "(inc 2)",                                                                    Value::Null, false));
-
-    // defun
     TEST_CASE(parserTest(parser, env, "(block (defun add (x y) (+ x y)) (add 1 2))",                                          Value(3ll),  true));
     TEST_CASE(parserTest(parser, env, "(block (var x 3) (var y 2) (defun sum () (+ x y)) (block (var x 4) (var y 5) (sum)))", Value(5ll),  true));
     TEST_CASE(parserTest(parser, env, "(block (defun inc (x) (+ x 1)) (defun add3 (x) (inc (inc (inc x)))) (add3 5))",        Value(8ll),  true));
