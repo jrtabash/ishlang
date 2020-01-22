@@ -65,8 +65,8 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArrayAdd);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
-    ADD_TEST(testCodeNodeCharAt);
-    ADD_TEST(testCodeNodeSetCharAt);
+    ADD_TEST(testCodeNodeStringGet);
+    ADD_TEST(testCodeNodeStringSet);
     ADD_TEST(testParserBasic);
     ADD_TEST(testParserIsType);
     ADD_TEST(testParserTypeName);
@@ -87,8 +87,8 @@ UnitTest::UnitTest()
     ADD_TEST(testParserStructName);
     ADD_TEST(testParserGetSetMember);
     ADD_TEST(testParserStringLen);
-    ADD_TEST(testParserGetChar);
-    ADD_TEST(testParserSetChar);
+    ADD_TEST(testParserStrGet);
+    ADD_TEST(testParserStrSrt);
     ADD_TEST(testParserStringCat);
     ADD_TEST(testParserSubString);
     ADD_TEST(testParserStringFind);
@@ -2169,25 +2169,25 @@ void UnitTest::testCodeNodeStringLen() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testCodeNodeCharAt() {
+void UnitTest::testCodeNodeStringGet() {
     Environment::SharedPtr env(new Environment());
 
     Value value =
-        std::make_shared<GetCharAt>(
+        std::make_shared<StringGet>(
             std::make_shared<Literal>(Value("abc")),
             std::make_shared<Literal>(Value(0ll)))
         ->exec(env);
     TEST_CASE_MSG(value == Value('a'), "actual=" << value);
 
     value =
-        std::make_shared<GetCharAt>(
+        std::make_shared<StringGet>(
             std::make_shared<Literal>(Value("abc")),
             std::make_shared<Literal>(Value(1ll)))
         ->exec(env);
     TEST_CASE_MSG(value == Value('b'), "actual=" << value);
 
     value =
-        std::make_shared<GetCharAt>(
+        std::make_shared<StringGet>(
             std::make_shared<Literal>(Value("abc")),
             std::make_shared<Literal>(Value(2ll)))
         ->exec(env);
@@ -2195,7 +2195,7 @@ void UnitTest::testCodeNodeCharAt() {
 
     try {
         value =
-            std::make_shared<GetCharAt>(
+            std::make_shared<StringGet>(
                 std::make_shared<Literal>(Value("abc")),
                 std::make_shared<Literal>(Value(3ll)))
             ->exec(env);
@@ -2206,7 +2206,7 @@ void UnitTest::testCodeNodeCharAt() {
 
     try {
         value =
-            std::make_shared<GetCharAt>(
+            std::make_shared<StringGet>(
                 std::make_shared<Literal>(Value("abc")),
                 std::make_shared<Literal>(Value(-1ll)))
             ->exec(env);
@@ -2217,14 +2217,14 @@ void UnitTest::testCodeNodeCharAt() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testCodeNodeSetCharAt() {
+void UnitTest::testCodeNodeStringSet() {
     Environment::SharedPtr env(new Environment());
     env->def("str", Value("abc"));
 
     CodeNode::SharedPtr var = std::make_shared<Variable>("str");
 
     Value value =
-        std::make_shared<SetCharAt>(
+        std::make_shared<StringSet>(
             var,
             std::make_shared<Literal>(Value(0ll)),
             std::make_shared<Literal>(Value('A')))
@@ -2235,7 +2235,7 @@ void UnitTest::testCodeNodeSetCharAt() {
     TEST_CASE_MSG(value == Value("Abc"), "actual=" << value);
 
     value =
-        std::make_shared<SetCharAt>(
+        std::make_shared<StringSet>(
             var,
             std::make_shared<Literal>(Value(1ll)),
             std::make_shared<Literal>(Value('B')))
@@ -2246,7 +2246,7 @@ void UnitTest::testCodeNodeSetCharAt() {
     TEST_CASE_MSG(value == Value("ABc"), "actual=" << value);
 
     value =
-        std::make_shared<SetCharAt>(
+        std::make_shared<StringSet>(
             var,
             std::make_shared<Literal>(Value(2ll)),
             std::make_shared<Literal>(Value('C')))
@@ -2258,7 +2258,7 @@ void UnitTest::testCodeNodeSetCharAt() {
 
     try {
         value =
-            std::make_shared<SetCharAt>(
+            std::make_shared<StringSet>(
                 var,
                 std::make_shared<Literal>(Value(-1ll)),
                 std::make_shared<Literal>(Value('X')))
@@ -2270,7 +2270,7 @@ void UnitTest::testCodeNodeSetCharAt() {
 
     try {
         value =
-            std::make_shared<SetCharAt>(
+            std::make_shared<StringSet>(
                 var,
                 std::make_shared<Literal>(Value(3ll)),
                 std::make_shared<Literal>(Value('Y')))
@@ -3092,25 +3092,25 @@ void UnitTest::testParserStringLen() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testParserGetChar() {
+void UnitTest::testParserStrGet() {
     Environment::SharedPtr env(new Environment());
     Parser parser;
 
-    TEST_CASE(parserTest(parser, env, "(getchar \"By\" 0)", Value('B'),  true));
-    TEST_CASE(parserTest(parser, env, "(getchar \"By\" 1)", Value('y'),  true));
-    TEST_CASE(parserTest(parser, env, "(getchar \"By\" 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strget \"By\" 0)", Value('B'),  true));
+    TEST_CASE(parserTest(parser, env, "(strget \"By\" 1)", Value('y'),  true));
+    TEST_CASE(parserTest(parser, env, "(strget \"By\" 2)", Value::Null, false));
 }
 
 // -------------------------------------------------------------
-void UnitTest::testParserSetChar() {
+void UnitTest::testParserStrSrt() {
     Environment::SharedPtr env(new Environment());
     Parser parser;
 
     env->def("str", Value("12345"));
 
-    TEST_CASE(parserTest(parser, env, "(setchar str 0 'a')", Value('a'),  true));
-    TEST_CASE(parserTest(parser, env, "(setchar str 2 'C')", Value('C'),  true));
-    TEST_CASE(parserTest(parser, env, "(setchar str 6 'b')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strset str 0 'a')", Value('a'),  true));
+    TEST_CASE(parserTest(parser, env, "(strset str 2 'C')", Value('C'),  true));
+    TEST_CASE(parserTest(parser, env, "(strset str 6 'b')", Value::Null, false));
 
     TEST_CASE(parserTest(parser, env, "str", Value("a2C45"), true));
 }

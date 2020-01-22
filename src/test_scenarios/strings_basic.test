@@ -7,15 +7,15 @@ __CODE__
 (println (strlen str))
 
 ;; get
-(println (getchar str 0))
-(println (getchar str 3))
-(println (getchar str 8))
+(println (strget str 0))
+(println (strget str 3))
+(println (strget str 8))
 
 ;; set
-(setchar str 5 'T')
-(setchar str 6 'E')
-(setchar str 7 'X')
-(setchar str 8 'T')
+(strset str 5 'T')
+(strset str 6 'E')
+(strset str 7 'X')
+(strset str 8 'T')
 (println str)
 
 __EXPECT__

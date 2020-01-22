@@ -535,13 +535,13 @@ Value StringLen::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-GetCharAt::GetCharAt(CodeNode::SharedPtr str, CodeNode::SharedPtr pos)
+StringGet::StringGet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos)
     : CodeNode()
     , str_(str)
     , pos_(pos)
 {}
 
-Value GetCharAt::exec(Environment::SharedPtr env) {
+Value StringGet::exec(Environment::SharedPtr env) {
     if (str_.get() && pos_.get()) {
         Value str = str_->exec(env);
         Value pos = pos_->exec(env);
@@ -552,7 +552,7 @@ Value GetCharAt::exec(Environment::SharedPtr env) {
         const auto &rawStr = str.text();
         const auto rawPos = pos.integer();
         if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawStr.size()) {
-            throw OutOfRange("string getchar access");
+            throw OutOfRange("string strget access");
         }
 
         return Value(rawStr[rawPos]);
@@ -561,14 +561,14 @@ Value GetCharAt::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-SetCharAt::SetCharAt(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr val)
+StringSet::StringSet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr val)
     : CodeNode()
     , str_(str)
     , pos_(pos)
     , val_(val)
 {}
 
-Value SetCharAt::exec(Environment::SharedPtr env) {
+Value StringSet::exec(Environment::SharedPtr env) {
     if (str_.get() && pos_.get() && val_.get()) {
         Value str = str_->exec(env);
         Value pos = pos_->exec(env);
@@ -581,7 +581,7 @@ Value SetCharAt::exec(Environment::SharedPtr env) {
         auto &rawStr = str.text();
         const auto rawPos = pos.integer();
         if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawStr.size()) {
-            throw OutOfRange("string setchar access");
+            throw OutOfRange("string strset access");
         }
 
         rawStr[rawPos] = val.character();

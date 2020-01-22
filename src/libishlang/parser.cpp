@@ -550,22 +550,22 @@ void Parser::initAppFtns() {
           }
         },
 
-        { "getchar",
+        { "strget",
           [this]() {
                 CodeNode::SharedPtr strExpr(readExpr());
                 CodeNode::SharedPtr posExpr(readExpr());
                 ignoreRightP();
-                return std::make_shared<GetCharAt>(strExpr, posExpr);
+                return std::make_shared<StringGet>(strExpr, posExpr);
           }
         },
 
-        { "setchar",
+        { "strset",
           [this]() {
                 CodeNode::SharedPtr strExpr(readExpr());
                 CodeNode::SharedPtr posExpr(readExpr());
                 CodeNode::SharedPtr valExpr(readExpr());
                 ignoreRightP();
-                return std::make_shared<SetCharAt>(strExpr, posExpr, valExpr);
+                return std::make_shared<StringSet>(strExpr, posExpr, valExpr);
           }
         },
 

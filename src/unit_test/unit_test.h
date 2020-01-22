@@ -72,8 +72,8 @@ namespace Ishlang {
         void testCodeNodeStructName();
         void testCodeNodeGetSetMember();
         void testCodeNodeStringLen();
-        void testCodeNodeCharAt();
-        void testCodeNodeSetCharAt();
+        void testCodeNodeStringGet();
+        void testCodeNodeStringSet();
         void testCodeNodeStringCat();
         void testCodeNodeSubString();
         void testCodeNodeStringFind();
@@ -104,8 +104,8 @@ namespace Ishlang {
         void testParserStructName();
         void testParserGetSetMember();
         void testParserStringLen();
-        void testParserGetChar();
-        void testParserSetChar();
+        void testParserStrGet();
+        void testParserStrSrt();
         void testParserStringCat();
         void testParserSubString();
         void testParserStringFind();

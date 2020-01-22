@@ -483,10 +483,10 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
-    class GetCharAt : public CodeNode {
+    class StringGet : public CodeNode {
     public:
-        GetCharAt(CodeNode::SharedPtr str, CodeNode::SharedPtr pos);
-        virtual ~GetCharAt() {}
+        StringGet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos);
+        virtual ~StringGet() {}
 
         virtual Value exec(Environment::SharedPtr env);
 
@@ -496,10 +496,10 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
-    class SetCharAt : public CodeNode {
+    class StringSet : public CodeNode {
     public:
-        SetCharAt(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr val);
-        virtual ~SetCharAt() {}
+        StringSet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr val);
+        virtual ~StringSet() {}
 
         virtual Value exec(Environment::SharedPtr env);
 

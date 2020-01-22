@@ -348,11 +348,11 @@ String Operations
 strlen: compute string length
         (strlen <string>)
 
-getchar: return character at position
-        (getchar <string> <position>)
+strget: return character at position
+       (strget <string> <position>)
 
-setchar: set character at position
-        (setchar <string> <position> <character>)
+strset: set character at position
+       (strset <string> <position> <character>)
 
 strcat: Concatenate string or character to string
         (strcat <string> <other>)
@@ -366,8 +366,8 @@ strfind: Find position of character in string
 Examples:
   (var str "Hello!")
   (println (strlen str))
-  (println (getchar str 3))
-  (setchar str 5 ' ')
+  (println (strget str 3))
+  (strset str 5 ' ')
   (strcat str "World!")
   (println (substr str 0 5))
   (println (strfind str 'W'))
