@@ -18,7 +18,7 @@ Run all scenarios in a given folder:
 
 Scenario files must have the extension .test, and should be divided into
 two sections, a __CODE__ section and an __EXPECT__ section. Add ishlang
-code to the __CODE__ section, and add exoected standard output to the
+code to the __CODE__ section, and add expected standard output to the
 __EXPECT__ section. Several scenarios are provided in the src/test_scenarios folder.
 
 Example scenario file (example.test)
