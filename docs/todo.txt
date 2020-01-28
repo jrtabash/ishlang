@@ -5,14 +5,12 @@
 
 * Add support for file IO
 
-* [InProgress] Cleanup and unification:
-  - [DONE] Remove def support in favor of defun
-  - [DONE] Rename member get and set functions to memget and memset
-  - [DONE] Rename string setchar and getchar to strget and strset
-  - [TODO] Add generic get / set functions that work with instances, strings and arrays
-  - [TODO] Add generic len function for strings and arrays
-  - [TODO] Add generic find function for strings and arrays
-  - [TODO] Add generic count function for strings and arrays
+* Add generic functions
+  - Add generic get function with support for instances, strings and arrays
+  - Add generic set function with support for instances, strings and arrays
+  - Add generic len function with support for strings and arrays
+  - Add generic find function with support for strings and arrays
+  - Add generic count function with support for strings and arrays
 
 * Implement built-in data structures:
   - List
