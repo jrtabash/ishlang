@@ -16,6 +16,11 @@
   - Hash table
   - Ordered table
 
+* Add rand function that returns an random integer between 0 and
+  a max value
+  Examples: (rand)
+            (rand 100)
+
 * Add support for modules
 
 * Rework 'break' implementation to avoid using Break::Except
