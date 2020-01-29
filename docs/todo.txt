@@ -1,5 +1,4 @@
-* Add array / string operations
-  - arrfind  : Find position of value in array
+* Add count operations
   - arrcount : Count occurences of value in array
   - strcount : Count occurences of character in string
 

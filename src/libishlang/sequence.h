@@ -3,6 +3,7 @@
 
 #include "value.h"
 
+#include <optional>
 #include <ostream>
 #include <vector>
 
@@ -28,6 +29,8 @@ namespace Ishlang {
         const Value & get(std::size_t idx) const { return vector_[idx]; }
         void set(std::size_t idx, const Value &value) { vector_[idx] = value; }
         void add(const Value &value) { vector_.push_back(value); }
+
+        std::optional<std::size_t> find(Value const & val, std::size_t pos = 0) const;
 
         std::size_t size() const { return vector_.size(); }
 

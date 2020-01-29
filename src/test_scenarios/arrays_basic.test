@@ -18,6 +18,13 @@ __CODE__
 (arrset a 4 10)
 (println a)
 
+(println (arrfind a 2))
+(println (arrfind a 4))
+(println (arrfind a 6 2))
+(println (arrfind a 8 2))
+(println (arrfind a 10))
+(println (arrfind a 12))
+
 __EXPECT__
 []
 [1 2 3]
@@ -28,3 +35,9 @@ __EXPECT__
 3
 5
 [2 4 6 8 10]
+0
+1
+2
+3
+4
+-1

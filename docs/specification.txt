@@ -393,6 +393,9 @@ arrset: set value at position
 arradd: Add element to end of array
         (arradd <array> <value>)
 
+arrfind: Find position of value in array
+         (arrfind <array> <value> [<position>])
+
 Examples:
   (var a (array))
   (arradd a 1)
@@ -404,6 +407,7 @@ Examples:
   (println (arrget a 1))
   (println (arraysv 5))
   (println (arraysv 10 0))
+  (println (arrfind a 2))
 
 Comments
 --------

@@ -30,6 +30,7 @@ UnitTest::UnitTest()
     ADD_TEST(testInstance);
     ADD_TEST(testInstanceValue);
     ADD_TEST(testSequence);
+    ADD_TEST(testSequenceFind);
     ADD_TEST(testSequenceValue);
     ADD_TEST(testSequencePrint);
     ADD_TEST(testCodeNodeBasic);
@@ -63,6 +64,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArrayGet);
     ADD_TEST(testCodeNodeArraySet);
     ADD_TEST(testCodeNodeArrayAdd);
+    ADD_TEST(testCodeNodeArrayFind);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -98,6 +100,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArrayGet);
     ADD_TEST(testParserArraySet);
     ADD_TEST(testParserArrayAdd);
+    ADD_TEST(testParserArrayFind);
 }
 #undef ADD_TEST
 
@@ -980,6 +983,29 @@ void UnitTest::testSequence() {
     TEST_CASE_MSG(seq3.get(0lu) == Value::Zero, "actual=" << seq3.get(0lu));
     TEST_CASE_MSG(seq3.get(1lu) == Value::Zero, "actual=" << seq3.get(1lu));
     TEST_CASE_MSG(seq3.get(2lu) == Value::Zero, "actual=" << seq3.get(2lu));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testSequenceFind() {
+    Value const a = Value('a');
+    Value const b = Value('b');
+    Value const c = Value('c');
+    Value const d = Value('d');
+    Sequence const seq({a, b, c, a, b, c});
+
+    auto index = seq.find(a); TEST_CASE(index && *index == 0);
+    index = seq.find(b); TEST_CASE(index && *index == 1);
+    index = seq.find(c); TEST_CASE(index && *index == 2);
+    index = seq.find(d); TEST_CASE(!index);
+
+    index = seq.find(a, 1); TEST_CASE(index && *index == 3);
+    index = seq.find(b, 2); TEST_CASE(index && *index == 4);
+    index = seq.find(c, 3); TEST_CASE(index && *index == 5);
+    index = seq.find(d, 3); TEST_CASE(!index);
+
+    index = seq.find(a, 4); TEST_CASE(!index);
+    index = seq.find(b, 5); TEST_CASE(!index);
+    index = seq.find(c, 6); TEST_CASE(!index);
 }
 
 // -------------------------------------------------------------
@@ -2657,6 +2683,62 @@ void UnitTest::testCodeNodeArrayAdd() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeArrayFind() {
+    Environment::SharedPtr env(new Environment());
+
+    Value const a('a');
+    Value const b('b');
+    Value const c('c');
+    Value const d('d');
+
+    env->def("arr", Value(Sequence({a, b, c, a, b, c})));
+
+    CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
+
+    auto ilit = [](Value::Long pos) { return std::make_shared<Literal>(Value(pos)); };
+    auto clit = [](Value const & chr) { return std::make_shared<Literal>(chr); };
+
+    Value value = std::make_shared<ArrayFind>(var, clit(a))->exec(env);
+    TEST_CASE_MSG(value == Value(0ll), "actual=" << value);
+
+    value = std::make_shared<ArrayFind>(var, clit(b))->exec(env);
+    TEST_CASE_MSG(value == Value(1ll), "actual=" << value);
+
+    value = std::make_shared<ArrayFind>(var, clit(c))->exec(env);
+    TEST_CASE_MSG(value == Value(2ll), "actual=" << value);
+
+    value = std::make_shared<ArrayFind>(var, clit(d))->exec(env);
+    TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
+
+    value = std::make_shared<ArrayFind>(var, clit(a), ilit(1))->exec(env);
+    TEST_CASE_MSG(value == Value(3ll), "actual=" << value);
+
+    value = std::make_shared<ArrayFind>(var, clit(b), ilit(2))->exec(env);
+    TEST_CASE_MSG(value == Value(4ll), "actual=" << value);
+
+    value = std::make_shared<ArrayFind>(var, clit(c), ilit(3))->exec(env);
+    TEST_CASE_MSG(value == Value(5ll), "actual=" << value);
+
+    value = std::make_shared<ArrayFind>(var, clit(d), ilit(3))->exec(env);
+    TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
+
+    value = std::make_shared<ArrayFind>(var, clit(a), ilit(4))->exec(env);
+    TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
+
+    value = std::make_shared<ArrayFind>(var, clit(b), ilit(5))->exec(env);
+    TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
+
+    try {
+        value = std::make_shared<ArrayFind>(var, clit(c), ilit(6))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const & ex) {
+        TEST_CASE_MSG(std::string("Out of range: arrfind position access") == ex.what(),
+                      "actual='" << ex.what() << "'");
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -3249,4 +3331,25 @@ void UnitTest::testParserArrayAdd() {
 
     expected = Value(Sequence({Value(1ll), Value(2ll)}));
     TEST_CASE(parserTest(parser, env, "(arradd arr 2)", expected, true));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserArrayFind() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c'), Value('a')})));
+
+    TEST_CASE(parserTest(parser, env, "(arrfind arr 'a')", Value(0ll),  true));
+    TEST_CASE(parserTest(parser, env, "(arrfind arr 'b')", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(arrfind arr 'c')", Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(arrfind arr 'd')", Value(-1ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(arrfind arr 'a' 1)", Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(arrfind arr 'b' 1)", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(arrfind arr 'c' 1)", Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(arrfind arr 'd' 1)", Value(-1ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(arrfind arr 'c' -1)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrfind arr 'c' 4)",  Value::Null, false));
 }

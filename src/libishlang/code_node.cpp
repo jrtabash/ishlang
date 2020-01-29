@@ -843,3 +843,42 @@ Value ArrayAdd::exec(Environment::SharedPtr env) {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+ArrayFind::ArrayFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr)
+    : CodeNode()
+    , arr_(str)
+    , val_(chr)
+    , pos_()
+{
+}
+
+ArrayFind::ArrayFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr, CodeNode::SharedPtr pos)
+    : CodeNode()
+    , arr_(str)
+    , val_(chr)
+    , pos_(pos)
+{
+}
+
+Value ArrayFind::exec(Environment::SharedPtr env) {
+    if (arr_.get() && val_.get()) {
+        Value arr = arr_->exec(env);
+        Value val = val_->exec(env);
+        Value pos = pos_ ? pos_->exec(env) : Value::Zero;
+
+        if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
+        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
+
+        const auto &rawArray = arr.array();
+
+        const auto rawPos = pos.integer();
+        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawArray.size()) {
+            throw OutOfRange("arrfind position access");
+        }
+
+        auto result = rawArray.find(val, rawPos);
+        return result ? Value(Value::Long(*result)) : Value(-1ll);
+    }
+    return Value::Null;
+}

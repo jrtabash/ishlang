@@ -631,6 +631,21 @@ namespace Ishlang {
         CodeNode::SharedPtr arr_;
         CodeNode::SharedPtr val_;
     };
+
+    // -------------------------------------------------------------
+    class ArrayFind : public CodeNode {
+    public:
+        ArrayFind(CodeNode::SharedPtr arr, CodeNode::SharedPtr val);
+        ArrayFind(CodeNode::SharedPtr str, CodeNode::SharedPtr val, CodeNode::SharedPtr pos);
+        virtual ~ArrayFind() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        CodeNode::SharedPtr arr_;
+        CodeNode::SharedPtr val_;
+        CodeNode::SharedPtr pos_;
+    };
 }
 
 #endif	// BYTE_CODE_H
