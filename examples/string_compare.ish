@@ -1,0 +1,37 @@
+(defun strcmp (str1 str2)
+  (var str1Len (strlen str1))
+  (var str2Len (strlen str2))
+  (var minLen (if (< str1Len str2Len) str1Len str2Len))
+
+  (var ret null)
+  (var diff 0)
+
+  (loop (var i 0) (< i minLen) (= i (+ i 1))
+        (progn
+          (= diff
+             (- (astype (strget str1 i) int)
+                (astype (strget str2 i) int)))
+          (unless (== diff 0)
+            (progn
+              (= ret diff)
+              (break)))))
+
+  (when (istypeof ret none)
+    (cond
+     ((== str1Len str2Len)
+      (= ret 0))
+     ((< str1Len str2Len)
+      (= ret (- 0 (astype (strget str2 str1Len) int))))
+     (true
+      (= ret (astype (strget str1 str2Len) int)))))
+
+  ret)
+
+(print "String1: ")
+(var str1 (read))
+
+(print "String2: ")
+(var str2 (read))
+
+(print "Compare: ")
+(println (strcmp str1 str2))
