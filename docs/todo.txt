@@ -21,6 +21,21 @@
   Examples: (rand)
             (rand 100)
 
+* Add support for command line arguments
+  Idea:
+    Command:
+      ishlang -f calc_sum.ish --args -v -n 10
+    In Code:
+      (progarg "-v" verbose bool)
+      (progarg "-n" num int)
+      (proginit)
+      (println (pargval verbose))
+      (println (pargval num))
+    Functions:
+      (progarg <option_name> <variable_name> <option_type>)
+      (pargval <variable_name>
+      (proginit)
+
 * Add support for modules
 
 * Rework 'break' implementation to avoid using Break::Except
