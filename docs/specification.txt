@@ -4,11 +4,10 @@ Ishlang is a fully parenthesized prefix notation programming language inspired b
 it is influnced by Lisp, the language diverts considerably from Lisp.
 
 The name Ishlang (ish-lang) is shorthand for "Lisp'ish programming language", and
-was chosen to pay homage to the Lisp programming language. It was a conscious decision to not
-name the language lispish (even though that was a first choice) as the language is not a lisp
-implementation, and does not try to be a lisp'ish implementation. Though many decisions
-and language features might look like lisp, there is no "lisp metric" that is being
-used in the development of Ishlang.
+was chosen to pay homage to the Lisp programming language. Another consideration for a language
+name was lispish, but as the language is not a lisp implementation, and does not try to be a
+lisp'ish implementation, that name was not used. Though many decisions and language features
+might look like lisp, there is no "lisp metric" that is being used in the development of Ishlang.
 
 Example: Hello world Program
   (println "Hello World")
