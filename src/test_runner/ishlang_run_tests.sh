@@ -5,9 +5,9 @@ if [ $# -ne 3 ]; then
     echo ""
     echo "    $0 <ishlang> <ishlang_test_files> <tests>"
     echo ""
-    echo "         ishlang := ishlang binary"
+    echo "            ishlang := ishlang binary"
     echo " ishlang_test_files := ishlang_test_files binary"
-    echo "           tests := tests/scenarios folder"
+    echo "              tests := tests/scenarios folder"
     echo ""
     echo "Error: Invalid arguments"
     exit 1
