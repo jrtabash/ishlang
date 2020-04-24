@@ -16,7 +16,7 @@
   - Hash table
   - Ordered table
 
-* Add rand function that returns an random integer between 0 and
+* Add rand function that returns a random integer between 0 and
   a max value
   Examples: (rand)
             (rand 100)
