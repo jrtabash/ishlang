@@ -37,3 +37,5 @@
 * Add support for modules
 
 * Rework 'break' implementation to avoid using Break::Except
+
+* Remove ignoreRightP uses from initAppFtns
