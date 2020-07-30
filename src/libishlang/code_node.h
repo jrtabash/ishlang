@@ -553,6 +553,19 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class StringCount : public CodeNode {
+    public:
+        StringCount(CodeNode::SharedPtr str, CodeNode::SharedPtr chr);
+        virtual ~StringCount() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        CodeNode::SharedPtr str_;
+        CodeNode::SharedPtr chr_;
+    };
+
+    // -------------------------------------------------------------
     class MakeArray : public CodeNode {
     public:
         MakeArray();

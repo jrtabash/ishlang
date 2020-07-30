@@ -58,6 +58,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeStringCat);
     ADD_TEST(testCodeNodeSubString);
     ADD_TEST(testCodeNodeStringFind);
+    ADD_TEST(testCodeNodeStringCount);
     ADD_TEST(testCodeNodeMakeArray);
     ADD_TEST(testCodeNodeMakeArraySV);
     ADD_TEST(testCodeNodeArrayLen);
@@ -94,6 +95,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserStringCat);
     ADD_TEST(testParserSubString);
     ADD_TEST(testParserStringFind);
+    ADD_TEST(testParserStringCount);
     ADD_TEST(testParserMakeArray);
     ADD_TEST(testParserMakeArraySV);
     ADD_TEST(testParserArrayLen);
@@ -2491,6 +2493,49 @@ void UnitTest::testCodeNodeStringFind() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeStringCount() {
+    Environment::SharedPtr env(new Environment());
+    env->def("str", Value("0120344501223678910"));
+
+    CodeNode::SharedPtr var = std::make_shared<Variable>("str");
+
+    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
+    auto count = [var, clit](Value::Char c) { return std::make_shared<StringCount>(var, clit(c)); };
+
+    Value value;
+
+    value = count('9')->exec(env); TEST_CASE_MSG(value == Value(1ll),  "actual=" << value);
+    value = count('8')->exec(env); TEST_CASE_MSG(value == Value(1ll),  "actual=" << value);
+    value = count('7')->exec(env); TEST_CASE_MSG(value == Value(1ll),  "actual=" << value);
+    value = count('6')->exec(env); TEST_CASE_MSG(value == Value(1ll),  "actual=" << value);
+    value = count('5')->exec(env); TEST_CASE_MSG(value == Value(1ll),  "actual=" << value);
+    value = count('4')->exec(env); TEST_CASE_MSG(value == Value(2ll),  "actual=" << value);
+    value = count('3')->exec(env); TEST_CASE_MSG(value == Value(2ll),  "actual=" << value);
+    value = count('2')->exec(env); TEST_CASE_MSG(value == Value(3ll),  "actual=" << value);
+    value = count('1')->exec(env); TEST_CASE_MSG(value == Value(3ll),  "actual=" << value);
+    value = count('0')->exec(env); TEST_CASE_MSG(value == Value(4ll),  "actual=" << value);
+    value = count('a')->exec(env); TEST_CASE_MSG(value == Value::Zero, "actual=" << value);
+
+    try {
+        std::make_shared<StringCount>(clit('b'), clit('0'))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<StringCount>(var, std::make_shared<Literal>(Value::Zero))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeMakeArray() {
     Environment::SharedPtr env(new Environment());
 
@@ -3249,6 +3294,28 @@ void UnitTest::testParserStringFind() {
     TEST_CASE(parserTest(parser, env, "(strfind str 'A')",     Value(-1ll), true));
     TEST_CASE(parserTest(parser, env, "(strfind str 1)",       Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(strfind str '0' '0')", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserStringCount() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("str", Value("0120344501223678910"));
+
+    TEST_CASE(parserTest(parser, env, "(strcount str '9')", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strcount str '8')", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strcount str '7')", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strcount str '6')", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strcount str '5')", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strcount str '4')", Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strcount str '3')", Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strcount str '2')", Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strcount str '1')", Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strcount str '0')", Value(4ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strcount str 'a')", Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(strcount 500 '0')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strcount str 5)",   Value::Null, false));
 }
 
 // -------------------------------------------------------------

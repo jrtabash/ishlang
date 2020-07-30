@@ -1,6 +1,4 @@
-* Add count operations
-  - arrcount : Count occurences of value in array
-  - strcount : Count occurences of character in string
+* Add arrcount operation to count occurrences of value in array
 
 * Add support for file IO
 

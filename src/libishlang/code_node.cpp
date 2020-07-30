@@ -7,6 +7,7 @@
 #include "util.h"
 
 #include <cmath>
+#include <algorithm>
 
 using namespace Ishlang;
 
@@ -699,6 +700,29 @@ Value StringFind::exec(Environment::SharedPtr env) {
 
         auto result = rawStr.find(chr.character(), rawPos);
         return result != std::string::npos ? Value(Value::Long(result)) : Value(-1ll);
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+StringCount::StringCount(CodeNode::SharedPtr str, CodeNode::SharedPtr chr)
+    : CodeNode()
+    , str_(str)
+    , chr_(chr)
+{
+}
+
+Value StringCount::exec(Environment::SharedPtr env) {
+    if (str_.get() && chr_.get()) {
+        Value str = str_->exec(env);
+        Value chr = chr_->exec(env);
+
+        if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
+        if (!chr.isChar()) { throw InvalidOperandType("Character", chr.typeToString()); }
+
+        const auto &rawStr = str.text();
+
+        return Value(Value::Long(std::count(rawStr.begin(), rawStr.end(), chr.character())));
     }
     return Value::Null;
 }

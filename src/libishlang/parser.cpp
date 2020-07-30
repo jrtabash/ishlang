@@ -608,6 +608,18 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "strcount",
+          [this]() {
+                CodeNode::SharedPtrList exprs(readExprList());
+                if (exprs.size() == 2) {
+                    return std::make_shared<StringCount>(exprs[0], exprs[1]);
+                }
+                else {
+                    throw InvalidExpression("Too many/few arguments to strcount");
+                }
+          }
+        },
+
         { "array",
           [this]() {
                 CodeNode::SharedPtrList valueExprs(readExprList());

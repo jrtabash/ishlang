@@ -19,6 +19,13 @@ __CODE__
 (println (strfind str 't' 6))
 (println (strfind str 'T'))
 
+;; strcount
+(println (strcount str 'b'))
+(println (strcount str 'I'))
+(println (strcount str 'm'))
+(println (strcount str 'e'))
+(println (strcount str ' '))
+
 __EXPECT__
 I am text! Read me...
 21
@@ -30,3 +37,8 @@ Read me...
 5
 8
 -1
+0
+1
+2
+3
+4

@@ -362,6 +362,9 @@ substr: Return substring from given string
 strfind: Find position of character in string
          (strfind <string> <character> [<position>])
 
+strcount: Count number of occurrences of characeter in string
+          (strcount <string> <character>)
+
 Examples:
   (var str "Hello!")
   (println (strlen str))
@@ -370,6 +373,7 @@ Examples:
   (strcat str "World!")
   (println (substr str 0 5))
   (println (strfind str 'W'))
+  (println (strcount str 'l'))
 
 Array Operations
 ----------------
