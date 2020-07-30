@@ -154,7 +154,18 @@ Value Value::asString() const {
 // -------------------------------------------------------------
 bool Value::operator==(const Value &rhs) const {
     if (type_ == rhs.type_) {
-        return value_ == rhs.value_;
+        switch (type_) {
+        case eInteger:    return std::get<Long>(value_) == std::get<Long>(rhs.value_);
+        case eReal:       return std::get<Double>(value_) == std::get<Double>(rhs.value_);
+        case eCharacter:  return std::get<Char>(value_) == std::get<Char>(rhs.value_);
+        case eBoolean:    return std::get<Bool>(value_) == std::get<Bool>(rhs.value_);
+        case eString:     return *std::get<StringPtr>(value_) == *std::get<StringPtr>(rhs.value_);
+        case eClosure:    return *std::get<LambdaPtr>(value_) == *std::get<LambdaPtr>(rhs.value_);
+        case eUserType:   return *std::get<StructPtr>(value_) == *std::get<StructPtr>(rhs.value_);
+        case eUserObject: return *std::get<InstancePtr>(value_) == *std::get<InstancePtr>(rhs.value_);
+        case eArray:      return *std::get<SequencePtr>(value_) == *std::get<SequencePtr>(rhs.value_);
+        case eNone:       return true;
+        }
     }
     else if (isNumber() && rhs.isNumber()) {
         return real() == rhs.real();
@@ -165,7 +176,18 @@ bool Value::operator==(const Value &rhs) const {
 // -------------------------------------------------------------        
 bool Value::operator!=(const Value &rhs) const {
     if (type_ == rhs.type_) {
-        return value_ != rhs.value_;
+        switch (type_) {
+        case eInteger:    return std::get<Long>(value_) != std::get<Long>(rhs.value_);
+        case eReal:       return std::get<Double>(value_) != std::get<Double>(rhs.value_);
+        case eCharacter:  return std::get<Char>(value_) != std::get<Char>(rhs.value_);
+        case eBoolean:    return std::get<Bool>(value_) != std::get<Bool>(rhs.value_);
+        case eString:     return *std::get<StringPtr>(value_) != *std::get<StringPtr>(rhs.value_);
+        case eClosure:    return *std::get<LambdaPtr>(value_) != *std::get<LambdaPtr>(rhs.value_);
+        case eUserType:   return *std::get<StructPtr>(value_) != *std::get<StructPtr>(rhs.value_);
+        case eUserObject: return *std::get<InstancePtr>(value_) != *std::get<InstancePtr>(rhs.value_);
+        case eArray:      return *std::get<SequencePtr>(value_) != *std::get<SequencePtr>(rhs.value_);
+        case eNone:       return false;
+        }
     }
     else if (isNumber() && rhs.isNumber()) {
         return real() != rhs.real();
@@ -176,7 +198,18 @@ bool Value::operator!=(const Value &rhs) const {
 // -------------------------------------------------------------        
 bool Value::operator<(const Value &rhs) const {
     if (type_ == rhs.type_) {
-        return value_ < rhs.value_;
+        switch (type_) {
+        case eInteger:    return std::get<Long>(value_) < std::get<Long>(rhs.value_);
+        case eReal:       return std::get<Double>(value_) < std::get<Double>(rhs.value_);
+        case eCharacter:  return std::get<Char>(value_) < std::get<Char>(rhs.value_);
+        case eBoolean:    return std::get<Bool>(value_) < std::get<Bool>(rhs.value_);
+        case eString:     return *std::get<StringPtr>(value_) < *std::get<StringPtr>(rhs.value_);
+        case eClosure:    return false;
+        case eUserType:   return false;
+        case eUserObject: return false;
+        case eArray:      return *std::get<SequencePtr>(value_) < *std::get<SequencePtr>(rhs.value_);
+        case eNone:       return false;
+        }
     }
     else if (isNumber() && rhs.isNumber()) {
         return real() < rhs.real();
@@ -187,7 +220,18 @@ bool Value::operator<(const Value &rhs) const {
 // -------------------------------------------------------------
 bool Value::operator>(const Value &rhs) const {
     if (type_ == rhs.type_) {
-        return value_ > rhs.value_;
+        switch (type_) {
+        case eInteger:    return std::get<Long>(value_) > std::get<Long>(rhs.value_);
+        case eReal:       return std::get<Double>(value_) > std::get<Double>(rhs.value_);
+        case eCharacter:  return std::get<Char>(value_) > std::get<Char>(rhs.value_);
+        case eBoolean:    return std::get<Bool>(value_) > std::get<Bool>(rhs.value_);
+        case eString:     return *std::get<StringPtr>(value_) > *std::get<StringPtr>(rhs.value_);
+        case eClosure:    return false;
+        case eUserType:   return false;
+        case eUserObject: return false;
+        case eArray:      return *std::get<SequencePtr>(value_) > *std::get<SequencePtr>(rhs.value_);
+        case eNone:       return false;
+        }
     }
     else if (isNumber() && rhs.isNumber()) {
         return real() > rhs.real();
@@ -198,7 +242,18 @@ bool Value::operator>(const Value &rhs) const {
 // -------------------------------------------------------------        
 bool Value::operator<=(const Value &rhs) const {
     if (type_ == rhs.type_) {
-        return value_ <= rhs.value_;
+        switch (type_) {
+        case eInteger:    return std::get<Long>(value_) <= std::get<Long>(rhs.value_);
+        case eReal:       return std::get<Double>(value_) <= std::get<Double>(rhs.value_);
+        case eCharacter:  return std::get<Char>(value_) <= std::get<Char>(rhs.value_);
+        case eBoolean:    return std::get<Bool>(value_) <= std::get<Bool>(rhs.value_);
+        case eString:     return *std::get<StringPtr>(value_) <= *std::get<StringPtr>(rhs.value_);
+        case eClosure:    return false;
+        case eUserType:   return false;
+        case eUserObject: return false;
+        case eArray:      return *std::get<SequencePtr>(value_) <= *std::get<SequencePtr>(rhs.value_);
+        case eNone:       return false;
+        }
     }
     else if (isNumber() && rhs.isNumber()) {
         return real() <= rhs.real();
@@ -209,7 +264,18 @@ bool Value::operator<=(const Value &rhs) const {
 // -------------------------------------------------------------
 bool Value::operator>=(const Value &rhs) const {
     if (type_ == rhs.type_) {
-        return value_ >= rhs.value_;
+        switch (type_) {
+        case eInteger:    return std::get<Long>(value_) >= std::get<Long>(rhs.value_);
+        case eReal:       return std::get<Double>(value_) >= std::get<Double>(rhs.value_);
+        case eCharacter:  return std::get<Char>(value_) >= std::get<Char>(rhs.value_);
+        case eBoolean:    return std::get<Bool>(value_) >= std::get<Bool>(rhs.value_);
+        case eString:     return *std::get<StringPtr>(value_) >= *std::get<StringPtr>(rhs.value_);
+        case eClosure:    return false;
+        case eUserType:   return false;
+        case eUserObject: return false;
+        case eArray:      return *std::get<SequencePtr>(value_) >= *std::get<SequencePtr>(rhs.value_);
+        case eNone:       return false;
+        }
     }
     else if (isNumber() && rhs.isNumber()) {
         return real() >= rhs.real();
