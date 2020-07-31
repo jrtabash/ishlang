@@ -48,6 +48,7 @@ namespace Ishlang {
         void testInstanceValue();
         void testSequence();
         void testSequenceFind();
+        void testSequenceCount();
         void testSequenceValue();
         void testSequencePrint();
         void testCodeNodeBasic();
@@ -86,6 +87,7 @@ namespace Ishlang {
         void testCodeNodeArraySet();
         void testCodeNodeArrayAdd();
         void testCodeNodeArrayFind();
+        void testCodeNodeArrayCount();
         void testParserBasic();
         void testParserIsType();
         void testParserTypeName();
@@ -120,6 +122,7 @@ namespace Ishlang {
         void testParserArraySet();
         void testParserArrayAdd();
         void testParserArrayFind();
+        void testParserArrayCount();
         
     private:
         bool  success_;

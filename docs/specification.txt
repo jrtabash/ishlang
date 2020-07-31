@@ -399,6 +399,9 @@ arradd: Add element to end of array
 arrfind: Find position of value in array
          (arrfind <array> <value> [<position>])
 
+arrcount: Count number of occurrences of value in array
+          (arrcount <array> <value>)
+
 Examples:
   (var a (array))
   (arradd a 1)
@@ -411,6 +414,7 @@ Examples:
   (println (arraysv 5))
   (println (arraysv 10 0))
   (println (arrfind a 2))
+  (println (arrcount a 2))
 
 Comments
 --------

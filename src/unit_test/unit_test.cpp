@@ -31,6 +31,7 @@ UnitTest::UnitTest()
     ADD_TEST(testInstanceValue);
     ADD_TEST(testSequence);
     ADD_TEST(testSequenceFind);
+    ADD_TEST(testSequenceCount);
     ADD_TEST(testSequenceValue);
     ADD_TEST(testSequencePrint);
     ADD_TEST(testCodeNodeBasic);
@@ -66,6 +67,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArraySet);
     ADD_TEST(testCodeNodeArrayAdd);
     ADD_TEST(testCodeNodeArrayFind);
+    ADD_TEST(testCodeNodeArrayCount);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -103,6 +105,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArraySet);
     ADD_TEST(testParserArrayAdd);
     ADD_TEST(testParserArrayFind);
+    ADD_TEST(testParserArrayCount);
 }
 #undef ADD_TEST
 
@@ -989,11 +992,11 @@ void UnitTest::testSequence() {
 
 // -------------------------------------------------------------
 void UnitTest::testSequenceFind() {
-    Value const a = Value('a');
-    Value const b = Value('b');
-    Value const c = Value('c');
-    Value const d = Value('d');
-    Sequence const seq({a, b, c, a, b, c});
+    const Value a = Value('a');
+    const Value b = Value('b');
+    const Value c = Value('c');
+    const Value d = Value('d');
+    const Sequence seq({a, b, c, a, b, c});
 
     auto index = seq.find(a); TEST_CASE(index && *index == 0);
     index = seq.find(b); TEST_CASE(index && *index == 1);
@@ -1008,6 +1011,24 @@ void UnitTest::testSequenceFind() {
     index = seq.find(a, 4); TEST_CASE(!index);
     index = seq.find(b, 5); TEST_CASE(!index);
     index = seq.find(c, 6); TEST_CASE(!index);
+}
+
+// -------------------------------------------------------------
+void UnitTest::testSequenceCount() {
+    const Value v0 = Value::Zero;
+    const Value v1 = Value(1ll);
+    const Value v2 = Value(2ll);
+    const Value v3 = Value(3ll);
+    const Value v4 = Value(4ll);
+    const Value v5 = Value(5ll);
+    const Sequence seq({v0, v1, v2, v3, v0, v2, v4, v3, v0, v4, v4, v0});
+
+    TEST_CASE_MSG(seq.count(v0) == 4, "actual=" << seq.count(v0));
+    TEST_CASE_MSG(seq.count(v1) == 1, "actual=" << seq.count(v1));
+    TEST_CASE_MSG(seq.count(v2) == 2, "actual=" << seq.count(v2));
+    TEST_CASE_MSG(seq.count(v3) == 2, "actual=" << seq.count(v3));
+    TEST_CASE_MSG(seq.count(v4) == 3, "actual=" << seq.count(v4));
+    TEST_CASE_MSG(seq.count(v5) == 0, "actual=" << seq.count(v5));
 }
 
 // -------------------------------------------------------------
@@ -2784,6 +2805,40 @@ void UnitTest::testCodeNodeArrayFind() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeArrayCount() {
+    Environment::SharedPtr env(new Environment());
+
+    const Value v1(1ll);
+    const Value v2(2ll);
+    const Value v3(3ll);
+    const Value v4(4ll);
+
+    env->def("arr", Value(Sequence({v1, v2, v3, v2, v3, v4, v3, v4, v4, v4})));
+
+    CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
+
+    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
+    auto count = [var, ilit](Value::Long i) { return std::make_shared<ArrayCount>(var, ilit(i)); };
+
+    Value value;
+
+    value = count(1)->exec(env); TEST_CASE_MSG(value == Value(1ll), "actual=" << value);
+    value = count(2)->exec(env); TEST_CASE_MSG(value == Value(2ll), "actual=" << value);
+    value = count(3)->exec(env); TEST_CASE_MSG(value == Value(3ll), "actual=" << value);
+    value = count(4)->exec(env); TEST_CASE_MSG(value == Value(4ll), "actual=" << value);
+    value = count(5)->exec(env); TEST_CASE_MSG(value == Value(0ll), "actual=" << value);
+
+    try {
+        std::make_shared<ArrayCount>(ilit(1), ilit(0))->exec(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -3419,4 +3474,25 @@ void UnitTest::testParserArrayFind() {
 
     TEST_CASE(parserTest(parser, env, "(arrfind arr 'c' -1)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(arrfind arr 'c' 4)",  Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserArrayCount() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    const Value v1(1ll);
+    const Value v2(2ll);
+    const Value v3(3ll);
+    const Value v4(4ll);
+
+    env->def("arr", Value(Sequence({v1, v2, v3, v2, v3, v4, v3, v4, v4, v4})));
+
+    TEST_CASE(parserTest(parser, env, "(arrcount arr 1)", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(arrcount arr 2)", Value(2ll), true));
+    TEST_CASE(parserTest(parser, env, "(arrcount arr 3)", Value(3ll), true));
+    TEST_CASE(parserTest(parser, env, "(arrcount arr 4)", Value(4ll), true));
+    TEST_CASE(parserTest(parser, env, "(arrcount arr 5)", Value(0ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(arrcount '5' 0)", Value::Null, false));
 }

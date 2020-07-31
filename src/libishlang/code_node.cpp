@@ -869,17 +869,17 @@ Value ArrayAdd::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-ArrayFind::ArrayFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr)
+ArrayFind::ArrayFind(CodeNode::SharedPtr arr, CodeNode::SharedPtr chr)
     : CodeNode()
-    , arr_(str)
+    , arr_(arr)
     , val_(chr)
     , pos_()
 {
 }
 
-ArrayFind::ArrayFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr, CodeNode::SharedPtr pos)
+ArrayFind::ArrayFind(CodeNode::SharedPtr arr, CodeNode::SharedPtr chr, CodeNode::SharedPtr pos)
     : CodeNode()
-    , arr_(str)
+    , arr_(arr)
     , val_(chr)
     , pos_(pos)
 {
@@ -903,6 +903,26 @@ Value ArrayFind::exec(Environment::SharedPtr env) {
 
         auto result = rawArray.find(val, rawPos);
         return result ? Value(Value::Long(*result)) : Value(-1ll);
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+ArrayCount::ArrayCount(CodeNode::SharedPtr arr, CodeNode::SharedPtr val)
+    : CodeNode()
+    , arr_(arr)
+    , val_(val)
+{
+}
+
+Value ArrayCount::exec(Environment::SharedPtr env) {
+    if (arr_.get() && val_.get()) {
+        Value arr = arr_->exec(env);
+        Value val = val_->exec(env);
+
+        if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
+
+        return Value(Value::Long(arr.array().count(val)));
     }
     return Value::Null;
 }

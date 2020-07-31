@@ -30,7 +30,8 @@ namespace Ishlang {
         void set(std::size_t idx, const Value &value) { vector_[idx] = value; }
         void add(const Value &value) { vector_.push_back(value); }
 
-        std::optional<std::size_t> find(Value const & val, std::size_t pos = 0) const;
+        std::optional<std::size_t> find(const Value &val, std::size_t pos = 0) const;
+        std::size_t count(const Value &value) const;
 
         std::size_t size() const { return vector_.size(); }
 

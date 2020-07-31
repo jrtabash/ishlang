@@ -696,6 +696,18 @@ void Parser::initAppFtns() {
                     throw InvalidExpression("Too many/few arguments to arrfind");
                 }
           }
+        },
+
+        { "arrcount",
+          [this]() {
+                CodeNode::SharedPtrList exprs(readExprList());
+                if (exprs.size() == 2) {
+                    return std::make_shared<ArrayCount>(exprs[0], exprs[1]);
+                }
+                else {
+                    throw InvalidExpression("Too many/few arguments to arrcount");
+                }
+          }
         }
     };
 }

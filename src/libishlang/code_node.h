@@ -659,6 +659,20 @@ namespace Ishlang {
         CodeNode::SharedPtr val_;
         CodeNode::SharedPtr pos_;
     };
+
+    // -------------------------------------------------------------
+    class ArrayCount : public CodeNode {
+    public:
+        ArrayCount(CodeNode::SharedPtr arr, CodeNode::SharedPtr val);
+        virtual ~ArrayCount() {}
+
+        virtual Value exec(Environment::SharedPtr env);
+
+    private:
+        CodeNode::SharedPtr arr_;
+        CodeNode::SharedPtr val_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H

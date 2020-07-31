@@ -1,5 +1,3 @@
-* Add arrcount operation to count occurrences of value in array
-
 * Add support for file IO
 
 * Add generic functions

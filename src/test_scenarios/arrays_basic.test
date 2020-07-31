@@ -25,6 +25,10 @@ __CODE__
 (println (arrfind a 10))
 (println (arrfind a 12))
 
+(println (arrcount a 0))
+(println (arrcount a 2))
+(println (arrcount (array 1 2 1) 1))
+
 __EXPECT__
 []
 [1 2 3]
@@ -41,3 +45,6 @@ __EXPECT__
 3
 4
 -1
+0
+1
+2
