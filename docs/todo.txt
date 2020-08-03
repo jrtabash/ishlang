@@ -36,4 +36,6 @@
 
 * Rework 'break' implementation to avoid using Break::Except
 
-* Remove ignoreRightP uses from initAppFtns
+* Remove ignoreRightP uses from initAppFtns.
+  Should be able to improve invalid expression
+  handling by using readExprList.
