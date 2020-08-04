@@ -73,6 +73,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeStringGet);
     ADD_TEST(testCodeNodeStringSet);
     ADD_TEST(testParserBasic);
+    ADD_TEST(testParserClone);
     ADD_TEST(testParserIsType);
     ADD_TEST(testParserTypeName);
     ADD_TEST(testParserAsType);
@@ -2934,6 +2935,26 @@ void UnitTest::testParserBasic() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testParserClone() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(var str1 \"hello\")",    Value("hello"), true));
+    TEST_CASE(parserTest(parser, env, "(var str2 (clone str1))", Value("hello"), true));
+    TEST_CASE(parserTest(parser, env, "(== str1 str2)",          Value::True,    true));
+    TEST_CASE(parserTest(parser, env, "(== str1 \"hello\")",     Value::True,    true));
+    TEST_CASE(parserTest(parser, env, "(== str2 \"hello\")",     Value::True,    true));
+
+    TEST_CASE(parserTest(parser, env, "(= str1 \"world\")",  Value("world"), true));
+    TEST_CASE(parserTest(parser, env, "(!= str1 str2)",      Value::True,    true));
+    TEST_CASE(parserTest(parser, env, "(== str1 \"world\")", Value::True,    true));
+    TEST_CASE(parserTest(parser, env, "(== str2 \"hello\")", Value::True,    true));
+
+    TEST_CASE(parserTest(parser, env, "(clone)",           Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(clone str1 str2)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
 void UnitTest::testParserIsType() {
     Environment::SharedPtr env(new Environment());
     Parser parser;
@@ -3020,6 +3041,11 @@ void UnitTest::testParserVar() {
     TEST_CASE(parserTest(parser, env, "foo",         Value(5ll),  true));
     TEST_CASE(parserTest(parser, env, "(= foo 12)",  Value(12ll), true));
     TEST_CASE(parserTest(parser, env, "foo",         Value(12ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(var x)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(var x 1 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(= x)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(= x 1 2)",   Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3087,6 +3113,9 @@ void UnitTest::testParserNot() {
     TEST_CASE(parserTest(parser, env, "(not (== 1 1))", Value::False, true));
     TEST_CASE(parserTest(parser, env, "(not (== 1 2))", Value::True,  true));
     TEST_CASE(parserTest(parser, env, "(not 3)",        Value::False, false));
+
+    TEST_CASE(parserTest(parser, env, "(not)",            Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(not True False)", Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3124,11 +3153,13 @@ void UnitTest::testParserCond() {
     TEST_CASE(parserTest(parser, env, "(when false 1)",  Value::Null, true));
     TEST_CASE(parserTest(parser, env, "(when true)",     Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(when true 1 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(when)",          Value::Null, false));
 
     TEST_CASE(parserTest(parser, env, "(unless true 1)",    Value::Null, true));
     TEST_CASE(parserTest(parser, env, "(unless false 1)",   Value(1ll),  true));
     TEST_CASE(parserTest(parser, env, "(unless false)",     Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(unless false 1 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(unless)",           Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3242,6 +3273,8 @@ void UnitTest::testParserStructName() {
     TEST_CASE(parserTest(parser, env, "(structname Person)",           Value("Person"), true));
     TEST_CASE(parserTest(parser, env, "(structname p)",                Value("Person"), true));
     TEST_CASE(parserTest(parser, env, "(structname 5)",                Value::Null,     false));
+    TEST_CASE(parserTest(parser, env, "(structname)",                  Value::Null,     false));
+    TEST_CASE(parserTest(parser, env, "(structname p Person)",         Value::Null,     false));
 }
 
 // -------------------------------------------------------------
@@ -3267,10 +3300,12 @@ void UnitTest::testParserStringLen() {
     Environment::SharedPtr env(new Environment());
     Parser parser;
 
-    TEST_CASE(parserTest(parser, env, "(strlen \"\")",       Value::Zero, true));
-    TEST_CASE(parserTest(parser, env, "(strlen \"a\")",      Value(1ll),  true));
-    TEST_CASE(parserTest(parser, env, "(strlen \"string\")", Value(6ll),  true));
-    TEST_CASE(parserTest(parser, env, "(strlen 10)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strlen \"\")",        Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(strlen \"a\")",       Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strlen \"string\")",  Value(6ll),  true));
+    TEST_CASE(parserTest(parser, env, "(strlen 10)",          Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strlen)",             Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strlen \"1\" \"2\")", Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3278,9 +3313,12 @@ void UnitTest::testParserStrGet() {
     Environment::SharedPtr env(new Environment());
     Parser parser;
 
-    TEST_CASE(parserTest(parser, env, "(strget \"By\" 0)", Value('B'),  true));
-    TEST_CASE(parserTest(parser, env, "(strget \"By\" 1)", Value('y'),  true));
-    TEST_CASE(parserTest(parser, env, "(strget \"By\" 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strget \"By\" 0)",   Value('B'),  true));
+    TEST_CASE(parserTest(parser, env, "(strget \"By\" 1)",   Value('y'),  true));
+    TEST_CASE(parserTest(parser, env, "(strget \"By\" 2)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strget)",            Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strget \"By\")",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strget \"By\" 0 1)", Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3293,6 +3331,10 @@ void UnitTest::testParserStrSrt() {
     TEST_CASE(parserTest(parser, env, "(strset str 0 'a')", Value('a'),  true));
     TEST_CASE(parserTest(parser, env, "(strset str 2 'C')", Value('C'),  true));
     TEST_CASE(parserTest(parser, env, "(strset str 6 'b')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strset)",           Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strset str)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strset str 0)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strset str 0 1 2)", Value::Null, false));
 
     TEST_CASE(parserTest(parser, env, "str", Value("a2C45"), true));
 }
@@ -3308,6 +3350,9 @@ void UnitTest::testParserStringCat() {
     TEST_CASE(parserTest(parser, env, "(strcat str \"gh\")",  Value("abcdefgh"),  true));
     TEST_CASE(parserTest(parser, env, "(strcat str 'i')",     Value("abcdefghi"), true));
     TEST_CASE(parserTest(parser, env, "(strcat str 5)",       Value::Null,        false));
+    TEST_CASE(parserTest(parser, env, "(strcat)",             Value::Null,        false));
+    TEST_CASE(parserTest(parser, env, "(strcat str)",         Value::Null,        false));
+    TEST_CASE(parserTest(parser, env, "(strcat str str str)", Value::Null,        false));
 
     TEST_CASE(parserTest(parser, env, "str", Value("abcdefghi"), true));
 }
@@ -3329,6 +3374,7 @@ void UnitTest::testParserSubString() {
     TEST_CASE(parserTest(parser, env, "(sbustr str 11)",   Value::Null,         false));
     TEST_CASE(parserTest(parser, env, "(sbustr str 0 -1)", Value::Null,         false));
     TEST_CASE(parserTest(parser, env, "(sbustr str 0 10)", Value::Null,         false));
+    TEST_CASE(parserTest(parser, env, "(substr)",          Value::Null,         false));
 }
 
 // -------------------------------------------------------------
@@ -3349,6 +3395,7 @@ void UnitTest::testParserStringFind() {
     TEST_CASE(parserTest(parser, env, "(strfind str 'A')",     Value(-1ll), true));
     TEST_CASE(parserTest(parser, env, "(strfind str 1)",       Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(strfind str '0' '0')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strfind)",             Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3371,6 +3418,8 @@ void UnitTest::testParserStringCount() {
     TEST_CASE(parserTest(parser, env, "(strcount str 'a')", Value::Zero, true));
     TEST_CASE(parserTest(parser, env, "(strcount 500 '0')", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(strcount str 5)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strcount)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strcount str)",     Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3403,6 +3452,7 @@ void UnitTest::testParserMakeArraySV() {
     TEST_CASE(parserTest(parser, env, "(arraysv 1)",     Value(Sequence({Value::Null})), true));
     TEST_CASE(parserTest(parser, env, "(arraysv)",       Value::Null,                    false));
     TEST_CASE(parserTest(parser, env, "(arraysv 'a' 0)", Value::Null,                    false));
+    TEST_CASE(parserTest(parser, env, "(arraysv)",       Value::Null,                    false));
 }
 
 // -------------------------------------------------------------
@@ -3414,6 +3464,8 @@ void UnitTest::testParserArrayLen() {
     TEST_CASE(parserTest(parser, env, "(arrlen (array 1))",       Value(1ll),  true));
     TEST_CASE(parserTest(parser, env, "(arrlen (array 1 2 3 4))", Value(4ll),  true));
     TEST_CASE(parserTest(parser, env, "(arrlen 10)",              Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrlen)",                 Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrlen (array) (array))", Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3424,6 +3476,8 @@ void UnitTest::testParserArrayGet() {
     TEST_CASE(parserTest(parser, env, "(arrget (array 'B' 'y') 0)", Value('B'),  true));
     TEST_CASE(parserTest(parser, env, "(arrget (array 'B' 'y') 1)", Value('y'),  true));
     TEST_CASE(parserTest(parser, env, "(arrget (array 'B' 'y') 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrget)",                   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrget (array 1))",         Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3436,6 +3490,9 @@ void UnitTest::testParserArraySet() {
     TEST_CASE(parserTest(parser, env, "(arrset arr 0 'a')", Value('a'),  true));
     TEST_CASE(parserTest(parser, env, "(arrset arr 2 'C')", Value('C'),  true));
     TEST_CASE(parserTest(parser, env, "(arrset arr 6 'b')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrset)",           Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrset arr)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrset arr 0)",     Value::Null, false));
 
     Value expected(Sequence({Value('a'), Value(2ll), Value('C'), Value(4ll), Value(5ll)}));
     TEST_CASE(parserTest(parser, env, "arr", expected, true));
@@ -3453,6 +3510,9 @@ void UnitTest::testParserArrayAdd() {
 
     expected = Value(Sequence({Value(1ll), Value(2ll)}));
     TEST_CASE(parserTest(parser, env, "(arradd arr 2)", expected, true));
+
+    TEST_CASE(parserTest(parser, env, "(arradd)",      Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arradd arr)",  Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3474,6 +3534,8 @@ void UnitTest::testParserArrayFind() {
 
     TEST_CASE(parserTest(parser, env, "(arrfind arr 'c' -1)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(arrfind arr 'c' 4)",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrfind)",            Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrfind arr)",        Value::Null, false));
 }
 
 // -------------------------------------------------------------
@@ -3495,4 +3557,6 @@ void UnitTest::testParserArrayCount() {
     TEST_CASE(parserTest(parser, env, "(arrcount arr 5)", Value(0ll), true));
 
     TEST_CASE(parserTest(parser, env, "(arrcount '5' 0)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrcount)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrcount arr)",   Value::Null, false));
 }

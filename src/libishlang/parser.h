@@ -31,6 +31,7 @@ namespace Ishlang {
         CodeNode::SharedPtr makeLiteral(Lexer::TokenType type, const std::string &text);
         CodeNode::SharedPtr readApp(const std::string &expected="");
         CodeNode::SharedPtrList readExprList();
+        CodeNode::SharedPtrList readAndCheckExprList(const char *name, std::size_t expectedSize);
         CodeNode::SharedPtrPairs readExprPairs();
         std::string readName();
         std::vector<std::string> readParams();
@@ -44,19 +45,19 @@ namespace Ishlang {
     private:
         template <typename ExprType, typename ExprOp>
         struct MakeBinaryExpression {
-            MakeBinaryExpression(Parser &parser, ExprOp exprOp)
-                : parser_(parser)
+            MakeBinaryExpression(const std::string &name, Parser &parser, ExprOp exprOp)
+                : name_(name)
+                , parser_(parser)
                 , exprOp_(exprOp)
             {}
 
             CodeNode::SharedPtr operator()() {
-                CodeNode::SharedPtr lhs(parser_.readExpr());
-                CodeNode::SharedPtr rhs(parser_.readExpr());
-                parser_.ignoreRightP();
-                return std::make_shared<ExprType>(exprOp_, lhs, rhs);
+                auto exprs(parser_.readAndCheckExprList(name_.c_str(), 2));
+                return std::make_shared<ExprType>(exprOp_, exprs[0], exprs[1]);
             }
 
         private:
+            const std::string &name_;
             Parser &parser_;
             ExprOp exprOp_;
         };

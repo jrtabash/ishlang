@@ -89,6 +89,7 @@ namespace Ishlang {
         void testCodeNodeArrayFind();
         void testCodeNodeArrayCount();
         void testParserBasic();
+        void testParserClone();
         void testParserIsType();
         void testParserTypeName();
         void testParserAsType();

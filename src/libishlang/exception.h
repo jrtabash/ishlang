@@ -109,6 +109,13 @@ namespace Ishlang {
         {}
     };
 
+    class TooManyOrFewForms : public InvalidExpression {
+    public:
+        TooManyOrFewForms(const std::string &name)
+            : InvalidExpression(format("Too many/few forms in %s", name.c_str()))
+        {}
+    };
+
     class UnexpectedExpression : public Exception {
     public:
         UnexpectedExpression(const std::string &expected, const std::string &actual)

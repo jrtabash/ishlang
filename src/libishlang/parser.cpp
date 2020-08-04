@@ -49,7 +49,7 @@ void Parser::readMulti(const std::string &expr, CallBack callback) {
             return;
         }
 
-        CodeNode::SharedPtr code = readExpr();
+        auto code = readExpr();
         if (code.get()) {
             callback(code);
         }
@@ -135,8 +135,8 @@ CodeNode::SharedPtr Parser::readApp(const std::string &expected) {
             }
             else {
                 if (token.type == Lexer::Symbol) {
-                    const std::string & name(token.text);
-                    CodeNode::SharedPtrList args(readExprList());
+                    const auto & name(token.text);
+                    auto args(readExprList());
                     return std::make_shared<FunctionApp>(name, args);
                 }
                 else {
@@ -151,12 +151,21 @@ CodeNode::SharedPtr Parser::readApp(const std::string &expected) {
 // -------------------------------------------------------------
 CodeNode::SharedPtrList Parser::readExprList() {
     CodeNode::SharedPtrList forms;
-    CodeNode::SharedPtr form = readExpr();
+    auto form = readExpr();
     while (form.get()) {
         forms.push_back(form);
         form = readExpr();
     }
     return forms;
+}
+
+// -------------------------------------------------------------
+CodeNode::SharedPtrList Parser::readAndCheckExprList(const char *name, std::size_t expectedSize) {
+    auto exprs(readExprList());
+    if (exprs.size() != expectedSize) {
+        throw TooManyOrFewForms(name);
+    }
+    return exprs;
 }
 
 // -------------------------------------------------------------
@@ -249,25 +258,23 @@ void Parser::initAppFtns() {
     appFtns_ = {
         { "var",
           [this]() {
-                const std::string name(readName());
-                CodeNode::SharedPtr code(readExpr());
-                ignoreRightP();
-                return std::make_shared<Define>(name, code);
+                const auto name(readName());
+                auto expr(readAndCheckExprList("var", 1));
+                return std::make_shared<Define>(name, expr[0]);
           }
         },
 
         { "=",
           [this]() {
-                const std::string name(readName());
-                CodeNode::SharedPtr code(readExpr());
-                ignoreRightP();
-                return std::make_shared<Assign>(name, code);
+                const auto name(readName());
+                auto expr(readAndCheckExprList("=", 1));
+                return std::make_shared<Assign>(name, expr[0]);
           }
         },
 
         { "?",
           [this]() {
-                const std::string name(readName());
+                const auto name(readName());
                 ignoreRightP();
                 return std::make_shared<Exists>(name);
           }
@@ -275,54 +282,52 @@ void Parser::initAppFtns() {
 
         { "clone",
           [this]() {
-                CodeNode::SharedPtr code(readExpr());
-                ignoreRightP();
-                return std::make_shared<Clone>(code);
+                auto expr(readAndCheckExprList("clone", 1));
+                return std::make_shared<Clone>(expr[0]);
           }
         },
 
-        { "+", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Add) },
-        { "-", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Sub) },
-        { "*", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Mul) },
-        { "/", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Div) },
-        { "%", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Mod) },
-        { "^", MakeBinaryExpression<ArithOp, ArithOp::Type>(*this, ArithOp::Pow) },
+        { "+", MakeBinaryExpression<ArithOp, ArithOp::Type>("+", *this, ArithOp::Add) },
+        { "-", MakeBinaryExpression<ArithOp, ArithOp::Type>("-", *this, ArithOp::Sub) },
+        { "*", MakeBinaryExpression<ArithOp, ArithOp::Type>("*", *this, ArithOp::Mul) },
+        { "/", MakeBinaryExpression<ArithOp, ArithOp::Type>("/", *this, ArithOp::Div) },
+        { "%", MakeBinaryExpression<ArithOp, ArithOp::Type>("%", *this, ArithOp::Mod) },
+        { "^", MakeBinaryExpression<ArithOp, ArithOp::Type>("^", *this, ArithOp::Pow) },
 
-        { "==", MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::EQ) },
-        { "!=", MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::NE) },
-        { "<",  MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::LT) },
-        { ">",  MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::GT) },
-        { "<=", MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::LE) },
-        { ">=", MakeBinaryExpression<CompOp, CompOp::Type>(*this, CompOp::GE) },
+        { "==", MakeBinaryExpression<CompOp, CompOp::Type>("==", *this, CompOp::EQ) },
+        { "!=", MakeBinaryExpression<CompOp, CompOp::Type>("!=", *this, CompOp::NE) },
+        { "<",  MakeBinaryExpression<CompOp, CompOp::Type>("<",  *this, CompOp::LT) },
+        { ">",  MakeBinaryExpression<CompOp, CompOp::Type>("<",  *this, CompOp::GT) },
+        { "<=", MakeBinaryExpression<CompOp, CompOp::Type>("<=", *this, CompOp::LE) },
+        { ">=", MakeBinaryExpression<CompOp, CompOp::Type>(">=", *this, CompOp::GE) },
 
-        { "and", MakeBinaryExpression<LogicOp, LogicOp::Type>(*this, LogicOp::Conjunction) },
-        { "or",  MakeBinaryExpression<LogicOp, LogicOp::Type>(*this, LogicOp::Disjunction) },
+        { "and", MakeBinaryExpression<LogicOp, LogicOp::Type>("and", *this, LogicOp::Conjunction) },
+        { "or",  MakeBinaryExpression<LogicOp, LogicOp::Type>("or",  *this, LogicOp::Disjunction) },
 
         { "not",
           [this]() {
-                CodeNode::SharedPtr operand(readExpr());
-                ignoreRightP();
-                return std::make_shared<Not>(operand);
+                auto expr(readAndCheckExprList("not", 1));
+                return std::make_shared<Not>(expr[0]);
           }
         },
 
         { "progn",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
+                auto exprs(readExprList());
                 return std::make_shared<ProgN>(exprs);
           }
         },
 
         { "block",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
+                auto exprs(readExprList());
                 return std::make_shared<Block>(exprs);
           }
         },
 
         { "if",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
+                auto exprs(readExprList());
                 if (exprs.size() == 2) {
                     return std::make_shared<If>(exprs[0], exprs[1]);
                 }
@@ -330,38 +335,28 @@ void Parser::initAppFtns() {
                     return std::make_shared<If>(exprs[0], exprs[1], exprs[2]);
                 }
                 else {
-                    throw InvalidExpression("Too many/few forms in if");
+                    throw TooManyOrFewForms("if");
                 }
           }
         },
 
         { "when",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
-                if (exprs.size() == 2) {
-                    return std::make_shared<If>(exprs[0], exprs[1]);
-                }
-                else {
-                    throw InvalidExpression("Too many/fiew forms in when");
-                }
+                auto exprs(readAndCheckExprList("when", 2));
+                return std::make_shared<If>(exprs[0], exprs[1]);
           }
         },
 
         { "unless",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
-                if (exprs.size() == 2) {
-                    return std::make_shared<If>(std::make_shared<Not>(exprs[0]), exprs[1]);
-                }
-                else {
-                    throw InvalidExpression("Too many/fiew forms in unless");
-                }
+                auto exprs(readAndCheckExprList("unless", 2));
+                return std::make_shared<If>(std::make_shared<Not>(exprs[0]), exprs[1]);
           }
         },
 
         { "cond",
           [this]() {
-                CodeNode::SharedPtrPairs pairs(readExprPairs());
+                auto pairs(readExprPairs());
                 return std::make_shared<Cond>(pairs);
           }
         },
@@ -375,58 +370,62 @@ void Parser::initAppFtns() {
 
         { "loop",
           [this]() {
-                CodeNode::SharedPtrList forms(readExprList());
+                auto forms(readExprList());
                 if (forms.size() == 4) {
-                    CodeNode::SharedPtrList::iterator iter = forms.begin();
-                    CodeNode::SharedPtr decl(*iter++);
-                    CodeNode::SharedPtr cond(*iter++);
-                    CodeNode::SharedPtr next(*iter++);
-                    CodeNode::SharedPtr body(*iter++);
+                    auto iter = forms.begin();
+                    auto decl(*iter++);
+                    auto cond(*iter++);
+                    auto next(*iter++);
+                    auto body(*iter++);
                     return std::make_shared<Loop>(decl, cond, next, body);
                 }
                 else if (forms.size() == 2) {
-                    CodeNode::SharedPtrList::iterator iter = forms.begin();
-                    CodeNode::SharedPtr cond(*iter++);
-                    CodeNode::SharedPtr body(*iter++);
+                    auto iter = forms.begin();
+                    auto cond(*iter++);
+                    auto body(*iter++);
                     return std::make_shared<Loop>(cond, body);
                 }
                 else {
-                    throw InvalidExpression("Too many/few forms in loop");
+                    throw TooManyOrFewForms("loop");
                 }
           }
         },
 
         { "lambda",
           [this]() {
-                CodeNode::ParamList params(readParams());
-                CodeNode::SharedPtrList exprs(readExprList());
-                CodeNode::SharedPtr body(exprs.size() == 1 ? exprs[0] : std::make_shared<ProgN>(exprs));
+                auto params(readParams());
+                auto exprs(readExprList());
+                auto body(exprs.size() == 1
+                          ? exprs[0]
+                          : std::make_shared<ProgN>(exprs));
                 return std::make_shared<LambdaExpr>(params, body);
           }
         },
 
         { "defun",
           [this]() {
-                const std::string name(readName());
-                CodeNode::ParamList params(readParams());
-                CodeNode::SharedPtrList exprs(readExprList());
-                CodeNode::SharedPtr body(exprs.size() == 1 ? exprs[0] : std::make_shared<ProgN>(exprs));
+                const auto name(readName());
+                auto params(readParams());
+                auto exprs(readExprList());
+                auto body(exprs.size() == 1
+                          ? exprs[0]
+                          : std::make_shared<ProgN>(exprs));
                 return std::make_shared<FunctionExpr>(name, params, body);
           }
         },
 
         { "(",
           [this]() {
-                CodeNode::SharedPtr lambda(readApp("lambda"));
-                CodeNode::SharedPtrList args(readExprList());
+                auto lambda(readApp("lambda"));
+                auto args(readExprList());
                 return std::make_shared<LambdaApp>(lambda, args);
           }
         },
 
         { "istypeof",
           [this]() {
-                CodeNode::SharedPtr form(readExpr());
-                Value::Type type(Value::stringToType(readName()));
+                auto form(readExpr());
+                auto type(Value::stringToType(readName()));
                 ignoreRightP();
                 return std::make_shared<IsType>(form, type);
           }
@@ -434,20 +433,15 @@ void Parser::initAppFtns() {
 
         { "typename",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
-                if (exprs.size() == 1) {
-                    return std::make_shared<TypeName>(exprs[0]);
-                }
-                else {
-                    throw InvalidExpression("Too many/few arguments to typename");
-                }
+                auto exprs(readAndCheckExprList("typename", 1));
+                return std::make_shared<TypeName>(exprs[0]);
           }
         },
 
         { "astype",
           [this]() {
-                CodeNode::SharedPtr form(readExpr());
-                Value::Type type(Value::stringToType(readName()));
+                auto form(readExpr());
+                auto type(Value::stringToType(readName()));
                 ignoreRightP();
                 return std::make_shared<AsType>(form, type);
           }
@@ -455,17 +449,15 @@ void Parser::initAppFtns() {
 
         { "print",
           [this]() {
-                CodeNode::SharedPtr pExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<Print>(false, pExpr);
+                auto exprs(readAndCheckExprList("print", 1));
+                return std::make_shared<Print>(false, exprs[0]);
           }
         },
 
         { "println",
           [this]() {
-                CodeNode::SharedPtr pExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<Print>(true, pExpr);
+                auto exprs(readAndCheckExprList("println", 1));
+                return std::make_shared<Print>(true, exprs[0]);
           }
         },
 
@@ -478,8 +470,8 @@ void Parser::initAppFtns() {
 
         { "struct",
           [this]() {
-                const std::string name(readName());
-                const Struct::MemberList members(readParams());
+                const auto name(readName());
+                const auto members(readParams());
                 ignoreRightP();
                 return std::make_shared<StructExpr>(name, members);
           }
@@ -487,8 +479,8 @@ void Parser::initAppFtns() {
 
         { "isstructname",
           [this]() {
-                CodeNode::SharedPtr snExpr(readExpr());
-                const std::string name(readName());
+                auto snExpr(readExpr());
+                const auto name(readName());
                 ignoreRightP();
                 return std::make_shared<IsStructName>(snExpr, name);
           }
@@ -496,19 +488,14 @@ void Parser::initAppFtns() {
 
         { "structname",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
-                if (exprs.size() == 1) {
-                    return std::make_shared<StructName>(exprs[0]);
-                }
-                else {
-                    throw InvalidExpression("Too many/few arguments to structname");
-                }
+                auto exprs(readAndCheckExprList("structname", 1));
+                return std::make_shared<StructName>(exprs[0]);
           }
         },
 
         { "makeinstance",
           [this]() {
-                const std::string name(readName());
+                const auto name(readName());
                 ignoreRightP();
                 return std::make_shared<MakeInstance>(name);
           }
@@ -516,8 +503,8 @@ void Parser::initAppFtns() {
 
         { "isinstanceof",
           [this]() {
-                CodeNode::SharedPtr ioExpr(readExpr());
-                const std::string name(readName());
+                auto ioExpr(readExpr());
+                const auto name(readName());
                 ignoreRightP();
                 return std::make_shared<IsInstanceOf>(ioExpr, name);
           }
@@ -525,8 +512,8 @@ void Parser::initAppFtns() {
 
         { "memget",
           [this]() {
-                CodeNode::SharedPtr instExpr(readExpr());
-                const std::string name(readName());
+                auto instExpr(readExpr());
+                const auto name(readName());
                 ignoreRightP();
                 return std::make_shared<GetMember>(instExpr, name);
           }
@@ -534,9 +521,9 @@ void Parser::initAppFtns() {
 
         { "memset",
           [this]() {
-                CodeNode::SharedPtr instExpr(readExpr());
-                const std::string name(readName());
-                CodeNode::SharedPtr valueExpr(readExpr());
+                auto instExpr(readExpr());
+                const auto name(readName());
+                auto valueExpr(readExpr());
                 ignoreRightP();
                 return std::make_shared<SetMember>(instExpr, name, valueExpr);
           }
@@ -544,43 +531,35 @@ void Parser::initAppFtns() {
 
         { "strlen",
           [this]() {
-                CodeNode::SharedPtr strExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<StringLen>(strExpr);
+                auto exprs(readAndCheckExprList("strlen", 1));
+                return std::make_shared<StringLen>(exprs[0]);
           }
         },
 
         { "strget",
           [this]() {
-                CodeNode::SharedPtr strExpr(readExpr());
-                CodeNode::SharedPtr posExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<StringGet>(strExpr, posExpr);
+                auto exprs(readAndCheckExprList("strget", 2));
+                return std::make_shared<StringGet>(exprs[0], exprs[1]);
           }
         },
 
         { "strset",
           [this]() {
-                CodeNode::SharedPtr strExpr(readExpr());
-                CodeNode::SharedPtr posExpr(readExpr());
-                CodeNode::SharedPtr valExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<StringSet>(strExpr, posExpr, valExpr);
+                auto exprs(readAndCheckExprList("strset", 3));
+                return std::make_shared<StringSet>(exprs[0], exprs[1], exprs[2]);
           }
         },
 
         { "strcat",
           [this]() {
-                CodeNode::SharedPtr strExpr(readExpr());
-                CodeNode::SharedPtr otherExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<StringCat>(strExpr, otherExpr);
+                auto exprs(readAndCheckExprList("strcat", 2));
+                return std::make_shared<StringCat>(exprs[0], exprs[1]);
           }
         },
 
         { "substr",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
+                auto exprs(readExprList());
                 if (exprs.size() == 2) {
                     return std::make_shared<SubString>(exprs[0], exprs[1]);
                 }
@@ -588,14 +567,14 @@ void Parser::initAppFtns() {
                     return std::make_shared<SubString>(exprs[0], exprs[1], exprs[2]);
                 }
                 else {
-                    throw InvalidExpression("Too many/few arguments to substr");
+                    throw TooManyOrFewForms("substr");
                 }
           }
         },
 
         { "strfind",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
+                auto exprs(readExprList());
                 if (exprs.size() == 2) {
                     return std::make_shared<StringFind>(exprs[0], exprs[1]);
                 }
@@ -603,26 +582,21 @@ void Parser::initAppFtns() {
                     return std::make_shared<StringFind>(exprs[0], exprs[1], exprs[2]);
                 }
                 else {
-                    throw InvalidExpression("Too many/few arguments to strfind");
+                    throw TooManyOrFewForms("strfind");
                 }
           }
         },
 
         { "strcount",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
-                if (exprs.size() == 2) {
-                    return std::make_shared<StringCount>(exprs[0], exprs[1]);
-                }
-                else {
-                    throw InvalidExpression("Too many/few arguments to strcount");
-                }
+                auto exprs(readAndCheckExprList("strcount", 2));
+                return std::make_shared<StringCount>(exprs[0], exprs[1]);
           }
         },
 
         { "array",
           [this]() {
-                CodeNode::SharedPtrList valueExprs(readExprList());
+                auto valueExprs(readExprList());
                 if (valueExprs.size() == 0) {
                     return std::make_shared<MakeArray>();
                 }
@@ -634,7 +608,7 @@ void Parser::initAppFtns() {
 
         { "arraysv",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
+                auto exprs(readExprList());
                 if (exprs.size() == 1) {
                     return std::make_shared<MakeArraySV>(exprs[0]);
                 }
@@ -642,50 +616,42 @@ void Parser::initAppFtns() {
                     return std::make_shared<MakeArraySV>(exprs[0], exprs[1]);
                 }
                 else {
-                    throw InvalidExpression("Too many/few arguments to arraysv");
+                    throw TooManyOrFewForms("arraysv");
                 }
           }
         },
 
         { "arrlen",
           [this]() {
-                CodeNode::SharedPtr strExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArrayLen>(strExpr);
+                auto exprs(readAndCheckExprList("arrlen", 1));
+                return std::make_shared<ArrayLen>(exprs[0]);
           }
         },
 
         { "arrget",
           [this]() {
-                CodeNode::SharedPtr arrExpr(readExpr());
-                CodeNode::SharedPtr posExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArrayGet>(arrExpr, posExpr);
+                auto exprs(readAndCheckExprList("arrget", 2));
+                return std::make_shared<ArrayGet>(exprs[0], exprs[1]);
           }
         },
 
         { "arrset",
           [this]() {
-                CodeNode::SharedPtr arrExpr(readExpr());
-                CodeNode::SharedPtr posExpr(readExpr());
-                CodeNode::SharedPtr valExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArraySet>(arrExpr, posExpr, valExpr);
+                auto exprs(readAndCheckExprList("arrset", 3));
+                return std::make_shared<ArraySet>(exprs[0], exprs[1], exprs[2]);
           }
         },
 
         { "arradd",
           [this]() {
-                CodeNode::SharedPtr arrExpr(readExpr());
-                CodeNode::SharedPtr valExpr(readExpr());
-                ignoreRightP();
-                return std::make_shared<ArrayAdd>(arrExpr, valExpr);
+                auto exprs(readAndCheckExprList("arradd", 2));
+                return std::make_shared<ArrayAdd>(exprs[0], exprs[1]);
           }
         },
 
         { "arrfind",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
+                auto exprs(readExprList());
                 if (exprs.size() == 2) {
                     return std::make_shared<ArrayFind>(exprs[0], exprs[1]);
                 }
@@ -693,20 +659,15 @@ void Parser::initAppFtns() {
                     return std::make_shared<ArrayFind>(exprs[0], exprs[1], exprs[2]);
                 }
                 else {
-                    throw InvalidExpression("Too many/few arguments to arrfind");
+                    throw TooManyOrFewForms("arrfind");
                 }
           }
         },
 
         { "arrcount",
           [this]() {
-                CodeNode::SharedPtrList exprs(readExprList());
-                if (exprs.size() == 2) {
-                    return std::make_shared<ArrayCount>(exprs[0], exprs[1]);
-                }
-                else {
-                    throw InvalidExpression("Too many/few arguments to arrcount");
-                }
+                auto exprs(readAndCheckExprList("arrcount", 2));
+                return std::make_shared<ArrayCount>(exprs[0], exprs[1]);
           }
         }
     };
