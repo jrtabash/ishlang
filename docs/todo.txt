@@ -1,4 +1,89 @@
+* Rename type checking functions:
+  - istypeof => type?
+  - isstructname => struct?
+  - isinstanceof => instance?
+
+* Rename substr to strsub in order to be
+  consistent with other string function names
+
 * Add support for file IO
+  Add file type
+  File functions
+  - fopen
+  - fclose
+  - fflush
+  - fread
+  - fwrite
+  - fget
+  - fput
+  - fgetline
+  - ftell
+  - fseek
+  File constants
+  - stdin
+  - stdout
+  - stderr
+
+* Implement built-in data structures:
+  List:
+  - list
+  - lislen
+  - lisfront
+  - lisback
+  - lispushf
+  - lispopf
+  - lispushb
+  - lispopb
+  - lisget
+  - lisset
+  - lisadd
+  - lisinsert
+  - lisfind
+  - liscount
+  - lissort
+  - lisrev
+  Hash table
+  - hashtable
+  - haslen
+  - has?
+  - hasget
+  - hasset
+  - hasfind
+  - hascount
+  Ordered table
+  - orderedtable
+  - ordlen
+  - ordget
+  - ordset
+  - ordfind
+  - ordcount
+
+* Add character functions
+  - chaupp? : check if character is upper case
+  - chalow? : check if character is lower case
+  - chaalp? : check if character is alphabatic
+  - chanum? : check if character is numeric
+  - chaaln? : check if character is alphanumeric
+  - chapct? : check if character is punctuation
+  - chaupp  : convert to upper case
+  - chalow  : convert to lower case
+
+* Add string functions:
+  - strsort : sort string
+  - strrev  : reverse string
+  - strcmp  : compare strings
+  - strupp  : convert to upper case
+  - strlow  : convert to lower case
+  - strupp? : check if all upper case
+  - strlow? : check if all lower case
+  - stralp? : check if all alphabetic
+  - strnum? : check if all numeric
+  - straln? : check if all alphanumeric
+  - strpct? : check if all punctuation
+
+* Add array functions
+  - arrsort
+  - arrrev
 
 * Add generic functions
   - Add generic get function with support for instances, strings and arrays
@@ -6,11 +91,11 @@
   - Add generic len function with support for strings and arrays
   - Add generic find function with support for strings and arrays
   - Add generic count function with support for strings and arrays
+  - Note: Should work with future types; list, hashtable and ordered table
 
-* Implement built-in data structures:
-  - List
-  - Hash table
-  - Ordered table
+* Add generic sort and reverse functions for string, array and list (future) types:
+  - sort(sequence, key=null, asc=true)
+  - reverse(sequence)
 
 * Add rand function that returns a random integer between 0 and
   a max value
