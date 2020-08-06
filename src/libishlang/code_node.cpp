@@ -69,7 +69,7 @@ Value ArithOp::exec(Environment::SharedPtr env) {
         if (!lhsVal.isNumber()) { throw InvalidOperandType("Number", lhsVal.typeToString()); }
         if (!rhsVal.isNumber()) { throw InvalidOperandType("Number", rhsVal.typeToString()); }
 
-        const bool real = lhsVal.isReal() || rhsVal.isReal() ? true : false;
+        const bool real = lhsVal.isReal() || rhsVal.isReal();
         switch (type_) {
         case Add:
             if (real) { return Value(lhsVal.real() + rhsVal.real()); }
