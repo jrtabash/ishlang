@@ -3,9 +3,6 @@
   - isstructname => struct?
   - isinstanceof => instance?
 
-* Rename substr to strsub in order to be
-  consistent with other string function names
-
 * Add support for file IO
   Add file type
   File functions
