@@ -27,7 +27,7 @@ namespace Ishlang {
             if (!env.get()) { throw NullEnvironment(); }
             return this->exec(env);
         }
-        
+
         virtual Value exec(Environment::SharedPtr env) = 0;
     };
     
@@ -99,7 +99,7 @@ namespace Ishlang {
         Define(const std::string &name, CodeNode::SharedPtr code) : CodeNode(), name_(name), code_(code) {}
         virtual ~Define() {}
         
-        virtual Value exec(Environment::SharedPtr env) { return env->def(name_, code_ ? code_->exec(env) : Value::Null); }
+        virtual Value exec(Environment::SharedPtr env) { return env->def(name_, code_ ? code_->eval(env) : Value::Null); }
 
     private:
         std::string         name_;
@@ -112,7 +112,7 @@ namespace Ishlang {
         Assign(const std::string &name, CodeNode::SharedPtr code) : CodeNode(), name_(name), code_(code) {}
         virtual ~Assign() {}
 
-        virtual Value exec(Environment::SharedPtr env) { return env->set(name_, code_ ? code_->exec(env) : Value::Null); }
+        virtual Value exec(Environment::SharedPtr env) { return env->set(name_, code_ ? code_->eval(env) : Value::Null); }
         
     private:
         std::string         name_;
@@ -137,7 +137,7 @@ namespace Ishlang {
         Clone(CodeNode::SharedPtr code) : CodeNode(), code_(code) {}
         virtual ~Clone() {}
 
-        virtual Value exec(Environment::SharedPtr env) { return code_->exec(env).clone(); }
+        virtual Value exec(Environment::SharedPtr env) { return code_->eval(env).clone(); }
 
     private:
         CodeNode::SharedPtr code_;
