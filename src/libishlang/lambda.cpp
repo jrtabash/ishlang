@@ -24,7 +24,7 @@ Value Lambda::exec(const ArgList &args) const {
             lambdaEnv->def(*pIter, *aIter);
         }
 
-        return body_->exec(lambdaEnv);
+        return body_->eval(lambdaEnv);
     }
     return Value::Null;
 }

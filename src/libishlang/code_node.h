@@ -28,6 +28,7 @@ namespace Ishlang {
             return this->exec(env);
         }
 
+    protected:
         virtual Value exec(Environment::SharedPtr env) = 0;
     };
     
@@ -37,6 +38,7 @@ namespace Ishlang {
         Literal(const Value &value) : CodeNode(), value_(value) {}
         virtual ~Literal() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr /*env*/) { return value_; }
 
     private:
@@ -49,6 +51,7 @@ namespace Ishlang {
         IsType(CodeNode::SharedPtr expr, Value::Type type);
         virtual ~IsType() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -62,6 +65,7 @@ namespace Ishlang {
         TypeName(CodeNode::SharedPtr expr);
         virtual ~TypeName() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -74,6 +78,7 @@ namespace Ishlang {
         AsType(CodeNode::SharedPtr expr, Value::Type type);
         virtual ~AsType() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -87,6 +92,7 @@ namespace Ishlang {
         Variable(const std::string &name) : CodeNode(), name_(name) {}
         virtual ~Variable() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env) { return env->get(name_); }
         
     private:
@@ -99,6 +105,7 @@ namespace Ishlang {
         Define(const std::string &name, CodeNode::SharedPtr code) : CodeNode(), name_(name), code_(code) {}
         virtual ~Define() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr env) { return env->def(name_, code_ ? code_->eval(env) : Value::Null); }
 
     private:
@@ -112,6 +119,7 @@ namespace Ishlang {
         Assign(const std::string &name, CodeNode::SharedPtr code) : CodeNode(), name_(name), code_(code) {}
         virtual ~Assign() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env) { return env->set(name_, code_ ? code_->eval(env) : Value::Null); }
         
     private:
@@ -125,6 +133,7 @@ namespace Ishlang {
         Exists(const std::string &name) : name_(name) {}
         virtual ~Exists() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env) { return Value(env->exists(name_)); }
 
     private:
@@ -137,6 +146,7 @@ namespace Ishlang {
         Clone(CodeNode::SharedPtr code) : CodeNode(), code_(code) {}
         virtual ~Clone() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env) { return code_->eval(env).clone(); }
 
     private:
@@ -149,6 +159,7 @@ namespace Ishlang {
         BinaryOp(CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs) : lhs_(lhs), rhs_(rhs) {}
         virtual ~BinaryOp() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr env) = 0;
         
     protected:
@@ -172,6 +183,7 @@ namespace Ishlang {
         ArithOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs);
         virtual ~ArithOp() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr env);
         
     private:
@@ -194,6 +206,7 @@ namespace Ishlang {
         CompOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs);
         virtual ~CompOp() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr env);
         
     private:
@@ -212,6 +225,7 @@ namespace Ishlang {
         LogicOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs);
         virtual ~LogicOp() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr env);
         
     private:
@@ -224,6 +238,7 @@ namespace Ishlang {
         Not(CodeNode::SharedPtr operand);
         virtual ~Not() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -236,6 +251,7 @@ namespace Ishlang {
         ProgN(CodeNode::SharedPtrList exprs);
         virtual ~ProgN() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr env);
         
     private:
@@ -248,6 +264,7 @@ namespace Ishlang {
         Block(CodeNode::SharedPtrList exprs);
         virtual ~Block() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr env);
     };
 
@@ -258,6 +275,7 @@ namespace Ishlang {
         If(CodeNode::SharedPtr pred, CodeNode::SharedPtr tCode, CodeNode::SharedPtr fCode);
         virtual ~If() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr env);
         
     private:
@@ -272,6 +290,7 @@ namespace Ishlang {
         Cond(CodeNode::SharedPtrPairs cases);
         virtual ~Cond() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr env);
         
     private:
@@ -287,6 +306,7 @@ namespace Ishlang {
         Break() {}
         virtual ~Break() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr /*env*/) { throw Except(); }
     };
 
@@ -297,6 +317,7 @@ namespace Ishlang {
         Loop(CodeNode::SharedPtr cond, CodeNode::SharedPtr body);
         virtual ~Loop() {}
         
+    protected:
         virtual Value exec(Environment::SharedPtr env);
         
     private:
@@ -312,6 +333,7 @@ namespace Ishlang {
         LambdaExpr(const ParamList &params, CodeNode::SharedPtr body);
         virtual ~LambdaExpr() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -325,6 +347,7 @@ namespace Ishlang {
         LambdaApp(CodeNode::SharedPtr closure, SharedPtrList args);
         virtual ~LambdaApp() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -341,6 +364,7 @@ namespace Ishlang {
         FunctionExpr(const std::string &name, const ParamList &params, CodeNode::SharedPtr body);
         virtual ~FunctionExpr() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -353,6 +377,7 @@ namespace Ishlang {
         FunctionApp(const std::string &name, SharedPtrList args);
         virtual ~FunctionApp() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -365,6 +390,7 @@ namespace Ishlang {
         Print(bool newline, CodeNode::SharedPtr expr);
         virtual ~Print() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -378,6 +404,7 @@ namespace Ishlang {
         Read();
         virtual ~Read() {};
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
     };
 
@@ -387,6 +414,7 @@ namespace Ishlang {
         StructExpr(const std::string &name, const Struct::MemberList &members);
         virtual ~StructExpr() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -399,6 +427,7 @@ namespace Ishlang {
         IsStructName(CodeNode::SharedPtr expr, const std::string &name);
         virtual ~IsStructName() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -412,6 +441,7 @@ namespace Ishlang {
         StructName(CodeNode::SharedPtr expr);
         virtual ~StructName() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -424,6 +454,7 @@ namespace Ishlang {
         MakeInstance(const std::string &name);
         virtual ~MakeInstance() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -436,6 +467,7 @@ namespace Ishlang {
         IsInstanceOf(CodeNode::SharedPtr expr, const std::string &name);
         virtual ~IsInstanceOf() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -449,6 +481,7 @@ namespace Ishlang {
         GetMember(CodeNode::SharedPtr expr, const std::string &name);
         virtual ~GetMember() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -462,6 +495,7 @@ namespace Ishlang {
         SetMember(CodeNode::SharedPtr expr, const std::string &name, CodeNode::SharedPtr newValExpr);
         virtual ~SetMember() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -476,6 +510,7 @@ namespace Ishlang {
         StringLen(CodeNode::SharedPtr expr);
         virtual ~StringLen() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -488,6 +523,7 @@ namespace Ishlang {
         StringGet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos);
         virtual ~StringGet() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -501,6 +537,7 @@ namespace Ishlang {
         StringSet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr val);
         virtual ~StringSet() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -515,6 +552,7 @@ namespace Ishlang {
         StringCat(CodeNode::SharedPtr str, CodeNode::SharedPtr other);
         virtual ~StringCat() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -529,6 +567,7 @@ namespace Ishlang {
         SubString(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr len);
         virtual ~SubString() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -544,6 +583,7 @@ namespace Ishlang {
         StringFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr, CodeNode::SharedPtr pos);
         virtual ~StringFind() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -558,6 +598,7 @@ namespace Ishlang {
         StringCount(CodeNode::SharedPtr str, CodeNode::SharedPtr chr);
         virtual ~StringCount() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -572,6 +613,7 @@ namespace Ishlang {
         MakeArray(CodeNode::SharedPtrList values);
         virtual ~MakeArray() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -586,6 +628,7 @@ namespace Ishlang {
         MakeArraySV(CodeNode::SharedPtr size, CodeNode::SharedPtr initValue);
         virtual ~MakeArraySV() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -599,6 +642,7 @@ namespace Ishlang {
         ArrayLen(CodeNode::SharedPtr expr);
         virtual ~ArrayLen() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -611,6 +655,7 @@ namespace Ishlang {
         ArrayGet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos);
         virtual ~ArrayGet() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -624,6 +669,7 @@ namespace Ishlang {
         ArraySet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeNode::SharedPtr val);
         virtual ~ArraySet() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -638,6 +684,7 @@ namespace Ishlang {
         ArrayAdd(CodeNode::SharedPtr arr, CodeNode::SharedPtr val);
         virtual ~ArrayAdd() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -652,6 +699,7 @@ namespace Ishlang {
         ArrayFind(CodeNode::SharedPtr str, CodeNode::SharedPtr val, CodeNode::SharedPtr pos);
         virtual ~ArrayFind() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
@@ -666,6 +714,7 @@ namespace Ishlang {
         ArrayCount(CodeNode::SharedPtr arr, CodeNode::SharedPtr val);
         virtual ~ArrayCount() {}
 
+    protected:
         virtual Value exec(Environment::SharedPtr env);
 
     private:
