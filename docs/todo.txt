@@ -1,8 +1,3 @@
-* Rename type checking functions:
-  - istypeof => type?
-  - isstructname => struct?
-  - isinstanceof => instance?
-
 * Add support for file IO
   Add file type
   File functions
@@ -42,7 +37,7 @@
   Hash table
   - hashtable
   - haslen
-  - has?
+  - hasexists
   - hasget
   - hasset
   - hasfind
@@ -55,28 +50,21 @@
   - ordfind
   - ordcount
 
-* Add character functions
-  - chaupp? : check if character is upper case
-  - chalow? : check if character is lower case
-  - chaalp? : check if character is alphabatic
-  - chanum? : check if character is numeric
-  - chaaln? : check if character is alphanumeric
-  - chapct? : check if character is punctuation
-  - chaupp  : convert to upper case
-  - chalow  : convert to lower case
+* Add character and string functions
+  - isupper
+  - islower
+  - isalpha
+  - isnumer
+  - isalnum
+  - ispunct
+  - isspace
+  - toupper
+  - tolower
 
-* Add string functions:
-  - strsort : sort string
-  - strrev  : reverse string
-  - strcmp  : compare strings
-  - strupp  : convert to upper case
-  - strlow  : convert to lower case
-  - strupp? : check if all upper case
-  - strlow? : check if all lower case
-  - stralp? : check if all alphabetic
-  - strnum? : check if all numeric
-  - straln? : check if all alphanumeric
-  - strpct? : check if all punctuation
+* Add string functions
+  - strsort
+  - strrev
+  - strcmp
 
 * Add array functions
   - arrsort
