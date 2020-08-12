@@ -51,13 +51,6 @@
   - ordcount
 
 * Add character and string functions
-  - isupper
-  - islower
-  - isalpha
-  - isnumer
-  - isalnum
-  - ispunct
-  - isspace
   - toupper
   - tolower
 

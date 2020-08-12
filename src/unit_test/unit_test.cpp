@@ -68,6 +68,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArrayAdd);
     ADD_TEST(testCodeNodeArrayFind);
     ADD_TEST(testCodeNodeArrayCount);
+    ADD_TEST(testCodeNodeStrCharCheck);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -107,6 +108,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArrayAdd);
     ADD_TEST(testParserArrayFind);
     ADD_TEST(testParserArrayCount);
+    ADD_TEST(testParserStrCharCheck);
 }
 #undef ADD_TEST
 
@@ -2840,6 +2842,82 @@ void UnitTest::testCodeNodeArrayCount() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeStrCharCheck() {
+    Environment::SharedPtr env(new Environment());
+
+    const Value cUp = Value('U');
+    const Value cLo = Value('l');
+    const Value cNm = Value('5');
+    const Value cPt = Value('?');
+    const Value cSp = Value(' ');
+
+    const Value sUp = Value("UPP");
+    const Value sLo = Value("low");
+    const Value sNm = Value("123");
+    const Value sPt = Value("@?!");
+    const Value sSp = Value(" \t\n");
+    const Value mix = Value("Ul5? ");
+
+    auto lit = [](const Value &val) { return std::make_shared<Literal>(val); };
+    auto check = [lit](StrCharCheck::Type chkType, const Value &val) {
+        return std::make_shared<StrCharCheck>(chkType, lit(val));
+    };
+
+    Value value;
+
+    value = check(StrCharCheck::Upper, cUp)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Lower, cLo)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Alpha, cLo)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Numer, cNm)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Alnum, cLo)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Alnum, cNm)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Punct, cPt)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Space, cSp)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+
+    value = check(StrCharCheck::Upper, cLo)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Lower, cUp)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Alpha, cNm)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Numer, cUp)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Alnum, cPt)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Punct, cSp)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Space, cPt)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+
+    value = check(StrCharCheck::Upper, sUp)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Lower, sLo)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Alpha, sLo)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Numer, sNm)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Alnum, sLo)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Alnum, sNm)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Punct, sPt)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+    value = check(StrCharCheck::Space, sSp)->eval(env); TEST_CASE_MSG(value == Value::True, "actual=" << value);
+
+    value = check(StrCharCheck::Upper, sLo)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Lower, sUp)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Alpha, sNm)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Numer, sUp)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Alnum, sPt)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Punct, sSp)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Space, sPt)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+
+    value = check(StrCharCheck::Upper, mix)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Lower, mix)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Alpha, mix)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Numer, mix)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Alnum, mix)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Punct, mix)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    value = check(StrCharCheck::Space, mix)->eval(env); TEST_CASE_MSG(value == Value::False, "actual=" << value);
+
+    try {
+        check(StrCharCheck::Upper, Value(5ll))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -3559,4 +3637,72 @@ void UnitTest::testParserArrayCount() {
     TEST_CASE(parserTest(parser, env, "(arrcount '5' 0)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(arrcount)",       Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(arrcount arr)",   Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserStrCharCheck() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("cUp", Value('U'));
+    env->def("cLo", Value('l'));
+    env->def("cNm", Value('5'));
+    env->def("cPt", Value('?'));
+    env->def("cSp", Value(' '));
+    env->def("sUp", Value("UPP"));
+    env->def("sLo", Value("low"));
+    env->def("sNm", Value("123"));
+    env->def("sPt", Value("@?!"));
+    env->def("sSp", Value(" \t\n"));
+    env->def("mix", Value("Ul5? "));
+
+    TEST_CASE(parserTest(parser, env, "(isupper cUp)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(islower cLo)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(isalpha cLo)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(isnumer cNm)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(isalnum cLo)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(isalnum cNm)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(ispunct cPt)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(isspace cSp)", Value::True, true));
+
+    TEST_CASE(parserTest(parser, env, "(isupper cLo)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(islower cUp)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isalpha cNm)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnumer cLo)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isalnum cPt)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(ispunct cSp)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isspace cPt)", Value::False, true));
+
+    TEST_CASE(parserTest(parser, env, "(isupper sUp)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(islower sLo)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(isalpha sLo)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(isnumer sNm)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(isalnum sLo)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(isalnum sNm)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(ispunct sPt)", Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(isspace sSp)", Value::True, true));
+
+    TEST_CASE(parserTest(parser, env, "(isupper sLo)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(islower sUp)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isalpha sNm)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnumer sLo)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isalnum sPt)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(ispunct sSp)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isspace sPt)", Value::False, true));
+
+    TEST_CASE(parserTest(parser, env, "(isupper mix)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(islower mix)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isalpha mix)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnumer mix)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isalnum mix)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(ispunct mix)", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isspace mix)", Value::False, true));
+
+    TEST_CASE(parserTest(parser, env, "(isupper 5)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(islower 5)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(isalpha 5)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(isnumer 5)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(isalnum 5)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(ispunct 5)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(isspace 5)", Value::Null, false));
 }

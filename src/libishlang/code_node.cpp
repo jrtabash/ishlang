@@ -8,6 +8,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <cctype>
 
 using namespace Ishlang;
 
@@ -925,4 +926,44 @@ Value ArrayCount::exec(Environment::SharedPtr env) {
         return Value(Value::Long(arr.array().count(val)));
     }
     return Value::Null;
+}
+
+// -------------------------------------------------------------
+StrCharCheck::StrCharCheck(Type type, CodeNode::SharedPtr operand)
+    : CodeNode()
+    , type_(type)
+    , operand_(operand)
+    , ftn_(typeToCheckFtn(type))
+{
+}
+
+Value StrCharCheck::exec(Environment::SharedPtr env) {
+    if (operand_.get()) {
+        const Value value = operand_->eval(env);
+
+        if (!value.isChar() && !value.isString()) { throw InvalidOperandType("Character|String", value.typeToString()); }
+
+        if (value.isString()) {
+            auto const & str = value.text();
+            return Value(std::all_of(str.begin(), str.end(), ftn_));
+        }
+        else {
+            return Value(ftn_(value.character()));
+        }
+    }
+    return Value::Null;
+}
+
+StrCharCheck::CheckFtn StrCharCheck::typeToCheckFtn(Type type) {
+    switch (type) {
+    case Upper: return [](unsigned char c) { return std::isupper(c); };
+    case Lower: return [](unsigned char c) { return std::islower(c); };
+    case Alpha: return [](unsigned char c) { return std::isalpha(c); };
+    case Numer: return [](unsigned char c) { return std::isdigit(c); };
+    case Alnum: return [](unsigned char c) { return std::isalnum(c); };
+    case Punct: return [](unsigned char c) { return std::ispunct(c); };
+    case Space: return [](unsigned char c) { return std::isspace(c); };
+    }
+
+    throw InvalidExpression("unknown string/character check type", std::string(1, char(type)));
 }

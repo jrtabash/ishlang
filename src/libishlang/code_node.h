@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include <functional>
 
 namespace Ishlang {
 
@@ -720,6 +721,37 @@ namespace Ishlang {
     private:
         CodeNode::SharedPtr arr_;
         CodeNode::SharedPtr val_;
+    };
+
+    // -------------------------------------------------------------
+    class StrCharCheck : public CodeNode {
+    public:
+        using CheckFtn = std::function<bool (unsigned char)>;
+
+        enum Type {
+            Upper = 'u',
+            Lower = 'l',
+            Alpha = 'a',
+            Numer = 'n',
+            Alnum = 'm',
+            Punct = 'p',
+            Space = 's',
+        };
+
+    public:
+        StrCharCheck(Type type, CodeNode::SharedPtr operand);
+        virtual ~StrCharCheck() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        static CheckFtn typeToCheckFtn(Type type);
+
+    private:
+        Type type_;
+        CodeNode::SharedPtr operand_;
+        CheckFtn ftn_;
     };
 
 }

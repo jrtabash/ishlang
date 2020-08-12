@@ -669,6 +669,14 @@ void Parser::initAppFtns() {
                 auto exprs(readAndCheckExprList("arrcount", 2));
                 return std::make_shared<ArrayCount>(exprs[0], exprs[1]);
           }
-        }
+        },
+
+        { "isupper", MakeStrCharCheck("isupper", *this, StrCharCheck::Upper) },
+        { "islower", MakeStrCharCheck("islower", *this, StrCharCheck::Lower) },
+        { "isalpha", MakeStrCharCheck("isalpha", *this, StrCharCheck::Alpha) },
+        { "isnumer", MakeStrCharCheck("isnumer", *this, StrCharCheck::Numer) },
+        { "isalnum", MakeStrCharCheck("isalnum", *this, StrCharCheck::Alnum) },
+        { "ispunct", MakeStrCharCheck("ispunct", *this, StrCharCheck::Punct) },
+        { "isspace", MakeStrCharCheck("isspace", *this, StrCharCheck::Space) }
     };
 }

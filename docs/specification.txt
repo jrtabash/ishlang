@@ -375,6 +375,55 @@ Examples:
   (println (strfind str 'W'))
   (println (strcount str 'l'))
 
+String / Character Operations
+-----------------------------
+isupper: Check upper case
+         (isupper <character>)
+         (isupper <string>)
+
+islower: Check lower case
+         (islower <character>)
+         (islower <string>)
+
+isalpha: Check alphabet
+         (isalpha <character>)
+         (isalpha <string>)
+
+isnumer: Check numeric/digit
+         (isnumer <character>)
+         (isnumer <string>)
+
+isalnum: Check alphabet or numeric/digit
+         (isalnum <character>)
+         (isalnum <string>)
+
+ispunct: Check punctuation
+         (ispunct <character>)
+         (ispunct <string>)
+
+isspace: Check space
+         (isspace <character>)
+         (isspace <string>)
+
+The string check operations will return true if
+the check is true for every character in the string.
+
+Examples:
+  (var c 'U')
+  (var s "UPPER")
+  (var n "124")
+  (var p '?')
+  (var a ' ')
+  (isupper c)
+  (isupper s)
+  (islower c)
+  (islower s)
+  (isalpha s)
+  (isnumer n)
+  (isalnum n)
+  (ispunct p)
+  (isspace a)
+
 Array Operations
 ----------------
 array: make an array
