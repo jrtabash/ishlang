@@ -204,7 +204,7 @@ Block::Block(CodeNode::SharedPtrList exprs)
 
 Value Block::exec(Environment::SharedPtr env) {
     Environment::SharedPtr blockEnv(std::make_shared<Environment>(env));
-    return ProgN::exec(std::make_shared<Environment>(blockEnv));
+    return ProgN::exec(blockEnv);
 }
 
 // -------------------------------------------------------------
