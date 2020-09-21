@@ -1,0 +1,130 @@
+;; --------------------------------------------------------------------------------
+(struct Node (value next))
+
+(defun make_node (value next)
+  (var n (makeinstance Node))
+  (memset n value value)
+  (memset n next next)
+  n)
+
+(defun node_value (node)
+  (memget node value))
+
+(defun node_next (node)
+  (memget node next))
+
+(defun node_setValue (node value)
+  (memset node value value))
+
+(defun node_setNext (node next)
+  (memset node next next))
+
+;; --------------------------------------------------------------------------------
+(struct List (head))
+
+(defun make_list ()
+  (var list (makeinstance List))
+  (memset list head null)
+  list)
+
+(defun list_head (list)
+  (memget list head))
+
+(defun list_setHead (list node)
+  (memset list head node))
+
+(defun list_empty (list)
+  (istypeof (list_head list) none))
+
+(defun list_foreach (list ftn)
+  (unless (list_empty list)
+    (loop (var cur (list_head list)) (not (istypeof cur none)) (= cur (node_next cur))
+          (ftn cur))))
+
+(defun list_len (list)
+  (var len 0)
+  (list_foreach list (lambda (node) (= len (+ len 1))))
+  len)
+
+(defun list_last (list)
+  (var last null)
+  (list_foreach
+   list
+   (lambda (node)
+     (when (istypeof (node_next node) none)
+       (= last node))))
+  last)
+
+(defun list_append (list value)
+  (if (list_empty list)
+      (list_setHead list (make_node value null))
+    (node_setNext (list_last list) (make_node value null))))
+
+(defun list_prepend (list value)
+  (list_setHead list (make_node value (list_head list))))
+
+(defun list_remove (list value)
+  (var prev null)
+  (list_foreach
+   list
+   (lambda (node)
+     (if (== (node_value node) value)
+         (if (istypeof prev none)
+             (list_setHead list (node_next node))
+           (node_setNext prev (node_next node)))
+       (= prev node)))))
+
+(defun list_clear (list)
+  (list_setHead list null))
+
+;; --------------------------------------------------------------------------------
+(defun testList ()
+  (defun prt (msg val)
+    (print msg)
+    (print ": ")
+    (println val))
+
+  (defun prtList (msg list)
+    (var first true)
+    (print msg)
+    (print ": [")
+    (list_foreach
+     list
+     (lambda (n)
+       (unless first
+         (print ", "))
+       (print (node_value n))
+       (= first false)))
+    (println "]"))
+
+  (defun show (what list)
+    (println "----------")
+    (println what)
+    (prt "empty" (list_empty list))
+    (prt " size" (list_len list))
+    (prtList " list" list))
+
+  (var list (make_list))
+  (show "Make" list)
+  (list_append list 1)
+  (show "Append 1" list)
+  (list_append list 2)
+  (show "Append 2" list)
+  (list_append list 3)
+  (show "Append 3" list)
+  (list_prepend list 0)
+  (show "Prepend 0" list)
+  (list_append list 4)
+  (list_append list 4)
+  (list_append list 5)
+  (list_append list 4)
+  (show "Append 4 4 5 4" list)
+  (list_remove list 4)
+  (show "Remove 4" list)
+  (list_remove list 3)
+  (list_remove list 5)
+  (show "Remove 3 5" list)
+  (list_clear list)
+  (show "Clear" list))
+
+(testList)
