@@ -61,7 +61,7 @@ Binary operations: + - * / %
 Unary operation:
   (neg <expression>)
 
-The operator neg inverts sign of <expression> returning - <expression>.
+The neg operator returns the negative of <expression>.
 
 Examples:
   (+ 10 12)
