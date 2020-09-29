@@ -22,6 +22,7 @@ namespace Ishlang {
         CodeNode::SharedPtr read(const std::string &expr);
         CodeNode::SharedPtr readLiteral(const std::string &expr);
         void readMulti(const std::string &expr, CallBack callback);
+        void readFile(const std::string &filename, CallBack callback);
 
         bool hasIncompleteExpr() const { return !lexer_.empty(); }
         void clearIncompleteExpr() { lexer_.clear(); }

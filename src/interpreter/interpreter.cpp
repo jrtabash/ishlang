@@ -2,7 +2,6 @@
 #include "util.h"
 
 #include <cstdlib>
-#include <fstream>
 
 using namespace Ishlang;
 
@@ -76,7 +75,7 @@ bool Interpreter::readEvalPrintLoop() {
 // -------------------------------------------------------------
 bool Interpreter::loadFile(const std::string &filename) {
     try {
-        readFile(filename);
+        parser_.readFile(filename, parserCB_);
     }
     catch (const Exception &ex) {
         ex.printError();
@@ -90,42 +89,11 @@ bool Interpreter::loadFile(const std::string &filename) {
 }
 
 // -------------------------------------------------------------
-void Interpreter::readFile(const std::string &filename) {
-    std::ifstream ifs(filename.c_str());
-    if (!ifs.is_open()) {
-        throw UnknownFile(filename);
-    }
-
-    unsigned lineNo = 0;
-    try {
-        std::string line;
-        while (std::getline(ifs, line)) {
-            ++lineNo;
-            parser_.readMulti(line, parserCB_);
-        }
-
-        if (parser_.hasIncompleteExpr()) {
-            parser_.clearIncompleteExpr();
-            throw IncompleteExpression("Incomplete code at end of file");
-        }
-
-        ifs.close();
-    }
-    catch (Exception &ex) {
-        ifs.close();
-        ex.setFileContext(filename, lineNo);
-        throw;
-    }
-    catch (...) {
-        ifs.close();
-        throw;
-    }
-}
-
 bool Interpreter::isREPLCommand(const std::string &expr) const {
     return expr[0] == ':' && !parser_.hasIncompleteExpr();
 }
 
+// -------------------------------------------------------------
 void Interpreter::handleREPLCommand(const std::string &expr) {
     Util::TokenList cmdTokens;
 
@@ -150,7 +118,7 @@ void Interpreter::handleREPLCommand(const std::string &expr) {
         else if (size > 2) {
             throw InvalidCommand(cmd, "too many arguments");
         }
-        readFile(cmdTokens.front());
+        parser_.readFile(cmdTokens.front(), parserCB_);
     }
     else if (cmd == ":batch") {
         if (size == 1) {

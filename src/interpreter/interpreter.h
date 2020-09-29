@@ -17,9 +17,6 @@ namespace Ishlang {
         bool loadFile(const std::string &filename);
 
     private:
-        void readFile(const std::string &filename);
-
-    private:
         bool isREPLCommand(const std::string &expr) const;
         void handleREPLCommand(const std::string &expr);
 

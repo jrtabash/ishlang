@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
+#include <fstream>
 
 using namespace Ishlang;
 
@@ -53,6 +54,39 @@ void Parser::readMulti(const std::string &expr, CallBack callback) {
         if (code.get()) {
             callback(code);
         }
+    }
+}
+
+// -------------------------------------------------------------
+void Parser::readFile(const std::string &filename, CallBack callback) {
+    std::ifstream ifs(filename.c_str());
+    if (!ifs.is_open()) {
+        throw UnknownFile(filename);
+    }
+
+    unsigned lineNo = 0;
+    try {
+        std::string line;
+        while (std::getline(ifs, line)) {
+            ++lineNo;
+            readMulti(line, callback);
+        }
+
+        if (hasIncompleteExpr()) {
+            clearIncompleteExpr();
+            throw IncompleteExpression("Incomplete code at end of file " + filename);
+        }
+
+        ifs.close();
+    }
+    catch (Exception &ex) {
+        ifs.close();
+        ex.setFileContext(filename, lineNo);
+        throw;
+    }
+    catch (...) {
+        ifs.close();
+        throw;
     }
 }
 
