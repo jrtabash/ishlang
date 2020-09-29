@@ -167,7 +167,7 @@ namespace Ishlang {
         CodeNode::SharedPtr lhs_;
         CodeNode::SharedPtr rhs_;
     };
-    
+
     // -------------------------------------------------------------
     class ArithOp : public BinaryOp {
     public:
@@ -238,6 +238,19 @@ namespace Ishlang {
     public:
         Not(CodeNode::SharedPtr operand);
         virtual ~Not() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr operand_;
+    };
+
+    // -------------------------------------------------------------
+    class NegativeOf : public CodeNode {
+    public:
+        NegativeOf(CodeNode::SharedPtr operand);
+        virtual ~NegativeOf() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) override;

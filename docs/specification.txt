@@ -55,12 +55,18 @@ Input / Output
 
 Arithmetic
 ----------
-Supported operations: + - * / %
+Binary operations: + - * / %
   (<op> <expression> <expression>)
+
+Unary operation:
+  (neg <expression>)
+
+The operator neg inverts sign of <expression> returning - <expression>.
 
 Examples:
   (+ 10 12)
   (* 2 5)
+  (neg 10)
 
 Logical
 -------

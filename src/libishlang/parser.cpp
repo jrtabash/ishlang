@@ -311,6 +311,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "neg",
+          [this]() {
+              auto expr(readAndCheckExprList("neg", 1));
+              return std::make_shared<NegativeOf>(expr[0]);
+          }
+        },
+
         { "progn",
           [this]() {
                 auto exprs(readExprList());

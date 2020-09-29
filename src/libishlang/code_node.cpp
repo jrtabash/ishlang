@@ -181,6 +181,24 @@ Value Not::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+NegativeOf::NegativeOf(CodeNode::SharedPtr operand)
+    : CodeNode()
+    , operand_(operand)
+{
+}
+
+Value NegativeOf::exec(Environment::SharedPtr env) {
+    if (operand_.get()) {
+        Value operand = operand_->eval(env);
+
+        if (!operand.isNumber()) { throw InvalidOperandType("Number", operand.typeToString()); }
+
+        return operand.isInt() ? Value(-operand.integer()) : Value(-operand.real());
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 ProgN::ProgN(CodeNode::SharedPtrList exprs)
     : CodeNode()
     , exprs_(exprs)

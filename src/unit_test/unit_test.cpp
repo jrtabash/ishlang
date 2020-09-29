@@ -43,6 +43,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeCompOp);
     ADD_TEST(testCodeNodeLogicOp);
     ADD_TEST(testCodeNodeNot);
+    ADD_TEST(testCodeNodeNegativeOf);
     ADD_TEST(testCodeNodeSequence);
     ADD_TEST(testCodeNodeCond);
     ADD_TEST(testCodeNodeLoop);
@@ -82,6 +83,8 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArith);
     ADD_TEST(testParserComp);
     ADD_TEST(testParserLogic);
+    ADD_TEST(testParserNot);
+    ADD_TEST(testParserNegativeOf);
     ADD_TEST(testParserBlock);
     ADD_TEST(testParserCond);
     ADD_TEST(testParserLoop);
@@ -1657,6 +1660,31 @@ void UnitTest::testCodeNodeNot() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeNegativeOf() {
+    Environment::SharedPtr env(new Environment());
+
+    auto iVal = std::make_shared<Literal>(Value(5ll));
+    auto fVal = std::make_shared<Literal>(Value(3.5));
+
+    auto inv = [env](CodeNode::SharedPtr operand) { return std::make_shared<NegativeOf>(operand)->eval(env); };
+
+    Value value = inv(iVal);
+    TEST_CASE_MSG(value == Value(-5ll), "actual=" << value);
+
+    value = inv(fVal);
+    TEST_CASE_MSG(value == Value(-3.5), "actual=" << value);
+
+    try {
+        value = inv(std::make_shared<Literal>(Value('a')));
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeSequence() {
     Environment::SharedPtr env(new Environment());
     
@@ -3194,6 +3222,21 @@ void UnitTest::testParserNot() {
 
     TEST_CASE(parserTest(parser, env, "(not)",            Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(not True False)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserNegativeOf() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(neg 0)",    Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(neg 1)",    Value(-1ll), true));
+    TEST_CASE(parserTest(parser, env, "(neg -1)",   Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(neg 2.5)",  Value(-2.5), true));
+    TEST_CASE(parserTest(parser, env, "(neg -2.5)", Value(2.5),  true));
+
+    TEST_CASE(parserTest(parser, env, "(neg)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(neg 'a')", Value::Null, false));
 }
 
 // -------------------------------------------------------------

@@ -60,6 +60,7 @@ namespace Ishlang {
         void testCodeNodeCompOp();
         void testCodeNodeLogicOp();
         void testCodeNodeNot();
+        void testCodeNodeNegativeOf();
         void testCodeNodeSequence();
         void testCodeNodeCond();
         void testCodeNodeLoop();
@@ -99,6 +100,7 @@ namespace Ishlang {
         void testParserComp();
         void testParserLogic();
         void testParserNot();
+        void testParserNegativeOf();
         void testParserBlock();
         void testParserCond();
         void testParserLoop();

@@ -7,7 +7,7 @@
   (defun abs (x)
     (if (>= x 0.0)
         x
-      (- 0.0 x)))
+      (neg x)))
 
   (defun withinTol (x)
     (< (abs x) tol))
