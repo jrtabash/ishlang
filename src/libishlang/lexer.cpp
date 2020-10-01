@@ -45,7 +45,7 @@ Lexer::TokenType Lexer::tokenType(const std::string &token) {
     static const std::unordered_set<char> notAllowed({
             '(', ')', '-', '+', '[', ']', '{', '}', '~', '!', '@',
             '#', '$', '%', '^', '&', '*', '=', '|', '\\', ',', '.',
-            '<', '>', '?', '`', '/', '\'', '"' });
+            '<', '>', '?', '`', '/', '\'', '"', ':' });
 
     const size_t size(token.size());
     if (token[0] == '(') {
