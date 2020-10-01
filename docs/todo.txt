@@ -11,7 +11,7 @@
   - fgetline
   - ftell
   - fseek
-  File constants
+  File variables
   - stdin
   - stdout
   - stderr
