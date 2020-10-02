@@ -50,10 +50,6 @@
   - ordfind
   - ordcount
 
-* Add character and string functions
-  - toupper
-  - tolower
-
 * Add string functions
   - strsort
   - strrev

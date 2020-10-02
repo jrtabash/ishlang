@@ -985,3 +985,40 @@ StrCharCheck::CheckFtn StrCharCheck::typeToCheckFtn(Type type) {
 
     throw InvalidExpression("unknown string/character check type", std::string(1, char(type)));
 }
+
+// -------------------------------------------------------------
+StrCharTransform::StrCharTransform(Type type, CodeNode::SharedPtr operand)
+    : CodeNode()
+    , type_(type)
+    , operand_(operand)
+    , ftn_(typeToTransformFtn(type))
+{
+}
+
+Value StrCharTransform::exec(Environment::SharedPtr env) {
+    if (operand_.get()) {
+        const Value value = operand_->eval(env);
+
+        if (!value.isChar() && !value.isString()) { throw InvalidOperandType("Character|String", value.typeToString()); }
+
+        if (value.isString()) {
+            Value retValue = value.clone();
+            auto & str = retValue.text();
+            std::transform(str.begin(), str.end(), str.begin(), ftn_);
+            return retValue;
+        }
+        else {
+            return Value(ftn_(value.character()));
+        }
+    }
+    return Value::Null;
+}
+
+auto StrCharTransform::typeToTransformFtn(Type type) -> TransformFtn {
+    switch (type) {
+    case ToUpper: return [](unsigned char c) { return static_cast<char>(std::toupper(c)); };
+    case ToLower: return [](unsigned char c) { return static_cast<char>(std::tolower(c)); };
+    }
+
+    throw InvalidExpression("unknown string/character translate type", std::string(1, char(type)));
+}

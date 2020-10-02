@@ -90,6 +90,7 @@ namespace Ishlang {
         void testCodeNodeArrayFind();
         void testCodeNodeArrayCount();
         void testCodeNodeStrCharCheck();
+        void testCodeNodeStrCharTransform();
         void testParserBasic();
         void testParserClone();
         void testParserIsType();
@@ -128,6 +129,7 @@ namespace Ishlang {
         void testParserArrayFind();
         void testParserArrayCount();
         void testParserStrCharCheck();
+        void testParserStrCharTransform();
         
     private:
         bool  success_;

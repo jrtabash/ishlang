@@ -64,22 +64,25 @@ namespace Ishlang {
         };
 
     private:
-        struct MakeStrCharCheck {
-            MakeStrCharCheck(const std::string &name, Parser &parser, StrCharCheck::Type checkType)
+        template <typename CodeNodeType>
+        struct MakeStrCharOp {
+            using OpType = typename CodeNodeType::Type;
+
+            MakeStrCharOp(const std::string &name, Parser &parser, OpType opType)
                 : name_(name)
                 , parser_(parser)
-                , checkType_(checkType)
+                , opType_(opType)
             {}
 
             CodeNode::SharedPtr operator()() {
                 auto exprs(parser_.readAndCheckExprList(name_.c_str(), 1));
-                return std::make_shared<StrCharCheck>(checkType_, exprs[0]);
+                return std::make_shared<CodeNodeType>(opType_, exprs[0]);
             }
 
         private:
             const std::string &name_;
             Parser &parser_;
-            StrCharCheck::Type checkType_;
+            OpType opType_;
         };
 
     private:

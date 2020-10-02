@@ -712,12 +712,15 @@ void Parser::initAppFtns() {
           }
         },
 
-        { "isupper", MakeStrCharCheck("isupper", *this, StrCharCheck::Upper) },
-        { "islower", MakeStrCharCheck("islower", *this, StrCharCheck::Lower) },
-        { "isalpha", MakeStrCharCheck("isalpha", *this, StrCharCheck::Alpha) },
-        { "isnumer", MakeStrCharCheck("isnumer", *this, StrCharCheck::Numer) },
-        { "isalnum", MakeStrCharCheck("isalnum", *this, StrCharCheck::Alnum) },
-        { "ispunct", MakeStrCharCheck("ispunct", *this, StrCharCheck::Punct) },
-        { "isspace", MakeStrCharCheck("isspace", *this, StrCharCheck::Space) }
+        { "isupper", MakeStrCharOp<StrCharCheck>("isupper", *this, StrCharCheck::Upper) },
+        { "islower", MakeStrCharOp<StrCharCheck>("islower", *this, StrCharCheck::Lower) },
+        { "isalpha", MakeStrCharOp<StrCharCheck>("isalpha", *this, StrCharCheck::Alpha) },
+        { "isnumer", MakeStrCharOp<StrCharCheck>("isnumer", *this, StrCharCheck::Numer) },
+        { "isalnum", MakeStrCharOp<StrCharCheck>("isalnum", *this, StrCharCheck::Alnum) },
+        { "ispunct", MakeStrCharOp<StrCharCheck>("ispunct", *this, StrCharCheck::Punct) },
+        { "isspace", MakeStrCharOp<StrCharCheck>("isspace", *this, StrCharCheck::Space) },
+
+        { "toupper", MakeStrCharOp<StrCharTransform>("toupper", *this, StrCharTransform::ToUpper) },
+        { "tolower", MakeStrCharOp<StrCharTransform>("tolower", *this, StrCharTransform::ToLower) }
     };
 }

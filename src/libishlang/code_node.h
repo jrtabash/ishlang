@@ -767,6 +767,32 @@ namespace Ishlang {
         CheckFtn ftn_;
     };
 
+    // -------------------------------------------------------------
+    class StrCharTransform : public CodeNode {
+    public:
+        using TransformFtn = std::function<char (unsigned char)>;
+
+        enum Type {
+            ToUpper = 'u',
+            ToLower = 'l',
+        };
+
+    public:
+        StrCharTransform(Type type, CodeNode::SharedPtr operand);
+        virtual ~StrCharTransform() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        static TransformFtn typeToTransformFtn(Type type);
+
+    private:
+        Type type_;
+        CodeNode::SharedPtr operand_;
+        TransformFtn ftn_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H

@@ -70,6 +70,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArrayFind);
     ADD_TEST(testCodeNodeArrayCount);
     ADD_TEST(testCodeNodeStrCharCheck);
+    ADD_TEST(testCodeNodeStrCharTransform);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -112,6 +113,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArrayFind);
     ADD_TEST(testParserArrayCount);
     ADD_TEST(testParserStrCharCheck);
+    ADD_TEST(testParserStrCharTransform);
 }
 #undef ADD_TEST
 
@@ -2946,6 +2948,49 @@ void UnitTest::testCodeNodeStrCharCheck() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeStrCharTransform() {
+    Environment::SharedPtr env(new Environment());
+
+    const Value a = Value('a');
+    const Value A = Value('A');
+    const Value n = Value('5');
+
+    const Value str = Value("str");
+    const Value STR = Value("STR");
+    const Value num = Value("525");
+
+    auto lit = [](const Value &val) { return std::make_shared<Literal>(val); };
+    auto trans = [lit](StrCharTransform::Type type, const Value &val) {
+        return std::make_shared<StrCharTransform>(type, lit(val));
+    };
+
+    Value value;
+
+    value = trans(StrCharTransform::ToUpper, a)->eval(env); TEST_CASE_MSG(value == Value('A'), "actual=" << value);
+    value = trans(StrCharTransform::ToUpper, A)->eval(env); TEST_CASE_MSG(value == Value('A'), "actual=" << value);
+    value = trans(StrCharTransform::ToUpper, n)->eval(env); TEST_CASE_MSG(value == Value('5'), "actual=" << value);
+    value = trans(StrCharTransform::ToLower, a)->eval(env); TEST_CASE_MSG(value == Value('a'), "actual=" << value);
+    value = trans(StrCharTransform::ToLower, A)->eval(env); TEST_CASE_MSG(value == Value('a'), "actual=" << value);
+    value = trans(StrCharTransform::ToLower, n)->eval(env); TEST_CASE_MSG(value == Value('5'), "actual=" << value);
+
+    value = trans(StrCharTransform::ToUpper, str)->eval(env); TEST_CASE_MSG(value == Value("STR"), "actual=" << value);
+    value = trans(StrCharTransform::ToUpper, STR)->eval(env); TEST_CASE_MSG(value == Value("STR"), "actual=" << value);
+    value = trans(StrCharTransform::ToUpper, num)->eval(env); TEST_CASE_MSG(value == Value("525"), "actual=" << value);
+    value = trans(StrCharTransform::ToLower, str)->eval(env); TEST_CASE_MSG(value == Value("str"), "actual=" << value);
+    value = trans(StrCharTransform::ToLower, STR)->eval(env); TEST_CASE_MSG(value == Value("str"), "actual=" << value);
+    value = trans(StrCharTransform::ToLower, num)->eval(env); TEST_CASE_MSG(value == Value("525"), "actual=" << value);
+
+    try {
+        trans(StrCharTransform::ToUpper, Value(5ll))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -3748,4 +3793,34 @@ void UnitTest::testParserStrCharCheck() {
     TEST_CASE(parserTest(parser, env, "(isalnum 5)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(ispunct 5)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(isspace 5)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserStrCharTransform() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("cUp", Value('A'));
+    env->def("cLo", Value('a'));
+    env->def("cNm", Value('5'));
+    env->def("sUp", Value("ABC"));
+    env->def("sLo", Value("abc"));
+    env->def("sNm", Value("123"));
+
+    TEST_CASE(parserTest(parser, env, "(toupper cUp)", Value('A'), true));
+    TEST_CASE(parserTest(parser, env, "(toupper cLo)", Value('A'), true));
+    TEST_CASE(parserTest(parser, env, "(toupper cNm)", Value('5'), true));
+    TEST_CASE(parserTest(parser, env, "(tolower cUp)", Value('a'), true));
+    TEST_CASE(parserTest(parser, env, "(tolower cLo)", Value('a'), true));
+    TEST_CASE(parserTest(parser, env, "(tolower cNm)", Value('5'), true));
+
+    TEST_CASE(parserTest(parser, env, "(toupper sUp)", Value("ABC"), true));
+    TEST_CASE(parserTest(parser, env, "(toupper sLo)", Value("ABC"), true));
+    TEST_CASE(parserTest(parser, env, "(toupper sNm)", Value("123"), true));
+    TEST_CASE(parserTest(parser, env, "(tolower sUp)", Value("abc"), true));
+    TEST_CASE(parserTest(parser, env, "(tolower sLo)", Value("abc"), true));
+    TEST_CASE(parserTest(parser, env, "(tolower sNm)", Value("123"), true));
+
+    TEST_CASE(parserTest(parser, env, "(toupper 10)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(tolower 10)", Value::Null, false));
 }
