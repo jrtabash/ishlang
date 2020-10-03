@@ -5,6 +5,8 @@ __CODE__
 (println (/ 8 2))
 (println (% 5 2))
 (println (^ 2 3))
+(println (neg 5))
+(println (neg -5))
 
 __EXPECT__
 3
@@ -13,3 +15,5 @@ __EXPECT__
 4
 1
 8
+-5
+5
