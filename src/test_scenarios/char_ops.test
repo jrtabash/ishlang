@@ -1,0 +1,40 @@
+__CODE__
+(defun printFlag (flag)
+  (print (astype flag int)))
+
+(defun printForChar (chr)
+  (printFlag (isupper chr))
+  (printFlag (islower chr))
+  (printFlag (isalpha chr))
+  (printFlag (isnumer chr))
+  (printFlag (isalnum chr))
+  (printFlag (ispunct chr))
+  (printFlag (isspace chr))
+  (println ""))
+
+(printForChar 'A')
+(printForChar 'a')
+(printForChar '5')
+(printForChar '?')
+(printForChar ' ')
+
+(println (toupper 'a'))
+(println (toupper 'A'))
+(println (toupper '5'))
+
+(println (tolower 'a'))
+(println (tolower 'A'))
+(println (tolower '5'))
+
+__EXPECT__
+1010100
+0110100
+0001100
+0000010
+0000001
+A
+A
+5
+a
+a
+5
