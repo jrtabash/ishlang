@@ -1,5 +1,5 @@
 #ifndef PARSER_H
-#define	PARSER_H
+#define PARSER_H
 
 #include "code_node.h"
 #include "lexer.h"

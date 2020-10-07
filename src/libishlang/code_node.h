@@ -1,5 +1,5 @@
 #ifndef BYTE_CODE_H
-#define	BYTE_CODE_H
+#define BYTE_CODE_H
 
 #include "environment.h"
 #include "struct.h"

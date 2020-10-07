@@ -1,5 +1,5 @@
 #ifndef EXCEPTION_H
-#define	EXCEPTION_H
+#define EXCEPTION_H
 
 #include <cstdarg>
 #include <optional>

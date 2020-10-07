@@ -1,5 +1,5 @@
 #ifndef LAMBDA_H
-#define	LAMBDA_H
+#define LAMBDA_H
 
 #include "code_node.h"
 #include "environment.h"

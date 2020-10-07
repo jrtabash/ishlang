@@ -1,5 +1,5 @@
 #ifndef UTIL_H
-#define	UTIL_H
+#define UTIL_H
 
 #include <forward_list>
 #include <string>

@@ -1,5 +1,5 @@
 #ifndef VALUE_H
-#define	VALUE_H
+#define VALUE_H
 
 #include <iostream>
 #include <memory>

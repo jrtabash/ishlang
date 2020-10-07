@@ -1,5 +1,5 @@
 #ifndef UNIT_TEST_H
-#define	UNIT_TEST_H
+#define UNIT_TEST_H
 
 #include "code_node.h"
 #include "environment.h"

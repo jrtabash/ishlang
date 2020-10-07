@@ -1,5 +1,5 @@
 #ifndef INSTANCE_H
-#define	INSTANCE_H
+#define INSTANCE_H
 
 #include "struct.h"
 #include "value.h"
