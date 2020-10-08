@@ -39,6 +39,20 @@ const Value &Environment::get(const std::string &name) const {
     return iter->second;
 }
 
-bool Environment::exists(const std::string &name) const {
+bool Environment::exists(const std::string &name) const noexcept {
     return table_.find(name) != table_.end();
+}
+
+bool Environment::empty() const noexcept {
+    return table_.empty();
+}
+
+std::size_t Environment::size() const noexcept {
+    return table_.size();
+}
+
+void Environment::foreach(ForeachFtn ftn) const {
+    for (const auto & nameValue : table_) {
+        ftn(nameValue.first, nameValue.second);
+    }
 }

@@ -10,6 +10,7 @@
 #include "sequence.h"
 #include "struct.h"
 #include "value.h"
+#include "module.h"
 
 #include <functional>
 #include <map>
@@ -41,6 +42,7 @@ namespace Ishlang {
         void testValue();
         void testValueAsType();
         void testEnvironment();
+        void testEnvironmentForeach();
         void testLambda();
         void testStruct();
         void testStructValue();
@@ -51,6 +53,7 @@ namespace Ishlang {
         void testSequenceCount();
         void testSequenceValue();
         void testSequencePrint();
+        void testModule();
         void testCodeNodeBasic();
         void testCodeNodeClone();
         void testCodeNodeIsType();

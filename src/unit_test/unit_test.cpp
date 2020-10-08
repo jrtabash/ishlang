@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <unordered_map>
 
 using namespace Ishlang;
 
@@ -24,6 +25,7 @@ UnitTest::UnitTest()
     ADD_TEST(testValue);
     ADD_TEST(testValueAsType);
     ADD_TEST(testEnvironment);
+    ADD_TEST(testEnvironmentForeach);
     ADD_TEST(testLambda);
     ADD_TEST(testStruct);
     ADD_TEST(testStructValue);
@@ -34,6 +36,7 @@ UnitTest::UnitTest()
     ADD_TEST(testSequenceCount);
     ADD_TEST(testSequenceValue);
     ADD_TEST(testSequencePrint);
+    ADD_TEST(testModule);
     ADD_TEST(testCodeNodeBasic);
     ADD_TEST(testCodeNodeClone);
     ADD_TEST(testCodeNodeIsType);
@@ -741,6 +744,9 @@ void UnitTest::testValueAsType() {
 // -------------------------------------------------------------
 void UnitTest::testEnvironment() {
     Environment::SharedPtr env(new Environment());
+    TEST_CASE(env->empty());
+    TEST_CASE(env->size() == 0);
+
     try {
         env->def("x", Value::Null);
         env->def("y", Value::Null);
@@ -748,6 +754,8 @@ void UnitTest::testEnvironment() {
     catch (const DuplicateDef &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
 
+    TEST_CASE(!env->empty());
+    TEST_CASE(env->size() == 2);
     TEST_CASE(env->exists("x"));
     TEST_CASE(env->exists("y"));
     TEST_CASE(!env->exists("z"));
@@ -853,6 +861,36 @@ void UnitTest::testEnvironment() {
     }
     catch (const UnknownSymbol &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testEnvironmentForeach() {
+    Environment::SharedPtr env(new Environment());
+    env->def("one", Value(1ll));
+    env->def("two", Value(2ll));
+    env->def("three", Value(3ll));
+
+    unsigned count = 0;
+    std::unordered_map<std::string, Value> nameValues{
+        { "one", Value(1ll) },
+        { "two", Value(2ll) },
+        { "three", Value(3ll) } };
+
+    env->foreach(
+        [this, &count, &nameValues](const std::string &name, const Value &value) {
+            ++count;
+
+            const auto nameCount = nameValues.count(name);
+            TEST_CASE_MSG(nameCount == 1, "actual=" << nameCount);
+
+            if (nameCount > 0) {
+                TEST_CASE_MSG(value == nameValues[name], "actual=" << value << " expected=" << nameValues[name]);
+                nameValues.erase(name);
+            }
+        });
+
+    TEST_CASE_MSG(nameValues.empty(), "actual size = " << nameValues.size());
+    TEST_CASE_MSG(count == 3, "actual=" << count);
 }
 
 // -------------------------------------------------------------
@@ -1102,6 +1140,99 @@ void UnitTest::testSequencePrint() {
         std::ostringstream oss;
         oss << Sequence({v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12});
         TEST_CASE_MSG(oss.str() == "[1 2 3 4 5 6 7 8 9 10 ...]", "actual=" << oss.str());
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testModule() {
+    const std::string moduleCode =
+        "(var PI 3.14)\n"
+        "(defun add (x y) (+ x y))\n"
+        "(defun sub (x y) (+ x y))\n";
+
+    { // Test import and alias
+        Environment::SharedPtr testEnv(new Environment());
+        Module::SharedPtr module(new Module("test", ""));
+
+        TEST_CASE_MSG(module->name() == "test", "name actual=" << module->name());
+        TEST_CASE_MSG(module->sourceFile() == "", "sourceFile actual=" << module->sourceFile());
+
+        Value value = module->loadFromString(moduleCode);
+        TEST_CASE_MSG(value == Value::True, "loadFromString moduleCode actual=" << value);
+
+        // Module is already loaded.
+        value = module->loadFromString(moduleCode);
+        TEST_CASE_MSG(value == Value::False, "loadFromString moduleCode actual=" << value);
+
+        value = module->import(testEnv);
+        TEST_CASE_MSG(value == Value::True, "import actual=" << value);
+        TEST_CASE_MSG(testEnv->size() == 3, "size actual=" << testEnv->size());
+        TEST_CASE(testEnv->exists("test.PI"));
+        TEST_CASE(testEnv->exists("test.add"));
+        TEST_CASE(testEnv->exists("test.sub"));
+
+        value = module->alias(testEnv, "add");
+        TEST_CASE_MSG(value == Value::True, "alias add actual=" << value);
+        TEST_CASE_MSG(testEnv->size() == 4, "size actual=" << testEnv->size());
+        TEST_CASE(testEnv->exists("test.PI"));
+        TEST_CASE(testEnv->exists("test.add"));
+        TEST_CASE(testEnv->exists("test.sub"));
+        TEST_CASE(testEnv->exists("add"));
+
+        value = module->alias(testEnv, "mul");
+        TEST_CASE_MSG(value == Value::False, "alias mul actual=" << value);
+        TEST_CASE_MSG(testEnv->size() == 4, "size actual=" << testEnv->size());
+        TEST_CASE(testEnv->exists("test.PI"));
+        TEST_CASE(testEnv->exists("test.add"));
+        TEST_CASE(testEnv->exists("test.sub"));
+        TEST_CASE(testEnv->exists("add"));
+        TEST_CASE(!testEnv->exists("mul"));
+    }
+
+    { // Test import and alias with as name
+        Environment::SharedPtr testEnv(new Environment());
+        Module::SharedPtr module(new Module("test", ""));
+
+        Value value = module->loadFromString(moduleCode);
+        TEST_CASE_MSG(value == Value::True, "loadFromString moduleCode actual=" << value);
+
+        value = module->import(testEnv, "astest");
+        TEST_CASE_MSG(value == Value::True, "import actual=" << value);
+        TEST_CASE_MSG(testEnv->size() == 3, "size actual=" << testEnv->size());
+        TEST_CASE(testEnv->exists("astest.PI"));
+        TEST_CASE(testEnv->exists("astest.add"));
+        TEST_CASE(testEnv->exists("astest.sub"));
+
+        value = module->alias(testEnv, "add", "asadd");
+        TEST_CASE_MSG(value == Value::True, "alias add actual=" << value);
+        TEST_CASE_MSG(testEnv->size() == 4, "size actual=" << testEnv->size());
+        TEST_CASE(testEnv->exists("astest.PI"));
+        TEST_CASE(testEnv->exists("astest.add"));
+        TEST_CASE(testEnv->exists("astest.sub"));
+        TEST_CASE(testEnv->exists("asadd"));
+    }
+
+    {
+        Module::SharedPtr module(new Module("test", "module.ish"));
+        TEST_CASE_MSG(module->name() == "test", "name actual=" << module->name());
+        TEST_CASE_MSG(module->sourceFile() == "module.ish", "sourceFile actual=" << module->sourceFile());
+
+        // Module has a source file, cannot load from string.
+        Value value = module->loadFromString(moduleCode);
+        TEST_CASE_MSG(value == Value::False, "actual=" << value);
+    }
+
+    try {
+        Module::SharedPtr module(new Module("test", ""));
+        const std::string incompleteCode = "(defun mul (x y)";
+        module->loadFromString(incompleteCode);
+        TEST_CASE(false);
+    }
+    catch (const IncompleteExpression &ex) {
+        TEST_CASE_MSG(ex.what() == std::string("Incomplete expression: Module 'test' loadFromString"), "actual=" << ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
     }
 }
 

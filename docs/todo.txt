@@ -1,3 +1,16 @@
+* [WIP] Add support for modules
+  * (import <module> [as <alias>])
+  * (from <module> import <name> [as <alias>])
+  * Examples: Assuming module in file 'adders.ish' with function add defined in it
+    - (import adders)
+      (adders.add 1 2)
+    - (import adders as arith)
+      (arith.add 1 2)
+    - (from adders import add)
+      (add 1 2)
+    - (from adders import add as plus)
+      (plus 1 2)
+
 * Add support for file IO
   Add file type
   File functions
@@ -90,7 +103,5 @@
       (progarg <option_name> <variable_name> <option_type>)
       (pargval <variable_name>
       (proginit)
-
-* Add support for modules
 
 * Rework 'break' implementation to avoid using Break::Except
