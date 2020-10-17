@@ -176,6 +176,13 @@ namespace Ishlang {
             : Exception(format("Invalid astype from '%s' to '%s'", from.c_str(), to.c_str()))
         {}
     };
+
+    class ModuleError : public Exception {
+    public:
+        ModuleError(const std::string &name, const std::string &msg)
+            : Exception(format("Module '%s' Error: %s", name.c_str(), msg.c_str()))
+        {}
+    };
 }
 
 #endif	// EXCEPTION_H

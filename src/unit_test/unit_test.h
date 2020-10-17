@@ -54,6 +54,7 @@ namespace Ishlang {
         void testSequenceValue();
         void testSequencePrint();
         void testModule();
+        void testModuleStorage();
         void testCodeNodeBasic();
         void testCodeNodeClone();
         void testCodeNodeIsType();

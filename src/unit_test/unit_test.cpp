@@ -37,6 +37,7 @@ UnitTest::UnitTest()
     ADD_TEST(testSequenceValue);
     ADD_TEST(testSequencePrint);
     ADD_TEST(testModule);
+    ADD_TEST(testModuleStorage);
     ADD_TEST(testCodeNodeBasic);
     ADD_TEST(testCodeNodeClone);
     ADD_TEST(testCodeNodeIsType);
@@ -1234,6 +1235,52 @@ void UnitTest::testModule() {
     catch (...) {
         TEST_CASE(false);
     }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testModuleStorage() {
+    const std::string name = "test";
+    const std::string name2 = "test2";
+
+    // Test basic exists, add and get
+    TEST_CASE(!ModuleStorage::exists(name));
+    TEST_CASE(ModuleStorage::add(name, ""));
+    TEST_CASE(ModuleStorage::exists(name));
+    TEST_CASE(ModuleStorage::get(name));
+
+    // Test adding a duplicate module name
+    try {
+        ModuleStorage::add(name, "");
+        TEST_CASE(false);
+    }
+    catch (const ModuleError &ex) {
+        TEST_CASE(std::string("Module 'test' Error: Failed to add duplicate module name to module storage") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    // Test getting a non-existing module name
+    try {
+        ModuleStorage::get(name2);
+        TEST_CASE(false);
+    }
+    catch (const ModuleError &ex) {
+        TEST_CASE(std::string("Module 'test2' Error: Failed to find module in module storage") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    // Test adding another module
+    TEST_CASE(!ModuleStorage::exists(name2));
+    TEST_CASE(ModuleStorage::add(name2, ""));
+    TEST_CASE(ModuleStorage::get(name2));
+    TEST_CASE(ModuleStorage::exists(name2));
+
+    // Test get returns the correct module
+    TEST_CASE(ModuleStorage::get(name)->name() == name);
+    TEST_CASE(ModuleStorage::get(name2)->name() == name2);
 }
 
 // -------------------------------------------------------------

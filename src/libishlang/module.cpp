@@ -4,6 +4,10 @@
 using namespace Ishlang;
 
 // -------------------------------------------------------------
+// MODULE
+// -------------------------------------------------------------
+
+// -------------------------------------------------------------
 Parser Module::parser_ = Parser();
 
 // -------------------------------------------------------------
@@ -62,4 +66,35 @@ void Module::parserCallback(CodeNode::SharedPtr & code) {
     if (code) {
         code->eval(env_);
     }
+}
+
+// -------------------------------------------------------------
+// MODULE STORAGE
+// -------------------------------------------------------------
+
+// -------------------------------------------------------------
+std::unordered_map<std::string, Module::SharedPtr> ModuleStorage::storage_;
+
+// -------------------------------------------------------------
+Module::SharedPtr ModuleStorage::add(const std::string &name, const std::string &sourceFile) {
+    if (exists(name)) {
+        throw ModuleError(name, "Failed to add duplicate module name to module storage");
+    }
+
+    auto [iter, success] = storage_.emplace(name, std::make_shared<Module>(name, sourceFile));
+    if (!success) {
+        throw ModuleError(name, "Failed to add module to module storage");
+    }
+
+    return iter->second;
+}
+
+// -------------------------------------------------------------
+Module::SharedPtr ModuleStorage::get(const std::string &name) {
+    auto iter = storage_.find(name);
+    if (iter == storage_.end()) {
+        throw ModuleError(name, "Failed to find module in module storage");
+    }
+
+    return iter->second;
 }

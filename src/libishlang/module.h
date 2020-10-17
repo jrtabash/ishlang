@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
 
 #include "code_node.h"
 #include "environment.h"
@@ -11,6 +12,7 @@
 
 namespace Ishlang {
 
+    // -------------------------------------------------------------
     class Module {
     public:
         using SharedPtr = std::shared_ptr<Module>;
@@ -37,6 +39,19 @@ namespace Ishlang {
         std::string name_;
         std::string sourceFile_;
         Environment::SharedPtr env_;
+    };
+
+    // -------------------------------------------------------------
+    class ModuleStorage {
+    public:
+        static Module::SharedPtr add(const std::string &name, const std::string &sourceFile);
+
+        static Module::SharedPtr get(const std::string &name);
+
+        static bool exists(const std::string &name) { return storage_.find(name) != storage_.end(); }
+
+    private:
+        static std::unordered_map<std::string, Module::SharedPtr> storage_;
     };
 
 }
