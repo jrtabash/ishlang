@@ -793,6 +793,19 @@ namespace Ishlang {
         TransformFtn ftn_;
     };
 
+    // -------------------------------------------------------------
+    class ImportModule : public CodeNode {
+    public:
+        ImportModule(const std::string &name, const std::string & asName = "");
+        virtual ~ImportModule() {}
+
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        std::string name_;
+        std::string asName_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H

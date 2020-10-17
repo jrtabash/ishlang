@@ -10,6 +10,9 @@
       (add 1 2)
     - (from adders import add as plus)
       (plus 1 2)
+  * Add support to interpreter binary to add paths to module storage
+    - Support a -p command line argument
+    - Support an ISHLANG_PATH environment variable
 
 * Add support for file IO
   Add file type

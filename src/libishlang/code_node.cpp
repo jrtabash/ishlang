@@ -2,6 +2,7 @@
 #include "exception.h"
 #include "instance.h"
 #include "lambda.h"
+#include "module.h"
 #include "parser.h"
 #include "sequence.h"
 #include "util.h"
@@ -1021,4 +1022,19 @@ auto StrCharTransform::typeToTransformFtn(Type type) -> TransformFtn {
     }
 
     throw InvalidExpression("unknown string/character translate type", std::string(1, char(type)));
+}
+
+// -------------------------------------------------------------
+ImportModule::ImportModule(const std::string &name, const std::string &asName)
+    : name_(name)
+    , asName_(asName)
+{
+}
+
+Value ImportModule::exec(Environment::SharedPtr env) {
+    auto modulePtr = ModuleStorage::getOrCreate(name_);
+    if (modulePtr) {
+        return modulePtr->import(env, asName_.empty() ? Module::OptionalName() : Module::OptionalName(asName_));
+    }
+    return Value::False;
 }

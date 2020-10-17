@@ -62,7 +62,7 @@ lexer.o: lexer.cpp lexer.h util.h exception.h
 parser.o: parser.cpp parser.h lexer.h code_node.h util.h exception.h
 	$(CPP) $(CFLAGS) -c parser.cpp -o $(BUILD)/parser.o
 
-module.o: module.cpp module.h environment.h parser.h
+module.o: module.cpp module.h environment.h parser.h util.h
 	$(CPP) $(CFLAGS) -c module.cpp -o $(BUILD)/module.o
 
 clean:

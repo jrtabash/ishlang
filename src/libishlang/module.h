@@ -43,14 +43,23 @@ namespace Ishlang {
 
     // -------------------------------------------------------------
     class ModuleStorage {
-    public:
-        static Module::SharedPtr add(const std::string &name, const std::string &sourceFile);
+    public: // Path
+        static bool addPath(const std::string &path);
 
+        static const std::vector<std::string> &paths() noexcept { return paths_; }
+
+    public: // Storage
+        static Module::SharedPtr getOrCreate(const std::string &name);
+        static Module::SharedPtr add(const std::string &name, const std::string &sourceFile);
         static Module::SharedPtr get(const std::string &name);
 
-        static bool exists(const std::string &name) { return storage_.find(name) != storage_.end(); }
+        static bool exists(const std::string &name) noexcept { return storage_.find(name) != storage_.end(); }
 
     private:
+        static std::string findModuleFile(const std::string &name);
+
+    private:
+        static std::vector<std::string> paths_;
         static std::unordered_map<std::string, Module::SharedPtr> storage_;
     };
 

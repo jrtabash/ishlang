@@ -180,7 +180,7 @@ namespace Ishlang {
     class ModuleError : public Exception {
     public:
         ModuleError(const std::string &name, const std::string &msg)
-            : Exception(format("Module '%s' Error: %s", name.c_str(), msg.c_str()))
+            : Exception(format("Module '%s' - %s", name.c_str(), msg.c_str()))
         {}
     };
 }

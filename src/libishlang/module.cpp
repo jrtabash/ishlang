@@ -1,5 +1,6 @@
 #include "module.h"
 #include "exception.h"
+#include "util.h"
 
 using namespace Ishlang;
 
@@ -73,7 +74,31 @@ void Module::parserCallback(CodeNode::SharedPtr & code) {
 // -------------------------------------------------------------
 
 // -------------------------------------------------------------
+std::vector<std::string> ModuleStorage::paths_;
 std::unordered_map<std::string, Module::SharedPtr> ModuleStorage::storage_;
+
+// -------------------------------------------------------------
+bool ModuleStorage::addPath(const std::string &path) {
+    if (Util::pathExists(path) && Util::isDirectory(path)) {
+        paths_.push_back(path);
+        return true;
+    }
+    return false;
+}
+
+// -------------------------------------------------------------
+Module::SharedPtr ModuleStorage::getOrCreate(const std::string &name) {
+    if (exists(name)) {
+        return get(name);
+    }
+    else {
+        auto ptr = add(name, findModuleFile(name));
+        if (ptr && !ptr->sourceFile().empty()) {
+            ptr->load();
+        }
+        return ptr;
+    }
+}
 
 // -------------------------------------------------------------
 Module::SharedPtr ModuleStorage::add(const std::string &name, const std::string &sourceFile) {
@@ -97,4 +122,25 @@ Module::SharedPtr ModuleStorage::get(const std::string &name) {
     }
 
     return iter->second;
+}
+
+// -------------------------------------------------------------
+std::string ModuleStorage::findModuleFile(const std::string &name) {
+    const auto filename = name + ".ish";
+    auto filePath = Util::findFilePath(Util::currentPath(), filename);
+
+    if (!filePath) {
+        for (auto const & path : paths_) {
+            filePath = Util::findFilePath(path, filename);
+            if (filePath) {
+                break;
+            }
+        }
+
+        if (!filePath) {
+            throw ModuleError(name, std::string("Cannot find module source file '") + filename + "'");
+        }
+    }
+
+    return filePath->string();
 }

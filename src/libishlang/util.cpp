@@ -3,6 +3,9 @@
 
 #include <cctype>
 #include <cmath>
+#include <fstream>
+
+namespace fs = std::filesystem;
 
 using namespace Ishlang;
 
@@ -114,4 +117,29 @@ bool Util::setBoolFromString(bool &out, const std::string &str) {
         return false;
     }
     return true;
+}
+
+// -------------------------------------------------------------
+Util::TemporaryFile::TemporaryFile(const std::string &basename, const std::string &stuffToWrite)
+    : tempFile_(temporaryPath() / basename)
+{
+    std::ofstream ofs(tempFile_.c_str());
+    if (ofs.is_open()) {
+        ofs << stuffToWrite;
+        ofs.close();
+    }
+}
+
+Util::TemporaryFile::~TemporaryFile() {
+    fs::remove(tempFile_);
+}
+
+// -------------------------------------------------------------
+std::optional<fs::path> Util::findFilePath(const fs::path &directory, const std::string &filename) {
+    for (auto const & p : fs::directory_iterator(directory)) {
+        if (p.path().filename() == filename) {
+            return p.path();
+        }
+    }
+    return std::nullopt;
 }

@@ -20,6 +20,8 @@ UnitTest::UnitTest()
     , verbose_(false)
     , tests_()
 {
+    ModuleStorage::addPath(Util::temporaryPath());
+
     ADD_TEST(testToken);
     ADD_TEST(testComment);
     ADD_TEST(testValue);
@@ -75,6 +77,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArrayCount);
     ADD_TEST(testCodeNodeStrCharCheck);
     ADD_TEST(testCodeNodeStrCharTransform);
+    ADD_TEST(testCodeNodeImportModule);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -1149,7 +1152,7 @@ void UnitTest::testModule() {
     const std::string moduleCode =
         "(var PI 3.14)\n"
         "(defun add (x y) (+ x y))\n"
-        "(defun sub (x y) (+ x y))\n";
+        "(defun sub (x y) (- x y))\n";
 
     { // Test import and alias
         Environment::SharedPtr testEnv(new Environment());
@@ -1254,7 +1257,7 @@ void UnitTest::testModuleStorage() {
         TEST_CASE(false);
     }
     catch (const ModuleError &ex) {
-        TEST_CASE(std::string("Module 'test' Error: Failed to add duplicate module name to module storage") == ex.what());
+        TEST_CASE(std::string("Module 'test' - Failed to add duplicate module name to module storage") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -1266,7 +1269,7 @@ void UnitTest::testModuleStorage() {
         TEST_CASE(false);
     }
     catch (const ModuleError &ex) {
-        TEST_CASE(std::string("Module 'test2' Error: Failed to find module in module storage") == ex.what());
+        TEST_CASE(std::string("Module 'test2' - Failed to find module in module storage") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -3165,6 +3168,46 @@ void UnitTest::testCodeNodeStrCharTransform() {
     catch (const InvalidOperandType &) {}
     catch (...) {
         TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeImportModule() {
+    const std::string moduleName = "importtest";
+    const std::string moduleCode =
+        "(var PI 3.14)\n"
+        "(defun add (x y) (+ x y))\n"
+        "(defun sub (x y) (- x y))\n";
+
+    Util::TemporaryFile tempFile(moduleName + ".ish", moduleCode);
+
+    {
+        Environment::SharedPtr env(new Environment());
+
+        auto varName = [&moduleName](const char *name) { return moduleName + '.' + name; };
+
+        auto import = std::make_shared<ImportModule>(moduleName);
+        TEST_CASE(import->eval(env) == Value::True);
+
+        TEST_CASE_MSG(env->size() == 3, "actual=" << env->size());
+        TEST_CASE(env->exists(varName("PI")));
+        TEST_CASE(env->exists(varName("add")));
+        TEST_CASE(env->exists(varName("sub")));
+    }
+
+    {
+        Environment::SharedPtr env(new Environment());
+
+        const std::string asName = "testmod";
+        auto varAsName = [&asName](const char *name) { return asName + '.' + name; };
+
+        auto import = std::make_shared<ImportModule>(moduleName, asName);
+        TEST_CASE(import->eval(env) == Value::True);
+
+        TEST_CASE_MSG(env->size() == 3, "actual=" << env->size());
+        TEST_CASE(env->exists(varAsName("PI")));
+        TEST_CASE(env->exists(varAsName("add")));
+        TEST_CASE(env->exists(varAsName("sub")));
     }
 }
 
