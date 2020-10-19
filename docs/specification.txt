@@ -482,3 +482,48 @@ Examples:
   ;; This is a function
   (defun x2 (x) ;; Double x
     (* 2 x))
+
+Imports and Aliases
+-------------------
+Import full ishlang files with import command, or import select components using from/import command.
+
+- (import <module> [as <asName>])
+- (from <module> import name [as <asName] [name [as <asName>]]*)
+
+A module name must have a corresponding source file <module>.ish.
+
+Ishlang searches for a module source file according to the following rule:
+1) Look in current working directory
+2) Then look in directories specified in ISHLANG_PATH environment variable
+3) then look in directories specified in ishlang command line -p option
+
+Paths specified in environment variable ISHLANG_PATH or command line -p option must
+be delimited using : character.
+
+Examples:
+* Assuming the following module is defined:
+  - name: arith.ish
+  - code:
+    (defun add (x y) (+ x y))
+    (defun sub (x y) (- x y))
+* Module uses:
+  - Import:
+    (import arith)
+    (println (arith.add 1 2))
+  - Import as
+    (import arith as math)
+    (println (math.sub 10 5))
+  - From/Import
+    (from arith import add)
+    (println (add 1 2))
+  - From/Import as
+    (from arith import sub as minus)
+    (println (minus 10 5))
+  - From/Import ...
+    (from arith import add sub)
+    (println (add 1 2))
+    (println (sub 10 5))
+  - From/Import as ...
+    (from arith import add as plus sub as minus)
+    (println (plus 1 2))
+    (println (minus 10 5))

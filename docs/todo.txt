@@ -1,19 +1,3 @@
-* [WIP] Add support for modules
-  * (import <module> [as <alias>])
-  * (from <module> import <name> [as <alias>])
-  * Examples: Assuming module in file 'adders.ish' with function add defined in it
-    - (import adders)
-      (adders.add 1 2)
-    - (import adders as arith)
-      (arith.add 1 2)
-    - (from adders import add)
-      (add 1 2)
-    - (from adders import add as plus)
-      (plus 1 2)
-  * Add support to interpreter binary to add paths to module storage
-    - Support a -p command line argument
-    - Support an ISHLANG_PATH environment variable
-
 * Add support for file IO
   Add file type
   File functions
