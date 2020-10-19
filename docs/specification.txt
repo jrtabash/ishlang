@@ -495,7 +495,7 @@ A module name must have a corresponding source file <module>.ish.
 Ishlang searches for a module source file according to the following rule:
 1) Look in current working directory
 2) Then look in directories specified in ISHLANG_PATH environment variable
-3) then look in directories specified in ishlang command line -p option
+3) Then look in directories specified in ishlang command line -p option
 
 Paths specified in environment variable ISHLANG_PATH or command line -p option must
 be delimited using : character.
