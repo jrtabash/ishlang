@@ -5,6 +5,7 @@
 #include <forward_list>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -16,6 +17,7 @@ namespace Ishlang {
 
     public:
         using TokenList = std::forward_list<std::string>;
+        using StringVector = std::vector<std::string>;
 
     public:
         static bool isZero(double val);
@@ -24,6 +26,9 @@ namespace Ishlang {
     public:
         static std::string nextToken(const std::string &str, size_t &pos);
         static size_t tokenize(const std::string &str, TokenList &tokens);
+
+    public:
+        static StringVector split(const std::string &str, char delimiter);
 
     public:
         static bool setBoolFromString(bool &out, const std::string &str);

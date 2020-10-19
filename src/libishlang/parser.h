@@ -35,6 +35,7 @@ namespace Ishlang {
         CodeNode::SharedPtrList readAndCheckExprList(const char *name, std::size_t expectedSize);
         CodeNode::SharedPtrPairs readExprPairs();
         std::string readName();
+        CodeNode::NameAndAsList readNameAndAsList();
         std::vector<std::string> readParams();
         bool ignoreLeftP(bool allowRightP);
         void ignoreRightP();

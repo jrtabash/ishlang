@@ -11,6 +11,7 @@
 #include "struct.h"
 #include "value.h"
 #include "module.h"
+#include "util.h"
 
 #include <functional>
 #include <map>
@@ -34,9 +35,12 @@ namespace Ishlang {
         
     private:
         void runTest(const std::string &name, Function ftn);
-        
+        const std::string & defaultModuleCode();
+        Util::TemporaryFile createTempModuleFile(const std::string &name, const std::string &code = "");
+
     private:
         void testToken();
+        void testUtilSplit();
         void testComment();
         void testTokenType();
         void testValue();
@@ -96,6 +100,7 @@ namespace Ishlang {
         void testCodeNodeStrCharCheck();
         void testCodeNodeStrCharTransform();
         void testCodeNodeImportModule();
+        void testCodeNodeFromModuleImport();
         void testParserBasic();
         void testParserClone();
         void testParserIsType();
@@ -135,6 +140,8 @@ namespace Ishlang {
         void testParserArrayCount();
         void testParserStrCharCheck();
         void testParserStrCharTransform();
+        void testParserImportModule();
+        void testParserFromModuleImport();
         
     private:
         bool  success_;

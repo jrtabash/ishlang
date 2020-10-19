@@ -1,5 +1,4 @@
 #include "unit_test.h"
-#include "util.h"
 
 #include <array>
 #include <functional>
@@ -23,6 +22,7 @@ UnitTest::UnitTest()
     ModuleStorage::addPath(Util::temporaryPath());
 
     ADD_TEST(testToken);
+    ADD_TEST(testUtilSplit);
     ADD_TEST(testComment);
     ADD_TEST(testValue);
     ADD_TEST(testValueAsType);
@@ -78,6 +78,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeStrCharCheck);
     ADD_TEST(testCodeNodeStrCharTransform);
     ADD_TEST(testCodeNodeImportModule);
+    ADD_TEST(testCodeNodeFromModuleImport);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -121,6 +122,8 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArrayCount);
     ADD_TEST(testParserStrCharCheck);
     ADD_TEST(testParserStrCharTransform);
+    ADD_TEST(testParserImportModule);
+    ADD_TEST(testParserFromModuleImport);
 }
 #undef ADD_TEST
 
@@ -158,6 +161,20 @@ void UnitTest::list() const {
 void UnitTest::runTest(const std::string &name, Function ftn) {
     if (verbose_) { std::cout << "Testing: " << name << '\n'; }
     ftn();
+}
+
+// -------------------------------------------------------------
+const std::string & UnitTest::defaultModuleCode() {
+    static const std::string defaultCode =
+        "(var PI 3.14)\n"
+        "(defun add (x y) (+ x y))\n"
+        "(defun sub (x y) (- x y))\n";
+    return defaultCode;
+}
+
+// -------------------------------------------------------------
+Util::TemporaryFile UnitTest::createTempModuleFile(const std::string &name, const std::string &code) {
+    return Util::TemporaryFile(name + ".ish", code.empty() ? defaultModuleCode() : code);
 }
 
 // -------------------------------------------------------------
@@ -370,6 +387,23 @@ void UnitTest::testToken() {
             TEST_CASE(iter == tokens.end());
         }
     }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testUtilSplit() {
+    auto test =
+        [this](const std::string &str, const Util::StringVector &expected, char delim = ',') {
+            TEST_CASE_MSG(Util::split(str, delim) == expected, "str='" << str << '\'');
+        };
+
+    test("",         {});
+    test("abc",      { "abc" });
+    test("ab,cd",    { "ab", "cd" });
+    test("ab,cd,ef", { "ab", "cd", "ef" });
+
+    test("/some/path", { "/some/path" }, ':');
+    test("/some/path:/another/path/", { "/some/path", "/another/path/" }, ':');
+    test("/some/path:/another/path/:/other/", { "/some/path", "/another/path/", "/other/" }, ':');
 }
 
 // -------------------------------------------------------------
@@ -1149,10 +1183,7 @@ void UnitTest::testSequencePrint() {
 
 // -------------------------------------------------------------
 void UnitTest::testModule() {
-    const std::string moduleCode =
-        "(var PI 3.14)\n"
-        "(defun add (x y) (+ x y))\n"
-        "(defun sub (x y) (- x y))\n";
+    const std::string moduleCode = defaultModuleCode();
 
     { // Test import and alias
         Environment::SharedPtr testEnv(new Environment());
@@ -1191,6 +1222,20 @@ void UnitTest::testModule() {
         TEST_CASE(testEnv->exists("test.sub"));
         TEST_CASE(testEnv->exists("add"));
         TEST_CASE(!testEnv->exists("mul"));
+    }
+
+    { // Test alias list
+        Environment::SharedPtr testEnv(new Environment());
+        Module::SharedPtr module(new Module("test", ""));
+
+        Value value = module->loadFromString(moduleCode);
+        TEST_CASE_MSG(value == Value::True, "loadFromString moduleCode actual=" << value);
+
+        value = module->aliases(testEnv, { { "add", Module::OptionalName() }, { "sub", "minus" } });
+        TEST_CASE_MSG(value == Value::True, "alias add actual=" << value);
+        TEST_CASE_MSG(testEnv->size() == 2, "size actual=" << testEnv->size());
+        TEST_CASE(testEnv->exists("add"));
+        TEST_CASE(testEnv->exists("minus"));
     }
 
     { // Test import and alias with as name
@@ -3174,12 +3219,7 @@ void UnitTest::testCodeNodeStrCharTransform() {
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeImportModule() {
     const std::string moduleName = "importtest";
-    const std::string moduleCode =
-        "(var PI 3.14)\n"
-        "(defun add (x y) (+ x y))\n"
-        "(defun sub (x y) (- x y))\n";
-
-    Util::TemporaryFile tempFile(moduleName + ".ish", moduleCode);
+    auto tempFile(createTempModuleFile(moduleName));
 
     {
         Environment::SharedPtr env(new Environment());
@@ -3193,6 +3233,10 @@ void UnitTest::testCodeNodeImportModule() {
         TEST_CASE(env->exists(varName("PI")));
         TEST_CASE(env->exists(varName("add")));
         TEST_CASE(env->exists(varName("sub")));
+
+        TEST_CASE(env->get(varName("PI")).isReal());
+        TEST_CASE(env->get(varName("add")).isClosure());
+        TEST_CASE(env->get(varName("sub")).isClosure());
     }
 
     {
@@ -3208,6 +3252,54 @@ void UnitTest::testCodeNodeImportModule() {
         TEST_CASE(env->exists(varAsName("PI")));
         TEST_CASE(env->exists(varAsName("add")));
         TEST_CASE(env->exists(varAsName("sub")));
+
+        TEST_CASE(env->get(varAsName("PI")).isReal());
+        TEST_CASE(env->get(varAsName("add")).isClosure());
+        TEST_CASE(env->get(varAsName("sub")).isClosure());
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeFromModuleImport() {
+    const std::string moduleName = "fromtest";
+    auto tempFile(createTempModuleFile(moduleName));
+
+    {
+        Environment::SharedPtr env(new Environment());
+
+        auto fromImport = std::make_shared<FromModuleImport>(moduleName, "add");
+        TEST_CASE(fromImport->eval(env) == Value::True);
+
+        TEST_CASE_MSG(env->size() == 1, "actual=" << env->size());
+        TEST_CASE(env->exists("add"));
+
+        fromImport = std::make_shared<FromModuleImport>(moduleName, "add", "plus");
+        TEST_CASE(fromImport->eval(env) == Value::True);
+
+        TEST_CASE_MSG(env->size() == 2, "actual=" << env->size());
+        TEST_CASE(env->exists("add"));
+        TEST_CASE(env->exists("plus"));
+
+        TEST_CASE(env->get("add").isClosure());
+        TEST_CASE(env->get("plus").isClosure());
+        TEST_CASE(env->get("add") == env->get("plus"));
+    }
+
+    {
+        Environment::SharedPtr env(new Environment());
+
+        auto fromImport = std::make_shared<FromModuleImport>(
+            moduleName,
+            Module::AliasList({ { "add", Module::OptionalName() }, { "sub", "minus" } }));
+
+        TEST_CASE(fromImport->eval(env) == Value::True);
+
+        TEST_CASE_MSG(env->size() == 2, "actual=" << env->size());
+        TEST_CASE(env->exists("add"));
+        TEST_CASE(env->exists("minus"));
+
+        TEST_CASE(env->get("add").isClosure());
+        TEST_CASE(env->get("minus").isClosure());
     }
 }
 
@@ -3274,6 +3366,10 @@ bool parserTest(Parser &parser, Environment::SharedPtr env, const std::string &e
         }
     }
     catch (const std::exception &ex) {
+        if (parser.hasIncompleteExpr()) {
+            parser.clearIncompleteExpr();
+        }
+
         if (success) {
             std::cerr << "Parser - " << expr << ": error " << ex.what() << '\n';
             return false;
@@ -4044,4 +4140,103 @@ void UnitTest::testParserStrCharTransform() {
 
     TEST_CASE(parserTest(parser, env, "(toupper 10)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(tolower 10)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserImportModule() {
+    const std::string moduleName = "pimporttest";
+    auto tempFile(createTempModuleFile(moduleName));
+
+    Parser parser;
+
+    {
+        Environment::SharedPtr env(new Environment());
+        const std::string asName = "test";
+
+        auto varName = [&moduleName](const char * var) { return moduleName + '.' + var; };
+        auto varAsName = [&asName](const char *var) { return asName + '.' + var; };
+
+        TEST_CASE(parserTest(parser, env, "(import pimporttest)", Value::True, true));
+
+        TEST_CASE_MSG(env->size() == 3, "actual=" << env->size());
+
+        TEST_CASE(parserTest(parser, env, "(import pimporttest as test)", Value::True, true));
+
+        TEST_CASE_MSG(env->size() == 6, "actual=" << env->size());
+
+        TEST_CASE(env->get(varName("PI")) == env->get(varAsName("PI")));
+        TEST_CASE(env->get(varName("add")) == env->get(varAsName("add")));
+        TEST_CASE(env->get(varName("sub")) == env->get(varAsName("sub")));
+
+        TEST_CASE(parserTest(parser, env, "(import pimporttest)",         Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(import pimporttest as test)", Value::Null, false));
+    }
+
+    {
+        Environment::SharedPtr env(new Environment());
+        TEST_CASE(parserTest(parser, env, "(import)",                Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(import as)",             Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(import pimporttest as)", Value::Null, false));
+
+        TEST_CASE_MSG(env->size() == 0, "actual=" << env->size());
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserFromModuleImport() {
+    const std::string moduleName = "pfromtest";
+    auto tempFile(createTempModuleFile(moduleName));
+
+    Parser parser;
+
+    {
+        Environment::SharedPtr env(new Environment());
+
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import add)", Value::True, true));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import sub)", Value::True, true));
+
+        TEST_CASE_MSG(env->size() == 2, "actual=" << env->size());
+
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import add as plus)",  Value::True, true));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import sub as minus)", Value::True, true));
+
+        TEST_CASE_MSG(env->size() == 4, "actual=" << env->size());
+
+        TEST_CASE(env->get("add") == env->get("plus"));
+        TEST_CASE(env->get("sub") == env->get("minus"));
+
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import add)", Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import sub)", Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import add as plus)",  Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import sub as minus)", Value::Null, false));
+    }
+
+    {
+        Environment::SharedPtr env(new Environment());
+
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import add sub)", Value::True, true));
+
+        TEST_CASE_MSG(env->size() == 2, "actual=" << env->size());
+
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import add as plus sub as minus)",  Value::True, true));
+
+        TEST_CASE_MSG(env->size() == 4, "actual=" << env->size());
+
+        TEST_CASE(env->get("add") == env->get("plus"));
+        TEST_CASE(env->get("sub") == env->get("minus"));
+    }
+
+    {
+        Environment::SharedPtr env(new Environment());
+
+        TEST_CASE(parserTest(parser, env, "(from)",                                     Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest)",                           Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import)",                    Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import as)",                 Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import add as)",             Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import add as plus as)",     Value::Null, false));
+        TEST_CASE(parserTest(parser, env, "(from pfromtest import add as plus sub as)", Value::Null, false));
+
+        TEST_CASE_MSG(env->size() == 0, "actual=" << env->size());
+    }
 }

@@ -1026,7 +1026,8 @@ auto StrCharTransform::typeToTransformFtn(Type type) -> TransformFtn {
 
 // -------------------------------------------------------------
 ImportModule::ImportModule(const std::string &name, const std::string &asName)
-    : name_(name)
+    : CodeNode()
+    , name_(name)
     , asName_(asName)
 {
 }
@@ -1035,6 +1036,30 @@ Value ImportModule::exec(Environment::SharedPtr env) {
     auto modulePtr = ModuleStorage::getOrCreate(name_);
     if (modulePtr) {
         return modulePtr->import(env, asName_.empty() ? Module::OptionalName() : Module::OptionalName(asName_));
+    }
+    return Value::False;
+}
+
+// -------------------------------------------------------------
+FromModuleImport::FromModuleImport(const std::string &name, const std::string &varName, const std::string &asName)
+    : CodeNode()
+    , name_(name)
+    , aliasList_()
+{
+    aliasList_.push_back({ varName, asName.empty() ? Module::OptionalName() : Module::OptionalName(asName) });
+}
+
+FromModuleImport::FromModuleImport(const std::string &name, const NameAndAsList &aliasList)
+    : CodeNode()
+    , name_(name)
+    , aliasList_(aliasList)
+{
+}
+
+Value FromModuleImport::exec(Environment::SharedPtr env) {
+    auto modulePtr = ModuleStorage::getOrCreate(name_);
+    if (modulePtr) {
+        return modulePtr->aliases(env, aliasList_);
     }
     return Value::False;
 }

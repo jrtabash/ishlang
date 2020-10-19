@@ -106,6 +106,23 @@ size_t Util::tokenize(const std::string &str, TokenList &tokens) {
 }
 
 // -------------------------------------------------------------
+Util::StringVector Util::split(const std::string &str, char delimiter) {
+    StringVector vec;
+    if (!str.empty()) {
+        std::string token;
+        size_t pos = 0;
+        size_t start = 0;
+        do {
+            pos = str.find(delimiter, start);
+            token = str.substr(start, pos - start);
+            vec.emplace_back(std::move(token));
+            start = pos + 1;
+        } while (pos != std::string::npos);
+    }
+    return vec;
+}
+
+// -------------------------------------------------------------
 bool Util::setBoolFromString(bool &out, const std::string &str) {
     if (str == "true") {
         out = true;

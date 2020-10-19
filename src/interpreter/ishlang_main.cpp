@@ -27,6 +27,7 @@ private:
                 if      (arg == "-h") { usage(); }
                 else if (arg == "-i") { interactive = true; }
                 else if (arg == "-b") { batch = true; }
+                else if (arg == "-p") { path = readArgValue("path", i); }
                 else if (arg == "-f") { filename = readArgValue("file", i); }
                 else {
                     argError(std::string("Invalid option '") + arg + "'");
@@ -38,12 +39,13 @@ private:
 private:
     void usage() {
         std::cerr << "Usage:\n"
-                  << '\t' << program << " [-h] [-i] [-b] [-f file]\n"
+                  << '\t' << program << " [-h] [-i] [-b] [-p] [-f file]\n"
                   << '\n'
                   << "Options:\n"
                   << '\t' << "-h : Print usage\n"
                   << '\t' << "-i : Enter interactive mode\n"
                   << '\t' << "-b : Run in batch mode\n"
+                  << '\t' << "-p : Import path\n"
                   << '\t' << "-f : Run code file\n"
                   << std::endl;
         exit(1);
@@ -67,6 +69,7 @@ public:
     std::string program;
     bool        interactive;
     bool        batch;
+    std::string path;
     std::string filename;
 };
 
@@ -76,7 +79,7 @@ int main(int argc, char** argv) {
     bool const forceInteractive = (args.filename.empty() && !args.interactive);
     bool const forceBatch = (!args.filename.empty() && !args.interactive);
 
-    Ishlang::Interpreter interpreter(args.batch || forceBatch);
+    Ishlang::Interpreter interpreter(args.batch || forceBatch, args.path);
     if (!args.filename.empty()) {
         interpreter.loadFile(args.filename);
     }

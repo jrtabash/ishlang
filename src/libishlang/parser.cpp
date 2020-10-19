@@ -230,6 +230,49 @@ std::string Parser::readName() {
 }
 
 // -------------------------------------------------------------
+CodeNode::NameAndAsList Parser::readNameAndAsList() {
+    // Parse following format: "name [as asName] [name [as asName]]*"
+    // Examples:
+    //   1) foo
+    //   2) foo as bar
+    //   3) one two
+    //   4) one as single two as double
+    //   5) one two foo as bar
+
+    CodeNode::NameAndAsList nameAndAsList;
+
+    auto getNext =
+        [this]() {
+            auto token = lexer_.next();
+            if (token.type != Lexer::Symbol) {
+                throw UnexpectedTokenType(token.text, token.type, "name/as list");
+            }
+            return token;
+        };
+
+    auto name = getNext();
+
+    while (name.type != Lexer::RightP) {
+        if (name.text == "as") {
+            throw InvalidExpression("Misformed name/as list");
+        }
+
+        auto maybeAs = lexer_.next();
+        if (maybeAs.text == "as") {
+            auto asName = getNext();
+            nameAndAsList.emplace_back(name.text, asName.text);
+            name = lexer_.next();
+        }
+        else {
+            nameAndAsList.emplace_back(name.text, std::nullopt);
+            name = maybeAs;
+        }
+    }
+
+    return nameAndAsList;
+}
+
+// -------------------------------------------------------------
 CodeNode::ParamList Parser::readParams() {
     CodeNode::ParamList params;
     auto token = lexer_.next();
@@ -290,6 +333,37 @@ bool Parser::haveSExpression() const {
 // -------------------------------------------------------------
 void Parser::initAppFtns() {
     appFtns_ = {
+        { "import",
+          [this]() {
+              const auto nameAndAsList = readNameAndAsList();
+              if (nameAndAsList.size() == 1) {
+                  return std::make_shared<ImportModule>(nameAndAsList[0].first,
+                                                        nameAndAsList[0].second ? *nameAndAsList[0].second : "");
+              }
+              else {
+                  throw InvalidExpression("Misformed import");
+              }
+          }
+        },
+
+        { "from",
+          [this]() {
+              const auto name = readName();
+              const auto import = readName();
+              if (import != "import") {
+                  throw InvalidExpression("Misformed from/import");
+              }
+
+              const auto nameAndAsList = readNameAndAsList();
+              if (nameAndAsList.size() > 0) {
+                  return std::make_shared<FromModuleImport>(name, nameAndAsList);
+              }
+              else {
+                  throw InvalidExpression("Misformed from/import");
+              }
+          }
+        },
+
         { "var",
           [this]() {
                 const auto name(readName());

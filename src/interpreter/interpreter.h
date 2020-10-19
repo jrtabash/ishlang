@@ -8,7 +8,7 @@ namespace Ishlang {
 
     class Interpreter {
     public:
-        Interpreter(bool batch);
+        Interpreter(bool batch, const std::string &path = "");
         Interpreter(const Interpreter &) = delete;
 
         const Interpreter &operator=(const Interpreter &) = delete;
@@ -19,6 +19,9 @@ namespace Ishlang {
     private:
         bool isREPLCommand(const std::string &expr) const;
         void handleREPLCommand(const std::string &expr);
+
+    private:
+        void initPath(const std::string &path);
 
     private:
         struct ParserCB {

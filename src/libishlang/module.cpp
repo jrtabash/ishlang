@@ -63,6 +63,17 @@ Value Module::alias(Environment::SharedPtr aliasEnv, const std::string &name, co
 }
 
 // -------------------------------------------------------------
+Value Module::aliases(Environment::SharedPtr aliasEnv, const AliasList &aliasList) {
+    std::size_t count = 0;
+    for (auto const & varAndAs : aliasList) {
+        if (alias(aliasEnv, varAndAs.first, varAndAs.second) == Value::True) {
+            ++count;
+        }
+    }
+    return Value(count == aliasList.size());
+}
+
+// -------------------------------------------------------------
 void Module::parserCallback(CodeNode::SharedPtr & code) {
     if (code) {
         code->eval(env_);
@@ -84,6 +95,17 @@ bool ModuleStorage::addPath(const std::string &path) {
         return true;
     }
     return false;
+}
+
+// -------------------------------------------------------------
+bool ModuleStorage::addPaths(const std::string &path) {
+    bool ret = true;
+    for (auto const & p : Util::split(path, ':')) {
+        if (!addPath(p)) {
+            ret = false;
+        }
+    }
+    return ret;
 }
 
 // -------------------------------------------------------------

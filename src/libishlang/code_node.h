@@ -5,9 +5,10 @@
 #include "struct.h"
 #include "value.h"
 
-#include <memory>
-#include <vector>
 #include <functional>
+#include <memory>
+#include <optional>
+#include <vector>
 
 namespace Ishlang {
 
@@ -19,6 +20,7 @@ namespace Ishlang {
         using SharedPtrPair  = std::pair<SharedPtr, SharedPtr>;
         using SharedPtrPairs = std::vector<SharedPtrPair>;
         using ParamList      = std::vector<std::string>;
+        using NameAndAsList  = std::vector<std::pair<std::string, std::optional<std::string>>>;
         
     public:
         CodeNode() {}
@@ -796,7 +798,7 @@ namespace Ishlang {
     // -------------------------------------------------------------
     class ImportModule : public CodeNode {
     public:
-        ImportModule(const std::string &name, const std::string & asName = "");
+        ImportModule(const std::string &name, const std::string &asName = "");
         virtual ~ImportModule() {}
 
         virtual Value exec(Environment::SharedPtr env) override;
@@ -804,6 +806,20 @@ namespace Ishlang {
     private:
         std::string name_;
         std::string asName_;
+    };
+
+    // -------------------------------------------------------------
+    class FromModuleImport : public CodeNode {
+    public:
+        FromModuleImport(const std::string &name, const std::string &varName, const std::string &asName = "");
+        FromModuleImport(const std::string &name, const NameAndAsList &aliasList);
+        virtual ~FromModuleImport() {}
+
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        std::string name_;
+        NameAndAsList aliasList_;
     };
 
 }

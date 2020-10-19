@@ -1,4 +1,5 @@
 #include "interpreter.h"
+#include "module.h"
 #include "util.h"
 
 #include <cstdlib>
@@ -30,7 +31,7 @@ void Interpreter::ParserCB::operator()(CodeNode::SharedPtr &code) {
 // -------------------------------------------------------------
 
 // -------------------------------------------------------------
-Interpreter::Interpreter(bool batch)
+Interpreter::Interpreter(bool batch, const std::string &path)
     : parser_()
     , env_(std::make_shared<Environment>())
     , prompt_(">>")
@@ -40,6 +41,7 @@ Interpreter::Interpreter(bool batch)
     , parserCB_(env_, lastResult_, batch_)
 {
     env_->def(lastResult_, Value::Null);
+    initPath(path);
 }
 
 // -------------------------------------------------------------
@@ -135,5 +137,20 @@ void Interpreter::handleREPLCommand(const std::string &expr) {
     }
     else {
         throw InvalidCommand(cmd, "unknown command");
+    }
+}
+
+// -------------------------------------------------------------
+void Interpreter::initPath(const std::string &path) {
+    const auto envPath = std::getenv("ISHLANG_PATH");
+    if (envPath) {
+        const std::string envPathStr(envPath);
+        if (!envPathStr.empty()) {
+            ModuleStorage::addPaths(envPathStr);
+        }
+    }
+
+    if (!path.empty()) {
+        ModuleStorage::addPaths(path);
     }
 }

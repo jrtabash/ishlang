@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "code_node.h"
 #include "environment.h"
@@ -17,6 +18,7 @@ namespace Ishlang {
     public:
         using SharedPtr = std::shared_ptr<Module>;
         using OptionalName = std::optional<std::string>;
+        using AliasList = CodeNode::NameAndAsList;
 
     public:
         Module(const std::string &name, const std::string &sourceFile);
@@ -25,6 +27,7 @@ namespace Ishlang {
         Value loadFromString(const std::string &expr);
         Value import(Environment::SharedPtr importEnv, const OptionalName &asName = std::nullopt);
         Value alias(Environment::SharedPtr aliasEnv, const std::string &name, const OptionalName &asName = std::nullopt);
+        Value aliases(Environment::SharedPtr aliasEnv, const AliasList &aliasList);
 
         const std::string &name() const noexcept { return name_; }
         const std::string &sourceFile() const noexcept { return sourceFile_; }
@@ -45,6 +48,7 @@ namespace Ishlang {
     class ModuleStorage {
     public: // Path
         static bool addPath(const std::string &path);
+        static bool addPaths(const std::string &path);
 
         static const std::vector<std::string> &paths() noexcept { return paths_; }
 
