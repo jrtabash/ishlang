@@ -1,0 +1,9 @@
+__CODE__
+(from test_module import add as plus sub as minus)
+
+(println (plus 1 2))
+(println (minus 10 5))
+
+__EXPECT__
+3
+5

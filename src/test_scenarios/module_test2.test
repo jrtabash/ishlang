@@ -1,0 +1,9 @@
+__CODE__
+(import test_module as arith)
+
+(println (arith.add 1 2))
+(println (arith.sub 10 5))
+
+__EXPECT__
+3
+5

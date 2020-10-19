@@ -1,0 +1,9 @@
+__CODE__
+(from test_module import add sub)
+
+(println (add 1 2))
+(println (sub 10 5))
+
+__EXPECT__
+3
+5

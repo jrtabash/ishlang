@@ -49,7 +49,7 @@ do
     expect_file=$(echo "${scenario}.expect")
     out_file=$(echo "${scenario}.out")
 
-    ${ishlang} -f ${code_file} > ${out_file}
+    ${ishlang} -p ${tests} -f ${code_file} > ${out_file}
     if [ ${?} -ne 0 ]; then
         echo "Terminating tests ... failed running ${code_file}"
         exit 1
