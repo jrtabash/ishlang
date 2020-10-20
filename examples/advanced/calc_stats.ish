@@ -48,7 +48,3 @@
   (printStat "max" (arrget samm 3))
   (printStat "var" variance)
   (printStat "std" (^ variance 0.5)))
-
-(calcStats (array 1 2 3 4 5 6 7 8 9 10))
-(println "----------")
-(calcStats (array -10 -8 -6 -4 -2 2 4 6 8 10))

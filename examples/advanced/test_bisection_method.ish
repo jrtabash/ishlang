@@ -1,0 +1,17 @@
+(from bisection_method import bisection)
+
+;; Solve x^2 - 25 = 0
+(defun f (x)
+  (- (^ x 2) 25))
+
+(println "Equation: x^2 - 25 = 0")
+(print "Solution: ")
+(println (bisection f 1.0 10.0 0.000001 100))
+
+;; Solve x^3 - x - 2 = 0
+(defun cubicF (x)
+  (- (- (^ x 3) x) 2))
+
+(println "Equation: x^3 - x - 2 = 0")
+(print "Solution: ")
+(println (bisection cubicF 1.0 2.0 0.000001 100))

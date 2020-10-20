@@ -84,21 +84,3 @@
               (print (arrget (memget mat data) i))
               (if (== i lastRowIndex) (println "]") (println ""))))
       (println ""))))
-
-(println "mat3x3")
-(var mat3x3 (matrix_fromArray 3 3 (array 1 2 3 4 5 6 7 8 9)))
-(matrix_print mat3x3)
-
-(println "mat3x2")
-(var mat3x2 (matrix_fromArray 3 2 (array 2 4 6 6 4 2)))
-(matrix_print mat3x2)
-
-(println "id3x3")
-(var id3x3 (matrix_id 3))
-(matrix_print id3x3)
-
-(println "mat3x3 + id3x3")
-(matrix_print (matrix_add mat3x3 id3x3))
-
-(println "mat3x3 * mat3x2")
-(matrix_print (matrix_mul mat3x3 mat3x2))
