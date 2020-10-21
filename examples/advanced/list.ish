@@ -76,3 +76,17 @@
 
 (defun list_clear (list)
   (list_setHead list null))
+
+(defun list_print (list newline)
+  (var first true)
+  (print '[')
+  (list_foreach
+   list
+   (lambda (node)
+     (if first
+         (= first false)
+       (print ", "))
+     (print (node_value node))))
+  (print ']')
+  (when newline
+    (println "")))

@@ -7,17 +7,9 @@
     (println val))
 
   (defun prtList (msg lst)
-    (var first true)
     (print msg)
-    (print ": [")
-    (list.list_foreach
-     lst
-     (lambda (n)
-       (unless first
-         (print ", "))
-       (print (list.node_value n))
-       (= first false)))
-    (println "]"))
+    (print ": ")
+    (list.list_print lst true))
 
   (defun show (what lst)
     (println "----------")
