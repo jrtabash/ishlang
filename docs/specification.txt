@@ -527,3 +527,22 @@ Examples:
     (from arith import add as plus sub as minus)
     (println (plus 1 2))
     (println (minus 10 5))
+
+Random Function
+---------------
+Return a random integer between 0 and max.
+
+  (rand [<max>])
+
+The return range of rand is [0, <max>] if <max> is specified.
+
+If <max> is not specified, then the return range is [0, 4294967295].
+
+If <max> is greater than 4294967295, then 4294967295 is used. Essentially,
+the call is equivalent to not specifying <max>.
+
+If <max> is 0, then function returns 0.
+
+Examples:
+* (rand)
+* (rand 10)

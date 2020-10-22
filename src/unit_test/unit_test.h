@@ -101,6 +101,7 @@ namespace Ishlang {
         void testCodeNodeStrCharTransform();
         void testCodeNodeImportModule();
         void testCodeNodeFromModuleImport();
+        void testCodeNodeRandom();
         void testParserBasic();
         void testParserClone();
         void testParserIsType();
@@ -142,6 +143,7 @@ namespace Ishlang {
         void testParserStrCharTransform();
         void testParserImportModule();
         void testParserFromModuleImport();
+        void testParserRandom();
         
     private:
         bool  success_;

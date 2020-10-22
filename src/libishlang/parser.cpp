@@ -795,6 +795,16 @@ void Parser::initAppFtns() {
         { "isspace", MakeStrCharOp<StrCharCheck>("isspace", *this, StrCharCheck::Space) },
 
         { "toupper", MakeStrCharOp<StrCharTransform>("toupper", *this, StrCharTransform::ToUpper) },
-        { "tolower", MakeStrCharOp<StrCharTransform>("tolower", *this, StrCharTransform::ToLower) }
+        { "tolower", MakeStrCharOp<StrCharTransform>("tolower", *this, StrCharTransform::ToLower) },
+
+        { "rand",
+          [this]() {
+              auto exprs(readExprList());
+              if (exprs.size() > 1) {
+                  throw TooManyOrFewForms("rand");
+              }
+              return std::make_shared<Random>(exprs.size() == 1 ? exprs[0] : CodeNode::SharedPtr());
+          }
+        }
     };
 }

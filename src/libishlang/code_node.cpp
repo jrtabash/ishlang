@@ -7,9 +7,10 @@
 #include "sequence.h"
 #include "util.h"
 
-#include <cmath>
 #include <algorithm>
 #include <cctype>
+#include <cmath>
+#include <random>
 
 using namespace Ishlang;
 
@@ -1062,4 +1063,28 @@ Value FromModuleImport::exec(Environment::SharedPtr env) {
         return modulePtr->aliases(env, aliasList_);
     }
     return Value::False;
+}
+
+// -------------------------------------------------------------
+Random::Random(CodeNode::SharedPtr max)
+    : max_(max)
+{}
+
+Value Random::exec(Environment::SharedPtr env) {
+    static auto randFtn = std::mt19937(std::random_device()());
+    static const auto maxRand = static_cast<Value::Long>(randFtn.max());
+
+    Value::Long rand = static_cast<Value::Long>(randFtn());
+    if (max_) {
+        const Value maxValue = max_->eval(env);
+
+        if (!maxValue.isInt()) { throw InvalidOperandType("Integer", maxValue.typeToString()); }
+        if (maxValue.integer() < 0) { throw InvalidExpression("max negative"); }
+
+        if (maxValue.integer() < maxRand) {
+            rand = rand % (maxValue.integer() + 1);
+        }
+    }
+
+    return Value(rand);
 }

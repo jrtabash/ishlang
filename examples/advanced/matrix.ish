@@ -26,6 +26,14 @@
         (matrix_set mat i i 1))
   mat)
 
+(defun matrix_random (n m)
+  ;; Generate a random nxm matrix with values in range [0.0, 1.0]
+  (var mat (matrix n m))
+  (loop (var i 0) (< i n) (= i (+ i 1))
+        (loop (var j 0) (< j m) (= j (+ j 1))
+              (matrix_set mat i j (/ (rand 1000000000) 1000000000.0))))
+  mat)
+
 (defun matrix_fromArray (n m arr)
   (defun row (i)
     (/ i m))

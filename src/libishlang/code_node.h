@@ -822,6 +822,18 @@ namespace Ishlang {
         NameAndAsList aliasList_;
     };
 
+    // -------------------------------------------------------------
+    class Random : public CodeNode {
+    public:
+        Random(CodeNode::SharedPtr max = CodeNode::SharedPtr());
+        virtual ~Random() {}
+
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr max_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H

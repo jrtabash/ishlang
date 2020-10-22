@@ -79,6 +79,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeStrCharTransform);
     ADD_TEST(testCodeNodeImportModule);
     ADD_TEST(testCodeNodeFromModuleImport);
+    ADD_TEST(testCodeNodeRandom);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -124,6 +125,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserStrCharTransform);
     ADD_TEST(testParserImportModule);
     ADD_TEST(testParserFromModuleImport);
+    ADD_TEST(testParserRandom);
 }
 #undef ADD_TEST
 
@@ -3304,6 +3306,50 @@ void UnitTest::testCodeNodeFromModuleImport() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeRandom() {
+    Environment::SharedPtr env(new Environment());
+
+    auto lit = [](const Value &val) { return std::make_shared<Literal>(val); };
+
+    auto test = [&env, lit](Value::Long mod, std::unordered_set<Value::Long> expectedSet) {
+                    auto randCode = std::make_shared<Random>(lit(Value(mod)));
+                    for (int i = 0; i < 1000; ++i) {
+                        if (expectedSet.find(randCode->eval(env).integer()) == expectedSet.end()) {
+                            return false;
+                        }
+                    }
+                    return true;
+                };
+
+    TEST_CASE_MSG(test(0, { 0 }), "rand(0)");
+    TEST_CASE_MSG(test(1, { 0, 1 }), "rand(1)");
+    TEST_CASE_MSG(test(2, { 0, 1, 2 }), "rand(2)");
+    TEST_CASE_MSG(test(10, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }), "rand(10)");
+
+    try {
+        std::make_shared<Random>(lit(Value(-1ll)))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidExpression &ex) {
+        TEST_CASE(std::string("Invalid expression - max negative") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<Random>(lit(Value('a')))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=Integer actual=char") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -4239,4 +4285,15 @@ void UnitTest::testParserFromModuleImport() {
 
         TEST_CASE_MSG(env->size() == 0, "actual=" << env->size());
     }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserRandom() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(rand 0)",   Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(rand -1)",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(rand 'a')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(rand 1 2)", Value::Null, false));
 }

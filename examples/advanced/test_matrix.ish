@@ -3,6 +3,7 @@
       matrix_id
       matrix_add
       matrix_mul
+      matrix_random
       matrix_print)
 
 (println "mat3x3")
@@ -22,3 +23,6 @@
 
 (println "mat3x3 * mat3x2")
 (matrix_print (matrix_mul mat3x3 mat3x2))
+
+(println "mat2x3 random")
+(matrix_print (matrix_random 2 3))
