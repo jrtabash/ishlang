@@ -127,6 +127,11 @@ namespace Ishlang {
         static void print(const Value &value);
         static void printC(std::ostream &out, const Value &value);
 
+    public:
+        struct Hash {
+            std::size_t operator()(const Value &value) const noexcept;
+        };
+
     private:
         using VariantValue = std::variant<Long,
                                           Double,

@@ -3,6 +3,7 @@
 
 #include "code_node.h"
 #include "environment.h"
+#include "hashtable.h"
 #include "instance.h"
 #include "lambda.h"
 #include "lexer.h"
@@ -57,6 +58,9 @@ namespace Ishlang {
         void testSequenceCount();
         void testSequenceValue();
         void testSequencePrint();
+        void testHashtable();
+        void testHashtableFind();
+        void testHashtableCount();
         void testModule();
         void testModuleStorage();
         void testCodeNodeBasic();

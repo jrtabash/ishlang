@@ -401,3 +401,21 @@ void Value::print(const Value &value) {
     case Value::eArray:      std::cout << *std::get<SequencePtr>(value.value_);              break;
     }
 }
+
+// -------------------------------------------------------------
+std::size_t Value::Hash::operator()(const Value &value) const noexcept {
+    switch (value.type_) {
+    case Value::eInteger:    return std::hash<Value::Long>{}(value.integer());
+    case Value::eReal:       return std::hash<Value::Double>{}(value.real());
+    case Value::eCharacter:  return std::hash<Value::Char>{}(value.character());
+    case Value::eBoolean:    return std::hash<Value::Bool>{}(value.boolean());
+    case Value::eString:     return std::hash<Value::Text>{}(value.text());
+    case Value::eClosure:    return std::hash<const Value::Func *>{}(&value.closure());
+    case Value::eUserType:   return std::hash<const Value::UserType *>{}(&value.userType());
+    case Value::eUserObject: return std::hash<const Value::UserObject *>{}(&value.userObject());
+    case Value::eArray:      return std::hash<const Value::Array *>{}(&value.array());
+    case Value::eNone:       break;
+    }
+
+    return std::size_t(0);
+}

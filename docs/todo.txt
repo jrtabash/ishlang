@@ -36,12 +36,14 @@
   - lisrev
   Hash table
   - hashtable
-  - haslen
-  - hasexists
-  - hasget
-  - hasset
-  - hasfind
-  - hascount
+  - hashlen
+  - hashexists
+  - hashget
+  - hashset
+  - hashrem
+  - hashclr
+  - hashfind
+  - hashcount
   Ordered table
   - orderedtable
   - ordlen

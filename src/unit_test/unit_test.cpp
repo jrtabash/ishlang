@@ -38,6 +38,9 @@ UnitTest::UnitTest()
     ADD_TEST(testSequenceCount);
     ADD_TEST(testSequenceValue);
     ADD_TEST(testSequencePrint);
+    ADD_TEST(testHashtable);
+    ADD_TEST(testHashtableFind);
+    ADD_TEST(testHashtableCount);
     ADD_TEST(testModule);
     ADD_TEST(testModuleStorage);
     ADD_TEST(testCodeNodeBasic);
@@ -1181,6 +1184,90 @@ void UnitTest::testSequencePrint() {
         oss << Sequence({v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12});
         TEST_CASE_MSG(oss.str() == "[1 2 3 4 5 6 7 8 9 10 ...]", "actual=" << oss.str());
     }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testHashtable() {
+    Hashtable ht;
+
+    const auto one = Value("one");
+    const auto two = Value("two");
+    const auto three = Value("three");
+    const auto four = Value("four");
+
+    TEST_CASE_MSG(ht.size() == 0lu, "actual=" << ht.size());
+
+    ht.set(one, Value(1ll));
+    TEST_CASE_MSG(ht.size() == 1lu, "actual=" << ht.size());
+    TEST_CASE_MSG(ht.get(one) == Value(1ll), "actual=" << ht.get(one));
+
+    ht.set(two, Value(2ll));
+    TEST_CASE_MSG(ht.size() == 2lu, "actual=" << ht.size());
+    TEST_CASE_MSG(ht.get(two) == Value(2ll), "actual=" << ht.get(two));
+
+    ht.set(three, Value(3ll));
+    TEST_CASE_MSG(ht.size() == 3lu, "actual=" << ht.size());
+    TEST_CASE_MSG(ht.get(three) == Value(3ll), "actual=" << ht.get(three));
+
+    TEST_CASE_MSG(ht.get(four) == Value::Null, "actual=" << ht.get(four));
+    TEST_CASE_MSG(ht.get(four, Value::Zero) == Value::Zero, "actual=" << ht.get(four, Value::Zero));
+
+    TEST_CASE_MSG(ht.exists(one), "actual=" << ht.exists(one));
+    TEST_CASE_MSG(ht.exists(two), "actual=" << ht.exists(two));
+    TEST_CASE_MSG(ht.exists(three), "actual=" << ht.exists(three));
+    TEST_CASE_MSG(!ht.exists(four), "actual=" << ht.exists(four));
+
+    ht.remove(two);
+    TEST_CASE_MSG(ht.size() == 2lu, "actual=" << ht.size());
+    TEST_CASE_MSG(!ht.exists(two), "actual=" << ht.exists(two));
+
+    ht.clear();
+    TEST_CASE_MSG(ht.size() == 0lu, "actual=" << ht.size());
+    TEST_CASE_MSG(!ht.exists(one), "actual=" << ht.exists(one));
+    TEST_CASE_MSG(!ht.exists(three), "actual=" << ht.exists(three));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testHashtableFind() {
+    const auto kOne = Value("one");
+    const auto kTwo = Value("two");
+    const auto kThree = Value("three");
+
+    const auto vOne = Value(1ll);
+    const auto vTwo = Value(2ll);
+    const auto vThree = Value(3ll);
+    const auto vFour = Value(4ll);
+
+    Hashtable ht;
+    ht.set(kOne, vOne);
+    ht.set(kTwo, vTwo);
+    ht.set(kThree, vThree);
+
+    Value key;
+
+    key = ht.find(vOne); TEST_CASE_MSG(key == kOne, "actual=" << key);
+    key = ht.find(vTwo); TEST_CASE_MSG(key == kTwo, "actual=" << key);
+    key = ht.find(vThree); TEST_CASE_MSG(key == kThree, "actual=" << key);
+    key = ht.find(vFour); TEST_CASE_MSG(key == Value::Null, "actual=" << key);
+}
+
+// -------------------------------------------------------------
+void UnitTest::testHashtableCount() {
+    const auto vOne = Value(1ll);
+    const auto vTwo = Value(2ll);
+    const auto vThree = Value(3ll);
+    const auto vFour = Value(4ll);
+
+    Hashtable ht;
+    ht.set(Value("one"), vOne);
+    ht.set(Value("two"), vTwo);
+    ht.set(Value("two2"), vTwo);
+    ht.set(Value("three"), vThree);
+
+    TEST_CASE_MSG(ht.count(vOne) == 1, "actual=" << ht.count(vOne));
+    TEST_CASE_MSG(ht.count(vTwo) == 2, "actual=" << ht.count(vOne));
+    TEST_CASE_MSG(ht.count(vThree) == 1, "actual=" << ht.count(vOne));
+    TEST_CASE_MSG(ht.count(vFour) == 0, "actual=" << ht.count(vOne));
 }
 
 // -------------------------------------------------------------

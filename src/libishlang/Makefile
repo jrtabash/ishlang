@@ -15,6 +15,7 @@ OBJS=\
 	struct.o \
 	instance.o \
 	sequence.o \
+	hashtable.o \
 	code_node.o \
 	lexer.o \
 	parser.o \
@@ -35,7 +36,7 @@ exception.o: exception.h exception.cpp
 util.o: util.h util.cpp exception.h
 	$(CPP) $(CFLAGS) -c util.cpp -o $(BUILD)/util.o
 
-value.o: value.h value.cpp lambda.h instance.h sequence.h exception.h
+value.o: value.h value.cpp lambda.h instance.h
 	$(CPP) $(CFLAGS) -c value.cpp -o $(BUILD)/value.o
 
 environment.o: environment.cpp environment.h value.h exception.h
@@ -52,6 +53,9 @@ instance.o: instance.cpp instance.h value.h exception.h
 
 sequence.o: sequence.cpp sequence.h value.h exception.h
 	$(CPP) $(CFLAGS) -c sequence.cpp -o $(BUILD)/sequence.o
+
+hashtable.o: hashtable.cpp hashtable.h value.h
+	$(CPP) $(CFLAGS) -c hashtable.cpp -o $(BUILD)/hashtable.o
 
 code_node.o: code_node.cpp code_node.h value.h parser.h environment.h lambda.h util.h exception.h
 	$(CPP) $(CFLAGS) -c code_node.cpp -o $(BUILD)/code_node.o
