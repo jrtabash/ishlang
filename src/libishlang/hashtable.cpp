@@ -29,19 +29,3 @@ std::size_t Hashtable::count(const Value &value) const {
                              return nameValue.second == value;
                          });
 }
-
-// -------------------------------------------------------------
-std::ostream &Hashtable::print(std::ostream &out) const {
-    out << '{';
-    std::size_t count = 0;
-    for (const auto &nameValue : table_) {
-        if (count > 0) { out << ' '; }
-        out << nameValue.first << ": " << nameValue.second;
-        if (++count >= maxDisplaySize_ && table_.size() > maxDisplaySize_) {
-            out << " ...";
-            break;
-        }
-    }
-    out << '}';
-    return out;
-}

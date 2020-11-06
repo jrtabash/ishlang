@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <forward_list>
 #include <optional>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -32,6 +33,28 @@ namespace Ishlang {
 
     public:
         static bool setBoolFromString(bool &out, const std::string &str);
+
+    public:
+        template <typename Container, typename ItemPrinter>
+        static std::ostream &printContainer(std::ostream &out,
+                                            const Container &container,
+                                            const ItemPrinter &itemPrinter,
+                                            char leftWrapper,
+                                            char rightWrapper,
+                                            std::size_t maxItems = 10) {
+            out << leftWrapper;
+            std::size_t count = 0;
+            for (const auto &item : container) {
+                if (count > 0) { out << ' '; }
+                itemPrinter(out, item);
+                if (++count >= maxItems && container.size() > maxItems) {
+                    out << " ...";
+                    break;
+                }
+            }
+            out << rightWrapper;
+            return out;
+        }
 
     public: // Filesystem
         struct TemporaryFile {

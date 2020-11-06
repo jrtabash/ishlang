@@ -23,6 +23,7 @@ UnitTest::UnitTest()
 
     ADD_TEST(testToken);
     ADD_TEST(testUtilSplit);
+    ADD_TEST(testUtilPrintContainer);
     ADD_TEST(testComment);
     ADD_TEST(testValue);
     ADD_TEST(testValueAsType);
@@ -410,6 +411,48 @@ void UnitTest::testUtilSplit() {
     test("/some/path:/another/path/", { "/some/path", "/another/path/" }, ':');
     test("/some/path:/another/path/:/other/", { "/some/path", "/another/path/", "/other/" }, ':');
 }
+
+// -------------------------------------------------------------
+void UnitTest::testUtilPrintContainer() {
+    auto itemPrinter = [](std::ostream &os, const auto &item) { os << item; };
+
+    {
+        std::ostringstream oss;
+        Util::printContainer(oss, std::vector<int>(), itemPrinter, '[', ']');
+        TEST_CASE_MSG(oss.str() == "[]", "actual=" << oss.str());
+    }
+
+    {
+        std::ostringstream oss;
+        Util::printContainer(oss, std::vector<int>({1, 2, 3}), itemPrinter, '[', ']');
+        TEST_CASE_MSG(oss.str() == "[1 2 3]", "actual=" << oss.str());
+    }
+
+    {
+        std::ostringstream oss;
+        Util::printContainer(oss, std::vector<int>({1, 2, 3, 4, 5, 6, 7, 8, 9, 10}), itemPrinter, '[', ']');
+        TEST_CASE_MSG(oss.str() == "[1 2 3 4 5 6 7 8 9 10]", "actual=" << oss.str());
+    }
+
+    {
+        std::ostringstream oss;
+        Util::printContainer(oss, std::vector<int>({1, 2, 3, 4, 5, 6, 7, 8, 9, 10}), itemPrinter, '[', ']', 3);
+        TEST_CASE_MSG(oss.str() == "[1 2 3 ...]", "actual=" << oss.str());
+    }
+
+    {
+        std::ostringstream oss;
+        Util::printContainer(oss, std::vector<int>({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}), itemPrinter, '[', ']');
+        TEST_CASE_MSG(oss.str() == "[1 2 3 4 5 6 7 8 9 10 ...]", "actual=" << oss.str());
+    }
+
+    {
+        std::ostringstream oss;
+        Util::printContainer(oss, std::vector<int>({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}), itemPrinter, '[', ']');
+        TEST_CASE_MSG(oss.str() == "[1 2 3 4 5 6 7 8 9 10 ...]", "actual=" << oss.str());
+    }
+}
+
 
 // -------------------------------------------------------------
 void UnitTest::testComment() {

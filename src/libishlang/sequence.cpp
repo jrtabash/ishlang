@@ -30,19 +30,3 @@ std::optional<std::size_t> Sequence::find(const Value &val, std::size_t pos) con
 std::size_t Sequence::count(const Value &value) const {
     return std::count(vector_.begin(), vector_.end(), value);
 }
-
-// -------------------------------------------------------------
-std::ostream &Sequence::print(std::ostream &out) const {
-    out << '[';
-    std::size_t count = 0;
-    for (const auto &value : vector_) {
-        if (count > 0) { out << ' '; }
-        out << value;
-        if (++count >= maxDisplaySize_ && vector_.size() > maxDisplaySize_) {
-            out << " ...";
-            break;
-        }
-    }
-    out << ']';
-    return out;
-}

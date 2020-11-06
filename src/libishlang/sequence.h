@@ -1,6 +1,7 @@
 #ifndef SEQUENCE_H
 #define SEQUENCE_H
 
+#include "util.h"
 #include "value.h"
 
 #include <optional>
@@ -36,12 +37,12 @@ namespace Ishlang {
         std::size_t size() const { return vector_.size(); }
 
         friend std::ostream &operator<<(std::ostream &out, const Sequence &sequence) {
-            sequence.print(out);
-            return out;
+            return Util::printContainer(out,
+                                        sequence.vector_,
+                                        [](std::ostream &os, const auto &value) { os << value; },
+                                        '[',
+                                        ']');
         }
-
-    private:
-        std::ostream &print(std::ostream &out) const;
 
     private:
         static bool vectorEqual(const Vector &lhs, const Vector &rhs) {

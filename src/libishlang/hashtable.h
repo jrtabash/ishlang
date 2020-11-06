@@ -1,6 +1,7 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
+#include "util.h"
 #include "value.h"
 
 #include <ostream>
@@ -41,11 +42,14 @@ namespace Ishlang {
         std::size_t size() const { return table_.size(); }
 
         friend std::ostream &operator<<(std::ostream &out, const Hashtable &ht) {
-            return ht.print(out);
+            return Util::printContainer(out,
+                                        ht.table_,
+                                        [](std::ostream &os, const auto &nameValue) {
+                                            os << nameValue.first << ": " << nameValue.second;
+                                        },
+                                        '{',
+                                        '}');
         }
-
-    private:
-        std::ostream &print(std::ostream &out) const;
 
     private:
         static bool tableEqual(const Table &lhs, const Table &rhs) {

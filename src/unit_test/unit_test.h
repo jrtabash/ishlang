@@ -42,6 +42,7 @@ namespace Ishlang {
     private:
         void testToken();
         void testUtilSplit();
+        void testUtilPrintContainer();
         void testComment();
         void testTokenType();
         void testValue();
