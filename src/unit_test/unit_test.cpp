@@ -84,6 +84,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeImportModule);
     ADD_TEST(testCodeNodeFromModuleImport);
     ADD_TEST(testCodeNodeRandom);
+    ADD_TEST(testCodeNodeHash);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -130,6 +131,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserImportModule);
     ADD_TEST(testParserFromModuleImport);
     ADD_TEST(testParserRandom);
+    ADD_TEST(testParserHash);
 }
 #undef ADD_TEST
 
@@ -3480,6 +3482,30 @@ void UnitTest::testCodeNodeRandom() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeHash() {
+    Environment::SharedPtr env(new Environment());
+
+    auto hash = [&env](const Value &value) {
+                    auto lit = std::make_shared<Literal>(value);
+                    return std::make_shared<Hash>(lit)->eval(env);
+                };
+
+    auto test = [hash](const Value &value) {
+                    auto hashValue = hash(value);
+                    return hashValue.isInt() && hashValue.integer() >= 0;
+                };
+
+    TEST_CASE(hash(Value::Null) == Value::Zero);
+
+    TEST_CASE_MSG(test(Value(5ll)), "hash(5)");
+    TEST_CASE_MSG(test(Value(2.5)), "hash(2.5)");
+    TEST_CASE_MSG(test(Value::True), "hash(true)");
+    TEST_CASE_MSG(test(Value::False), "hash(false");
+    TEST_CASE_MSG(test(Value('a')), "hash('a')");
+    TEST_CASE_MSG(test(Value("str")), "hash(\"str\")");
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -4426,4 +4452,15 @@ void UnitTest::testParserRandom() {
     TEST_CASE(parserTest(parser, env, "(rand -1)",  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(rand 'a')", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(rand 1 2)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHash() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(hash null)", Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(hash 0)",    Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(hash)",      Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hash 1 2)",  Value::Null, false));
 }

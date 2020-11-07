@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <limits>
 #include <random>
 
 using namespace Ishlang;
@@ -1067,7 +1068,8 @@ Value FromModuleImport::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 Random::Random(CodeNode::SharedPtr max)
-    : max_(max)
+    : CodeNode()
+    , max_(max)
 {}
 
 Value Random::exec(Environment::SharedPtr env) {
@@ -1087,4 +1089,20 @@ Value Random::exec(Environment::SharedPtr env) {
     }
 
     return Value(rand);
+}
+
+// -------------------------------------------------------------
+Hash::Hash(CodeNode::SharedPtr operand)
+    : CodeNode()
+    , operand_(operand)
+{}
+
+Value Hash::exec(Environment::SharedPtr env) {
+    static const Value::Hash hashFtn;
+    static const std::size_t maxLongPlus1 =
+        std::size_t(std::numeric_limits<Value::Long>::max()) + 1;
+
+    return (operand_
+            ? Value(Value::Long(hashFtn(operand_->eval(env)) % maxLongPlus1))
+            : Value::Zero);
 }

@@ -805,6 +805,13 @@ void Parser::initAppFtns() {
               }
               return std::make_shared<Random>(exprs.size() == 1 ? exprs[0] : CodeNode::SharedPtr());
           }
+        },
+
+        { "hash",
+          [this]() {
+              auto exprs(readAndCheckExprList("hash", 1));
+              return std::make_shared<Hash>(exprs[0]);
+          }
         }
     };
 }

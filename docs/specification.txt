@@ -546,3 +546,29 @@ If <max> is 0, then function returns 0.
 Examples:
 * (rand)
 * (rand 10)
+
+Hash Function
+-------------
+Return a hash of operand.
+
+  (hash <operand>)
+
+The return range of hash is [0, 9223372036854775807].
+
+Operand can be any ishlang value.
+
+Examples:
+* (hash 100)
+* (hash "string")
+* (hash 'a')
+* (hash true)
+* (hash null)
+* (hash 3.14)
+* (struct Foo (bar))
+  (hash Foo)
+* (var inst (makeinstance Foo))
+  (hash inst)
+* (defun ftn () 5)
+  (hash ftn)
+* (var a (array 1 2))
+  (hash a)

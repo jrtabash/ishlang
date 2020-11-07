@@ -834,6 +834,18 @@ namespace Ishlang {
         CodeNode::SharedPtr max_;
     };
 
+    // -------------------------------------------------------------
+    class Hash : public CodeNode {
+    public:
+        Hash(CodeNode::SharedPtr operand);
+        virtual ~Hash() {}
+
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr operand_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H
