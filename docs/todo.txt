@@ -30,47 +30,55 @@
 * Implement built-in data structures:
   List:
   - list
-  - lislen
-  - lisfront
-  - lisback
-  - lispushf
-  - lispopf
-  - lispushb
-  - lispopb
-  - lisget
-  - lisset
-  - lisadd
-  - lisinsert
-  - lisfind
-  - liscount
-  - lissort
-  - lisrev
+  - lislen    (list length)
+  - lisfront  (list front)
+  - lisback   (list back)
+  - lispushf  (list push front)
+  - lispopf   (list pop front)
+  - lispushb  (list push back)
+  - lispopb   (list pop back)
+  - lisget    (list get item at index)
+  - lisset    (list set item at index)
+  - lisadd    (list append)
+  - lisins    (list insert at index)
+  - lisrem    (list remove index)
+  - lisclr    (list clear)
+  - lisfind   (list find value index)
+  - liscount  (list count value)
+  - lissort   (list sort)
+  - lisrev    (list reverse)
   Hash table
-  - hashtable
-  - hashlen
-  - hashexists
-  - hashget
-  - hashset
-  - hashrem
-  - hashclr
-  - hashfind
-  - hashcount
+  - [Done] hashmap
+  - hmlen    (hashmap length)
+  - hm?      (hashmap key exists)
+  - hmget    (hashmap get)
+  - hmset    (hashmap set)
+  - hmrel    (hashmap remove)
+  - hmclr    (hashmap clear)
+  - hmfind   (hashmap find by value)
+  - hmcount  (hashmap count value)
   Ordered table
-  - orderedtable
-  - ordlen
-  - ordget
-  - ordset
-  - ordfind
-  - ordcount
+  - orderedmap
+  - omlen    (orderedmap length)
+  - om?      (orderedmap key exists)
+  - omget    (orderedmap get)
+  - omset    (orderedmap set)
+  - omrem    (orderedmap remove)
+  - omclr    (orderedmap clear)
+  - omfind   (orderedmap find by value)
+  - omcount  (orderedmap count value)
 
 * Add string functions
-  - strsort
-  - strrev
-  - strcmp
+  - strsort  (string sort)
+  - strrev   (string reverse)
+  - strcmp   (string compare)
 
 * Add array functions
-  - arrsort
-  - arrrev
+  - arrins   (array insert at index)
+  - arrrem   (array remove index)
+  - arrclr   (array clear)
+  - arrsort  (array sort)
+  - arrrev   (array reverse)
 
 * Add generic functions
   - Add generic get function with support for instances, strings and arrays
