@@ -1,5 +1,6 @@
 #include "value.h"
 #include "exception.h"
+#include "hashtable.h"
 #include "instance.h"
 #include "lambda.h"
 #include "sequence.h"
@@ -19,6 +20,7 @@ Lambda      Value::NullFunc;
 Struct      Value::NullUserType;
 Instance    Value::NullObject;
 Sequence    Value::NullSequence;
+Hashtable   Value::NullHashtable;
 
 // -------------------------------------------------------------
 Value::Value(const char *t)
@@ -54,6 +56,12 @@ Value::Value(const Instance &o)
 Value::Value(const Sequence &s)
     : type_(eArray)
     , value_(std::make_shared<Sequence>(s))
+{}
+
+// -------------------------------------------------------------
+Value::Value(const Hashtable &h)
+    : type_(eHashMap)
+    , value_(std::make_shared<Hashtable>(h))
 {}
 
 // -------------------------------------------------------------
@@ -164,6 +172,7 @@ bool Value::operator==(const Value &rhs) const {
         case eUserType:   return *std::get<StructPtr>(value_) == *std::get<StructPtr>(rhs.value_);
         case eUserObject: return *std::get<InstancePtr>(value_) == *std::get<InstancePtr>(rhs.value_);
         case eArray:      return *std::get<SequencePtr>(value_) == *std::get<SequencePtr>(rhs.value_);
+        case eHashMap:    return *std::get<HashtablePtr>(value_) == *std::get<HashtablePtr>(rhs.value_);
         case eNone:       return true;
         }
     }
@@ -186,6 +195,7 @@ bool Value::operator!=(const Value &rhs) const {
         case eUserType:   return *std::get<StructPtr>(value_) != *std::get<StructPtr>(rhs.value_);
         case eUserObject: return *std::get<InstancePtr>(value_) != *std::get<InstancePtr>(rhs.value_);
         case eArray:      return *std::get<SequencePtr>(value_) != *std::get<SequencePtr>(rhs.value_);
+        case eHashMap:    return *std::get<HashtablePtr>(value_) != *std::get<HashtablePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -208,6 +218,7 @@ bool Value::operator<(const Value &rhs) const {
         case eUserType:   return false;
         case eUserObject: return false;
         case eArray:      return *std::get<SequencePtr>(value_) < *std::get<SequencePtr>(rhs.value_);
+        case eHashMap:    return *std::get<HashtablePtr>(value_) < *std::get<HashtablePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -230,6 +241,7 @@ bool Value::operator>(const Value &rhs) const {
         case eUserType:   return false;
         case eUserObject: return false;
         case eArray:      return *std::get<SequencePtr>(value_) > *std::get<SequencePtr>(rhs.value_);
+        case eHashMap:    return *std::get<HashtablePtr>(value_) > *std::get<HashtablePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -252,6 +264,7 @@ bool Value::operator<=(const Value &rhs) const {
         case eUserType:   return false;
         case eUserObject: return false;
         case eArray:      return *std::get<SequencePtr>(value_) <= *std::get<SequencePtr>(rhs.value_);
+        case eHashMap:    return *std::get<HashtablePtr>(value_) <= *std::get<HashtablePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -274,6 +287,7 @@ bool Value::operator>=(const Value &rhs) const {
         case eUserType:   return false;
         case eUserObject: return false;
         case eArray:      return *std::get<SequencePtr>(value_) >= *std::get<SequencePtr>(rhs.value_);
+        case eHashMap:    return *std::get<HashtablePtr>(value_) >= *std::get<HashtablePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -296,6 +310,7 @@ std::string Value::typeToString(Type type) {
         case eUserType:   return "usertype";
         case eUserObject: return "userobject";
         case eArray:      return "array";
+        case eHashMap:    return "hashmap";
     }
     return "unknown";
 }
@@ -312,6 +327,7 @@ Value::Type Value::stringToType(const std::string &str) {
     else if (str == "usertype")   { return Value::eUserType; }
     else if (str == "userobject") { return Value::eUserObject; }
     else if (str == "array")      { return Value::eArray; }
+    else if (str == "hashmap")    { return Value::eHashMap; }
     throw InvalidExpression("unknown value type", str);
     return Value::eNone;
 }
@@ -340,6 +356,9 @@ Value Value::clone() const {
 
     case eArray:
         return Value(*std::get<SequencePtr>(value_));
+
+    case eHashMap:
+        return Value(*std::get<HashtablePtr>(value_));
     }
 
     return Value::Null;
@@ -363,6 +382,7 @@ Value Value::asType(Type otherType) const {
     case eUserType:
     case eUserObject:
     case eArray:
+    case eHashMap:
         break;
     }
 
@@ -383,6 +403,7 @@ void Value::printC(std::ostream &out, const Value &value) {
     case Value::eUserType:   out << *std::get<StructPtr>(value.value_);                break;
     case Value::eUserObject: out << *std::get<InstancePtr>(value.value_);              break;
     case Value::eArray:      out << *std::get<SequencePtr>(value.value_);              break;
+    case Value::eHashMap:    out << *std::get<HashtablePtr>(value.value_);             break;
     }
 }
 
@@ -399,6 +420,7 @@ void Value::print(const Value &value) {
     case Value::eUserType:   std::cout << *std::get<StructPtr>(value.value_);                break;
     case Value::eUserObject: std::cout << *std::get<InstancePtr>(value.value_);              break;
     case Value::eArray:      std::cout << *std::get<SequencePtr>(value.value_);              break;
+    case Value::eHashMap:    std::cout << *std::get<HashtablePtr>(value.value_);             break;
     }
 }
 
@@ -414,6 +436,7 @@ std::size_t Value::Hash::operator()(const Value &value) const noexcept {
     case Value::eUserType:   return std::hash<const Value::UserType *>{}(&value.userType());
     case Value::eUserObject: return std::hash<const Value::UserObject *>{}(&value.userObject());
     case Value::eArray:      return std::hash<const Value::Array *>{}(&value.array());
+    case Value::eHashMap:    return std::hash<const Value::HashMap *>{}(&value.hashMap());
     case Value::eNone:       break;
     }
 

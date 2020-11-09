@@ -1,5 +1,6 @@
 #include "code_node.h"
 #include "exception.h"
+#include "hashtable.h"
 #include "instance.h"
 #include "lambda.h"
 #include "module.h"
@@ -1105,4 +1106,30 @@ Value Hash::exec(Environment::SharedPtr env) {
     return (operand_
             ? Value(Value::Long(hashFtn(operand_->eval(env)) % maxLongPlus1))
             : Value::Zero);
+}
+
+// -------------------------------------------------------------
+MakeHashMap::MakeHashMap(CodeNode::SharedPtrList pairs)
+    : CodeNode()
+    , pairs_(pairs)
+{}
+
+Value MakeHashMap::exec(Environment::SharedPtr env) {
+    if (pairs_.empty()) {
+        return Value(Hashtable());
+    }
+    else {
+        Hashtable::Table table;
+        for (auto & pairCode : pairs_) {
+            // TODO:JT - Add support for list of pairs once pair type is added.
+            auto pairValue = pairCode->eval(env);
+            if (!pairValue.isArray()) { throw InvalidOperandType("Array", pairValue.typeToString()); }
+
+            const auto &arr = pairValue.array();
+            if (arr.size() != 2) { throw InvalidExpression("Wrong array size, expecting 2"); }
+
+            table.emplace(arr.get(0), arr.get(1));
+        }
+        return Value(Hashtable(std::move(table)));
+    }
 }

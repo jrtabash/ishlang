@@ -11,12 +11,14 @@ namespace Ishlang {
     class Struct;
     class Instance;
     class Sequence;
+    class Hashtable;
 
     using StringPtr = std::shared_ptr<std::string>;
     using LambdaPtr = std::shared_ptr<Lambda>;
     using StructPtr = std::shared_ptr<Struct>;
     using InstancePtr = std::shared_ptr<Instance>;
     using SequencePtr = std::shared_ptr<Sequence>;
+    using HashtablePtr = std::shared_ptr<Hashtable>;
 
     struct Value {
     public:
@@ -31,6 +33,7 @@ namespace Ishlang {
         static Struct      NullUserType;
         static Instance    NullObject;
         static Sequence    NullSequence;
+        static Hashtable   NullHashtable;
         
     public:
         enum Type {
@@ -44,6 +47,7 @@ namespace Ishlang {
             eUserType   = 'U',
             eUserObject = 'O',
             eArray      = 'A',
+            eHashMap    = 'H',
         };
 
         using Long       = long long int;
@@ -55,6 +59,7 @@ namespace Ishlang {
         using UserType   = Struct;
         using UserObject = Instance;
         using Array      = Sequence;
+        using HashMap    = Hashtable;
         
     public:
         Value()         : type_(eNone) {}
@@ -68,6 +73,7 @@ namespace Ishlang {
         Value(const Struct &s);
         Value(const Instance &o);
         Value(const Sequence &s);
+        Value(const Hashtable &h);
 
         Type type() const { return type_; }
         
@@ -81,6 +87,7 @@ namespace Ishlang {
         bool isUserType() const   { return type_ == eUserType; }
         bool isUserObject() const { return type_ == eUserObject; }
         bool isArray() const      { return type_ == eArray; }
+        bool isHashMap() const    { return type_ == eHashMap; }
         
         bool isNumber() const { return type_ == eInteger || type_ == eReal; }
         
@@ -96,6 +103,8 @@ namespace Ishlang {
         UserObject &userObject()             { return isUserObject() ? *std::get<InstancePtr>(value_) : NullObject; }
         const Array &array()           const { return isArray()      ? *std::get<SequencePtr>(value_) : NullSequence; }
         Array &array()                       { return isArray()      ? *std::get<SequencePtr>(value_) : NullSequence; }
+        const HashMap &hashMap()       const { return isHashMap()    ? *std::get<HashtablePtr>(value_) : NullHashtable; }
+        HashMap &hashMap()                   { return isHashMap()    ? *std::get<HashtablePtr>(value_) : NullHashtable; }
 
         Value asInt() const;
         Value asReal() const;
@@ -141,7 +150,8 @@ namespace Ishlang {
                                           LambdaPtr,
                                           StructPtr,
                                           InstancePtr,
-                                          SequencePtr>;
+                                          SequencePtr,
+                                          HashtablePtr>;
 
         Type type_;
         VariantValue value_;

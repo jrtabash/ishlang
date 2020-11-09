@@ -45,7 +45,7 @@ namespace Ishlang {
             return Util::printContainer(out,
                                         ht.table_,
                                         [](std::ostream &os, const auto &nameValue) {
-                                            os << nameValue.first << ": " << nameValue.second;
+                                            os << nameValue.first << '=' << nameValue.second;
                                         },
                                         '{',
                                         '}');

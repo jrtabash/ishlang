@@ -85,6 +85,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeFromModuleImport);
     ADD_TEST(testCodeNodeRandom);
     ADD_TEST(testCodeNodeHash);
+    ADD_TEST(testCodeNodeMakeHashMap);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -132,6 +133,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserFromModuleImport);
     ADD_TEST(testParserRandom);
     ADD_TEST(testParserHash);
+    ADD_TEST(testParserMakeHashMap);
 }
 #undef ADD_TEST
 
@@ -641,6 +643,7 @@ void UnitTest::testValue() {
         TEST_CASE(Value::stringToType("usertype")   == Value::eUserType);
         TEST_CASE(Value::stringToType("userobject") == Value::eUserObject);
         TEST_CASE(Value::stringToType("array")      == Value::eArray);
+        TEST_CASE(Value::stringToType("hashmap")    == Value::eHashMap);
 
         try {
             Value::stringToType("foobar");
@@ -704,6 +707,7 @@ void UnitTest::testValueAsType() {
     Value const stringTrue = Value("true");
     Value const stringFalse = Value("false");
     Value const array1 = Value(Sequence(1, int1));
+    Value const ht = Value(Hashtable());
 
     { // asInt
         TEST_VALUE_ASTYPE(int1,        asInt(), int1);
@@ -716,6 +720,7 @@ void UnitTest::testValueAsType() {
 
         TEST_ASTYPE_EXCEPT(null,   asInt(), "int");
         TEST_ASTYPE_EXCEPT(array1, asInt(), "int");
+        TEST_ASTYPE_EXCEPT(ht,     asInt(), "int");
     }
 
     { // asReal
@@ -729,6 +734,7 @@ void UnitTest::testValueAsType() {
 
         TEST_ASTYPE_EXCEPT(null,   asReal(), "real");
         TEST_ASTYPE_EXCEPT(array1, asReal(), "real");
+        TEST_ASTYPE_EXCEPT(ht,     asReal(), "real");
     }
 
     { // asChar
@@ -742,6 +748,7 @@ void UnitTest::testValueAsType() {
 
         TEST_ASTYPE_EXCEPT(null,   asChar(), "char");
         TEST_ASTYPE_EXCEPT(array1, asChar(), "char");
+        TEST_ASTYPE_EXCEPT(ht,     asChar(), "char");
     }
 
     { // asBool
@@ -760,6 +767,7 @@ void UnitTest::testValueAsType() {
         TEST_ASTYPE_EXCEPT(charC,    asBool(), "bool");
         TEST_ASTYPE_EXCEPT(string25, asBool(), "bool");
         TEST_ASTYPE_EXCEPT(array1,   asBool(), "bool");
+        TEST_ASTYPE_EXCEPT(ht,       asBool(), "bool");
     }
 
     { // asString
@@ -772,6 +780,7 @@ void UnitTest::testValueAsType() {
 
         TEST_ASTYPE_EXCEPT(null,   asString(), "string");
         TEST_ASTYPE_EXCEPT(array1, asString(), "string");
+        TEST_ASTYPE_EXCEPT(ht,     asString(), "string");
     }
 
     { // asType
@@ -3506,6 +3515,71 @@ void UnitTest::testCodeNodeHash() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeMakeHashMap() {
+    Environment::SharedPtr env(new Environment());
+
+    auto ilit = [](Value::Long value) { return std::make_shared<Literal>(Value(value)); };
+    auto slit = [](const Value::Text &value) { return std::make_shared<Literal>(Value(value)); };
+
+    Value value = std::make_shared<MakeHashMap>()->eval(env);
+    TEST_CASE_MSG(value.isHashMap(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value.hashMap().size() == 0lu, "actual=" << value.hashMap().size());
+
+    value =
+        std::make_shared<MakeHashMap>(
+            CodeNode::SharedPtrList(
+                { std::make_shared<MakeArray>(CodeNode::SharedPtrList({slit("one"), ilit(1)})),
+                  std::make_shared<MakeArray>(CodeNode::SharedPtrList({slit("two"), ilit(2)})),
+                  std::make_shared<MakeArray>(CodeNode::SharedPtrList({slit("three"), ilit(3)}))
+                }))
+        ->eval(env);
+    TEST_CASE_MSG(value.isHashMap(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value.hashMap().size() == 3lu, "actual=" << value.hashMap().size());
+    TEST_CASE_MSG(value.hashMap().get(Value("one")) == Value(1ll), "actual=" << value.hashMap().get(Value("one")));
+    TEST_CASE_MSG(value.hashMap().get(Value("two")) == Value(2ll), "actual=" << value.hashMap().get(Value("two")));
+    TEST_CASE_MSG(value.hashMap().get(Value("three")) == Value(3ll), "actual=" << value.hashMap().get(Value("three")));
+
+    try {
+        std::make_shared<MakeHashMap>(CodeNode::SharedPtrList({ilit(5)}))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE_MSG(std::string("Invalid operand type, expected=Array actual=int") == ex.what(), ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<MakeHashMap>(
+            CodeNode::SharedPtrList(
+                { std::make_shared<MakeArray>(CodeNode::SharedPtrList({slit("one")})) }))
+            ->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidExpression &ex) {
+        TEST_CASE_MSG(std::string("Invalid expression - Wrong array size, expecting 2") == ex.what(), ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<MakeHashMap>(
+            CodeNode::SharedPtrList(
+                { std::make_shared<MakeArray>(CodeNode::SharedPtrList({slit("one"), ilit(1), ilit(2)})) }))
+            ->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidExpression &ex) {
+        TEST_CASE_MSG(std::string("Invalid expression - Wrong array size, expecting 2") == ex.what(), ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -4463,4 +4537,27 @@ void UnitTest::testParserHash() {
     TEST_CASE(parserTest(parser, env, "(hash 0)",    Value::Zero, true));
     TEST_CASE(parserTest(parser, env, "(hash)",      Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hash 1 2)",  Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserMakeHashMap() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    auto ht = [](int count) {
+                  Hashtable ht;
+                  if (count >= 1) { ht.set(Value('a'), Value(0ll)); }
+                  if (count >= 2) { ht.set(Value('b'), Value(1ll)); }
+                  if (count >= 3) { ht.set(Value('c'), Value(2ll)); }
+                  return ht;
+              };
+
+    TEST_CASE(parserTest(parser, env, "(hashmap)",                                           Value(ht(0)), true));
+    TEST_CASE(parserTest(parser, env, "(hashmap (array 'a' 0))",                             Value(ht(1)), true));
+    TEST_CASE(parserTest(parser, env, "(hashmap (array 'a' 0) (array 'b' 1))",               Value(ht(2)), true));
+    TEST_CASE(parserTest(parser, env, "(hashmap (array 'a' 0) (array 'b' 1) (array 'c' 2))", Value(ht(3)), true));
+
+    TEST_CASE(parserTest(parser, env, "(hashmap (array))",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hashmap (array 1))",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hashmap (array 1 2 3))", Value::Null, false));
 }

@@ -846,6 +846,18 @@ namespace Ishlang {
         CodeNode::SharedPtr operand_;
     };
 
+    // -------------------------------------------------------------
+    class MakeHashMap : public CodeNode {
+    public:
+        MakeHashMap(CodeNode::SharedPtrList pairs = CodeNode::SharedPtrList());
+        virtual ~MakeHashMap() {}
+
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtrList pairs_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H

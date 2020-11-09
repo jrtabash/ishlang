@@ -812,6 +812,18 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("hash", 1));
               return std::make_shared<Hash>(exprs[0]);
           }
+        },
+
+        { "hashmap",
+          [this]() {
+              auto pairExprs(readExprList());
+              if (pairExprs.size() == 0) {
+                  return std::make_shared<MakeHashMap>();
+              }
+              else {
+                  return std::make_shared<MakeHashMap>(pairExprs);
+              }
+          }
         }
     };
 }
