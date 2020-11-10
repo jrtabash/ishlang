@@ -53,7 +53,7 @@
   - [Done] hmhas    (hashmap has key)
   - hmget    (hashmap get)
   - hmset    (hashmap set)
-  - hmrel    (hashmap remove)
+  - hmrem    (hashmap remove)
   - hmclr    (hashmap clear)
   - hmfind   (hashmap find by value)
   - hmcount  (hashmap count value)
