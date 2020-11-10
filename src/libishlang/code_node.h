@@ -858,6 +858,33 @@ namespace Ishlang {
         CodeNode::SharedPtrList pairs_;
     };
 
+    // -------------------------------------------------------------
+    class HashMapLen : public CodeNode {
+    public:
+        HashMapLen(CodeNode::SharedPtr htExpr);
+        virtual ~HashMapLen() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr htExpr_;
+    };
+
+    // -------------------------------------------------------------
+    class HashMapContains : public CodeNode {
+    public:
+        HashMapContains(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr);
+        virtual ~HashMapContains() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr keyExpr_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H

@@ -1133,3 +1133,39 @@ Value MakeHashMap::exec(Environment::SharedPtr env) {
         return Value(Hashtable(std::move(table)));
     }
 }
+
+// -------------------------------------------------------------
+HashMapLen::HashMapLen(CodeNode::SharedPtr htExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
+{}
+
+Value HashMapLen::exec(Environment::SharedPtr env) {
+    if (htExpr_.get()) {
+        Value hm = htExpr_->eval(env);
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        return Value(Value::Long(hm.hashMap().size()));
+    }
+    return Value::Zero;
+}
+
+// -------------------------------------------------------------
+HashMapContains::HashMapContains(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
+    , keyExpr_(keyExpr)
+{}
+
+Value HashMapContains::exec(Environment::SharedPtr env) {
+    if (htExpr_.get() && keyExpr_.get()) {
+        const Value hm = htExpr_->eval(env);
+        const Value key = keyExpr_->eval(env);
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        return Value(hm.hashMap().exists(key));
+    }
+    return Value::False;
+}

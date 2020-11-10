@@ -86,6 +86,8 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeRandom);
     ADD_TEST(testCodeNodeHash);
     ADD_TEST(testCodeNodeMakeHashMap);
+    ADD_TEST(testCodeNodeHashMapLen);
+    ADD_TEST(testCodeNodeHashMapContains);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -134,6 +136,8 @@ UnitTest::UnitTest()
     ADD_TEST(testParserRandom);
     ADD_TEST(testParserHash);
     ADD_TEST(testParserMakeHashMap);
+    ADD_TEST(testParserHashMapLen);
+    ADD_TEST(testParserHashMapContains);
 }
 #undef ADD_TEST
 
@@ -3580,6 +3584,93 @@ void UnitTest::testCodeNodeMakeHashMap() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapLen() {
+    Environment::SharedPtr env(new Environment());
+
+    auto ht = [](int count) {
+                  Hashtable table;
+                  if (count >= 1) { table.set(Value(1ll), Value(100ll)); }
+                  if (count >= 2) { table.set(Value(2ll), Value(200ll)); }
+                  if (count >= 3) { table.set(Value(3ll), Value(300ll)); }
+                  return table;
+              };
+
+    Value value =
+        std::make_shared<HashMapLen>(
+            std::make_shared<Literal>(Value(ht(0))))
+        ->eval(env);
+    TEST_CASE_MSG(value == Value::Zero, "actual=" << value);
+
+    value =
+        std::make_shared<HashMapLen>(
+            std::make_shared<Literal>(Value(ht(1))))
+        ->eval(env);
+    TEST_CASE_MSG(value == Value(1ll), "actual=" << value);
+
+    value =
+        std::make_shared<HashMapLen>(
+            std::make_shared<Literal>(Value(ht(3))))
+        ->eval(env);
+    TEST_CASE_MSG(value == Value(3ll), "actual=" << value);
+
+    try {
+        value =
+            std::make_shared<HashMapLen>(
+                std::make_shared<Literal>(Value::Zero))
+            ->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) { TEST_CASE(false); }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapContains() {
+    Environment::SharedPtr env(new Environment());
+
+    const Value one("one");
+    const Value two("two");
+    const Value three("three");
+    const Value four("four");
+
+    auto htlit = [one, two, three](int count) {
+                     Hashtable table;
+                     if (count >= 1) { table.set(one, Value(1ll)); }
+                     if (count >= 2) { table.set(two, Value(2ll)); }
+                     if (count >= 3) { table.set(three, Value(3ll)); }
+                     return std::make_shared<Literal>(Value(table));
+                 };
+
+    auto exists = [htlit, &env](int count, const Value &key) {
+                      return std::make_shared<HashMapContains>(htlit(count), std::make_shared<Literal>(key))->eval(env);
+                  };
+
+    Value result;
+
+    result = exists(0, one);   TEST_CASE_MSG(result == Value::False, "actual=" << result);
+    result = exists(1, one);   TEST_CASE_MSG(result == Value::True,  "actual=" << result);
+    result = exists(1, two);   TEST_CASE_MSG(result == Value::False, "actual=" << result);
+    result = exists(2, one);   TEST_CASE_MSG(result == Value::True,  "actual=" << result);
+    result = exists(2, two);   TEST_CASE_MSG(result == Value::True,  "actual=" << result);
+    result = exists(2, three); TEST_CASE_MSG(result == Value::False, "actual=" << result);
+    result = exists(3, one);   TEST_CASE_MSG(result == Value::True,  "actual=" << result);
+    result = exists(3, two);   TEST_CASE_MSG(result == Value::True,  "actual=" << result);
+    result = exists(3, three); TEST_CASE_MSG(result == Value::True,  "actual=" << result);
+    result = exists(3, four);  TEST_CASE_MSG(result == Value::False, "actual=" << result);
+
+    try {
+        std::make_shared<HashMapContains>(
+            std::make_shared<Literal>(one),
+            std::make_shared<Literal>(two))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -4560,4 +4651,41 @@ void UnitTest::testParserMakeHashMap() {
     TEST_CASE(parserTest(parser, env, "(hashmap (array))",       Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hashmap (array 1))",     Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hashmap (array 1 2 3))", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapLen() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(hmlen (hashmap))",                                           Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(hmlen (hashmap (array 'a' 1)))",                             Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(hmlen (hashmap (array 'a' 1) (array 'b' 2) (array 'c' 3)))", Value(3ll),  true));
+
+    TEST_CASE(parserTest(parser, env, "(hmlen 10)",                  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmlen)",                     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmlen (hashamp) (hashmap))", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapContains() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    Hashtable ht;
+    ht.set(Value('a'), Value(1ll));
+    ht.set(Value('b'), Value(2ll));
+    ht.set(Value('c'), Value(3ll));
+    env->def("ht", ht);
+
+    TEST_CASE(parserTest(parser, env, "(hmhas (hashmap) 'a')",  Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(hmhas ht 'a')",         Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(hmhas ht 'b')",         Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(hmhas ht 'c')",         Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(hmhas ht 'd')",         Value::False, true));
+
+    TEST_CASE(parserTest(parser, env, "(hmhas)",            Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmhas ht)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmhas ht 'a' 'b')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmhas 'a')",        Value::Null, false));
 }

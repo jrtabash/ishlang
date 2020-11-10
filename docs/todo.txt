@@ -49,8 +49,8 @@
   - lisrev    (list reverse)
   Hash table
   - [Done] hashmap
-  - hmlen    (hashmap length)
-  - hm?      (hashmap key exists)
+  - [Done] hmlen    (hashmap length)
+  - [Done] hmhas    (hashmap has key)
   - hmget    (hashmap get)
   - hmset    (hashmap set)
   - hmrel    (hashmap remove)
@@ -60,7 +60,7 @@
   Ordered table
   - orderedmap
   - omlen    (orderedmap length)
-  - om?      (orderedmap key exists)
+  - omhas    (orderedmap has key)
   - omget    (orderedmap get)
   - omset    (orderedmap set)
   - omrem    (orderedmap remove)
