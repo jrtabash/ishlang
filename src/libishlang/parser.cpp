@@ -203,6 +203,15 @@ CodeNode::SharedPtrList Parser::readAndCheckExprList(const char *name, std::size
 }
 
 // -------------------------------------------------------------
+CodeNode::SharedPtrList Parser::readAndCheckRangeExprList(const char *name, std::size_t minExpectedSize, std::size_t maxExpectedSize) {
+    auto exprs(readExprList());
+    if (exprs.size() < minExpectedSize || exprs.size() > maxExpectedSize) {
+        throw TooManyOrFewForms(name);
+    }
+    return exprs;
+}
+
+// -------------------------------------------------------------
 CodeNode::SharedPtrPairs Parser::readExprPairs() {
     CodeNode::SharedPtrPairs pairs;
     CodeNode::SharedPtrPair cons;
@@ -831,6 +840,20 @@ void Parser::initAppFtns() {
           [this]() {
               auto exprs(readAndCheckExprList("hmhas", 2));
               return std::make_shared<HashMapContains>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "hmget",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("hmget", 2, 3));
+              return std::make_shared<HashMapGet>(exprs[0], exprs[1], exprs.size() == 3 ? exprs[2] : CodeNode::SharedPtr());
+          }
+        },
+
+        { "hmset",
+          [this]() {
+              auto exprs(readAndCheckExprList("hmget", 3));
+              return std::make_shared<HashMapSet>(exprs[0], exprs[1], exprs[2]);
           }
         }
     };

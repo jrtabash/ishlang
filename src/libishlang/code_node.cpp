@@ -1169,3 +1169,46 @@ Value HashMapContains::exec(Environment::SharedPtr env) {
     }
     return Value::False;
 }
+
+// -------------------------------------------------------------
+HashMapGet::HashMapGet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr defaultExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
+    , keyExpr_(keyExpr)
+    , defaultExpr_(defaultExpr)
+{}
+
+Value HashMapGet::exec(Environment::SharedPtr env) {
+    if (htExpr_.get() && keyExpr_.get()) {
+        const Value hm = htExpr_->eval(env);
+        const Value key = keyExpr_->eval(env);
+        const Value defaultRet = defaultExpr_.get() ? defaultExpr_->eval(env) : Value::Null;
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        return Value(hm.hashMap().get(key, defaultRet));
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+HashMapSet::HashMapSet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr valueExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
+    , keyExpr_(keyExpr)
+    , valueExpr_(valueExpr)
+{}
+
+Value HashMapSet::exec(Environment::SharedPtr env) {
+    if (htExpr_.get() && keyExpr_.get() && valueExpr_.get()) {
+        Value hm = htExpr_->eval(env);
+        const Value key = keyExpr_->eval(env);
+        const Value value = valueExpr_->eval(env);
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        hm.hashMap().set(key, value);
+        return value;
+    }
+    return Value::Null;
+}

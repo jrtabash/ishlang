@@ -51,8 +51,8 @@
   - [Done] hashmap
   - [Done] hmlen    (hashmap length)
   - [Done] hmhas    (hashmap has key)
-  - hmget    (hashmap get)
-  - hmset    (hashmap set)
+  - [Done] hmget    (hashmap get)
+  - [Done] hmset    (hashmap set)
   - hmrem    (hashmap remove)
   - hmclr    (hashmap clear)
   - hmfind   (hashmap find by value)

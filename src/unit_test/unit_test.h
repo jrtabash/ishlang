@@ -111,6 +111,8 @@ namespace Ishlang {
         void testCodeNodeMakeHashMap();
         void testCodeNodeHashMapLen();
         void testCodeNodeHashMapContains();
+        void testCodeNodeHashMapGet();
+        void testCodeNodeHashMapSet();
         void testParserBasic();
         void testParserClone();
         void testParserIsType();
@@ -157,6 +159,8 @@ namespace Ishlang {
         void testParserMakeHashMap();
         void testParserHashMapLen();
         void testParserHashMapContains();
+        void testParserHashMapGet();
+        void testParserHashMapSet();
         
     private:
         bool  success_;

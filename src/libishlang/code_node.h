@@ -885,6 +885,36 @@ namespace Ishlang {
         CodeNode::SharedPtr keyExpr_;
     };
 
+    // -------------------------------------------------------------
+    class HashMapGet : public CodeNode {
+    public:
+        HashMapGet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr defaultExpr = CodeNode::SharedPtr());
+        virtual ~HashMapGet() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr keyExpr_;
+        CodeNode::SharedPtr defaultExpr_;
+    };
+
+    // -------------------------------------------------------------
+    class HashMapSet : public CodeNode {
+    public:
+        HashMapSet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr valueExpr);
+        virtual ~HashMapSet() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr keyExpr_;
+        CodeNode::SharedPtr valueExpr_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H

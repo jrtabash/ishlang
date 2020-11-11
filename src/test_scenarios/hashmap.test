@@ -1,0 +1,25 @@
+__CODE__
+(var ht (hashmap))
+(println (hmlen ht))
+
+(hmset ht "one" 1)
+(println (hmlen ht))
+(println (hmhas ht "one"))
+(println (hmget ht "one"))
+
+(hmset ht "two" 2)
+(println (hmlen ht))
+(println (hmhas ht "two"))
+(println (hmget ht "two"))
+
+(println (hmhas ht "foobar"))
+
+__EXPECT__
+0
+1
+true
+1
+2
+true
+2
+false

@@ -88,6 +88,8 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeMakeHashMap);
     ADD_TEST(testCodeNodeHashMapLen);
     ADD_TEST(testCodeNodeHashMapContains);
+    ADD_TEST(testCodeNodeHashMapGet);
+    ADD_TEST(testCodeNodeHashMapSet);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -138,6 +140,8 @@ UnitTest::UnitTest()
     ADD_TEST(testParserMakeHashMap);
     ADD_TEST(testParserHashMapLen);
     ADD_TEST(testParserHashMapContains);
+    ADD_TEST(testParserHashMapGet);
+    ADD_TEST(testParserHashMapSet);
 }
 #undef ADD_TEST
 
@@ -3671,6 +3675,103 @@ void UnitTest::testCodeNodeHashMapContains() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapGet() {
+    Environment::SharedPtr env(new Environment());
+
+    const Value kOne("one");
+    const Value kTwo("two");
+    const Value kThree("three");
+    const Value kFour("four");
+
+    const Value vOne(1ll);
+    const Value vTwo(2ll);
+    const Value vThree(3ll);
+
+    Hashtable ht;
+    ht.set(kOne, vOne);
+    ht.set(kTwo, vTwo);
+    ht.set(kThree, vThree);
+    env->def("ht", Value(ht));
+
+    auto get = [&env](const Value &key, const std::optional<Value> &defaultValue = std::nullopt) {
+                   return std::make_shared<HashMapGet>(std::make_shared<Variable>("ht"),
+                                                       std::make_shared<Literal>(key),
+                                                       (defaultValue
+                                                        ? std::make_shared<Literal>(*defaultValue)
+                                                        : CodeNode::SharedPtr()))->eval(env);
+               };
+
+    Value result;
+
+    result = get(kOne);   TEST_CASE_MSG(result == vOne,        "actual=" << result);
+    result = get(kTwo);   TEST_CASE_MSG(result == vTwo,        "actual=" << result);
+    result = get(kThree); TEST_CASE_MSG(result == vThree,      "actual=" << result);
+    result = get(kFour);  TEST_CASE_MSG(result == Value::Null, "actual=" << result);
+
+    result = get(kOne,   Value::Zero); TEST_CASE_MSG(result == vOne,        "actual=" << result);
+    result = get(kTwo,   Value::Zero); TEST_CASE_MSG(result == vTwo,        "actual=" << result);
+    result = get(kThree, Value::Zero); TEST_CASE_MSG(result == vThree,      "actual=" << result);
+    result = get(kFour,  Value::Zero); TEST_CASE_MSG(result == Value::Zero, "actual=" << result);
+
+    try {
+        std::make_shared<HashMapGet>(std::make_shared<Literal>(Value::Zero),
+                                     std::make_shared<Literal>(kOne))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapSet() {
+    Environment::SharedPtr env(new Environment());
+    env->def("ht", Value(Hashtable()));
+
+    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+
+    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
+    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
+
+    auto set = [&env, &ht, clit, ilit](Value::Char key, Value::Long val) {
+                   return std::make_shared<HashMapSet>(ht, clit(key), ilit(val))->eval(env);
+               };
+
+    auto htget = [&env](Value::Char key) { return env->get("ht").hashMap().get(Value(key)); };
+    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
+
+    Value result = set('a', 1);
+    TEST_CASE_MSG(result == Value(1ll), "actual=" << result);
+    TEST_CASE_MSG(htget('a') == result, "actual=" << htget('a'));
+    TEST_CASE_MSG(htlen() == 1, "actual=" << htlen());
+
+    result = set('b', 2);
+    TEST_CASE_MSG(result == Value(2ll), "actual=" << result);
+    TEST_CASE_MSG(htget('b') == result, "actual=" << htget('b'));
+    TEST_CASE_MSG(htlen() == 2, "actual=" << htlen());
+
+    result = set('c', 3);
+    TEST_CASE_MSG(result == Value(3ll), "actual=" << result);
+    TEST_CASE_MSG(htget('c') == result, "actual=" << htget('c'));
+    TEST_CASE_MSG(htlen() == 3, "actual=" << htlen());
+
+    result = set('a', 100);
+    TEST_CASE_MSG(result == Value(100ll), "actual=" << result);
+    TEST_CASE_MSG(htget('a') == result, "actual=" << htget('a'));
+    TEST_CASE_MSG(htlen() == 3, "actual=" << htlen());
+
+    try {
+        std::make_shared<HashMapSet>(ilit(0), ilit(1), ilit(2))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -4688,4 +4789,69 @@ void UnitTest::testParserHashMapContains() {
     TEST_CASE(parserTest(parser, env, "(hmhas ht)",         Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmhas ht 'a' 'b')", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmhas 'a')",        Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapGet() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    Hashtable ht;
+    ht.set(Value('a'), Value(1ll));
+    ht.set(Value('b'), Value(2ll));
+    ht.set(Value('c'), Value(3ll));
+    env->def("ht", ht);
+
+    TEST_CASE(parserTest(parser, env, "(hmget (hashmap) 'a')", Value::Null, true));
+    TEST_CASE(parserTest(parser, env, "(hmget ht 'a')",        Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(hmget ht 'b')",        Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(hmget ht 'c')",        Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(hmget ht 'd')",        Value::Null, true));
+
+    TEST_CASE(parserTest(parser, env, "(hmget (hashmap) 'a' 0)", Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(hmget ht 'a' 0)",        Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(hmget ht 'b' 0)",        Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(hmget ht 'c' 0)",        Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(hmget ht 'd' 0)",        Value::Zero, true));
+
+    TEST_CASE(parserTest(parser, env, "(hmget)",            Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmget ht)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmget ht 'a' 0 1)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmget 'a' 0)",      Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapSet() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    Hashtable ht;
+    env->def("ht", Value(ht));
+
+    auto htget = [&env](Value::Char key) { return env->get("ht").hashMap().get(Value(key)); };
+    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
+
+    TEST_CASE(parserTest(parser, env, "(hmset ht 'a' 1)", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(hmset ht 'b' 2)", Value(2ll), true));
+    TEST_CASE(parserTest(parser, env, "(hmset ht 'c' 3)", Value(3ll), true));
+
+    TEST_CASE(htlen() == 3);
+    TEST_CASE(htget('a') == Value(1ll));
+    TEST_CASE(htget('b') == Value(2ll));
+    TEST_CASE(htget('c') == Value(3ll));
+
+    TEST_CASE(parserTest(parser, env, "(hmset ht 'a' 100)", Value(100ll), true));
+    TEST_CASE(parserTest(parser, env, "(hmset ht 'b' 200)", Value(200ll), true));
+    TEST_CASE(parserTest(parser, env, "(hmset ht 'c' 300)", Value(300ll), true));
+
+    TEST_CASE(htlen() == 3);
+    TEST_CASE(htget('a') == Value(100ll));
+    TEST_CASE(htget('b') == Value(200ll));
+    TEST_CASE(htget('c') == Value(300ll));
+
+    TEST_CASE(parserTest(parser, env, "(hmset)",            Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmset ht)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmset ht 'a')",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmset ht 'a' 1 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmset 'a' 1 2)",    Value::Null, false));
 }
