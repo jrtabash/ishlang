@@ -1212,3 +1212,39 @@ Value HashMapSet::exec(Environment::SharedPtr env) {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+HashMapRemove::HashMapRemove(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
+    , keyExpr_(keyExpr)
+{}
+
+Value HashMapRemove::exec(Environment::SharedPtr env) {
+    if (htExpr_.get() && keyExpr_.get()) {
+        Value hm = htExpr_->eval(env);
+        const Value key = keyExpr_->eval(env);
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        hm.hashMap().remove(key);
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------H
+HashMapClear::HashMapClear(CodeNode::SharedPtr htExpr)
+    : htExpr_(htExpr)
+{
+}
+
+Value HashMapClear::exec(Environment::SharedPtr env) {
+    if (htExpr_.get()) {
+        Value hm = htExpr_->eval(env);
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        hm.hashMap().clear();
+    }
+    return Value::Null;
+}

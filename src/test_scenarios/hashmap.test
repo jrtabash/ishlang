@@ -14,6 +14,16 @@ __CODE__
 
 (println (hmhas ht "foobar"))
 
+(hmrem ht "two")
+(println (hmlen ht))
+(println (hmhas ht "two"))
+(println (hmhas ht "one"))
+
+(hmclr ht)
+(println (hmlen ht))
+(println (hmhas ht "two"))
+(println (hmhas ht "one"))
+
 __EXPECT__
 0
 1
@@ -22,4 +32,10 @@ true
 2
 true
 2
+false
+1
+false
+true
+0
+false
 false

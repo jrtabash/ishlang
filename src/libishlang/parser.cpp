@@ -855,6 +855,20 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("hmget", 3));
               return std::make_shared<HashMapSet>(exprs[0], exprs[1], exprs[2]);
           }
+        },
+
+        { "hmrem",
+          [this]() {
+              auto exprs(readAndCheckExprList("hmget", 2));
+              return std::make_shared<HashMapRemove>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "hmclr",
+          [this]() {
+              auto exprs(readAndCheckExprList("hmclr", 1));
+              return std::make_shared<HashMapClear>(exprs[0]);
+          }
         }
     };
 }

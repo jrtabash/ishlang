@@ -90,6 +90,8 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeHashMapContains);
     ADD_TEST(testCodeNodeHashMapGet);
     ADD_TEST(testCodeNodeHashMapSet);
+    ADD_TEST(testCodeNodeHashMapRemove);
+    ADD_TEST(testCodeNodeHashMapClear);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -142,6 +144,8 @@ UnitTest::UnitTest()
     ADD_TEST(testParserHashMapContains);
     ADD_TEST(testParserHashMapGet);
     ADD_TEST(testParserHashMapSet);
+    ADD_TEST(testParserHashMapRemove);
+    ADD_TEST(testParserHashMapClear);
 }
 #undef ADD_TEST
 
@@ -3772,6 +3776,104 @@ void UnitTest::testCodeNodeHashMapSet() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapRemove() {
+    Environment::SharedPtr env(new Environment());
+
+    {
+        Hashtable ht;
+        ht.set(Value('a'), Value(1ll));
+        ht.set(Value('b'), Value(2ll));
+        ht.set(Value('c'), Value(3ll));
+        env->def("ht", Value(ht));
+    }
+
+    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+
+    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
+
+    auto remove = [&env, &ht, clit](Value::Char key) {
+                      return std::make_shared<HashMapRemove>(ht, clit(key))->eval(env);
+                  };
+
+    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
+    auto hthas = [&env](Value::Char key) { return env->get("ht").hashMap().exists(Value(key)); };
+
+    TEST_CASE_MSG(htlen() == 3, "actual=" << htlen());
+    TEST_CASE(hthas('a'));
+    remove('a');
+    TEST_CASE(!hthas('a'));
+
+    TEST_CASE_MSG(htlen() == 2, "actual=" << htlen());
+    TEST_CASE(hthas('b'));
+    remove('b');
+    TEST_CASE(!hthas('b'));
+
+    TEST_CASE_MSG(htlen() == 1, "actual=" << htlen());
+    TEST_CASE(hthas('c'));
+    remove('c');
+    TEST_CASE(!hthas('c'));
+
+    TEST_CASE_MSG(htlen() == 0, "actual=" << htlen());
+    TEST_CASE(!hthas('d'));
+    remove('d');
+    TEST_CASE(!hthas('d'));
+
+    TEST_CASE_MSG(htlen() == 0, "actual=" << htlen());
+
+    try {
+        std::make_shared<HashMapRemove>(clit('a'), clit('b'))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapClear() {
+    Environment::SharedPtr env(new Environment());
+
+    {
+        Hashtable ht;
+        ht.set(Value('a'), Value(1ll));
+        ht.set(Value('b'), Value(2ll));
+        ht.set(Value('c'), Value(3ll));
+        env->def("ht", Value(ht));
+    }
+
+    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+
+    auto clear = [&env, &ht]() {
+                     return std::make_shared<HashMapClear>(ht)->eval(env);
+                 };
+
+    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
+    auto hthas = [&env](Value::Char key) { return env->get("ht").hashMap().exists(Value(key)); };
+
+    TEST_CASE(htlen() == 3);
+    TEST_CASE(hthas('a'));
+    TEST_CASE(hthas('b'));
+    TEST_CASE(hthas('c'));
+
+    clear();
+
+    TEST_CASE(htlen() == 0);
+    TEST_CASE(!hthas('a'));
+    TEST_CASE(!hthas('b'));
+    TEST_CASE(!hthas('c'));
+
+    try {
+        std::make_shared<HashMapClear>(std::make_shared<Literal>(Value('a')))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -4854,4 +4956,81 @@ void UnitTest::testParserHashMapSet() {
     TEST_CASE(parserTest(parser, env, "(hmset ht 'a')",     Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmset ht 'a' 1 2)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmset 'a' 1 2)",    Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapRemove() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    Hashtable ht;
+    ht.set(Value('a'), Value(1ll));
+    ht.set(Value('b'), Value(2ll));
+    ht.set(Value('c'), Value(3ll));
+    env->def("ht", Value(ht));
+
+    auto hthas = [&env](Value::Char key) { return env->get("ht").hashMap().exists(Value(key)); };
+    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
+
+    TEST_CASE(parserTest(parser, env, "(hmrem ht 'd')", Value::Null, true));
+    TEST_CASE(htlen() == 3);
+    TEST_CASE(hthas('a'));
+    TEST_CASE(hthas('b'));
+    TEST_CASE(hthas('c'));
+
+    TEST_CASE(parserTest(parser, env, "(hmrem ht 'c')", Value::Null, true));
+    TEST_CASE(htlen() == 2);
+    TEST_CASE(hthas('a'));
+    TEST_CASE(hthas('b'));
+    TEST_CASE(!hthas('c'));
+
+    TEST_CASE(parserTest(parser, env, "(hmrem ht 'b')", Value::Null, true));
+    TEST_CASE(htlen() == 1);
+    TEST_CASE(hthas('a'));
+    TEST_CASE(!hthas('b'));
+    TEST_CASE(!hthas('c'));
+
+    TEST_CASE(parserTest(parser, env, "(hmrem ht 'a')", Value::Null, true));
+    TEST_CASE(htlen() == 0);
+    TEST_CASE(!hthas('a'));
+    TEST_CASE(!hthas('b'));
+    TEST_CASE(!hthas('c'));
+
+    TEST_CASE(parserTest(parser, env, "(hmrem)",          Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmrem ht)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmrem ht 'a' 1)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmrem 'a' 1)",    Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapClear() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    Hashtable ht;
+    ht.set(Value('a'), Value(1ll));
+    ht.set(Value('b'), Value(2ll));
+    ht.set(Value('c'), Value(3ll));
+    env->def("ht", Value(ht));
+
+    auto hthas = [&env](Value::Char key) { return env->get("ht").hashMap().exists(Value(key)); };
+    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
+
+    TEST_CASE(htlen() == 3);
+    TEST_CASE(hthas('a'));
+    TEST_CASE(hthas('b'));
+    TEST_CASE(hthas('c'));
+
+    TEST_CASE(parserTest(parser, env, "(hmclr ht)", Value::Null, true));
+
+    TEST_CASE(htlen() == 0);
+    TEST_CASE(!hthas('a'));
+    TEST_CASE(!hthas('b'));
+    TEST_CASE(!hthas('c'));
+
+    TEST_CASE(parserTest(parser, env, "(hmclr ht)", Value::Null, true));
+
+    TEST_CASE(parserTest(parser, env, "(hmclr)",          Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmclr ht 'a')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmclr 'a')",    Value::Null, false));
 }

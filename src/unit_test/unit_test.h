@@ -113,6 +113,8 @@ namespace Ishlang {
         void testCodeNodeHashMapContains();
         void testCodeNodeHashMapGet();
         void testCodeNodeHashMapSet();
+        void testCodeNodeHashMapRemove();
+        void testCodeNodeHashMapClear();
         void testParserBasic();
         void testParserClone();
         void testParserIsType();
@@ -161,6 +163,8 @@ namespace Ishlang {
         void testParserHashMapContains();
         void testParserHashMapGet();
         void testParserHashMapSet();
+        void testParserHashMapRemove();
+        void testParserHashMapClear();
         
     private:
         bool  success_;

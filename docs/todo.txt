@@ -53,8 +53,8 @@
   - [Done] hmhas    (hashmap has key)
   - [Done] hmget    (hashmap get)
   - [Done] hmset    (hashmap set)
-  - hmrem    (hashmap remove)
-  - hmclr    (hashmap clear)
+  - [Done] hmrem    (hashmap remove)
+  - [Done] hmclr    (hashmap clear)
   - hmfind   (hashmap find by value)
   - hmcount  (hashmap count value)
   Ordered table
