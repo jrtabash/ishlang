@@ -7,7 +7,9 @@
     Example: (second p)
   - Update MakeHashMap code node to support
     list of pairs, as well as the currently
-    supported list of arrays.
+    supported list of arrays
+  - Add hmitems function to hashmap to
+    return array of key/value pairs
 
 * Add support for file IO
   Add file type
@@ -47,16 +49,6 @@
   - liscount  (list count value)
   - lissort   (list sort)
   - lisrev    (list reverse)
-  Hash table
-  - [Done] hashmap
-  - [Done] hmlen    (hashmap length)
-  - [Done] hmhas    (hashmap has key)
-  - [Done] hmget    (hashmap get)
-  - [Done] hmset    (hashmap set)
-  - [Done] hmrem    (hashmap remove)
-  - [Done] hmclr    (hashmap clear)
-  - hmfind   (hashmap find by value)
-  - hmcount  (hashmap count value)
   Ordered table
   - orderedmap
   - omlen    (orderedmap length)
@@ -67,6 +59,9 @@
   - omclr    (orderedmap clear)
   - omfind   (orderedmap find by value)
   - omcount  (orderedmap count value)
+  - omkeys   (orderedmap keys)
+  - omvals   (orderedmap values)
+  - omitems  (orderedmap items)
 
 * Add string functions
   - strsort  (string sort)
@@ -81,12 +76,12 @@
   - arrrev   (array reverse)
 
 * Add generic functions
-  - Add generic get function with support for instances, strings and arrays
-  - Add generic set function with support for instances, strings and arrays
-  - Add generic len function with support for strings and arrays
-  - Add generic find function with support for strings and arrays
-  - Add generic count function with support for strings and arrays
-  - Note: Should work with future types; list, hashtable and ordered table
+  - Add generic get function with support for instances, strings, arrays and hashmaps
+  - Add generic set function with support for instances, strings, arrays and hashmaps
+  - Add generic len function with support for strings, arrays and hashmaps
+  - Add generic find function with support for strings, arrays and hashmaps
+  - Add generic count function with support for strings, arrays and hashmaps
+  - Note: Should work with future types; list and orderedmap.
 
 * Add generic sort and reverse functions for string, array and list (future) types:
   - sort(sequence, key=null, asc=true)

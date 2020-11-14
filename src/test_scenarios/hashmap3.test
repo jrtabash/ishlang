@@ -1,0 +1,24 @@
+__CODE__
+(defun checkEqual (hm k v)
+  (== (hmget hm k) v))
+
+(var ht (hashmap (array "one" 1) (array "two" 2) (array "three" 3) (array "two2" 2)))
+
+(var keys (hmkeys ht))
+(var vals (hmvals ht))
+
+(println (arrlen keys))
+(println (arrlen vals))
+
+(println (checkEqual ht (arrget keys 0) (arrget vals 0)))
+(println (checkEqual ht (arrget keys 1) (arrget vals 1)))
+(println (checkEqual ht (arrget keys 2) (arrget vals 2)))
+(println (checkEqual ht (arrget keys 3) (arrget vals 3)))
+
+__EXPECT__
+4
+4
+true
+true
+true
+true

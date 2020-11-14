@@ -42,6 +42,7 @@ UnitTest::UnitTest()
     ADD_TEST(testHashtable);
     ADD_TEST(testHashtableFind);
     ADD_TEST(testHashtableCount);
+    ADD_TEST(testHashtableKeysValues);
     ADD_TEST(testModule);
     ADD_TEST(testModuleStorage);
     ADD_TEST(testCodeNodeBasic);
@@ -92,6 +93,10 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeHashMapSet);
     ADD_TEST(testCodeNodeHashMapRemove);
     ADD_TEST(testCodeNodeHashMapClear);
+    ADD_TEST(testCodeNodeHashMapFind);
+    ADD_TEST(testCodeNodeHashMapCount);
+    ADD_TEST(testCodeNodeHashMapKeys);
+    ADD_TEST(testCodeNodeHashMapValues);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -146,6 +151,10 @@ UnitTest::UnitTest()
     ADD_TEST(testParserHashMapSet);
     ADD_TEST(testParserHashMapRemove);
     ADD_TEST(testParserHashMapClear);
+    ADD_TEST(testParserHashMapFind);
+    ADD_TEST(testParserHashMapCount);
+    ADD_TEST(testParserHashMapKeys);
+    ADD_TEST(testParserHashMapVals);
 }
 #undef ADD_TEST
 
@@ -1334,6 +1343,43 @@ void UnitTest::testHashtableCount() {
     TEST_CASE_MSG(ht.count(vTwo) == 2, "actual=" << ht.count(vOne));
     TEST_CASE_MSG(ht.count(vThree) == 1, "actual=" << ht.count(vOne));
     TEST_CASE_MSG(ht.count(vFour) == 0, "actual=" << ht.count(vOne));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testHashtableKeysValues() {
+    const auto kOne = Value("one");
+    const auto kTwo = Value("two");
+    const auto kThree = Value("three");
+
+    const auto vOne = Value(1ll);
+    const auto vTwo = Value(2ll);
+    const auto vThree = Value(3ll);
+
+    Hashtable ht;
+    TEST_CASE(ht.keys() == Sequence());
+    TEST_CASE(ht.values() == Sequence());
+
+    ht.set(kOne, vOne);
+    ht.set(kTwo, vTwo);
+    ht.set(kThree, vThree);
+
+    const Sequence keys = ht.keys();
+    const Sequence values = ht.values();
+    TEST_CASE_MSG(keys.size() == 3, "actual=" << keys.size());
+    TEST_CASE_MSG(values.size() == 3, "actual=" << values.size());
+
+    std::size_t result = 0;
+    result = keys.count(kOne);   TEST_CASE_MSG(result == 1, "actual=" << result);
+    result = keys.count(kTwo);   TEST_CASE_MSG(result == 1, "actual=" << result);
+    result = keys.count(kThree); TEST_CASE_MSG(result == 1, "actual=" << result);
+
+    result = values.count(vOne);   TEST_CASE_MSG(result == 1, "actual=" << result);
+    result = values.count(vTwo);   TEST_CASE_MSG(result == 1, "actual=" << result);
+    result = values.count(vThree); TEST_CASE_MSG(result == 1, "actual=" << result);
+
+    for (std::size_t i = 0; i < keys.size(); ++i) {
+        TEST_CASE_MSG(ht.get(keys.get(i)) == values.get(i), "index=" << i << " key=" << keys.get(i) << " value=" << values.get(i));
+    }
 }
 
 // -------------------------------------------------------------
@@ -3874,6 +3920,158 @@ void UnitTest::testCodeNodeHashMapClear() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapFind() {
+    Environment::SharedPtr env(new Environment());
+
+    {
+        Hashtable ht;
+        ht.set(Value('a'), Value(1ll));
+        ht.set(Value('b'), Value(2ll));
+        ht.set(Value('c'), Value(3ll));
+        env->def("ht", Value(ht));
+    }
+
+    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+
+    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(i); };
+
+    auto find = [&env, &ht, ilit](Value::Long value) {
+                    return std::make_shared<HashMapFind>(ht, ilit(value))->eval(env);
+                };
+
+    Value result;
+    result = find(1); TEST_CASE_MSG(result == Value('a'),  "actual=" << result);
+    result = find(2); TEST_CASE_MSG(result == Value('b'),  "actual=" << result);
+    result = find(3); TEST_CASE_MSG(result == Value('c'),  "actual=" << result);
+    result = find(4); TEST_CASE_MSG(result == Value::Null, "actual=" << result);
+
+    try {
+        std::make_shared<HashMapFind>(ilit(1), ilit(2))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapCount() {
+    Environment::SharedPtr env(new Environment());
+
+    {
+        Hashtable ht;
+        ht.set(Value('a'), Value(1ll));
+        ht.set(Value('b'), Value(2ll));
+        ht.set(Value('c'), Value(3ll));
+        ht.set(Value('2'), Value(2ll));
+        env->def("ht", Value(ht));
+    }
+
+    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+
+    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(i); };
+
+    auto count = [&env, &ht, ilit](Value::Long value) {
+                     return std::make_shared<HashMapCount>(ht, ilit(value))->eval(env);
+                 };
+
+    Value result;
+    result = count(1); TEST_CASE_MSG(result == Value(1ll),  "actual=" << result);
+    result = count(2); TEST_CASE_MSG(result == Value(2ll),  "actual=" << result);
+    result = count(3); TEST_CASE_MSG(result == Value(1ll),  "actual=" << result);
+    result = count(4); TEST_CASE_MSG(result == Value::Zero, "actual=" << result);
+
+    try {
+        std::make_shared<HashMapCount>(ilit(1), ilit(2))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapKeys() {
+    Environment::SharedPtr env(new Environment());
+
+    {
+        Hashtable ht;
+        ht.set(Value('a'), Value(1ll));
+        ht.set(Value('b'), Value(2ll));
+        ht.set(Value('c'), Value(3ll));
+        env->def("ht", Value(ht));
+    }
+
+    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+
+    auto keys = [&env, &ht]() {
+                    return std::make_shared<HashMapKeys>(ht)->eval(env);
+                };
+
+    const Value ks = keys();
+    TEST_CASE(ks.isArray());
+
+    const Sequence &seq = ks.array();
+    TEST_CASE_MSG(seq.size() == 3, "actual=" << seq.size());
+
+    std::size_t cnt = 0;
+    cnt = seq.count(Value('a')); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
+    cnt = seq.count(Value('b')); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
+    cnt = seq.count(Value('c')); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
+
+    try {
+        std::make_shared<HashMapKeys>(std::make_shared<Literal>(Value('a')))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapValues() {
+    Environment::SharedPtr env(new Environment());
+
+    {
+        Hashtable ht;
+        ht.set(Value('a'), Value(1ll));
+        ht.set(Value('b'), Value(2ll));
+        ht.set(Value('c'), Value(3ll));
+        ht.set(Value('2'), Value(2ll));
+        env->def("ht", Value(ht));
+    }
+
+    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+
+    auto values = [&env, &ht]() {
+                      return std::make_shared<HashMapValues>(ht)->eval(env);
+                  };
+
+    const Value vs = values();
+    TEST_CASE(vs.isArray());
+
+    const Sequence &vals = vs.array();
+    TEST_CASE_MSG(vals.size() == 4, "actual=" << vals.size());
+
+    std::size_t cnt = 0;
+    cnt = vals.count(Value(1ll)); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
+    cnt = vals.count(Value(2ll)); TEST_CASE_MSG(cnt == 2, "actual=" << cnt);
+    cnt = vals.count(Value(3ll)); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
+
+    try {
+        std::make_shared<HashMapValues>(std::make_shared<Literal>(Value(1ll)))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -5030,7 +5228,91 @@ void UnitTest::testParserHashMapClear() {
 
     TEST_CASE(parserTest(parser, env, "(hmclr ht)", Value::Null, true));
 
-    TEST_CASE(parserTest(parser, env, "(hmclr)",          Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmclr)",        Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmclr ht 'a')", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmclr 'a')",    Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapFind() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    Hashtable ht;
+    ht.set(Value('a'), Value(1ll));
+    ht.set(Value('b'), Value(2ll));
+    ht.set(Value('c'), Value(3ll));
+    env->def("ht", Value(ht));
+
+    TEST_CASE(parserTest(parser, env, "(hmfind ht 1)", Value('a'),  true));
+    TEST_CASE(parserTest(parser, env, "(hmfind ht 2)", Value('b'),  true));
+    TEST_CASE(parserTest(parser, env, "(hmfind ht 3)", Value('c'),  true));
+    TEST_CASE(parserTest(parser, env, "(hmfind ht 4)", Value::Null, true));
+
+    TEST_CASE(parserTest(parser, env, "(hmfind)",        Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmfind ht)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmfind ht 1 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmfind 1 2)",    Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapCount() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    Hashtable ht;
+    ht.set(Value('a'), Value(1ll));
+    ht.set(Value('b'), Value(2ll));
+    ht.set(Value('c'), Value(3ll));
+    ht.set(Value('2'), Value(2ll));
+    env->def("ht", Value(ht));
+
+    TEST_CASE(parserTest(parser, env, "(hmcount ht 1)", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(hmcount ht 2)", Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(hmcount ht 3)", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(hmcount ht 4)", Value::Zero, true));
+
+    TEST_CASE(parserTest(parser, env, "(hmcount)",        Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmcount ht)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmcount ht 1 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmcount 1 2)",    Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapKeys() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    Hashtable ht;
+    ht.set(Value('a'), Value(1ll));
+    ht.set(Value('b'), Value(2ll));
+    ht.set(Value('c'), Value(3ll));
+    env->def("ht", Value(ht));
+
+    TEST_CASE(parserTest(parser, env, "(hmkeys (hashmap))",   Value(Sequence()), true));
+    TEST_CASE(parserTest(parser, env, "(arrlen (hmkeys ht))", Value(3ll),        true));
+
+    TEST_CASE(parserTest(parser, env, "(hmkeys)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmkeys ht 'a')",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmkeys 'a' 'b')", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapVals() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    Hashtable ht;
+    ht.set(Value('a'), Value(1ll));
+    ht.set(Value('b'), Value(2ll));
+    ht.set(Value('c'), Value(3ll));
+    ht.set(Value('2'), Value(2ll));
+    env->def("ht", Value(ht));
+
+    TEST_CASE(parserTest(parser, env, "(hmvals (hashmap))",   Value(Sequence()), true));
+    TEST_CASE(parserTest(parser, env, "(arrlen (hmvals ht))", Value(4ll),        true));
+
+    TEST_CASE(parserTest(parser, env, "(hmvals)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmvals ht 'a')",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmvals 'a' 'b')", Value::Null, false));
 }

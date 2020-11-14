@@ -1248,3 +1248,73 @@ Value HashMapClear::exec(Environment::SharedPtr env) {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+HashMapFind::HashMapFind(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueExpr)
+    : htExpr_(htExpr)
+    , valueExpr_(valueExpr)
+{}
+
+Value HashMapFind::exec(Environment::SharedPtr env) {
+    if (htExpr_.get() && valueExpr_.get()) {
+        const Value hm = htExpr_->eval(env);
+        const Value value = valueExpr_->eval(env);
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        return hm.hashMap().find(value);
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+HashMapCount::HashMapCount(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueExpr)
+    : htExpr_(htExpr)
+    , valueExpr_(valueExpr)
+{}
+
+Value HashMapCount::exec(Environment::SharedPtr env) {
+    if (htExpr_.get() && valueExpr_.get()) {
+        const Value hm = htExpr_->eval(env);
+        const Value value = valueExpr_->eval(env);
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        return Value(Value::Long(hm.hashMap().count(value)));
+    }
+    return Value::Zero;
+}
+
+// -------------------------------------------------------------H
+HashMapKeys::HashMapKeys(CodeNode::SharedPtr htExpr)
+    : htExpr_(htExpr)
+{
+}
+
+Value HashMapKeys::exec(Environment::SharedPtr env) {
+    if (htExpr_.get()) {
+        Value hm = htExpr_->eval(env);
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        return Value(hm.hashMap().keys());
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------H
+HashMapValues::HashMapValues(CodeNode::SharedPtr htExpr)
+    : htExpr_(htExpr)
+{
+}
+
+Value HashMapValues::exec(Environment::SharedPtr env) {
+    if (htExpr_.get()) {
+        Value hm = htExpr_->eval(env);
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        return Value(hm.hashMap().values());
+    }
+    return Value::Null;
+}

@@ -62,6 +62,7 @@ namespace Ishlang {
         void testHashtable();
         void testHashtableFind();
         void testHashtableCount();
+        void testHashtableKeysValues();
         void testModule();
         void testModuleStorage();
         void testCodeNodeBasic();
@@ -115,6 +116,10 @@ namespace Ishlang {
         void testCodeNodeHashMapSet();
         void testCodeNodeHashMapRemove();
         void testCodeNodeHashMapClear();
+        void testCodeNodeHashMapFind();
+        void testCodeNodeHashMapCount();
+        void testCodeNodeHashMapKeys();
+        void testCodeNodeHashMapValues();
         void testParserBasic();
         void testParserClone();
         void testParserIsType();
@@ -165,6 +170,10 @@ namespace Ishlang {
         void testParserHashMapSet();
         void testParserHashMapRemove();
         void testParserHashMapClear();
+        void testParserHashMapFind();
+        void testParserHashMapCount();
+        void testParserHashMapKeys();
+        void testParserHashMapVals();
         
     private:
         bool  success_;

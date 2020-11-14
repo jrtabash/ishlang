@@ -29,3 +29,21 @@ std::size_t Hashtable::count(const Value &value) const {
                              return nameValue.second == value;
                          });
 }
+
+// -------------------------------------------------------------
+Sequence Hashtable::keys() const {
+    Sequence keys;
+    for (const auto & nameValue : table_) {
+        keys.add(nameValue.first);
+    }
+    return keys;
+}
+
+// -------------------------------------------------------------
+Sequence Hashtable::values() const {
+    Sequence values;
+    for (const auto & nameValue : table_) {
+        values.add(nameValue.second);
+    }
+    return values;
+}

@@ -859,7 +859,7 @@ void Parser::initAppFtns() {
 
         { "hmrem",
           [this]() {
-              auto exprs(readAndCheckExprList("hmget", 2));
+              auto exprs(readAndCheckExprList("hmrem", 2));
               return std::make_shared<HashMapRemove>(exprs[0], exprs[1]);
           }
         },
@@ -868,6 +868,34 @@ void Parser::initAppFtns() {
           [this]() {
               auto exprs(readAndCheckExprList("hmclr", 1));
               return std::make_shared<HashMapClear>(exprs[0]);
+          }
+        },
+
+        { "hmfind",
+          [this]() {
+              auto exprs(readAndCheckExprList("hmfind", 2));
+              return std::make_shared<HashMapFind>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "hmcount",
+          [this]() {
+              auto exprs(readAndCheckExprList("hmcount", 2));
+              return std::make_shared<HashMapCount>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "hmkeys",
+          [this]() {
+              auto exprs(readAndCheckExprList("hmkeys", 1));
+              return std::make_shared<HashMapKeys>(exprs[0]);
+          }
+        },
+
+        { "hmvals",
+          [this]() {
+              auto exprs(readAndCheckExprList("hmvals", 1));
+              return std::make_shared<HashMapValues>(exprs[0]);
           }
         }
     };

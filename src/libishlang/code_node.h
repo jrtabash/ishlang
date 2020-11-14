@@ -942,6 +942,60 @@ namespace Ishlang {
         CodeNode::SharedPtr htExpr_;
     };
 
+    // -------------------------------------------------------------
+    class HashMapFind : public CodeNode {
+    public:
+        HashMapFind(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueExpr);
+        virtual ~HashMapFind() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr valueExpr_;
+    };
+
+    // -------------------------------------------------------------
+    class HashMapCount : public CodeNode {
+    public:
+        HashMapCount(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueExpr);
+        virtual ~HashMapCount() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr valueExpr_;
+    };
+
+    // -------------------------------------------------------------
+    class HashMapKeys : public CodeNode {
+    public:
+        HashMapKeys(CodeNode::SharedPtr htExpr);
+        virtual ~HashMapKeys() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr htExpr_;
+    };
+
+    // -------------------------------------------------------------
+    class HashMapValues : public CodeNode {
+    public:
+        HashMapValues(CodeNode::SharedPtr htExpr);
+        virtual ~HashMapValues() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr htExpr_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H

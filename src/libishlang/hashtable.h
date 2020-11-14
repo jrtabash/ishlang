@@ -1,6 +1,7 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
+#include "sequence.h"
 #include "util.h"
 #include "value.h"
 
@@ -38,6 +39,9 @@ namespace Ishlang {
 
         const Value &find(const Value &value) const;
         std::size_t count(const Value &value) const;
+
+        Sequence keys() const;
+        Sequence values() const;
 
         std::size_t size() const { return table_.size(); }
 
