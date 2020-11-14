@@ -1,0 +1,27 @@
+(defun word_counts (words)
+  (var counts (hashmap))
+  (var word null)
+  (loop (var i 0) (< i (arrlen words)) (= i (+ i 1))
+        (progn
+          (= word (arrget words i))
+          (hmset counts word (+ 1 (hmget counts word 0)))))
+  counts)
+
+(defun print_counts (counts)
+  (var keys (hmkeys counts))
+  (var vals (hmvals counts))
+  (loop (var i 0) (< i (hmlen counts)) (= i (+ i 1))
+        (progn
+          (print (arrget vals i))
+          (print "  ")
+          (println (arrget keys i)))))
+
+(print_counts
+ (word_counts
+  (array "This" "is" "an" "array" "of" "words")))
+
+(println "----------")
+
+(print_counts
+ (word_counts
+  (array "one" "two" "two" "three" "three" "three" "four" "four" "four" "four")))
