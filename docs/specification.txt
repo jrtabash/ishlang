@@ -15,7 +15,7 @@ Example: Hello world Program
 Values
 ------
 Every expression in ishlang evaluates to a value. A value can hold any of the following types:
-  none, int, real, char, bool, string, array, closure, usertype, userobject
+  none, int, real, char, bool, string, array, hashmap, closure, usertype, userobject
 
 Literals
 --------
@@ -256,7 +256,7 @@ Type Checking
 Is type of?
   (istypeof <expression> <type>
 
-<type> is one of: none, int, real, char, bool, string, array, closure, usertype, userobject
+<type> is one of: none, int, real, char, bool, string, array, hashmap, closure, usertype, userobject
 
 Example:
   (istypeof 10 int)
@@ -470,6 +470,57 @@ Examples:
   (println (arraysv 10 0))
   (println (arrfind a 2))
   (println (arrcount a 2))
+
+Hashmap Operations
+------------------
+hashmap: make a hashmap
+         (hashmap [(array key value) [(array key value) ...]])
+
+hmlen: return hashmap length
+       (hmlen <hashmap>)
+
+hmhas: check if key is in hashmap
+       (hmhas <hashmap> <key>)
+
+hmget: get hashmap value for given key
+       returns default_return when key is not found
+       default default_return value is null
+       (hmget <hashmap> <key> [<default_return])
+
+hmset: set hashmap value for given key
+       (hmset <hashmap> <key> <value>)
+
+hmrem: remove hashmap value with given key
+       (hmrem <hashmap> <key>)
+
+hmclr: clear hashmap
+       (hmclr <hashmap>)
+
+hmfind: find hashmap key with given value
+        (hmfind <hashmap> <value>)
+
+hmcount: count number of occurrences of value in hashmap
+         (hmcount <hashmap> <value>)
+
+hmkeys: return array of hashmap keys
+        (hmkeys <hashmap>)
+
+hmvals: return array of hashmap values
+        (hmvals <hashmap>)
+
+Examples:
+  (var ht (hashmap (array "one" 1) (array "two" 2) (array "four" 4)))
+  (hmlen ht)
+  (hmhas ht "one")
+  (hmget ht "two")
+  (hmget ht "two" 0)
+  (hmset ht "three" 3)
+  (hmrem ht "three")
+  (hmfind ht 2)
+  (hmcount ht 1)
+  (hmkeys ht)
+  (hmvals ht)
+  (hmclr ht)
 
 Comments
 --------
