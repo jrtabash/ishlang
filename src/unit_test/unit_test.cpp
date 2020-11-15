@@ -162,11 +162,13 @@ UnitTest::UnitTest()
 bool UnitTest::run(const std::string &test) {
     success_ = true;
     if (test.empty()) {
+        std::cout << "\n***** Running unit tests" << '\n';
         for (Tests::iterator iter = tests_.begin(); iter != tests_.end(); ++iter) {
             runTest(iter->first, iter->second);
         }
     }
     else {
+        std::cout << "\n***** Running unit test " << test << '\n';
         Tests::iterator iter = tests_.find(test);
         if (iter == tests_.end()) {
             std::cerr << "Unknown test - " << test << '\n';

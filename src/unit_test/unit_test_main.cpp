@@ -42,7 +42,7 @@ private:
                   << '\n'
                   << "Options:\n"
                   << '\t' << "-h : Print usage\n"
-                  << '\t' << "-v : Wse verbose mode\n"
+                  << '\t' << "-v : Use verbose mode\n"
                   << '\t' << "-l : List unit test names\n"
                   << '\t' << "-n : Run specified unit test\n"
                   << std::endl;

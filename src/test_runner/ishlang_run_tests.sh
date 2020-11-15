@@ -37,6 +37,10 @@ if [ "${scenarios}" == "" ]; then
     echo "Terminating tests ... no scenarios "
 fi
 
+echo ""
+echo "***** Running test scenarios"
+echo ""
+
 for scenario in ${scenarios}
 do
     ${ishlang_test_files} ${scenario}
@@ -67,3 +71,8 @@ do
 
     rm ${code_file} ${expect_file} ${out_file}
 done
+
+count=$(ls ${tests}/*.test | wc -l)
+echo ""
+echo "***** Ran ${count} test scenarios"
+echo "***** Success"
