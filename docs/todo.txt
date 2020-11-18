@@ -1,10 +1,4 @@
-* Add immutable pair type which holds two Value items. Functions:
-  - pair := make a pair
-    Example: (var p (pair 1 2))
-  - first := access first item
-    Example: (first p)
-  - second := access second item
-    Example: (second p)
+* Hahmap updates
   - Update MakeHashMap code node to support
     list of pairs, as well as the currently
     supported list of arrays

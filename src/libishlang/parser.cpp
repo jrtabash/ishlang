@@ -897,6 +897,27 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("hmvals", 1));
               return std::make_shared<HashMapValues>(exprs[0]);
           }
+        },
+
+        { "pair",
+          [this]() {
+              auto exprs(readAndCheckExprList("pair", 2));
+              return std::make_shared<MakePair>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "first",
+          [this]() {
+              auto exprs(readAndCheckExprList("first", 1));
+              return std::make_shared<PairFirst>(exprs[0]);
+          }
+        },
+
+        { "second",
+          [this]() {
+              auto exprs(readAndCheckExprList("second", 1));
+              return std::make_shared<PairSecond>(exprs[0]);
+          }
         }
     };
 }

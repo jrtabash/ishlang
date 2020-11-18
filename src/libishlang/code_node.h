@@ -996,6 +996,46 @@ namespace Ishlang {
         CodeNode::SharedPtr htExpr_;
     };
 
+    // -------------------------------------------------------------
+    class MakePair : public CodeNode {
+    public:
+        MakePair(CodeNode::SharedPtr firstExpr, CodeNode::SharedPtr secondExpr);
+        virtual ~MakePair() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr firstExpr_;
+        CodeNode::SharedPtr secondExpr_;
+    };
+
+    // -------------------------------------------------------------
+    class PairFirst : public CodeNode {
+    public:
+        PairFirst(CodeNode::SharedPtr pairExpr);
+        virtual ~PairFirst() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr pairExpr_;
+    };
+
+    // -------------------------------------------------------------
+    class PairSecond : public CodeNode {
+    public:
+        PairSecond(CodeNode::SharedPtr pairExpr);
+        virtual ~PairSecond() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr pairExpr_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H

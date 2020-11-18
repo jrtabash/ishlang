@@ -10,6 +10,7 @@ OBJS=\
 	exception.o \
 	util.o \
 	value.o \
+	value_pair.o \
 	environment.o \
 	lambda.o \
 	struct.o \
@@ -36,8 +37,11 @@ exception.o: exception.h exception.cpp
 util.o: util.h util.cpp exception.h
 	$(CPP) $(CFLAGS) -c util.cpp -o $(BUILD)/util.o
 
-value.o: value.h value.cpp lambda.h instance.h
+value.o: value.h value.cpp value_pair.h lambda.h instance.h
 	$(CPP) $(CFLAGS) -c value.cpp -o $(BUILD)/value.o
+
+value_pair.o: value_pair.cpp value_pair.h value.h
+	$(CPP) $(CFLAGS) -c value_pair.cpp -o $(BUILD)/value_pair.o
 
 environment.o: environment.cpp environment.h value.h exception.h
 	$(CPP) $(CFLAGS) -c environment.cpp -o $(BUILD)/environment.o

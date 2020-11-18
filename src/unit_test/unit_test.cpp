@@ -27,6 +27,7 @@ UnitTest::UnitTest()
     ADD_TEST(testComment);
     ADD_TEST(testValue);
     ADD_TEST(testValueAsType);
+    ADD_TEST(testValuePair);
     ADD_TEST(testEnvironment);
     ADD_TEST(testEnvironmentForeach);
     ADD_TEST(testLambda);
@@ -97,6 +98,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeHashMapCount);
     ADD_TEST(testCodeNodeHashMapKeys);
     ADD_TEST(testCodeNodeHashMapValues);
+    ADD_TEST(testCodeNodePairOperations);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -155,6 +157,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserHashMapCount);
     ADD_TEST(testParserHashMapKeys);
     ADD_TEST(testParserHashMapVals);
+    ADD_TEST(testParserPairOperations);
 }
 #undef ADD_TEST
 
@@ -656,11 +659,39 @@ void UnitTest::testValue() {
     }
 
     {
+        Value iVal1(1ll);
+        Value iVal2(2ll);
+        Value iVal4(4ll);
+        Value p1(Value::Pair(iVal1, iVal2));
+        Value p2(Value::Pair(iVal1, iVal2));
+        Value p3(Value::Pair(iVal1, iVal4));
+
+        TEST_CASE(p1.isPair());
+        TEST_CASE(p2.isPair());
+        TEST_CASE(p3.isPair());
+
+        TEST_CASE(p1.pair().first() == iVal1);
+        TEST_CASE(p1.pair().second() == iVal2);
+        TEST_CASE(p2.pair().first() == iVal1);
+        TEST_CASE(p2.pair().second() == iVal2);
+        TEST_CASE(p3.pair().first() == iVal1);
+        TEST_CASE(p3.pair().second() == iVal4);
+
+        TEST_CASE(p1 == p2);
+        TEST_CASE(p1 != p3);
+        TEST_CASE(p1 < p3);
+        TEST_CASE(p3 > p1);
+        TEST_CASE(p1 <= p2);
+        TEST_CASE(p1 >= p2);
+    }
+
+    {
         TEST_CASE(Value::stringToType("none")       == Value::eNone);
         TEST_CASE(Value::stringToType("int")        == Value::eInteger);
         TEST_CASE(Value::stringToType("real")       == Value::eReal);
         TEST_CASE(Value::stringToType("char")       == Value::eCharacter);
         TEST_CASE(Value::stringToType("bool")       == Value::eBoolean);
+        TEST_CASE(Value::stringToType("pair")       == Value::ePair);
         TEST_CASE(Value::stringToType("string")     == Value::eString);
         TEST_CASE(Value::stringToType("closure")    == Value::eClosure);
         TEST_CASE(Value::stringToType("usertype")   == Value::eUserType);
@@ -860,6 +891,48 @@ void UnitTest::testValueAsType() {
 }
 #undef TEST_ASTYPE_EXCEPT
 #undef TEST_VALUE_ASTYPE
+
+// -------------------------------------------------------------
+#define TEST_PAIR_EQUAL(VP, F, S) TEST_CASE(VP.first() == F && VP.second() == S)
+void UnitTest::testValuePair() {
+    TEST_PAIR_EQUAL(ValuePair(), Value::Null, Value::Null);
+    TEST_PAIR_EQUAL(ValuePair(Value('a'), Value('b')), Value('a'), Value('b'));
+    TEST_PAIR_EQUAL(ValuePair(ValuePair::Pair(Value("a"), Value("b"))), Value("a"), Value("b"));
+
+    const Value one(1ll);
+    const Value two(2ll);
+    const Value three(3ll);
+    const Value four(4ll);
+
+    TEST_CASE( (ValuePair(one, two) == ValuePair(one, two)) );
+    TEST_CASE(!(ValuePair(one, two) == ValuePair(one, three)) );
+
+    TEST_CASE( (ValuePair(one, two) != ValuePair(one, three)) );
+    TEST_CASE(!(ValuePair(one, two) != ValuePair(one, two)) );
+
+    TEST_CASE( (ValuePair(one, two) < ValuePair(two, one)) );
+    TEST_CASE( (ValuePair(one, two) < ValuePair(one, three)) );
+    TEST_CASE(!(ValuePair(two, four) < ValuePair(one, four)) );
+    TEST_CASE(!(ValuePair(two, four) < ValuePair(two, three)) );
+
+    TEST_CASE( (ValuePair(two, one) > ValuePair(one, two)) );
+    TEST_CASE( (ValuePair(one, two) > ValuePair(one, one)) );
+    TEST_CASE(!(ValuePair(two, four) > ValuePair(three, four)) );
+    TEST_CASE(!(ValuePair(two, three) > ValuePair(two, four)) );
+
+    TEST_CASE( (ValuePair(one, two) <= ValuePair(two, one)) );
+    TEST_CASE( (ValuePair(one, two) <= ValuePair(one, three)) );
+    TEST_CASE( (ValuePair(one, two) <= ValuePair(one, two)) );
+    TEST_CASE(!(ValuePair(two, four) <= ValuePair(one, four)) );
+    TEST_CASE(!(ValuePair(two, four) <= ValuePair(two, three)) );
+
+    TEST_CASE( (ValuePair(two, one) >= ValuePair(one, two)) );
+    TEST_CASE( (ValuePair(one, two) >= ValuePair(one, one)) );
+    TEST_CASE( (ValuePair(one, two) >= ValuePair(one, two)) );
+    TEST_CASE(!(ValuePair(two, four) >= ValuePair(three, four)) );
+    TEST_CASE(!(ValuePair(two, three) >= ValuePair(two, four)) );
+}
+#undef TEST_PAIR_EQUAL
 
 // -------------------------------------------------------------
 void UnitTest::testEnvironment() {
@@ -4074,6 +4147,44 @@ void UnitTest::testCodeNodeHashMapValues() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodePairOperations() {
+    Environment::SharedPtr env(new Environment());
+
+    auto ilit = [](Value::Long value) { return std::make_shared<Literal>(Value(value)); };
+
+    Value value = std::make_shared<MakePair>(ilit(1), ilit(2))->eval(env);
+    TEST_CASE_MSG(value.isPair(), "actual=" << value.isPair());
+    TEST_CASE_MSG(value.pair().first() == Value(1ll), "actual=" << value.pair().first());
+    TEST_CASE_MSG(value.pair().second() == Value(2ll), "actual=" << value.pair().second());
+
+    env->def("p", value);
+
+    Value fValue = std::make_shared<PairFirst>(std::make_shared<Variable>("p"))->eval(env);
+    TEST_CASE_MSG(fValue == Value(1ll), "actual=" << fValue);
+
+    Value sValue = std::make_shared<PairSecond>(std::make_shared<Variable>("p"))->eval(env);
+    TEST_CASE_MSG(sValue == Value(2ll), "actual=" << sValue);
+
+    try {
+        std::make_shared<PairFirst>(std::make_shared<Literal>(Value(1ll)))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        std::make_shared<PairSecond>(std::make_shared<Literal>(Value(1ll)))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -5317,4 +5428,26 @@ void UnitTest::testParserHashMapVals() {
     TEST_CASE(parserTest(parser, env, "(hmvals)",         Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmvals ht 'a')",  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmvals 'a' 'b')", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserPairOperations() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("p", Value(Value::Pair(Value('a'), Value('b'))));
+
+    TEST_CASE(parserTest(parser, env, "(pair 'a' 'b')", Value(Value::Pair(Value('a'), Value('b'))), true));
+
+    TEST_CASE(parserTest(parser, env, "(first p)",  Value('a'), true));
+    TEST_CASE(parserTest(parser, env, "(second p)", Value('b'), true));
+
+    TEST_CASE(parserTest(parser, env, "(pair)",             Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(pair 'a')",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(pair 'a' 'b' 'c')", Value::Null, false));
+
+    TEST_CASE(parserTest(parser, env, "(first)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(first p 'a')",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(second)",        Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(second p 'a')",  Value::Null, false));
 }

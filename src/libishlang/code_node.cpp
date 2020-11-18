@@ -7,6 +7,7 @@
 #include "parser.h"
 #include "sequence.h"
 #include "util.h"
+#include "value_pair.h"
 
 #include <algorithm>
 #include <cctype>
@@ -1232,9 +1233,10 @@ Value HashMapRemove::exec(Environment::SharedPtr env) {
     return Value::Null;
 }
 
-// -------------------------------------------------------------H
+// -------------------------------------------------------------
 HashMapClear::HashMapClear(CodeNode::SharedPtr htExpr)
-    : htExpr_(htExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
 {
 }
 
@@ -1251,7 +1253,8 @@ Value HashMapClear::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 HashMapFind::HashMapFind(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueExpr)
-    : htExpr_(htExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
     , valueExpr_(valueExpr)
 {}
 
@@ -1269,7 +1272,8 @@ Value HashMapFind::exec(Environment::SharedPtr env) {
 
 // -------------------------------------------------------------
 HashMapCount::HashMapCount(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueExpr)
-    : htExpr_(htExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
     , valueExpr_(valueExpr)
 {}
 
@@ -1285,9 +1289,10 @@ Value HashMapCount::exec(Environment::SharedPtr env) {
     return Value::Zero;
 }
 
-// -------------------------------------------------------------H
+// -------------------------------------------------------------
 HashMapKeys::HashMapKeys(CodeNode::SharedPtr htExpr)
-    : htExpr_(htExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
 {
 }
 
@@ -1302,9 +1307,10 @@ Value HashMapKeys::exec(Environment::SharedPtr env) {
     return Value::Null;
 }
 
-// -------------------------------------------------------------H
+// -------------------------------------------------------------
 HashMapValues::HashMapValues(CodeNode::SharedPtr htExpr)
-    : htExpr_(htExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
 {
 }
 
@@ -1315,6 +1321,57 @@ Value HashMapValues::exec(Environment::SharedPtr env) {
         if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
 
         return Value(hm.hashMap().values());
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+MakePair::MakePair(CodeNode::SharedPtr firstExpr, CodeNode::SharedPtr secondExpr)
+    : CodeNode()
+    , firstExpr_(firstExpr)
+    , secondExpr_(secondExpr)
+{}
+
+Value MakePair::exec(Environment::SharedPtr env) {
+    if (firstExpr_ && secondExpr_) {
+        const auto first = firstExpr_->eval(env);
+        const auto second = secondExpr_->eval(env);
+
+        return Value(ValuePair(first, second));
+    }
+    return Value::EmptyPair;
+}
+
+// -------------------------------------------------------------
+PairFirst::PairFirst(CodeNode::SharedPtr pairExpr)
+    : CodeNode()
+    , pairExpr_(pairExpr)
+{}
+
+Value PairFirst::exec(Environment::SharedPtr env) {
+    if (pairExpr_) {
+        auto pairValue = pairExpr_->eval(env);
+
+        if (!pairValue.isPair()) { throw InvalidOperandType("Pair", pairValue.typeToString()); }
+
+        return pairValue.pair().first();
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+PairSecond::PairSecond(CodeNode::SharedPtr pairExpr)
+    : CodeNode()
+    , pairExpr_(pairExpr)
+{}
+
+Value PairSecond::exec(Environment::SharedPtr env) {
+    if (pairExpr_) {
+        auto pairValue = pairExpr_->eval(env);
+
+        if (!pairValue.isPair()) { throw InvalidOperandType("Pair", pairValue.typeToString()); }
+
+        return pairValue.pair().second();
     }
     return Value::Null;
 }

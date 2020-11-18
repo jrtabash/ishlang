@@ -11,6 +11,7 @@
 #include "sequence.h"
 #include "struct.h"
 #include "value.h"
+#include "value_pair.h"
 #include "module.h"
 #include "util.h"
 
@@ -47,6 +48,7 @@ namespace Ishlang {
         void testTokenType();
         void testValue();
         void testValueAsType();
+        void testValuePair();
         void testEnvironment();
         void testEnvironmentForeach();
         void testLambda();
@@ -120,6 +122,7 @@ namespace Ishlang {
         void testCodeNodeHashMapCount();
         void testCodeNodeHashMapKeys();
         void testCodeNodeHashMapValues();
+        void testCodeNodePairOperations();
         void testParserBasic();
         void testParserClone();
         void testParserIsType();
@@ -174,6 +177,7 @@ namespace Ishlang {
         void testParserHashMapCount();
         void testParserHashMapKeys();
         void testParserHashMapVals();
+        void testParserPairOperations();
         
     private:
         bool  success_;

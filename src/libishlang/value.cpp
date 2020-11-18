@@ -1,4 +1,5 @@
 #include "value.h"
+#include "value_pair.h"
 #include "exception.h"
 #include "hashtable.h"
 #include "instance.h"
@@ -13,14 +14,22 @@ const Value Value::True(true);
 const Value Value::False(false);
 const Value Value::Zero(0ll);
 const Value Value::Null;
+const Value Value::EmptyPair(Pair(Value::Null, Value::Null));
 
 // -------------------------------------------------------------
+ValuePair   Value::NullPair;
 std::string Value::NullText;
 Lambda      Value::NullFunc;
 Struct      Value::NullUserType;
 Instance    Value::NullObject;
 Sequence    Value::NullSequence;
 Hashtable   Value::NullHashtable;
+
+// -------------------------------------------------------------
+Value::Value(const Pair &p)
+    : type_(ePair)
+    , value_(std::make_shared<Pair>(p))
+{}
 
 // -------------------------------------------------------------
 Value::Value(const char *t)
@@ -167,6 +176,7 @@ bool Value::operator==(const Value &rhs) const {
         case eReal:       return std::get<Double>(value_) == std::get<Double>(rhs.value_);
         case eCharacter:  return std::get<Char>(value_) == std::get<Char>(rhs.value_);
         case eBoolean:    return std::get<Bool>(value_) == std::get<Bool>(rhs.value_);
+        case ePair:       return *std::get<PairPtr>(value_) == *std::get<PairPtr>(rhs.value_);
         case eString:     return *std::get<StringPtr>(value_) == *std::get<StringPtr>(rhs.value_);
         case eClosure:    return *std::get<LambdaPtr>(value_) == *std::get<LambdaPtr>(rhs.value_);
         case eUserType:   return *std::get<StructPtr>(value_) == *std::get<StructPtr>(rhs.value_);
@@ -190,6 +200,7 @@ bool Value::operator!=(const Value &rhs) const {
         case eReal:       return std::get<Double>(value_) != std::get<Double>(rhs.value_);
         case eCharacter:  return std::get<Char>(value_) != std::get<Char>(rhs.value_);
         case eBoolean:    return std::get<Bool>(value_) != std::get<Bool>(rhs.value_);
+        case ePair:       return *std::get<PairPtr>(value_) != *std::get<PairPtr>(rhs.value_);
         case eString:     return *std::get<StringPtr>(value_) != *std::get<StringPtr>(rhs.value_);
         case eClosure:    return *std::get<LambdaPtr>(value_) != *std::get<LambdaPtr>(rhs.value_);
         case eUserType:   return *std::get<StructPtr>(value_) != *std::get<StructPtr>(rhs.value_);
@@ -213,6 +224,7 @@ bool Value::operator<(const Value &rhs) const {
         case eReal:       return std::get<Double>(value_) < std::get<Double>(rhs.value_);
         case eCharacter:  return std::get<Char>(value_) < std::get<Char>(rhs.value_);
         case eBoolean:    return std::get<Bool>(value_) < std::get<Bool>(rhs.value_);
+        case ePair:       return *std::get<PairPtr>(value_) < *std::get<PairPtr>(rhs.value_);
         case eString:     return *std::get<StringPtr>(value_) < *std::get<StringPtr>(rhs.value_);
         case eClosure:    return false;
         case eUserType:   return false;
@@ -236,6 +248,7 @@ bool Value::operator>(const Value &rhs) const {
         case eReal:       return std::get<Double>(value_) > std::get<Double>(rhs.value_);
         case eCharacter:  return std::get<Char>(value_) > std::get<Char>(rhs.value_);
         case eBoolean:    return std::get<Bool>(value_) > std::get<Bool>(rhs.value_);
+        case ePair:       return *std::get<PairPtr>(value_) > *std::get<PairPtr>(rhs.value_);
         case eString:     return *std::get<StringPtr>(value_) > *std::get<StringPtr>(rhs.value_);
         case eClosure:    return false;
         case eUserType:   return false;
@@ -259,6 +272,7 @@ bool Value::operator<=(const Value &rhs) const {
         case eReal:       return std::get<Double>(value_) <= std::get<Double>(rhs.value_);
         case eCharacter:  return std::get<Char>(value_) <= std::get<Char>(rhs.value_);
         case eBoolean:    return std::get<Bool>(value_) <= std::get<Bool>(rhs.value_);
+        case ePair:       return *std::get<PairPtr>(value_) <= *std::get<PairPtr>(rhs.value_);
         case eString:     return *std::get<StringPtr>(value_) <= *std::get<StringPtr>(rhs.value_);
         case eClosure:    return false;
         case eUserType:   return false;
@@ -282,6 +296,7 @@ bool Value::operator>=(const Value &rhs) const {
         case eReal:       return std::get<Double>(value_) >= std::get<Double>(rhs.value_);
         case eCharacter:  return std::get<Char>(value_) >= std::get<Char>(rhs.value_);
         case eBoolean:    return std::get<Bool>(value_) >= std::get<Bool>(rhs.value_);
+        case ePair:       return *std::get<PairPtr>(value_) >= *std::get<PairPtr>(rhs.value_);
         case eString:     return *std::get<StringPtr>(value_) >= *std::get<StringPtr>(rhs.value_);
         case eClosure:    return false;
         case eUserType:   return false;
@@ -305,6 +320,7 @@ std::string Value::typeToString(Type type) {
         case eReal:       return "real";
         case eCharacter:  return "char";
         case eBoolean:    return "bool";
+        case ePair:       return "pair";
         case eString:     return "string";
         case eClosure:    return "closure";
         case eUserType:   return "usertype";
@@ -322,6 +338,7 @@ Value::Type Value::stringToType(const std::string &str) {
     else if (str == "real")       { return Value::eReal; }
     else if (str == "char")       { return Value::eCharacter; }
     else if (str == "bool")       { return Value::eBoolean; }
+    else if (str == "pair")       { return Value::ePair; }
     else if (str == "string")     { return Value::eString; }
     else if (str == "closure")    { return Value::eClosure; }
     else if (str == "usertype")   { return Value::eUserType; }
@@ -340,6 +357,10 @@ Value Value::clone() const {
     case eReal:
     case eCharacter:
     case eBoolean:
+        return *this;
+
+    case ePair:
+        // Since pair is immutable, there is no need to allocate a new one.
         return *this;
 
     case eString:
@@ -378,6 +399,7 @@ Value Value::asType(Type otherType) const {
     case eString:    return asString();
 
     case eNone:
+    case ePair:
     case eClosure:
     case eUserType:
     case eUserObject:
@@ -398,6 +420,7 @@ void Value::printC(std::ostream &out, const Value &value) {
     case Value::eReal:       out << std::get<Double>(value.value_);                    break;
     case Value::eCharacter:  out << '\'' << std::get<Char>(value.value_) << '\'';      break;
     case Value::eBoolean:    out << (std::get<Bool>(value.value_) ? "true" : "false"); break;
+    case Value::ePair:       out << *std::get<PairPtr>(value.value_);                  break;
     case Value::eString:     out << '"' << *std::get<StringPtr>(value.value_) << '"';  break;
     case Value::eClosure:    out << "[Lambda]";                                        break;
     case Value::eUserType:   out << *std::get<StructPtr>(value.value_);                break;
@@ -415,6 +438,7 @@ void Value::print(const Value &value) {
     case Value::eReal:       std::cout << std::get<Double>(value.value_);                    break;
     case Value::eCharacter:  std::cout << std::get<Char>(value.value_);                      break;
     case Value::eBoolean:    std::cout << (std::get<Bool>(value.value_) ? "true" : "false"); break;
+    case Value::ePair:       std::cout << *std::get<PairPtr>(value.value_);                  break;
     case Value::eString:     std::cout << *std::get<StringPtr>(value.value_);                break;
     case Value::eClosure:    std::cout << "[Lambda]";                                        break;
     case Value::eUserType:   std::cout << *std::get<StructPtr>(value.value_);                break;
@@ -431,6 +455,7 @@ std::size_t Value::Hash::operator()(const Value &value) const noexcept {
     case Value::eReal:       return std::hash<Value::Double>{}(value.real());
     case Value::eCharacter:  return std::hash<Value::Char>{}(value.character());
     case Value::eBoolean:    return std::hash<Value::Bool>{}(value.boolean());
+    case Value::ePair:       return operator()(value.pair());
     case Value::eString:     return std::hash<Value::Text>{}(value.text());
     case Value::eClosure:    return std::hash<const Value::Func *>{}(&value.closure());
     case Value::eUserType:   return std::hash<const Value::UserType *>{}(&value.userType());
@@ -441,4 +466,10 @@ std::size_t Value::Hash::operator()(const Value &value) const noexcept {
     }
 
     return std::size_t(0);
+}
+
+std::size_t Value::Hash::operator()(const ValuePair &value) const noexcept {
+    const std::size_t hash1 = operator()(value.first());
+    const std::size_t hash2 = operator()(value.second());
+    return hash1 ^ (hash2 << 1);
 }

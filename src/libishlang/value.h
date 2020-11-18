@@ -7,12 +7,14 @@
 #include <variant>
 
 namespace Ishlang {
+    class ValuePair;
     class Lambda;
     class Struct;
     class Instance;
     class Sequence;
     class Hashtable;
 
+    using PairPtr = std::shared_ptr<ValuePair>;
     using StringPtr = std::shared_ptr<std::string>;
     using LambdaPtr = std::shared_ptr<Lambda>;
     using StructPtr = std::shared_ptr<Struct>;
@@ -26,8 +28,10 @@ namespace Ishlang {
         static const Value False;
         static const Value Zero;
         static const Value Null;
+        static const Value EmptyPair;
 
     private:
+        static ValuePair   NullPair;
         static std::string NullText;
         static Lambda      NullFunc;
         static Struct      NullUserType;
@@ -42,6 +46,7 @@ namespace Ishlang {
             eReal       = 'R',
             eCharacter  = 'C',
             eBoolean    = 'B',
+            ePair       = 'P',
             eString     = 'S',
             eClosure    = 'F',
             eUserType   = 'U',
@@ -54,6 +59,7 @@ namespace Ishlang {
         using Double     = double;
         using Char       = char;
         using Bool       = bool;
+        using Pair       = ValuePair;
         using Text       = std::string;
         using Func       = Lambda;
         using UserType   = Struct;
@@ -67,6 +73,7 @@ namespace Ishlang {
         Value(Double r) : type_(eReal),      value_(r) {}
         Value(Char c)   : type_(eCharacter), value_(c) {}
         Value(Bool b)   : type_(eBoolean),   value_(b) {}
+        Value(const Pair &p);
         Value(const char *t);
         Value(const std::string &t);
         Value(const Lambda &f);
@@ -82,6 +89,7 @@ namespace Ishlang {
         bool isReal() const       { return type_ == eReal; }
         bool isChar() const       { return type_ == eCharacter; }
         bool isBool() const       { return type_ == eBoolean; }
+        bool isPair() const       { return type_ == ePair; }
         bool isString() const     { return type_ == eString; }
         bool isClosure() const    { return type_ == eClosure; }
         bool isUserType() const   { return type_ == eUserType; }
@@ -95,6 +103,7 @@ namespace Ishlang {
         Double real()                  const { return isReal()       ? std::get<Double>(value_)  : (isInt() ? (Double)std::get<Long>(value_) : 0.0); }
         Char character()               const { return isChar()       ? std::get<Char>(value_)  : '\0'; }
         Bool boolean()                 const { return isBool()       ? std::get<Bool>(value_)  : false; }
+        const Pair &pair()             const { return isPair()       ? *std::get<PairPtr>(value_) : NullPair; }
         const Text &text()             const { return isString()     ? *std::get<StringPtr>(value_) : NullText; }
         Text &text()                         { return isString()     ? *std::get<StringPtr>(value_) : NullText; }
         const Func &closure()          const { return isClosure()    ? *std::get<LambdaPtr>(value_) : NullFunc; }
@@ -139,6 +148,7 @@ namespace Ishlang {
     public:
         struct Hash {
             std::size_t operator()(const Value &value) const noexcept;
+            std::size_t operator()(const ValuePair &value) const noexcept;
         };
 
     private:
@@ -146,6 +156,7 @@ namespace Ishlang {
                                           Double,
                                           Char,
                                           Bool,
+                                          PairPtr,
                                           StringPtr,
                                           LambdaPtr,
                                           StructPtr,
