@@ -7,10 +7,8 @@ __CODE__
 (println (hmfind ht 3))
 (println (hmfind ht 4))
 
-(hmset ht "two2" 2)
-(hmset ht "two3" 2)
-(hmset ht "three2" 3)
-(hmset ht "four" 4)
+(= ht (hashmap (pair "one" 1) (pair "two" 2) (pair "three" 3) (pair "two2" 2) (pair "two3" 2) (pair "three2" 3) (pair "four" 4)))
+(println (hmlen ht))
 
 (println (hmcount ht 1))
 (println (hmcount ht 2))
@@ -24,6 +22,7 @@ one
 two
 three
 null
+7
 1
 3
 2

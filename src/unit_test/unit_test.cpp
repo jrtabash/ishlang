@@ -3672,12 +3672,26 @@ void UnitTest::testCodeNodeMakeHashMap() {
     TEST_CASE_MSG(value.hashMap().get(Value("two")) == Value(2ll), "actual=" << value.hashMap().get(Value("two")));
     TEST_CASE_MSG(value.hashMap().get(Value("three")) == Value(3ll), "actual=" << value.hashMap().get(Value("three")));
 
+    value =
+        std::make_shared<MakeHashMap>(
+            CodeNode::SharedPtrList(
+                { std::make_shared<MakePair>(slit("a"), ilit(10)),
+                  std::make_shared<MakePair>(slit("b"), ilit(20)),
+                  std::make_shared<MakePair>(slit("c"), ilit(30))
+                }))
+        ->eval(env);
+    TEST_CASE_MSG(value.isHashMap(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value.hashMap().size() == 3lu, "actual=" << value.hashMap().size());
+    TEST_CASE_MSG(value.hashMap().get(Value("a")) == Value(10ll), "actual=" << value.hashMap().get(Value("a")));
+    TEST_CASE_MSG(value.hashMap().get(Value("b")) == Value(20ll), "actual=" << value.hashMap().get(Value("b")));
+    TEST_CASE_MSG(value.hashMap().get(Value("c")) == Value(30ll), "actual=" << value.hashMap().get(Value("c")));
+
     try {
         std::make_shared<MakeHashMap>(CodeNode::SharedPtrList({ilit(5)}))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE_MSG(std::string("Invalid operand type, expected=Array actual=int") == ex.what(), ex.what());
+        TEST_CASE_MSG(std::string("Invalid operand type, expected=Pair or Array actual=int") == ex.what(), ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -5158,10 +5172,16 @@ void UnitTest::testParserMakeHashMap() {
               };
 
     TEST_CASE(parserTest(parser, env, "(hashmap)",                                           Value(ht(0)), true));
+    TEST_CASE(parserTest(parser, env, "(hashmap (pair 'a' 0))",                              Value(ht(1)), true));
+    TEST_CASE(parserTest(parser, env, "(hashmap (pair 'a' 0) (pair 'b' 1))",                 Value(ht(2)), true));
+    TEST_CASE(parserTest(parser, env, "(hashmap (pair 'a' 0) (pair 'b' 1) (pair 'c' 2))",    Value(ht(3)), true));
     TEST_CASE(parserTest(parser, env, "(hashmap (array 'a' 0))",                             Value(ht(1)), true));
     TEST_CASE(parserTest(parser, env, "(hashmap (array 'a' 0) (array 'b' 1))",               Value(ht(2)), true));
     TEST_CASE(parserTest(parser, env, "(hashmap (array 'a' 0) (array 'b' 1) (array 'c' 2))", Value(ht(3)), true));
 
+    TEST_CASE(parserTest(parser, env, "(hashmap (pair))",        Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hashmap (pair 1))",      Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hashmap (pair 1 2 3))",  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hashmap (array))",       Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hashmap (array 1))",     Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hashmap (array 1 2 3))", Value::Null, false));

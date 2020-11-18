@@ -1,13 +1,11 @@
 #include "code_node.h"
 #include "exception.h"
-#include "hashtable.h"
 #include "instance.h"
 #include "lambda.h"
 #include "module.h"
 #include "parser.h"
 #include "sequence.h"
 #include "util.h"
-#include "value_pair.h"
 
 #include <algorithm>
 #include <cctype>
@@ -1122,17 +1120,28 @@ Value MakeHashMap::exec(Environment::SharedPtr env) {
     else {
         Hashtable::Table table;
         for (auto & pairCode : pairs_) {
-            // TODO:JT - Add support for list of pairs once pair type is added.
             auto pairValue = pairCode->eval(env);
-            if (!pairValue.isArray()) { throw InvalidOperandType("Array", pairValue.typeToString()); }
-
-            const auto &arr = pairValue.array();
-            if (arr.size() != 2) { throw InvalidExpression("Wrong array size, expecting 2"); }
-
-            table.emplace(arr.get(0), arr.get(1));
+            if (pairValue.isPair()) {
+                append(table, pairValue.pair());
+            }
+            else if (pairValue.isArray()) {
+                append(table, pairValue.array());
+            }
+            else {
+                throw InvalidOperandType("Pair or Array", pairValue.typeToString());
+            }
         }
         return Value(Hashtable(std::move(table)));
     }
+}
+
+void MakeHashMap::append(Hashtable::Table & table, const Sequence &arr) {
+    if (arr.size() != 2) { throw InvalidExpression("Wrong array size, expecting 2"); }
+    table.emplace(arr.get(0), arr.get(1));
+}
+
+void MakeHashMap::append(Hashtable::Table & table, const ValuePair &pair) {
+    table.emplace(pair.first(), pair.second());
 }
 
 // -------------------------------------------------------------

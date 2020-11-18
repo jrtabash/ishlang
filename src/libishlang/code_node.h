@@ -2,8 +2,10 @@
 #define BYTE_CODE_H
 
 #include "environment.h"
+#include "hashtable.h"
 #include "struct.h"
 #include "value.h"
+#include "value_pair.h"
 
 #include <functional>
 #include <memory>
@@ -853,6 +855,10 @@ namespace Ishlang {
         virtual ~MakeHashMap() {}
 
         virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        static void append(Hashtable::Table &table, const Sequence &arr);
+        static void append(Hashtable::Table &table, const ValuePair &pair);
 
     private:
         CodeNode::SharedPtrList pairs_;

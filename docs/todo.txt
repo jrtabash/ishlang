@@ -1,9 +1,5 @@
-* Hahmap updates
-  - Update MakeHashMap code node to support
-    list of pairs, as well as the currently
-    supported list of arrays
-  - Add hmitems function to hashmap to
-    return array of key/value pairs
+* Add hmitems function to hashmap to
+  return array of key/value pairs
 
 * Add support for file IO
   Add file type
