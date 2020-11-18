@@ -15,7 +15,7 @@ Example: Hello world Program
 Values
 ------
 Every expression in ishlang evaluates to a value. A value can hold any of the following types:
-  none, int, real, char, bool, string, array, hashmap, closure, usertype, userobject
+  none, int, real, char, bool, string, pair, array, hashmap, closure, usertype, userobject
 
 Literals
 --------
@@ -256,7 +256,7 @@ Type Checking
 Is type of?
   (istypeof <expression> <type>
 
-<type> is one of: none, int, real, char, bool, string, array, hashmap, closure, usertype, userobject
+<type> is one of: none, int, real, char, bool, string, pair, array, hashmap, closure, usertype, userobject
 
 Example:
   (istypeof 10 int)
@@ -429,6 +429,22 @@ Examples:
   (isalnum n)
   (ispunct p)
   (isspace a)
+
+Pair Operations
+---------------
+pair : make a pair
+       (pair <first> <second>)
+
+first: get first item
+       (first <pair>)
+
+second: get second item
+        (second <pair>)
+
+Examples:
+  (var p (pair 1 2))
+  (first p)
+  (second p)
 
 Array Operations
 ----------------
