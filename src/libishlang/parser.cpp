@@ -899,6 +899,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "hmitems",
+          [this]() {
+              auto exprs(readAndCheckExprList("hmitems", 1));
+              return std::make_shared<HashMapItems>(exprs[0]);
+          }
+        },
+
         { "pair",
           [this]() {
               auto exprs(readAndCheckExprList("pair", 2));

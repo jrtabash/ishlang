@@ -42,6 +42,7 @@ namespace Ishlang {
 
         Sequence keys() const;
         Sequence values() const;
+        Sequence items() const;
 
         std::size_t size() const { return table_.size(); }
 

@@ -98,6 +98,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeHashMapCount);
     ADD_TEST(testCodeNodeHashMapKeys);
     ADD_TEST(testCodeNodeHashMapValues);
+    ADD_TEST(testCodeNodeHashMapItems);
     ADD_TEST(testCodeNodePairOperations);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
@@ -157,6 +158,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserHashMapCount);
     ADD_TEST(testParserHashMapKeys);
     ADD_TEST(testParserHashMapVals);
+    ADD_TEST(testParserHashMapItems);
     ADD_TEST(testParserPairOperations);
 }
 #undef ADD_TEST
@@ -1430,9 +1432,14 @@ void UnitTest::testHashtableKeysValues() {
     const auto vTwo = Value(2ll);
     const auto vThree = Value(3ll);
 
+    const auto pOne = Value(Value::Pair(kOne, vOne));
+    const auto pTwo = Value(Value::Pair(kTwo, vTwo));
+    const auto pThree = Value(Value::Pair(kThree, vThree));
+
     Hashtable ht;
     TEST_CASE(ht.keys() == Sequence());
     TEST_CASE(ht.values() == Sequence());
+    TEST_CASE(ht.items() == Sequence());
 
     ht.set(kOne, vOne);
     ht.set(kTwo, vTwo);
@@ -1440,8 +1447,10 @@ void UnitTest::testHashtableKeysValues() {
 
     const Sequence keys = ht.keys();
     const Sequence values = ht.values();
+    const Sequence items = ht.items();
     TEST_CASE_MSG(keys.size() == 3, "actual=" << keys.size());
     TEST_CASE_MSG(values.size() == 3, "actual=" << values.size());
+    TEST_CASE_MSG(items.size() == 3, "actual=" << items.size());
 
     std::size_t result = 0;
     result = keys.count(kOne);   TEST_CASE_MSG(result == 1, "actual=" << result);
@@ -1452,8 +1461,17 @@ void UnitTest::testHashtableKeysValues() {
     result = values.count(vTwo);   TEST_CASE_MSG(result == 1, "actual=" << result);
     result = values.count(vThree); TEST_CASE_MSG(result == 1, "actual=" << result);
 
+    result = items.count(pOne);   TEST_CASE_MSG(result == 1, "actual=" << result);
+    result = items.count(pTwo);   TEST_CASE_MSG(result == 1, "actual=" << result);
+    result = items.count(pThree); TEST_CASE_MSG(result == 1, "actual=" << result);
+
     for (std::size_t i = 0; i < keys.size(); ++i) {
-        TEST_CASE_MSG(ht.get(keys.get(i)) == values.get(i), "index=" << i << " key=" << keys.get(i) << " value=" << values.get(i));
+        const auto & key = keys.get(i);
+        const auto & value = values.get(i);
+        const auto & pair = items.get(i).pair();
+
+        TEST_CASE_MSG(ht.get(key) == value, "index=" << i << " key=" << key << " value=" << value);
+        TEST_CASE_MSG(ht.get(pair.first()) == pair.second(), "index=" << i << " key=" << pair.first() << " value=" << pair.second());
     }
 }
 
@@ -4161,6 +4179,47 @@ void UnitTest::testCodeNodeHashMapValues() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeHashMapItems() {
+    Environment::SharedPtr env(new Environment());
+
+    {
+        Hashtable ht;
+        ht.set(Value('a'), Value(1ll));
+        ht.set(Value('b'), Value(2ll));
+        ht.set(Value('c'), Value(3ll));
+        ht.set(Value('2'), Value(2ll));
+        env->def("ht", Value(ht));
+    }
+
+    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+
+    auto items = [&env, &ht]() {
+                     return std::make_shared<HashMapItems>(ht)->eval(env);
+                 };
+
+    const Value itms = items();
+    TEST_CASE(itms.isArray());
+
+    const Sequence &pairs = itms.array();
+    TEST_CASE_MSG(pairs.size() == 4, "actual=" << pairs.size());
+
+    std::size_t cnt = 0;
+    cnt = pairs.count(Value(Value::Pair(Value('a'), Value(1ll)))); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
+    cnt = pairs.count(Value(Value::Pair(Value('b'), Value(2ll)))); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
+    cnt = pairs.count(Value(Value::Pair(Value('c'), Value(3ll)))); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
+    cnt = pairs.count(Value(Value::Pair(Value('2'), Value(2ll)))); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
+
+    try {
+        std::make_shared<HashMapItems>(std::make_shared<Literal>(Value(1ll)))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodePairOperations() {
     Environment::SharedPtr env(new Environment());
 
@@ -5448,6 +5507,26 @@ void UnitTest::testParserHashMapVals() {
     TEST_CASE(parserTest(parser, env, "(hmvals)",         Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmvals ht 'a')",  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmvals 'a' 'b')", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserHashMapItems() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    Hashtable ht;
+    ht.set(Value('a'), Value(1ll));
+    ht.set(Value('b'), Value(2ll));
+    ht.set(Value('c'), Value(3ll));
+    ht.set(Value('2'), Value(2ll));
+    env->def("ht", Value(ht));
+
+    TEST_CASE(parserTest(parser, env, "(hmitems (hashmap))",   Value(Sequence()), true));
+    TEST_CASE(parserTest(parser, env, "(arrlen (hmitems ht))", Value(4ll),        true));
+
+    TEST_CASE(parserTest(parser, env, "(hmitems)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmitems ht 'a')",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmitems 'a' 'b')", Value::Null, false));
 }
 
 // -------------------------------------------------------------

@@ -122,6 +122,7 @@ namespace Ishlang {
         void testCodeNodeHashMapCount();
         void testCodeNodeHashMapKeys();
         void testCodeNodeHashMapValues();
+        void testCodeNodeHashMapItems();
         void testCodeNodePairOperations();
         void testParserBasic();
         void testParserClone();
@@ -177,6 +178,7 @@ namespace Ishlang {
         void testParserHashMapCount();
         void testParserHashMapKeys();
         void testParserHashMapVals();
+        void testParserHashMapItems();
         void testParserPairOperations();
         
     private:

@@ -1335,6 +1335,23 @@ Value HashMapValues::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+HashMapItems::HashMapItems(CodeNode::SharedPtr htExpr)
+    : CodeNode()
+    , htExpr_(htExpr)
+{}
+
+Value HashMapItems::exec(Environment::SharedPtr env) {
+    if (htExpr_.get()) {
+        Value hm = htExpr_->eval(env);
+
+        if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
+
+        return Value(hm.hashMap().items());
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 MakePair::MakePair(CodeNode::SharedPtr firstExpr, CodeNode::SharedPtr secondExpr)
     : CodeNode()
     , firstExpr_(firstExpr)

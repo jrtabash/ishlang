@@ -1003,6 +1003,19 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class HashMapItems : public CodeNode {
+    public:
+        HashMapItems(CodeNode::SharedPtr htExpr);
+        virtual ~HashMapItems() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr htExpr_;
+    };
+
+    // -------------------------------------------------------------
     class MakePair : public CodeNode {
     public:
         MakePair(CodeNode::SharedPtr firstExpr, CodeNode::SharedPtr secondExpr);
