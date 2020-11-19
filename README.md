@@ -29,12 +29,19 @@ Run ishlang REPL:
 ishlang
 ```
 
-Run ishlang unit tests:
-```bash
-ishlang_unit_test
-```
-
 See usage for more information:
 ```bash
 ishlang -h
+```
+## Ishlang Usage
+```bash
+Usage:
+        ishlang [-h] [-i] [-b] [-p] [-f file]
+
+Options:
+        -h : Print usage
+        -i : Enter interactive mode
+        -b : Run in batch mode
+        -p : Import path
+        -f : Run code file
 ```
