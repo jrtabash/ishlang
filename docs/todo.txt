@@ -84,14 +84,12 @@
     Command:
       ishlang -f calc_sum.ish --args -v -n 10
     In Code:
-      (progarg "-v" verbose bool)
-      (progarg "-n" num int)
-      (proginit)
-      (println (pargval verbose))
-      (println (pargval num))
+      (defarg "-v" verbose bool)
+      (defarg "-n" num int)
+      (initargs)
+      (println (getarg verbose))
+      (println (getarg num))
     Functions:
-      (progarg <option_name> <variable_name> <option_type>)
-      (pargval <variable_name>
-      (proginit)
-
-* Rework 'break' implementation to avoid using Break::Except
+      (defarg <option_name> <variable_name> <option_type>)
+      (getarg <variable_name>)
+      (initargs)
