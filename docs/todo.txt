@@ -64,15 +64,20 @@
 
 * Add generic functions
   - Add generic get function with support for instances, strings, arrays and hashmaps
+    (get <instance|container> <item>)
   - Add generic set function with support for instances, strings, arrays and hashmaps
+    (set <instance|container> <item> <value>)
   - Add generic len function with support for strings, arrays and hashmaps
+    (len <container>)
   - Add generic find function with support for strings, arrays and hashmaps
+    (find <container> <item>)
   - Add generic count function with support for strings, arrays and hashmaps
+    (count <container> <item>)
+  - Add generic sort function with support for strings and arrays
+    (sort <sequence> key=null asc=true)
+  - Add generic reverse function with support for strings and arrays
+    (reverse <sequence>)
   - Note: Should work with future types; list and orderedmap.
-
-* Add generic sort and reverse functions for string, array and list (future) types:
-  - sort(sequence, key=null, asc=true)
-  - reverse(sequence)
 
 * Add support for command line arguments
   Idea:
