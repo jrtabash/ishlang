@@ -8,13 +8,12 @@
   counts)
 
 (defun print_counts (counts)
-  (var keys (hmkeys counts))
-  (var vals (hmvals counts))
-  (loop (var i 0) (< i (hmlen counts)) (= i (+ i 1))
+  (var items (hmitems counts))
+  (loop (var i 0) (< i (arrlen items)) (= i (+ i 1))
         (progn
-          (print (arrget vals i))
+          (print (second (arrget items i)))
           (print "  ")
-          (println (arrget keys i)))))
+          (println (first (arrget items i))))))
 
 (print_counts
  (word_counts
