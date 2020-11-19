@@ -524,6 +524,9 @@ hmkeys: return array of hashmap keys
 hmvals: return array of hashmap values
         (hmvals <hashmap>)
 
+hmitems: return array of hashmap key/value pairs
+         (hmitems <hashmap>)
+
 Examples:
   (var ht (hashmap (array "one" 1) (array "two" 2) (array "four" 4)))
   (hmlen ht)
@@ -536,6 +539,7 @@ Examples:
   (hmcount ht 1)
   (hmkeys ht)
   (hmvals ht)
+  (hmitems ht)
   (hmclr ht)
 
 Comments
