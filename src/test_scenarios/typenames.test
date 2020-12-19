@@ -7,7 +7,9 @@ __CODE__
 (var b true)
 (var c 'a')
 (var s "foobar")
+(var p (pair 1 2))
 (var a (array 1 2 3))
+(var h (hashmap))
 (var f (lambda (x y) (+ x y)))
 (var t MyStruct)
 (var o (makeinstance MyStruct))
@@ -18,7 +20,9 @@ __CODE__
 (println (typename b))
 (println (typename c))
 (println (typename s))
+(println (typename p))
 (println (typename a))
+(println (typename h))
 (println (typename f))
 (println (typename t))
 (println (typename o))
@@ -30,7 +34,9 @@ real
 bool
 char
 string
+pair
 array
+hashmap
 closure
 usertype
 userobject
