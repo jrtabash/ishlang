@@ -68,11 +68,11 @@ namespace Ishlang {
         using HashMap    = Hashtable;
         
     public:
-        Value()         : type_(eNone) {}
-        Value(Long i)   : type_(eInteger),   value_(i) {}
-        Value(Double r) : type_(eReal),      value_(r) {}
-        Value(Char c)   : type_(eCharacter), value_(c) {}
-        Value(Bool b)   : type_(eBoolean),   value_(b) {}
+        inline Value();
+        inline Value(Long i);
+        inline Value(Double r);
+        inline Value(Char c);
+        inline Value(Bool b);
         Value(const Pair &p);
         Value(const char *t);
         Value(const std::string &t);
@@ -82,38 +82,38 @@ namespace Ishlang {
         Value(const Sequence &s);
         Value(const Hashtable &h);
 
-        Type type() const { return type_; }
+        inline Type type() const;
         
-        bool isNull() const       { return type_ == eNone; }
-        bool isInt()  const       { return type_ == eInteger; }
-        bool isReal() const       { return type_ == eReal; }
-        bool isChar() const       { return type_ == eCharacter; }
-        bool isBool() const       { return type_ == eBoolean; }
-        bool isPair() const       { return type_ == ePair; }
-        bool isString() const     { return type_ == eString; }
-        bool isClosure() const    { return type_ == eClosure; }
-        bool isUserType() const   { return type_ == eUserType; }
-        bool isUserObject() const { return type_ == eUserObject; }
-        bool isArray() const      { return type_ == eArray; }
-        bool isHashMap() const    { return type_ == eHashMap; }
+        inline bool isNull() const;
+        inline bool isInt()  const;
+        inline bool isReal() const;
+        inline bool isChar() const;
+        inline bool isBool() const;
+        inline bool isPair() const;
+        inline bool isString() const;
+        inline bool isClosure() const;
+        inline bool isUserType() const;
+        inline bool isUserObject() const;
+        inline bool isArray() const;
+        inline bool isHashMap() const;
         
-        bool isNumber() const { return type_ == eInteger || type_ == eReal; }
+        inline bool isNumber() const;
         
-        Long integer()                 const { return isInt()        ? std::get<Long>(value_)  : 0; }
-        Double real()                  const { return isReal()       ? std::get<Double>(value_)  : (isInt() ? (Double)std::get<Long>(value_) : 0.0); }
-        Char character()               const { return isChar()       ? std::get<Char>(value_)  : '\0'; }
-        Bool boolean()                 const { return isBool()       ? std::get<Bool>(value_)  : false; }
-        const Pair &pair()             const { return isPair()       ? *std::get<PairPtr>(value_) : NullPair; }
-        const Text &text()             const { return isString()     ? *std::get<StringPtr>(value_) : NullText; }
-        Text &text()                         { return isString()     ? *std::get<StringPtr>(value_) : NullText; }
-        const Func &closure()          const { return isClosure()    ? *std::get<LambdaPtr>(value_) : NullFunc; }
-        const UserType &userType()     const { return isUserType()   ? *std::get<StructPtr>(value_) : NullUserType; }
-        const UserObject &userObject() const { return isUserObject() ? *std::get<InstancePtr>(value_) : NullObject; }
-        UserObject &userObject()             { return isUserObject() ? *std::get<InstancePtr>(value_) : NullObject; }
-        const Array &array()           const { return isArray()      ? *std::get<SequencePtr>(value_) : NullSequence; }
-        Array &array()                       { return isArray()      ? *std::get<SequencePtr>(value_) : NullSequence; }
-        const HashMap &hashMap()       const { return isHashMap()    ? *std::get<HashtablePtr>(value_) : NullHashtable; }
-        HashMap &hashMap()                   { return isHashMap()    ? *std::get<HashtablePtr>(value_) : NullHashtable; }
+        inline Long integer() const;
+        inline Double real() const;
+        inline Char character() const;
+        inline Bool boolean() const;
+        inline const Pair &pair() const;
+        inline const Text &text() const;
+        inline Text &text();
+        inline const Func &closure() const;
+        inline const UserType &userType() const;
+        inline const UserObject &userObject() const;
+        inline UserObject &userObject();
+        inline const Array &array() const;
+        inline Array &array();
+        inline const HashMap &hashMap() const;
+        inline HashMap &hashMap();
 
         Value asInt() const;
         Value asReal() const;
@@ -131,11 +131,12 @@ namespace Ishlang {
         static std::string typeToString(Type type);
         static Type stringToType(const std::string &str);
         
-        std::string typeToString() const { return typeToString(type_); }
+        inline std::string typeToString() const;
 
         Value clone() const;
         Value asType(Type otherType) const;
 
+    public:
         friend std::ostream &operator<<(std::ostream &out, const Value &value) {
             printC(out, value);
             return out;
@@ -167,6 +168,154 @@ namespace Ishlang {
         Type type_;
         VariantValue value_;
     };
+
+    // --------------------------------------------------------------------------------
+    // INLINE
+
+    inline Value::Value()
+        : type_(eNone)
+    {}
+
+    inline Value::Value(Long i)
+        : type_(eInteger)
+        ,   value_(i)
+    {}
+
+    inline Value::Value(Double r)
+        : type_(eReal)
+        , value_(r)
+    {}
+
+    inline Value::Value(Char c)
+        : type_(eCharacter)
+        , value_(c)
+    {}
+
+    inline Value::Value(Bool b)
+        : type_(eBoolean)
+        , value_(b)
+    {}
+
+    inline auto Value::type() const -> Type {
+        return type_;
+    }
+
+    inline bool Value::isNull() const {
+        return type_ == eNone;
+    }
+
+    inline bool Value::isInt() const {
+        return type_ == eInteger;
+    }
+
+    inline bool Value::isReal() const {
+        return type_ == eReal;
+    }
+
+    inline bool Value::isChar() const {
+        return type_ == eCharacter;
+    }
+
+    inline bool Value::isBool() const {
+        return type_ == eBoolean;
+    }
+
+    inline bool Value::isPair() const {
+        return type_ == ePair;
+    }
+
+    inline bool Value::isString() const {
+        return type_ == eString;
+    }
+
+    inline bool Value::isClosure() const {
+        return type_ == eClosure;
+    }
+
+    inline bool Value::isUserType() const {
+        return type_ == eUserType;
+    }
+
+    inline bool Value::isUserObject() const {
+        return type_ == eUserObject;
+    }
+
+    inline bool Value::isArray() const {
+        return type_ == eArray;
+    }
+
+    inline bool Value::isHashMap() const {
+        return type_ == eHashMap;
+    }
+
+    inline bool Value::isNumber() const {
+        return type_ == eInteger || type_ == eReal;
+    }
+
+    inline auto Value::integer() const -> Long {
+        return isInt() ? std::get<Long>(value_) : 0;
+    }
+
+    inline auto Value::real() const -> Double {
+        return isReal() ? std::get<Double>(value_) : (isInt() ? (Double)std::get<Long>(value_) : 0.0);
+    }
+
+    inline auto Value::character() const -> Char {
+        return isChar() ? std::get<Char>(value_) : '\0';
+    }
+
+    inline auto Value::boolean() const -> Bool {
+        return isBool() ? std::get<Bool>(value_) : false;
+    }
+
+    inline auto Value::pair() const -> const Pair & {
+        return isPair() ? *std::get<PairPtr>(value_) : NullPair;
+    }
+
+    inline auto Value::text() const -> const Text & {
+        return isString() ? *std::get<StringPtr>(value_) : NullText;
+    }
+
+    inline auto Value::text() -> Text & {
+        return isString() ? *std::get<StringPtr>(value_) : NullText;
+    }
+
+    inline auto Value::closure() const -> const Func & {
+        return isClosure() ? *std::get<LambdaPtr>(value_) : NullFunc;
+    }
+
+    inline auto Value::userType() const -> const UserType & {
+        return isUserType() ? *std::get<StructPtr>(value_) : NullUserType;
+    }
+
+    inline auto Value::userObject() const -> const UserObject & {
+        return isUserObject() ? *std::get<InstancePtr>(value_) : NullObject;
+    }
+
+    inline auto Value::userObject() -> UserObject & {
+        return isUserObject() ? *std::get<InstancePtr>(value_) : NullObject;
+    }
+
+    inline auto Value::array() const -> const Array & {
+        return isArray() ? *std::get<SequencePtr>(value_) : NullSequence;
+    }
+
+    inline auto Value::array() -> Array & {
+        return isArray() ? *std::get<SequencePtr>(value_) : NullSequence;
+    }
+
+    inline auto Value::hashMap() const -> const HashMap & {
+        return isHashMap() ? *std::get<HashtablePtr>(value_) : NullHashtable;
+    }
+
+    inline auto Value::hashMap() -> HashMap & {
+        return isHashMap() ? *std::get<HashtablePtr>(value_) : NullHashtable;
+    }
+
+    inline std::string Value::typeToString() const {
+        return typeToString(type_);
+    }
+
 }
 
 #endif	// VALUE_H

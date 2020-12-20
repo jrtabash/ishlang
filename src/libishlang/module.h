@@ -13,7 +13,7 @@
 
 namespace Ishlang {
 
-    // -------------------------------------------------------------
+    // --------------------------------------------------------------------------------
     class Module {
     public:
         using SharedPtr = std::shared_ptr<Module>;
@@ -29,8 +29,8 @@ namespace Ishlang {
         Value alias(Environment::SharedPtr aliasEnv, const std::string &name, const OptionalName &asName = std::nullopt);
         Value aliases(Environment::SharedPtr aliasEnv, const AliasList &aliasList);
 
-        const std::string &name() const noexcept { return name_; }
-        const std::string &sourceFile() const noexcept { return sourceFile_; }
+        inline const std::string &name() const noexcept;
+        inline const std::string &sourceFile() const noexcept;
 
     private:
         void parserCallback(CodeNode::SharedPtr & code);
@@ -44,20 +44,20 @@ namespace Ishlang {
         Environment::SharedPtr env_;
     };
 
-    // -------------------------------------------------------------
+    // --------------------------------------------------------------------------------
     class ModuleStorage {
     public: // Path
         static bool addPath(const std::string &path);
         static bool addPaths(const std::string &path);
 
-        static const std::vector<std::string> &paths() noexcept { return paths_; }
+        static inline const std::vector<std::string> &paths() noexcept;
 
     public: // Storage
         static Module::SharedPtr getOrCreate(const std::string &name);
         static Module::SharedPtr add(const std::string &name, const std::string &sourceFile);
         static Module::SharedPtr get(const std::string &name);
 
-        static bool exists(const std::string &name) noexcept { return storage_.find(name) != storage_.end(); }
+        static inline bool exists(const std::string &name) noexcept;
 
     private:
         static std::string findModuleFile(const std::string &name);
@@ -66,6 +66,25 @@ namespace Ishlang {
         static std::vector<std::string> paths_;
         static std::unordered_map<std::string, Module::SharedPtr> storage_;
     };
+
+    // --------------------------------------------------------------------------------
+    // INLINE
+
+    inline const std::string &Module::name() const noexcept {
+        return name_;
+    }
+
+    inline const std::string &Module::sourceFile() const noexcept {
+        return sourceFile_;
+    }
+
+    inline const std::vector<std::string> &ModuleStorage::paths() noexcept {
+        return paths_;
+    }
+
+    inline bool ModuleStorage::exists(const std::string &name) noexcept {
+        return storage_.find(name) != storage_.end();
+    }
 
 }
 

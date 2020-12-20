@@ -13,6 +13,6 @@ ValuePair::ValuePair(const Value &first, const Value &second)
 {}
 
 // -------------------------------------------------------------
-ValuePair::ValuePair(const Pair & pair)
+ValuePair::ValuePair(const Pair &pair)
     : pair_(pair)
 {}

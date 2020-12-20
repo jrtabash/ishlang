@@ -37,7 +37,9 @@ namespace Ishlang {
     private:
         std::optional<FileContext> fileContext_ = std::nullopt;
     };
-    
+
+    // --------------------------------------------------------------------------------
+
     class NullEnvironment : public Exception {
     public:
         NullEnvironment() : Exception("Null Environment") {}

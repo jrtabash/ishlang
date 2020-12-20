@@ -24,8 +24,8 @@ namespace Ishlang {
         void readMulti(const std::string &expr, CallBack callback);
         void readFile(const std::string &filename, CallBack callback);
 
-        bool hasIncompleteExpr() const { return !lexer_.empty(); }
-        void clearIncompleteExpr() { lexer_.clear(); }
+        inline bool hasIncompleteExpr() const;
+        inline void clearIncompleteExpr();
 
     private:
         CodeNode::SharedPtr readExpr();
@@ -48,16 +48,9 @@ namespace Ishlang {
     private:
         template <typename ExprType, typename ExprOp>
         struct MakeBinaryExpression {
-            MakeBinaryExpression(const std::string &name, Parser &parser, ExprOp exprOp)
-                : name_(name)
-                , parser_(parser)
-                , exprOp_(exprOp)
-            {}
+            inline MakeBinaryExpression(const std::string &name, Parser &parser, ExprOp exprOp);
 
-            CodeNode::SharedPtr operator()() {
-                auto exprs(parser_.readAndCheckExprList(name_.c_str(), 2));
-                return std::make_shared<ExprType>(exprOp_, exprs[0], exprs[1]);
-            }
+            inline CodeNode::SharedPtr operator()();
 
         private:
             const std::string &name_;
@@ -70,16 +63,9 @@ namespace Ishlang {
         struct MakeStrCharOp {
             using OpType = typename CodeNodeType::Type;
 
-            MakeStrCharOp(const std::string &name, Parser &parser, OpType opType)
-                : name_(name)
-                , parser_(parser)
-                , opType_(opType)
-            {}
+            inline MakeStrCharOp(const std::string &name, Parser &parser, OpType opType);
 
-            CodeNode::SharedPtr operator()() {
-                auto exprs(parser_.readAndCheckExprList(name_.c_str(), 1));
-                return std::make_shared<CodeNodeType>(opType_, exprs[0]);
-            }
+            inline CodeNode::SharedPtr operator()();
 
         private:
             const std::string &name_;
@@ -91,6 +77,43 @@ namespace Ishlang {
         Lexer lexer_;
         std::unordered_map<std::string, std::function<CodeNode::SharedPtr ()>> appFtns_;
     };
+
+    // --------------------------------------------------------------------------------
+    // INLINE
+
+    inline bool Parser::hasIncompleteExpr() const {
+        return !lexer_.empty();
+    }
+
+    inline void Parser::clearIncompleteExpr() {
+        lexer_.clear();
+    }
+
+    template <typename ExprType, typename ExprOp>
+    inline Parser::MakeBinaryExpression<ExprType, ExprOp>::MakeBinaryExpression(const std::string &name, Parser &parser, ExprOp exprOp)
+        : name_(name)
+        , parser_(parser)
+        , exprOp_(exprOp)
+    {}
+
+    template <typename ExprType, typename ExprOp>
+    inline CodeNode::SharedPtr Parser::MakeBinaryExpression<ExprType, ExprOp>::operator()() {
+        auto exprs(parser_.readAndCheckExprList(name_.c_str(), 2));
+        return std::make_shared<ExprType>(exprOp_, exprs[0], exprs[1]);
+    }
+
+    template <typename CodeNodeType>
+    inline Parser::MakeStrCharOp<CodeNodeType>::MakeStrCharOp(const std::string &name, Parser &parser, OpType opType)
+        : name_(name)
+        , parser_(parser)
+        , opType_(opType)
+    {}
+
+    template <typename CodeNodeType>
+    inline CodeNode::SharedPtr Parser::MakeStrCharOp<CodeNodeType>::operator()() {
+        auto exprs(parser_.readAndCheckExprList(name_.c_str(), 1));
+        return std::make_shared<CodeNodeType>(opType_, exprs[0]);
+    }
 
 } // Int
 

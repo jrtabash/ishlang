@@ -19,23 +19,24 @@ namespace Ishlang {
         Sequence(Vector && vec);
         Sequence(std::size_t size, const Value &value);
 
-        bool operator==(const Sequence &rhs) const { return vectorEqual(vector_, rhs.vector_); }
-        bool operator!=(const Sequence &rhs) const { return !vectorEqual(vector_, rhs.vector_); }
+        inline bool operator==(const Sequence &rhs) const;
+        inline bool operator!=(const Sequence &rhs) const;
 
-        bool operator<(const Sequence &rhs)  const { return vector_.size() < rhs.vector_.size(); }
-        bool operator>(const Sequence &rhs)  const { return vector_.size() > rhs.vector_.size(); }
-        bool operator<=(const Sequence &rhs) const { return vector_.size() <= rhs.vector_.size(); }
-        bool operator>=(const Sequence &rhs) const { return vector_.size() >= rhs.vector_.size(); }
+        inline bool operator<(const Sequence &rhs) const;
+        inline bool operator>(const Sequence &rhs) const;
+        inline bool operator<=(const Sequence &rhs) const;
+        inline bool operator>=(const Sequence &rhs) const;
 
-        const Value & get(std::size_t idx) const { return vector_[idx]; }
-        void set(std::size_t idx, const Value &value) { vector_[idx] = value; }
-        void add(const Value &value) { vector_.push_back(value); }
+        inline const Value &get(std::size_t idx) const;
+        inline void set(std::size_t idx, const Value &value);
+        inline void add(const Value &value);
 
         std::optional<std::size_t> find(const Value &val, std::size_t pos = 0) const;
         std::size_t count(const Value &value) const;
 
-        std::size_t size() const { return vector_.size(); }
+        inline std::size_t size() const;
 
+    public:
         friend std::ostream &operator<<(std::ostream &out, const Sequence &sequence) {
             return Util::printContainer(out,
                                         sequence.vector_,
@@ -45,14 +46,60 @@ namespace Ishlang {
         }
 
     private:
-        static bool vectorEqual(const Vector &lhs, const Vector &rhs) {
-            return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
-        }
+        static inline bool vectorEqual(const Vector &lhs, const Vector &rhs);
 
     private:
         static std::size_t maxDisplaySize_;
         Vector vector_;
     };
+
+    // --------------------------------------------------------------------------------
+    // INLINE
+
+    inline bool Sequence::operator==(const Sequence &rhs) const {
+        return vectorEqual(vector_, rhs.vector_);
+    }
+
+    inline bool Sequence::operator!=(const Sequence &rhs) const {
+        return !vectorEqual(vector_, rhs.vector_);
+    }
+
+    inline bool Sequence::operator<(const Sequence &rhs) const {
+        return vector_.size() < rhs.vector_.size();
+    }
+
+    inline bool Sequence::operator>(const Sequence &rhs) const {
+        return vector_.size() > rhs.vector_.size();
+    }
+
+    inline bool Sequence::operator<=(const Sequence &rhs) const {
+        return vector_.size() <= rhs.vector_.size();
+    }
+
+    inline bool Sequence::operator>=(const Sequence &rhs) const {
+        return vector_.size() >= rhs.vector_.size();
+    }
+
+    inline const Value &Sequence::get(std::size_t idx) const {
+        return vector_[idx];
+    }
+
+    inline void Sequence::set(std::size_t idx, const Value &value) {
+        vector_[idx] = value;
+    }
+
+    inline void Sequence::add(const Value &value) {
+        vector_.push_back(value);
+    }
+
+    inline std::size_t Sequence::size() const {
+        return vector_.size();
+    }
+
+    inline bool Sequence::vectorEqual(const Vector &lhs, const Vector &rhs) {
+        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
+
 }
 
 #endif // VECTOR_H

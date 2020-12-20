@@ -27,10 +27,7 @@ namespace Ishlang {
             TokenType type;
             std::string text;
 
-            Token(TokenType type, std::string &&text)
-                : type(type)
-                , text(text)
-            {}
+            inline Token(TokenType type, std::string &&text);
         };
 
         using Tokens = std::deque<Token>;
@@ -42,13 +39,13 @@ namespace Ishlang {
 
         Token next();
 
-        Tokens::const_iterator cbegin() const { return tokens_.begin(); }
-        Tokens::const_iterator cend() const { return tokens_.end(); }
+        inline Tokens::const_iterator cbegin() const;
+        inline Tokens::const_iterator cend() const;
 
-        size_t size() const { return tokens_.size(); }
-        bool empty() const { return tokens_.empty(); }
+        inline size_t size() const;
+        inline bool empty() const;
 
-        void clear() { tokens_.clear(); }
+        inline void clear();
 
     public:
         static TokenType tokenType(const std::string &token);
@@ -56,6 +53,35 @@ namespace Ishlang {
     private:
         Tokens tokens_;
     };
+
+    // --------------------------------------------------------------------------------
+    // INLINE
+
+    inline Lexer::Token::Token(TokenType type, std::string &&text)
+        : type(type)
+        , text(text)
+    {}
+
+    inline auto Lexer::cbegin() const -> Tokens::const_iterator {
+        return tokens_.begin();
+    }
+
+    inline auto Lexer::cend() const -> Tokens::const_iterator {
+        return tokens_.end();
+    }
+
+    inline size_t Lexer::size() const {
+        return tokens_.size();
+    }
+
+    inline bool Lexer::empty() const {
+        return tokens_.empty();
+    }
+
+    inline void Lexer::clear() {
+        tokens_.clear();
+    }
+
 }
 
 #endif // LEXER_H

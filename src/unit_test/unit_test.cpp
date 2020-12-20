@@ -196,6 +196,11 @@ void UnitTest::list() const {
 }
 
 // -------------------------------------------------------------
+void UnitTest::setVerbose(bool flag) {
+    verbose_ = flag;
+}
+
+// -------------------------------------------------------------
 void UnitTest::runTest(const std::string &name, Function ftn) {
     if (verbose_) { std::cout << "Testing: " << name << '\n'; }
     ftn();

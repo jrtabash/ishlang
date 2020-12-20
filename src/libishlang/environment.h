@@ -23,9 +23,9 @@ namespace Ishlang {
         const Value &set(const std::string &name, const Value &value);
         const Value &get(const std::string &name) const;
 
-        bool exists(const std::string &name) const noexcept;
-        bool empty() const noexcept;
-        std::size_t size() const noexcept;
+        inline bool exists(const std::string &name) const noexcept;
+        inline bool empty() const noexcept;
+        inline std::size_t size() const noexcept;
 
         void foreach(ForeachFtn ftn) const;
         
@@ -35,6 +35,22 @@ namespace Ishlang {
         SharedPtr parent_;
         Table     table_;
     };
+
+    // --------------------------------------------------------------------------------
+    // INLINE
+
+    inline bool Environment::exists(const std::string &name) const noexcept {
+        return table_.find(name) != table_.end();
+    }
+
+    inline bool Environment::empty() const noexcept {
+        return table_.empty();
+    }
+
+    inline std::size_t Environment::size() const noexcept {
+        return table_.size();
+    }
+
 }
 
 #endif	// ENVIRONMENT_H

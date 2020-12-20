@@ -22,29 +22,53 @@ namespace Ishlang {
 
         Value exec(const ArgList &args) const;
 
-        bool operator==(const Lambda &rhs) const {
-            return paramEqual(params_, rhs.params_) && body_.get() == rhs.body_.get() && env_.get() == rhs.env_.get();
-        }
+        inline bool operator==(const Lambda &rhs) const;
+        inline bool operator!=(const Lambda &rhs) const;
 
-        bool operator!=(const Lambda &rhs) const {
-            return !paramEqual(params_, rhs.params_) || body_.get() != rhs.body_.get() || env_.get() != rhs.env_.get();
-        }
-
-        bool operator<(const Lambda &rhs)  const { return params_.size() < rhs.params_.size(); }
-        bool operator>(const Lambda &rhs)  const { return params_.size() > rhs.params_.size(); }
-        bool operator<=(const Lambda &rhs) const { return params_.size() <= rhs.params_.size(); }
-        bool operator>=(const Lambda &rhs) const { return params_.size() >= rhs.params_.size(); }
+        inline bool operator<(const Lambda &rhs) const;
+        inline bool operator>(const Lambda &rhs) const;
+        inline bool operator<=(const Lambda &rhs) const;
+        inline bool operator>=(const Lambda &rhs) const;
 
     private:
-        static bool paramEqual(const ParamList &lhs, const ParamList &rhs) {
-            return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
-        }
+        static inline bool paramEqual(const ParamList &lhs, const ParamList &rhs);
 
     private:
         ParamList                      params_;
         CodeNode::SharedPtr            body_;
         mutable Environment::SharedPtr env_;
     };
+
+    // --------------------------------------------------------------------------------
+    // INLINE
+
+    inline bool Lambda::operator==(const Lambda &rhs) const {
+        return paramEqual(params_, rhs.params_) && body_.get() == rhs.body_.get() && env_.get() == rhs.env_.get();
+    }
+
+    inline bool Lambda::operator!=(const Lambda &rhs) const {
+        return !paramEqual(params_, rhs.params_) || body_.get() != rhs.body_.get() || env_.get() != rhs.env_.get();
+    }
+
+    inline bool Lambda::operator<(const Lambda &rhs) const {
+        return params_.size() < rhs.params_.size();
+    }
+
+    inline bool Lambda::operator>(const Lambda &rhs) const {
+        return params_.size() > rhs.params_.size();
+    }
+
+    inline bool Lambda::operator<=(const Lambda &rhs) const {
+        return params_.size() <= rhs.params_.size();
+    }
+
+    inline bool Lambda::operator>=(const Lambda &rhs) const {
+        return params_.size() >= rhs.params_.size();
+    }
+
+    inline bool Lambda::paramEqual(const ParamList &lhs, const ParamList &rhs) {
+        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
 
 }
 

@@ -33,7 +33,7 @@ namespace Ishlang {
         
         void list() const;
 
-        void setVerbose(bool flag) { verbose_ = flag; }
+        void setVerbose(bool flag);
         
     private:
         void runTest(const std::string &name, Function ftn);

@@ -14,35 +14,19 @@ namespace Ishlang {
     public:
         ValuePair();
         ValuePair(const Value &first, const Value &second);
-        ValuePair(const Pair & pair);
+        ValuePair(const Pair &pair);
 
-        bool operator==(const ValuePair &rhs) const {
-            return first() == rhs.first() && second() == rhs.second();
-        }
+        inline bool operator==(const ValuePair &rhs) const;
+        inline bool operator!=(const ValuePair &rhs) const;
+        inline bool operator<(const ValuePair &rhs)  const;
+        inline bool operator>(const ValuePair &rhs)  const;
+        inline bool operator<=(const ValuePair &rhs) const;
+        inline bool operator>=(const ValuePair &rhs) const;
 
-        bool operator!=(const ValuePair &rhs) const {
-            return first() != rhs.first() || second() != rhs.second();
-        }
+        inline const Value & first() const noexcept;
+        inline const Value & second() const noexcept;
 
-        bool operator<(const ValuePair &rhs)  const {
-            return first() < rhs.first() || (first() == rhs.first() && second() < rhs.second());
-        }
-
-        bool operator>(const ValuePair &rhs)  const {
-            return first() > rhs.first() || (first() == rhs.first() && second() > rhs.second());
-        }
-
-        bool operator<=(const ValuePair &rhs) const {
-            return first() < rhs.first() || (first() == rhs.first() && second() <= rhs.second());
-        }
-
-        bool operator>=(const ValuePair &rhs) const {
-            return first() > rhs.first() || (first() == rhs.first() && second() >= rhs.second());
-        }
-
-        const Value & first() const noexcept { return pair_.first; }
-        const Value & second() const noexcept { return pair_.second; }
-
+    public:
         friend std::ostream &operator<<(std::ostream &out, const ValuePair &p) {
             out << '(' << p.first() << ' ' << p.second() << ')';
             return out;
@@ -51,6 +35,41 @@ namespace Ishlang {
     private:
         Pair pair_;
     };
+
+    // --------------------------------------------------------------------------------
+    // INLINE
+
+    inline bool ValuePair::operator==(const ValuePair &rhs) const {
+        return first() == rhs.first() && second() == rhs.second();
+    }
+
+    inline bool ValuePair::operator!=(const ValuePair &rhs) const {
+        return first() != rhs.first() || second() != rhs.second();
+    }
+
+    inline bool ValuePair::operator<(const ValuePair &rhs)  const {
+        return first() < rhs.first() || (first() == rhs.first() && second() < rhs.second());
+    }
+
+    inline bool ValuePair::operator>(const ValuePair &rhs)  const {
+        return first() > rhs.first() || (first() == rhs.first() && second() > rhs.second());
+    }
+
+    inline bool ValuePair::operator<=(const ValuePair &rhs) const {
+        return first() < rhs.first() || (first() == rhs.first() && second() <= rhs.second());
+    }
+
+    inline bool ValuePair::operator>=(const ValuePair &rhs) const {
+        return first() > rhs.first() || (first() == rhs.first() && second() >= rhs.second());
+    }
+
+    inline const Value & ValuePair::first() const noexcept {
+        return pair_.first;
+    }
+
+    inline const Value & ValuePair::second() const noexcept {
+        return pair_.second;
+    }
 
 }
 
