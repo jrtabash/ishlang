@@ -8,8 +8,9 @@ Using CTRL-d also exits the REPL.
 ## Load Source File
 
 The following command loads an Ishlang source file:
-
-  :load <filename>
+```
+:load <filename>
+```
 
 #### Example
 ```
@@ -19,8 +20,9 @@ The following command loads an Ishlang source file:
 ## Switch Batch Mode On/Off
 
 The batch command allows for changing the interpreter's batch mode:
-
-  :batch [<value>]
+```
+:batch [<value>]
+```
 
 * If used without an argument, the interpreter's batch mode is toggled.
 * If used with an argument, the command expects true or false values.
