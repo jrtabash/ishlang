@@ -11,7 +11,7 @@ REPL command definitions available in [docs/repl_commands.txt](docs/repl_command
 
 List of todos available in [docs/todo.txt](docs/todo.txt)
 
-Details on testing are provided in [docs/testing.txt](docs/testing.txt)
+Details on testing are provided in [docs/testing.md](docs/testing.md)
 
 ## Example: Hello World Program
 ```
