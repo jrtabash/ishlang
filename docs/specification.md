@@ -110,7 +110,7 @@ The functions print and println evaluate to null value
 (neg <expression>)
 ```
 
-The neg operator returns the negative of <expression>.
+The neg operator returns the negative of expression.
 
 #### Example
 ```
