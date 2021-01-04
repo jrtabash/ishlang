@@ -187,7 +187,7 @@ The unless form is syntactic sugar for the following if/not statement:
   (true <expression>))
 ```
 
-The (true <expression>) case acts as a default catch all case, and is optional
+The (true ...) case acts as a default catch all case, and is optional
 
 ### Example:
 ```
@@ -228,10 +228,10 @@ The value of executing a sequence is the result of evaluating the last expressio
   (= x (+ x 5))
   (pringln x))
 
+```
 In the progn case the variable x is defined in the enclosing environment, and as such
 exists outside the boundary of progn. In the block case, the variable x is defined in
 the block environment, and is not available outside the scope of block.
-```
 
 ## Looping
 General form:
@@ -348,7 +348,7 @@ Setting / Getting member fields:
 ## Type Checking
 Is type of?
 ```
-(istypeof <expression> <type>
+(istypeof <expression> <type>)
 ```
 
 <type> is one of: none, int, real, char, bool, string, pair, array, hashmap, closure, usertype, userobject
@@ -467,17 +467,17 @@ will clone the value resulting from executing expression
 ```
 
 ## String Operations
-**strlen**: compute string length
+**strlen**: Compute string length
 ```
 (strlen <string>)
 ```
 
-**strget**: return character at position
+**strget**: Return character at position
 ```
 (strget <string> <position>)
 ```
 
-**strset**: set character at position
+**strset**: Set character at position
 ```
 (strset <string> <position> <character>)
 ```
@@ -579,17 +579,17 @@ the check is true for every character in the string.
 ```
 
 ## Pair Operations
-**pair**: make a pair
+**pair**: Make a pair
 ```
 (pair <first> <second>)
 ```
 
-**first**: get first item
+**first**: Get first item
 ```
 (first <pair>)
 ```
 
-**second**: get second item
+**second**: Get second item
 ```
 (second <pair>)
 ```
@@ -602,28 +602,27 @@ the check is true for every character in the string.
 ```
 
 ## Array Operations
-**array**: make an array
+**array**: Make an array
 ```
 (array [<element> [<element ...]])
 ```
 
-**arraysv**: make an array from size and inital value
-             default initial value is null
+**arraysv**: Make an array from size and inital value. Default initial value is null
 ```
 (arraysv <size> [<inital_value>])
 ```
 
-**arrlen**: return array length
+**arrlen**: Return array length
 ```
 (arrlen <array>)
 ```
 
-**arrget**: return value at position
+**arrget**: Return value at position
 ```
 (arrget <array> <position>)
 ```
 
-**arrset**: set value at position
+**arrset**: Set value at position
 ```
 (arrset <array> <position> <value>)
 ```
@@ -661,64 +660,62 @@ the check is true for every character in the string.
 
 ## Hashmap Operations
 
-**hashmap**: make a hashmap
+**hashmap**: Make a hashmap
 ```
 (hashmap [(array key value) [(array key value) ...]])
 ```
 
-**hmlen**: return hashmap length
+**hmlen**: Return hashmap length
 ```
 (hmlen <hashmap>)
 ```
 
-**hmhas**: check if key is in hashmap
+**hmhas**: Check if key is in hashmap
 ```
 (hmhas <hashmap> <key>)
 ```
 
-**hmget**: get hashmap value for given key
-           returns default_return when key is not found
-           default default_return value is null
+**hmget**: Get hashmap value for given key. Returns default_return when key is not found. Default default_return value is null
 ```
 (hmget <hashmap> <key> [<default_return])
 ```
 
-**hmset**: set hashmap value for given key
+**hmset**: Set hashmap value for given key
 ```
 (hmset <hashmap> <key> <value>)
 ```
 
-**hmrem**: remove hashmap value with given key
+**hmrem**: Remove hashmap value with given key
 ```
 (hmrem <hashmap> <key>)
 ```
 
-**hmclr**: clear hashmap
+**hmclr**: Clear hashmap
 ```
 (hmclr <hashmap>)
 ```
 
-**hmfind**: find hashmap key with given value
+**hmfind**: Find hashmap key with given value
 ```
 (hmfind <hashmap> <value>)
 ```
 
-**hmcount**: count number of occurrences of value in hashmap
+**hmcount**: Count number of occurrences of value in hashmap
 ```
 (hmcount <hashmap> <value>)
 ```
 
-**hmkeys**: return array of hashmap keys
+**hmkeys**: Return array of hashmap keys
 ```
 (hmkeys <hashmap>)
 ```
 
-**hmvals**: return array of hashmap values
+**hmvals**: Return array of hashmap values
 ```
 (hmvals <hashmap>)
 ```
 
-**hmitems**: return array of hashmap key/value pairs
+**hmitems**: Return array of hashmap key/value pairs
 ```
 (hmitems <hashmap>)
 ```
@@ -819,14 +816,14 @@ Return a random integer between 0 and max.
 (rand [<max>])
 ```
 
-The return range of rand is [0, <max>] if <max> is specified.
+The return range of rand is [0, max] if max is specified.
 
-If <max> is not specified, then the return range is [0, 4294967295].
+If max is not specified, then the return range is [0, 4294967295].
 
-If <max> is greater than 4294967295, then 4294967295 is used. Essentially,
-the call is equivalent to not specifying <max>.
+If max is greater than 4294967295, then 4294967295 is used. Essentially,
+the call is equivalent to not specifying max.
 
-If <max> is 0, then function returns 0.
+If max is 0, then function returns 0.
 
 ### Examples:
 ```
