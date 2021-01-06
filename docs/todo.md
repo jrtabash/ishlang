@@ -19,9 +19,9 @@
   - stderr
 
 ### Implement built-in data structures:
-- List:
+- List
   - **list**: make list
-  - ****lislen**: list length
+  - **lislen**: list length
   - **lisfront**: list front
   - **lisback**: list back
   - **lispushf**: list push front
