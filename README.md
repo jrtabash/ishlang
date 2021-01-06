@@ -9,7 +9,7 @@ More details about the language available in [docs/specification.md](docs/specif
 
 REPL command definitions available in [docs/repl_commands.md](docs/repl_commands.md)
 
-List of todos available in [docs/todo.txt](docs/todo.txt)
+List of todos available in [docs/todo.md](docs/todo.md)
 
 Details on testing are provided in [docs/testing.md](docs/testing.md)
 
