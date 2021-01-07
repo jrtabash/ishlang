@@ -662,6 +662,7 @@ the check is true for every character in the string.
 
 **hashmap**: Make a hashmap
 ```
+(hashmap [(pair key value) [(pair key value) ...]])
 (hashmap [(array key value) [(array key value) ...]])
 ```
 
