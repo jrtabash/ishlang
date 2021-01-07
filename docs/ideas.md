@@ -2,10 +2,8 @@
 
 ### Add support for a standard library / set of standard modules
 1. Add stdlib folder under src folder in ishlang repo
-2. New ISHLANG_LIB_PATH vs use ISHLANG_PATH?
-   With ISHLANG_LIB_PATH can enforce module search order
-3. Use a default install location similar to default ishlang
-   install location. Update top level Makefile as necesary
+2. New ISHLANG_LIB_PATH vs use ISHLANG_PATH? With ISHLANG_LIB_PATH can enforce module search order
+3. Use a default install location similar to default ishlang install location. Update top level Makefile as necessary.
 
 ### Add a math standard module
 Initial Functions
