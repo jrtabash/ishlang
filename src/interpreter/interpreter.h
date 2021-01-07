@@ -16,6 +16,8 @@ namespace Ishlang {
         bool readEvalPrintLoop();
         bool loadFile(const std::string &filename);
 
+        void setArguments(char ** argv, int begin, int end);
+
     private:
         bool isREPLCommand(const std::string &expr) const;
         void handleREPLCommand(const std::string &expr);

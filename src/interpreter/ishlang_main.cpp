@@ -7,28 +7,33 @@
 class Arguments {
 public:
     Arguments(int argc, char **argv)
-        : argc_(argc)
-        , argv_(argv)
+        : argc(argc)
+        , argv(argv)
         , program()
         , interactive(false)
         , batch(false)
         , filename()
+        , argsBegin(argc)
     {
         parse();
     }
 
 private:
     void parse() {
-        if (argc_ > 0) {
-            program = argv_[0];
+        if (argc > 0) {
+            program = argv[0];
 
-            for (int i = 1; i < argc_; ++i) {
-                std::string arg(argv_[i]);
+            for (int i = 1; i < argc; ++i) {
+                std::string arg(argv[i]);
                 if      (arg == "-h") { usage(); }
                 else if (arg == "-i") { interactive = true; }
                 else if (arg == "-b") { batch = true; }
                 else if (arg == "-p") { path = readArgValue("path", i); }
                 else if (arg == "-f") { filename = readArgValue("file", i); }
+                else if (arg == "-a") {
+                    argsBegin = i + 1;
+                    break;
+                }
                 else {
                     argError(std::string("Invalid option '") + arg + "'");
                 }
@@ -39,7 +44,7 @@ private:
 private:
     void usage() {
         std::cerr << "Usage:\n"
-                  << '\t' << program << " [-h] [-i] [-b] [-p] [-f file]\n"
+                  << '\t' << program << " [-h] [-i] [-b] [-p] [-f file] [-a arg1 ... argN]\n"
                   << '\n'
                   << "Options:\n"
                   << '\t' << "-h : Print usage\n"
@@ -47,12 +52,13 @@ private:
                   << '\t' << "-b : Run in batch mode\n"
                   << '\t' << "-p : Import path\n"
                   << '\t' << "-f : Run code file\n"
+                  << '\t' << "-a : Arguments passed to user. Must be last option. Available in argv array"
                   << std::endl;
         exit(1);
     }
 
     const char *readArgValue(const char *name, int &i) {
-        if (++i < argc_) { return argv_[i]; }
+        if (++i < argc) { return argv[i]; }
         argError(std::string("Premature end of arguments - ") + name + "\n");
         return 0;
     }
@@ -63,14 +69,15 @@ private:
     }
 
 public:
-    int    argc_;
-    char **argv_;
+    int    argc;
+    char **argv;
 
     std::string program;
     bool        interactive;
     bool        batch;
     std::string path;
     std::string filename;
+    int         argsBegin;
 };
 
 int main(int argc, char** argv) {
@@ -80,6 +87,8 @@ int main(int argc, char** argv) {
     bool const forceBatch = (!args.filename.empty() && !args.interactive);
 
     Ishlang::Interpreter interpreter(args.batch || forceBatch, args.path);
+    interpreter.setArguments(args.argv, args.argsBegin, args.argc);
+
     if (!args.filename.empty()) {
         interpreter.loadFile(args.filename);
     }

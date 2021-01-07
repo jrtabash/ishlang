@@ -1,5 +1,6 @@
 #include "interpreter.h"
 #include "module.h"
+#include "sequence.h"
 #include "util.h"
 
 #include <cstdlib>
@@ -88,6 +89,15 @@ bool Interpreter::loadFile(const std::string &filename) {
         return false;
     }
     return true;
+}
+
+// -------------------------------------------------------------
+void Interpreter::setArguments(char ** argv, int begin, int end) {
+    Sequence arguments;
+    for (int i = begin; i < end; ++i) {
+        arguments.add(Value(argv[i]));
+    }
+    env_->def("argv", Value(arguments));
 }
 
 // -------------------------------------------------------------

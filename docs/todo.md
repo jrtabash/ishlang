@@ -94,24 +94,3 @@
   (reverse <sequence>)
   ```
 Note: Should work with future types; list and orderedmap.
-
-### Add support for command line arguments
-- Idea:
-  - Command:
-    ```bash
-    ishlang -f calc_sum.ish --args -v -n 10
-    ```
-  - In Code:
-    ```
-    (defarg "-v" verbose bool)
-    (defarg "-n" num int)
-    (initargs)
-    (println (getarg verbose))
-    (println (getarg num))
-    ```
-  - Functions:
-    ```
-    (defarg <option_name> <variable_name> <option_type>)
-    (getarg <variable_name>)
-    (initargs)
-    ```
