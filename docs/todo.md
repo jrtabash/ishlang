@@ -1,5 +1,14 @@
 ## TODO
 
+### Add support to pass init arguments to makeinstance
+(makeinstance Struct [(pair name value) [(pair name value) ...]])
+
+#### Example
+```
+(struct Person (name age))
+(makeinstance Person (name "Jon") (age 25))
+```
+
 ### Add support for file IO
 - Add file type
 - File functions
