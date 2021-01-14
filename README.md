@@ -36,7 +36,7 @@ ishlang -h
 ## Ishlang Usage
 ```bash
 Usage:
-        ishlang [-h] [-i] [-b] [-p] [-f file]
+        ishlang [-h] [-i] [-b] [-p] [-f file] [-a arg1 ... argN]
 
 Options:
         -h : Print usage
@@ -44,4 +44,5 @@ Options:
         -b : Run in batch mode
         -p : Import path
         -f : Run code file
+        -a : Arguments passed to user. Must be last option. Available in argv array
 ```
