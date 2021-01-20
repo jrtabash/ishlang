@@ -2,7 +2,7 @@
 
 ### Add support to pass init arguments to makeinstance
 ```
-(makeinstance Struct [(pair name value) [(pair name value) ...]])
+(makeinstance Struct [(name value) [(name value) ...]])
 ```
 
 #### Example
