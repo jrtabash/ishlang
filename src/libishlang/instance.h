@@ -14,9 +14,10 @@ namespace Ishlang {
     class Instance {
     public:
         using MemberTable = std::unordered_map<std::string, Value>;
+        using InitArgs = std::unordered_map<std::string, Value>;
 
         Instance() = default;
-        Instance(const Struct &type);
+        Instance(const Struct &type, InitArgs const & initArgs = InitArgs());
 
         inline bool operator==(const Instance &rhs) const;
         inline bool operator!=(const Instance &rhs) const;
@@ -39,6 +40,7 @@ namespace Ishlang {
 
     private:
         static inline bool membersEqual(const MemberTable &lhs, const MemberTable &rhs);
+        static inline const Value &initArgOrNull(InitArgs const & initArgs, const std::string &name);
         
     private:
         const Struct type_;
@@ -78,6 +80,11 @@ namespace Ishlang {
 
     inline bool Instance::membersEqual(const MemberTable &lhs, const MemberTable &rhs) {
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
+
+    inline const Value &Instance::initArgOrNull(InitArgs const & initArgs, const std::string &name) {
+        auto const iter = initArgs.find(name);
+        return iter == initArgs.end() ? Value::Null : iter->second;
     }
 
 }

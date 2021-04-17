@@ -3,6 +3,7 @@
 
 #include "environment.h"
 #include "hashtable.h"
+#include "instance.h"
 #include "struct.h"
 #include "value.h"
 #include "value_pair.h"
@@ -23,6 +24,7 @@ namespace Ishlang {
         using SharedPtrPairs = std::vector<SharedPtrPair>;
         using ParamList      = std::vector<std::string>;
         using NameAndAsList  = std::vector<std::pair<std::string, std::optional<std::string>>>;
+        using NameSharedPtrs = std::vector<std::pair<std::string, SharedPtr>>;
         
     public:
         CodeNode() {}
@@ -469,14 +471,18 @@ namespace Ishlang {
     // -------------------------------------------------------------
     class MakeInstance : public CodeNode {
     public:
-        MakeInstance(const std::string &name);
+        MakeInstance(const std::string &name, const NameSharedPtrs &initList = NameSharedPtrs());
         virtual ~MakeInstance() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) override;
 
     private:
+        Instance::InitArgs makeInitArgs(Environment::SharedPtr &env) const;
+
+    private:
         std::string name_;
+        NameSharedPtrs initList_;
     };
 
     // -------------------------------------------------------------

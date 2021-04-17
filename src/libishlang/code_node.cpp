@@ -1,6 +1,5 @@
 #include "code_node.h"
 #include "exception.h"
-#include "instance.h"
 #include "lambda.h"
 #include "module.h"
 #include "parser.h"
@@ -465,9 +464,10 @@ Value StructName::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-MakeInstance::MakeInstance(const std::string &name)
+MakeInstance::MakeInstance(const std::string &name, const NameSharedPtrs &initList)
     : CodeNode()
     , name_(name)
+    , initList_(initList)
 {}
 
 Value MakeInstance::exec(Environment::SharedPtr env) {
@@ -475,7 +475,15 @@ Value MakeInstance::exec(Environment::SharedPtr env) {
     if (!structValue.isUserType()) {
         throw InvalidExpressionType("UserType", structValue.typeToString());
     }
-    return Value(Instance(structValue.userType()));
+    return Value(Instance(structValue.userType(), makeInitArgs(env)));
+}
+
+Instance::InitArgs MakeInstance::makeInitArgs(Environment::SharedPtr &env) const {
+    Instance::InitArgs initArgs;
+    for (auto & nameSharedPtr : initList_) {
+        initArgs.emplace(nameSharedPtr.first, nameSharedPtr.second->eval(env));
+    }
+    return initArgs;
 }
 
 // -------------------------------------------------------------

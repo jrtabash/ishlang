@@ -38,6 +38,14 @@ Lexer::Token Lexer::next() {
 }
 
 // -------------------------------------------------------------
+const Lexer::Token &Lexer::peek() const {
+    if (tokens_.empty()) {
+        throw InvalidExpression("incomplete form");
+    }
+    return tokens_.front();
+}
+
+// -------------------------------------------------------------
 Lexer::TokenType Lexer::tokenType(const std::string &token) {
     static const std::unordered_set<char> singles({
             '-', '+', '*', '/', '%', '^', '=', '<', '>', '?'});

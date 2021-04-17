@@ -87,6 +87,7 @@ namespace Ishlang {
         void testCodeNodeStruct();
         void testCodeNodeIsStructName();
         void testCodeNodeMakeInstance();
+        void testCodeNodeMakeInstanceWithInitArgs();
         void testCodeNodeIsInstanceOf();
         void testCodeNodeStructName();
         void testCodeNodeGetSetMember();
@@ -143,6 +144,7 @@ namespace Ishlang {
         void testParserStruct();
         void testParserIsStructName();
         void testParserMakeInstance();
+        void testParserMakeInstanceWithInitArgs();
         void testParserIsInstanceOf();
         void testParserStructName();
         void testParserGetSetMember();

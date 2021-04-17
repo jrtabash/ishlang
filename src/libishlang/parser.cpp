@@ -230,6 +230,33 @@ CodeNode::SharedPtrPairs Parser::readExprPairs() {
 }
 
 // -------------------------------------------------------------
+CodeNode::NameSharedPtrs Parser::readNameExprPairs() {
+    CodeNode::NameSharedPtrs nameExprs;
+    std::pair<std::string, CodeNode::SharedPtr> cons;
+    bool rpseen = false;
+    if (lexer_.peek().type == Lexer::LeftP) {
+        ignoreLeftP(false);
+        cons.first = readName();
+        cons.second = readExpr();
+        ignoreRightP();
+        while (cons.second.get()) {
+            nameExprs.push_back(cons);
+            if (ignoreLeftP(true)) {
+                rpseen = true;
+                break;
+            }
+            cons.first = readName();
+            cons.second = readExpr();
+            ignoreRightP();
+        }
+    }
+    if (!rpseen && lexer_.peek().type == Lexer::RightP) {
+        ignoreRightP();
+    }
+    return nameExprs;
+}
+
+// -------------------------------------------------------------
 std::string Parser::readName() {
     auto nameToken = lexer_.next();
     if (nameToken.type != Lexer::Symbol) {
@@ -620,8 +647,8 @@ void Parser::initAppFtns() {
         { "makeinstance",
           [this]() {
                 const auto name(readName());
-                ignoreRightP();
-                return std::make_shared<MakeInstance>(name);
+                const auto initArgs = readNameExprPairs();
+                return std::make_shared<MakeInstance>(name, initArgs);
           }
         },
 

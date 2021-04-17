@@ -38,6 +38,7 @@ namespace Ishlang {
         void read(const std::string & expr);
 
         Token next();
+        const Token &peek() const;
 
         inline Tokens::const_iterator cbegin() const;
         inline Tokens::const_iterator cend() const;

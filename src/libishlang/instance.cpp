@@ -4,12 +4,12 @@
 using namespace Ishlang;
 
 // -------------------------------------------------------------
-Instance::Instance(const Struct &type)
+Instance::Instance(const Struct &type, InitArgs const & initArgs)
     : type_(type)
     , members_()
 {
     for (const auto &m : type.members()) {
-        members_.insert(MemberTable::value_type(m, Value::Null));
+        members_.insert(MemberTable::value_type(m, initArgOrNull(initArgs, m)));
     }
 }
 

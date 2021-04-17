@@ -323,7 +323,7 @@ Define a user type:
 
 Creating an instance:
 ```
-(makeinstance <name>)
+(makeinstance <name> [(member value) [(member value) ...]])
 ```
 
 Setting / Getting member fields:
@@ -338,8 +338,7 @@ Setting / Getting member fields:
   (name
    age))
 
-(var p (makeinstance Person))
-(memset p name "John")
+(var p (makeinstance Person (name "John")))
 (memset p age 25)
 (println (memget p name))
 (println (memget p age))

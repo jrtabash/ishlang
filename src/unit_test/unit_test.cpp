@@ -66,6 +66,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeStruct);
     ADD_TEST(testCodeNodeIsStructName);
     ADD_TEST(testCodeNodeMakeInstance);
+    ADD_TEST(testCodeNodeMakeInstanceWithInitArgs);
     ADD_TEST(testCodeNodeIsInstanceOf);
     ADD_TEST(testCodeNodeStructName);
     ADD_TEST(testCodeNodeGetSetMember);
@@ -123,6 +124,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserStruct);
     ADD_TEST(testParserIsStructName);
     ADD_TEST(testParserMakeInstance);
+    ADD_TEST(testParserMakeInstanceWithInitArgs);
     ADD_TEST(testParserIsInstanceOf);
     ADD_TEST(testParserStructName);
     ADD_TEST(testParserGetSetMember);
@@ -1166,6 +1168,14 @@ void UnitTest::testInstance() {
 
     TEST_CASE_MSG(i.get("name") == Value("Jack"), "actual=" << i.get("name"));
     TEST_CASE_MSG(i.get("age") == Value(32ll), "actual=" << i.get("age"));
+
+    Instance i2(s, {{"name", Value("Stan")}, {"age", Value(25ll)}});
+    TEST_CASE_MSG(i2.get("name") == Value("Stan"), "actual=" << i2.get("name"));
+    TEST_CASE_MSG(i2.get("age") == Value(25ll), "actual=" << i2.get("age"));
+
+    Instance i3(s, {{"name", Value("Sara")}});
+    TEST_CASE_MSG(i3.get("name") == Value("Sara"), "actual=" << i3.get("name"));
+    TEST_CASE_MSG(i3.get("age") == Value::Null, "actual=" << i3.get("age"));
 }
 
 // -------------------------------------------------------------
@@ -2651,6 +2661,44 @@ void UnitTest::testCodeNodeMakeInstance() {
     const Instance &inst = instValue.userObject();
     TEST_CASE_MSG(inst.get("name") == Value::Null, "actual=" << inst.get("name"));
     TEST_CASE_MSG(inst.get("age") == Value::Null, "actual=" << inst.get("age"));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeMakeInstanceWithInitArgs() {
+    Environment::SharedPtr env(new Environment());
+
+    CodeNode::SharedPtr structExpr(
+        std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})));
+
+    Value structValue = structExpr->eval(env);
+    TEST_CASE_MSG(structValue.isUserType(), "actual=" << structValue.typeToString());
+    TEST_CASE_MSG(structValue.userType().name() == "Person", "actual=" << structValue.userType().name());
+
+    CodeNode::SharedPtr nameInit = std::make_shared<Literal>(Value("John"));
+    CodeNode::SharedPtr ageInit = std::make_shared<Literal>(Value(30ll));
+
+    CodeNode::SharedPtr makeInstance(
+        std::make_shared<MakeInstance>("Person", CodeNode::NameSharedPtrs{{"name", nameInit}, {"age", ageInit}}));
+
+    Value instValue = makeInstance->eval(env);
+    TEST_CASE_MSG(instValue.isUserObject(), "actual=" << instValue.typeToString());
+
+    const Struct &type = instValue.userObject().type();
+    TEST_CASE_MSG(type.name() == "Person", "actual=" << type.name());
+
+    const Instance &inst = instValue.userObject();
+    TEST_CASE_MSG(inst.get("name") == Value("John"), "actual=" << inst.get("name"));
+    TEST_CASE_MSG(inst.get("age") == Value(30ll), "actual=" << inst.get("age"));
+
+    // Partial init args
+    makeInstance = std::make_shared<MakeInstance>("Person", CodeNode::NameSharedPtrs{{"name", nameInit}});
+
+    instValue = makeInstance->eval(env);
+    TEST_CASE_MSG(instValue.isUserObject(), "actual=" << instValue.typeToString());
+
+    const Instance &inst2 = instValue.userObject();
+    TEST_CASE_MSG(inst2.get("name") == Value("John"), "actual=" << inst2.get("name"));
+    TEST_CASE_MSG(inst2.get("age") == Value::Null, "actual=" << inst2.get("age"));
 }
 
 // -------------------------------------------------------------
@@ -4688,6 +4736,22 @@ void UnitTest::testParserMakeInstance() {
     TEST_CASE(parserTest(parser, env, "(var s (struct Person (name age)))", Value(stest), true));
     TEST_CASE(parserTest(parser, env, "(var p (makeinstance Person))",      Value(itest), true));
     TEST_CASE(parserTest(parser, env, "(istypeof p userobject)",            Value::True,  true));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserMakeInstanceWithInitArgs() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    const Struct stest("Person", {"name", "age"});
+    const Instance itest(stest, {{"name", Value("John")}, {"age", Value(25ll)}});
+    TEST_CASE(parserTest(parser, env, "(var s (struct Person (name age)))",                     Value(stest), true));
+    TEST_CASE(parserTest(parser, env, "(var p (makeinstance Person (name \"John\") (age 25)))", Value(itest), true));
+    TEST_CASE(parserTest(parser, env, "(istypeof p userobject)",                                Value::True,  true));
+
+    const Instance itest2(stest, {{"name", Value("Sara")}});
+    TEST_CASE(parserTest(parser, env, "(var p2 (makeinstance Person (name \"Sara\")))", Value(itest2), true));
+    TEST_CASE(parserTest(parser, env, "(istypeof p2 userobject)",                       Value::True,   true));
 }
 
 // -------------------------------------------------------------

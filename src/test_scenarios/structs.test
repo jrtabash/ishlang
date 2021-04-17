@@ -22,6 +22,14 @@ __CODE__
 (println (memget p name))
 (println (memget p age))
 
+(var p2 (makeinstance Person (name "John") (age 30)))
+(println (memget p2 name))
+(println (memget p2 age))
+
+(var p3 (makeinstance Person (name "Sara")))
+(println (memget p3 name))
+(println (memget p3 age))
+
 __EXPECT__
 true
 5
@@ -29,3 +37,7 @@ true
 true
 Albert
 25
+John
+30
+Sara
+null
