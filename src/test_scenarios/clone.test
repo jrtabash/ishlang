@@ -1,8 +1,6 @@
 __CODE__
 (struct Point (x y))
-(var pt1 (makeinstance Point))
-(memset pt1 x 10)
-(memset pt1 y 20)
+(var pt1 (makeinstance Point (x 10) (y 20)))
 
 (var pt2 (clone pt1))
 (println (== pt1 pt2))

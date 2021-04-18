@@ -6,10 +6,7 @@
   (isinstanceof p Person))
 
 (defun makePerson (newName newAge)
-  (var newPerson (makeinstance Person))
-  (memset newPerson name newName)
-  (memset newPerson age newAge)
-  newPerson)
+  (makeinstance Person (name newName) (age newAge)))
 
 (defun printPerson (p)
   (print "[Person: name='")

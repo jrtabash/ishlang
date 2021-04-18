@@ -2,10 +2,7 @@
 (struct Node (value next))
 
 (defun make_node (value next)
-  (var n (makeinstance Node))
-  (memset n value value)
-  (memset n next next)
-  n)
+  (makeinstance Node (value value) (next next)))
 
 (defun node_value (node)
   (memget node value))
@@ -23,9 +20,7 @@
 (struct List (head))
 
 (defun make_list ()
-  (var list (makeinstance List))
-  (memset list head null)
-  list)
+  (makeinstance List (head null)))
 
 (defun list_head (list)
   (memget list head))

@@ -459,9 +459,7 @@ will clone the value resulting from executing expression
 
 ### Example:
 ```
-(var p (makeinstance Person))
-(memset p name "John")
-(memset p age 25)
+(var p (makeinstance Person (name "John") (age 25)))
 (var q (clone p))
 ```
 

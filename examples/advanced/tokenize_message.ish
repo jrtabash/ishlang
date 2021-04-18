@@ -4,11 +4,7 @@
    position))
 
 (defun makeTokenizerState (str)
-  (var state (makeinstance TokenizerState))
-  (memset state string str)
-  (memset state length (strlen str))
-  (memset state position 0)
-  state)
+  (makeinstance TokenizerState (string str) (length (strlen str)) (position 0)))
 
 (defun nextToken (tokState)
   (var str (memget tokState string))
