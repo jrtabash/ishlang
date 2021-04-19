@@ -3,7 +3,7 @@ Ishlang is a fully parenthesized prefix notation programming language inspired b
 
 The name Ishlang (ish-lang) is shorthand for "Lisp'ish programming language", and was chosen to pay homage to Lisp. Though it is inspired by Lisp, the language diverts considerably from Lisp, and is not a lisp implementation.
 
-The language is still under development, but already supports a rich set of features, including branching, looping, functions, nested-functions, recursion, lambdas/closures, pairs, arrays, hashmaps, structs and modules.
+The language supports a rich set of features, including branching, looping, functions, nested-functions, recursion, lambdas/closures, pairs, arrays, hashmaps, structs and modules.
 
 More details about the language available in [docs/specification.md](docs/specification.md)
 
@@ -36,7 +36,7 @@ ishlang -h
 ## Ishlang Usage
 ```bash
 Usage:
-        ishlang [-h] [-i] [-b] [-p] [-f file] [-a arg1 ... argN]
+        ishlang [-h] [-i] [-b] [-p] [-f file] [-e expr] [-a arg1 ... argN]
 
 Options:
         -h : Print usage
@@ -44,5 +44,6 @@ Options:
         -b : Run in batch mode
         -p : Import path
         -f : Run code file
+        -e : Execute expression, after running file, before entering interactive mode
         -a : Arguments passed to user. Must be last option. Available in argv array
 ```

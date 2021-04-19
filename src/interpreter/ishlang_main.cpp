@@ -46,7 +46,7 @@ private:
 private:
     void usage() {
         std::cerr << "Usage:\n"
-                  << '\t' << program << " [-h] [-i] [-b] [-p] [-f file] [-a arg1 ... argN]\n"
+                  << '\t' << program << " [-h] [-i] [-b] [-p] [-f file] [-e expr] [-a arg1 ... argN]\n"
                   << '\n'
                   << "Options:\n"
                   << '\t' << "-h : Print usage\n"
