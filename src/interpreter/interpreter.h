@@ -15,6 +15,7 @@ namespace Ishlang {
 
         bool readEvalPrintLoop();
         bool loadFile(const std::string &filename);
+        bool evalExpr(const std::string &expression);
 
         void setArguments(char ** argv, int begin, int end);
 

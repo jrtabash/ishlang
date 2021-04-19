@@ -92,6 +92,26 @@ bool Interpreter::loadFile(const std::string &filename) {
 }
 
 // -------------------------------------------------------------
+bool Interpreter::evalExpr(const std::string &expression) {
+    try {
+        parser_.readMulti(expression, parserCB_);
+        if (parser_.hasIncompleteExpr()) {
+            throw IncompleteExpression(expression);
+        }
+    }
+    catch (const Exception &ex) {
+        parser_.clearIncompleteExpr();
+        ex.printError();
+        return false;
+    }
+    catch (const std::exception &ex) {
+        std::cerr << "System error: " << ex.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+// -------------------------------------------------------------
 void Interpreter::setArguments(char ** argv, int begin, int end) {
     Sequence arguments;
     for (int i = begin; i < end; ++i) {

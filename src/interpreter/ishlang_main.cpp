@@ -13,6 +13,7 @@ public:
         , interactive(false)
         , batch(false)
         , filename()
+        , expression()
         , argsBegin(argc)
     {
         parse();
@@ -30,6 +31,7 @@ private:
                 else if (arg == "-b") { batch = true; }
                 else if (arg == "-p") { path = readArgValue("path", i); }
                 else if (arg == "-f") { filename = readArgValue("file", i); }
+                else if (arg == "-e") { expression = readArgValue("expression", i); }
                 else if (arg == "-a") {
                     argsBegin = i + 1;
                     break;
@@ -52,6 +54,7 @@ private:
                   << '\t' << "-b : Run in batch mode\n"
                   << '\t' << "-p : Import path\n"
                   << '\t' << "-f : Run code file\n"
+                  << '\t' << "-e : Execute expression, after running file, before entering interactive mode\n"
                   << '\t' << "-a : Arguments passed to user. Must be last option. Available in argv array"
                   << std::endl;
         exit(1);
@@ -77,13 +80,14 @@ public:
     bool        batch;
     std::string path;
     std::string filename;
+    std::string expression;
     int         argsBegin;
 };
 
 int main(int argc, char** argv) {
     Arguments args(argc, argv);
 
-    bool const forceInteractive = (args.filename.empty() && !args.interactive);
+    bool const forceInteractive = (args.filename.empty() && args.expression.empty() && !args.interactive);
     bool const forceBatch = (!args.filename.empty() && !args.interactive);
 
     Ishlang::Interpreter interpreter(args.batch || forceBatch, args.path);
@@ -91,6 +95,10 @@ int main(int argc, char** argv) {
 
     if (!args.filename.empty()) {
         interpreter.loadFile(args.filename);
+    }
+
+    if (!args.expression.empty()) {
+        interpreter.evalExpr(args.expression);
     }
 
     if (args.interactive || forceInteractive) {
