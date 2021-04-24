@@ -46,7 +46,7 @@ namespace Ishlang {
         virtual ~Literal() {}
 
     protected:
-        virtual Value exec(Environment::SharedPtr /*env*/) override { return value_; }
+        virtual Value exec(Environment::SharedPtr /*env*/) override { return value_.clone(); }
 
     private:
         Value value_;
