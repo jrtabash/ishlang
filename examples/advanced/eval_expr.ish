@@ -1,0 +1,131 @@
+;; --------------------------------------------------------------------------------
+;; This program evaluates prefix arithmetic expressions.
+;;
+;; Supported operations
+;; --------------------
+;; + : add
+;; - : subtract
+;; * : multiply
+;; / : divide
+;; % : remainder
+;; ^ : power
+;;
+;; Example Expression
+;; ------------------
+;; (+ 1 2)
+;; (+ (- 10 9) (/ (* 2 4) 2))
+;; (+ 1.5 (/ 3.2 2))
+;;
+;; Example Usage
+;; -------------
+;; ishlang -f eval_expr.ish -a "(+ 1 2)"
+;; ishlang -f eval_expr.ish -a "(+ (- 10 9) (/ (* 2 4) 2))"
+;; ishlang -f eval_expr.ish -a "(+ 1.5 (/ 3.2 2))"
+;;
+
+;; --------------------------------------------------------------------------------
+;; Tokenizer
+
+(defun tokenize (sexpr)
+  (var size (strlen sexpr))
+  (var tokens (array))
+  (var token "")
+  (var char ' ')
+
+  (defun add_token ()
+    (when (> (strlen token) 0)
+      (progn
+        (arradd tokens token)
+        (= token ""))))
+
+  (loop (var i 0) (< i size) (= i (+ i 1))
+        (progn
+          (= char (strget sexpr i))
+          (cond
+           ((isspace char)
+            (add_token))
+           ((!= (strfind "()" char) -1)
+            (add_token))
+           (true
+            (strcat token char)))))
+
+  tokens)
+
+;; --------------------------------------------------------------------------------
+;; Expression
+
+(var add "+")
+(var sub "-")
+(var mul "*")
+(var div "/")
+(var mod "%")
+(var pow "^")
+(var ops (array add sub mul div mod pow))
+
+(struct Expr
+   (op
+    lhs
+    rhs))
+
+(defun expr (op lhs rhs)
+  (makeinstance Expr (op op) (lhs lhs) (rhs rhs)))
+
+(defun make_expr (sexpr)
+  (defun make_expr_recur (tokens index)
+    (var token (arrget tokens index))
+    (cond
+     ((!= (arrfind ops token) -1)
+      (progn
+        (var lhs_idx (make_expr_recur tokens (+ index 1)))
+        (var rhs_idx (make_expr_recur tokens (second lhs_idx)))
+        (pair (expr token (first lhs_idx) (first rhs_idx)) (second rhs_idx))))
+     (true
+      (pair (astype token real) (+ index 1)))))
+
+  (first (make_expr_recur (tokenize sexpr) 0)))
+
+(defun op2ftn (expr)
+  (var op (memget expr op))
+  (cond
+   ((== op add) (lambda (x y) (+ x y)))
+   ((== op sub) (lambda (x y) (- x y)))
+   ((== op mul) (lambda (x y) (* x y)))
+   ((== op div) (lambda (x y) (/ x y)))
+   ((== op mod) (lambda (x y) (% x y)))
+   ((== op pow) (lambda (x y) (^ x y)))
+   (true
+    (lambda (x y)
+      (print "Unknown expr op ")
+      (println op)))))
+
+(defun eval (expr)
+  (if (isinstanceof expr Expr)
+      (progn
+        (var lhs_val (eval (memget expr lhs)))
+        (var rhs_val (eval (memget expr rhs)))
+        (var ftn (op2ftn expr))
+        (ftn lhs_val rhs_val))
+    expr))
+
+(defun show (expr newline)
+  (if (isinstanceof expr Expr)
+      (progn
+        (print "(")
+        (print (memget expr op))
+        (print " ")
+        (show (memget expr lhs) false)
+        (print " ")
+        (show (memget expr rhs) false)
+        (print ")"))
+    (print expr))
+  (when newline
+    (println "")))
+
+;; --------------------------------------------------------------------------------
+;; Main
+
+(when (> (arrlen argv) 0)
+  (progn
+    (var e (make_expr (arrget argv 0)))
+    (show e true)
+    (println (eval e))))
