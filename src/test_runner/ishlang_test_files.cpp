@@ -14,18 +14,12 @@ namespace {
     bool seenExpectBlock = false;
 }
 
-void makeAndThrowException(const std::string & first,
-                           const std::string & second = "",
-                           const std::string & third = "") {
-    throw std::runtime_error(first + second + third);
-}
-
 void parseArgs(int argc, char ** argv) {
     if (argc != 2) {
         std::cerr << "Usage\n"
                   << "\t" << argv[0] << " <test_scenario_file>\n"
                   << std::endl;
-        makeAndThrowException("Missing test filename");
+        throw std::runtime_error("Missing test filename");
     }
 
     testFilename = argv[1];
@@ -34,7 +28,7 @@ void parseArgs(int argc, char ** argv) {
 void openTestFile() {
     testFile.open(testFilename.c_str(), std::ios_base::in);
     if (!testFile.is_open()) {
-        makeAndThrowException("Unable to open test file '", testFilename, "'");
+        throw std::runtime_error("Unable to open test file '" + testFilename + "'");
     }
 }
 
@@ -47,7 +41,7 @@ void closeTestFile() {
 bool checkBlock(const std::string & line, const std::string & block, bool & seenBlock) {
     if (line == block) {
         if (seenBlock) {
-            makeAndThrowException("Multiple ", block, " lines");
+            throw std::runtime_error("Multiple " + block + " lines");
         }
         seenBlock = true;
         return true;
@@ -57,11 +51,11 @@ bool checkBlock(const std::string & line, const std::string & block, bool & seen
 
 void checkSeenBlocks() {
     if (!seenCodeBlock) {
-        makeAndThrowException("Missing ", CodeBlock);
+        throw std::runtime_error("Missing " + CodeBlock);
     }
 
     if (!seenExpectBlock) {
-        makeAndThrowException("Missing ", ExpectBlock);
+        throw std::runtime_error("Missing " + ExpectBlock);
     }
 }
 
@@ -85,7 +79,7 @@ void readAndCopyBlock(std::ostream & outFile) {
 void readAndCopyBlock(const std::string & outFilename) {
     std::ofstream outFile(outFilename, std::ios_base::out);
     if (!outFile.is_open()) {
-        makeAndThrowException("Unable to open file '", outFilename, "' for writing");
+        throw std::runtime_error("Unable to open file '" + outFilename + "' for writing");
     }
 
     try {
