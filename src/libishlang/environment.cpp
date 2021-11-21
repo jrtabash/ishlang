@@ -8,15 +8,15 @@ Environment::Environment(SharedPtr parent)
 {}
 
 const Value &Environment::def(const std::string &name, const Value &value) {
-    auto result = table_.insert(Table::value_type(name, value));
-    if (!result.second) {
+    auto [iter, success] = table_.emplace(name, value);
+    if (!success) {
         throw DuplicateDef(name);
     }
-    return result.first->second;
+    return iter->second;
 }
 
 const Value &Environment::set(const std::string &name, const Value &value) {
-    Table::iterator iter = table_.find(name);
+    auto iter = table_.find(name);
     if (iter == table_.end()) {
         if (parent_) {
             return parent_->set(name, value);
@@ -29,7 +29,7 @@ const Value &Environment::set(const std::string &name, const Value &value) {
 }
 
 const Value &Environment::get(const std::string &name) const {
-    Table::const_iterator iter = table_.find(name);
+    auto iter = table_.find(name);
     if (iter == table_.end()) {
         if (parent_) {
             return parent_->get(name);
