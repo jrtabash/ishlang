@@ -9,13 +9,13 @@ Instance::Instance(const Struct &type, InitArgs const & initArgs)
     , members_()
 {
     for (const auto &m : type.members()) {
-        members_.insert(MemberTable::value_type(m, initArgOrNull(initArgs, m)));
+        members_.emplace(m, initArgOrNull(initArgs, m));
     }
 }
 
 // -------------------------------------------------------------
 const Value &Instance::get(const std::string &name) const {
-    MemberTable::const_iterator iter = members_.find(name);
+    auto iter = members_.find(name);
     if (iter == members_.end()) {
         throw UnknownMember(type_.name(), name);
     }
@@ -24,7 +24,7 @@ const Value &Instance::get(const std::string &name) const {
 
 // -------------------------------------------------------------
 void Instance::set(const std::string &name, const Value &value) {
-    MemberTable::iterator iter = members_.find(name);
+    auto iter = members_.find(name);
     if (iter == members_.end()) {
         throw UnknownMember(type_.name(), name);
     }
