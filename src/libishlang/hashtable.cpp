@@ -33,27 +33,28 @@ std::size_t Hashtable::count(const Value &value) const {
 
 // -------------------------------------------------------------
 Sequence Hashtable::keys() const {
-    Sequence keys;
-    for (const auto & nameValue : table_) {
-        keys.add(nameValue.first);
-    }
-    return keys;
+    return Sequence::generate(
+        table_.size(),
+        [iter = table_.begin()]() mutable {
+            return (iter++)->first;
+        });
 }
 
 // -------------------------------------------------------------
 Sequence Hashtable::values() const {
-    Sequence values;
-    for (const auto & nameValue : table_) {
-        values.add(nameValue.second);
-    }
-    return values;
+    return Sequence::generate(
+        table_.size(),
+        [iter = table_.begin()]() mutable {
+            return (iter++)->second;
+        });
 }
 
 // -------------------------------------------------------------
 Sequence Hashtable::items() const {
-    Sequence pairs;
-    for (const auto & nameValue : table_) {
-        pairs.add(Value(ValuePair(nameValue.first, nameValue.second)));
-    }
-    return pairs;
+    return Sequence::generate(
+        table_.size(),
+        [iter = table_.begin()]() mutable {
+            auto kv = *iter++;
+            return Value(ValuePair(kv.first, kv.second));
+        });
 }

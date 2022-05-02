@@ -45,6 +45,9 @@ namespace Ishlang {
                                         ']');
         }
 
+    public:
+        static inline Sequence generate(std::size_t size, auto && ftn);
+
     private:
         static inline bool vectorEqual(const Vector &lhs, const Vector &rhs);
 
@@ -94,6 +97,12 @@ namespace Ishlang {
 
     inline std::size_t Sequence::size() const {
         return vector_.size();
+    }
+
+    inline Sequence Sequence::generate(std::size_t size, auto && ftn) {
+        auto vec = std::vector<Value>(size, Value::Null);
+        std::generate(vec.begin(), vec.end(), std::forward<std::remove_cvref_t<decltype(ftn)>>(ftn));
+        return Sequence(std::move(vec));
     }
 
     inline bool Sequence::vectorEqual(const Vector &lhs, const Vector &rhs) {

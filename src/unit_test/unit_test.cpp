@@ -40,6 +40,7 @@ UnitTest::UnitTest()
     ADD_TEST(testSequenceCount);
     ADD_TEST(testSequenceValue);
     ADD_TEST(testSequencePrint);
+    ADD_TEST(testSequenceGenerate);
     ADD_TEST(testHashtable);
     ADD_TEST(testHashtableFind);
     ADD_TEST(testHashtableCount);
@@ -1351,6 +1352,24 @@ void UnitTest::testSequencePrint() {
         oss << Sequence({v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12});
         TEST_CASE_MSG(oss.str() == "[1 2 3 4 5 6 7 8 9 10 ...]", "actual=" << oss.str());
     }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testSequenceGenerate() {
+    auto seq = Sequence::generate(0, []() { return Value::Zero; });
+    TEST_CASE_MSG(seq.size() == 0, "actual=" << seq.size());
+
+    seq = Sequence::generate(1, []() { return Value::Zero; });
+    TEST_CASE_MSG(seq.size() == 1, "actual=" << seq.size());
+    TEST_CASE_MSG(seq.get(0ul) == Value::Zero, "actual=" << seq.get(0ul));
+
+    seq = Sequence::generate(5, [i = 1ll]() mutable { return Value(i++); });
+    TEST_CASE_MSG(seq.size() == 5, "actual=" << seq.size());
+    TEST_CASE_MSG(seq.get(0ul) == Value(1ll), "actual=" << seq.get(0ul));
+    TEST_CASE_MSG(seq.get(1ul) == Value(2ll), "actual=" << seq.get(1ul));
+    TEST_CASE_MSG(seq.get(2ul) == Value(3ll), "actual=" << seq.get(2ul));
+    TEST_CASE_MSG(seq.get(3ul) == Value(4ll), "actual=" << seq.get(3ul));
+    TEST_CASE_MSG(seq.get(4ul) == Value(5ll), "actual=" << seq.get(4ul));
 }
 
 // -------------------------------------------------------------

@@ -61,6 +61,7 @@ namespace Ishlang {
         void testSequenceCount();
         void testSequenceValue();
         void testSequencePrint();
+        void testSequenceGenerate();
         void testHashtable();
         void testHashtableFind();
         void testHashtableCount();
