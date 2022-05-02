@@ -772,7 +772,6 @@ namespace Ishlang {
         static CheckFtn typeToCheckFtn(Type type);
 
     private:
-        Type type_;
         CodeNode::SharedPtr operand_;
         CheckFtn ftn_;
     };
@@ -798,7 +797,6 @@ namespace Ishlang {
         static TransformFtn typeToTransformFtn(Type type);
 
     private:
-        Type type_;
         CodeNode::SharedPtr operand_;
         TransformFtn ftn_;
     };

@@ -43,7 +43,7 @@ namespace Ishlang {
         static inline const Value &initArgOrNull(InitArgs const & initArgs, const std::string &name);
         
     private:
-        const Struct type_;
+        Struct type_;
         MemberTable  members_;
     };
 

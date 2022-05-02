@@ -1,5 +1,5 @@
-CPP=g++
-CFLAGS=-std=c++17 -fPIC -Wall -Wextra -Wformat -Werror
+CPP=clang++
+CFLAGS=-std=c++20 -fPIC -Wall -Wextra -Wformat -Werror
 LFLAGS=
 INCS=-I../libishlang
 LIBSPATH=-L../build

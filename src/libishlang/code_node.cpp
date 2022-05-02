@@ -960,7 +960,6 @@ Value ArrayCount::exec(Environment::SharedPtr env) {
 // -------------------------------------------------------------
 StrCharCheck::StrCharCheck(Type type, CodeNode::SharedPtr operand)
     : CodeNode()
-    , type_(type)
     , operand_(operand)
     , ftn_(typeToCheckFtn(type))
 {
@@ -1000,7 +999,6 @@ StrCharCheck::CheckFtn StrCharCheck::typeToCheckFtn(Type type) {
 // -------------------------------------------------------------
 StrCharTransform::StrCharTransform(Type type, CodeNode::SharedPtr operand)
     : CodeNode()
-    , type_(type)
     , operand_(operand)
     , ftn_(typeToTransformFtn(type))
 {

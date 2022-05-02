@@ -1,5 +1,5 @@
-CPP=g++
-CFLAGS=-std=c++17 -Wall -Wextra -Wformat -Werror
+CPP=clang++
+CFLAGS=-std=c++20 -Wall -Wextra -Wformat -Werror
 RM=rm -f
 CP=cp
 BUILD=../build

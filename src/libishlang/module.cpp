@@ -46,7 +46,7 @@ Value Module::loadFromString(const std::string &expr) {
 Value Module::import(Environment::SharedPtr importEnv, const OptionalName &asName) {
     const std::string &importName = asName ? *asName : name_;
     env_->foreach(
-        [this, &importEnv, &importName](const std::string &varName, const Value &varValue) {
+        [&importEnv, &importName](const std::string &varName, const Value &varValue) {
             importEnv->def(importName + '.' + varName, varValue);
         });
     return Value::True;
