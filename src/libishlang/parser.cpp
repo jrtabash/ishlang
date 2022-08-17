@@ -745,6 +745,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "strcmp",
+          [this]() {
+              auto exprs(readAndCheckExprList("strcmp", 2));
+              return std::make_shared<StringCompare>(exprs[0], exprs[1]);
+          }
+        },
+
         { "array",
           [this]() {
                 auto valueExprs(readExprList());

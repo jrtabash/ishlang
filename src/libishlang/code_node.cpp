@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <cstring>
 #include <limits>
 #include <random>
 
@@ -753,6 +754,31 @@ Value StringCount::exec(Environment::SharedPtr env) {
         const auto &rawStr = str.text();
 
         return Value(Value::Long(std::count(rawStr.begin(), rawStr.end(), chr.character())));
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+StringCompare::StringCompare(CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
+    : CodeNode()
+    , lhs_(lhs)
+    , rhs_(rhs)
+{
+}
+
+Value StringCompare::exec(Environment::SharedPtr env) {
+    if (lhs_.get() && rhs_.get()) {
+        Value lhs = lhs_->eval(env);
+        Value rhs = rhs_->eval(env);
+
+        if (!lhs.isString()) { throw InvalidOperandType("String", lhs.typeToString()); }
+        if (!rhs.isString()) { throw InvalidOperandType("String", rhs.typeToString()); }
+
+        auto const & rawLhs = lhs.text();
+        auto const & rawRhs = rhs.text();
+        auto const maxSize = std::max(rawLhs.size(), rawRhs.size());
+
+        return Value(Value::Long(std::strncmp(rawLhs.c_str(), rawRhs.c_str(), maxSize)));
     }
     return Value::Null;
 }

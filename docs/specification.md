@@ -499,6 +499,11 @@ will clone the value resulting from executing expression
 (strcount <string> <character>)
 ```
 
+**strcmp**: Compare two strings lexicographically
+```
+(strcmp <string1> <string2>)
+```
+
 ### Examples:
 ```
 (var str "Hello!")
@@ -509,6 +514,7 @@ will clone the value resulting from executing expression
 (println (substr str 0 5))
 (println (strfind str 'W'))
 (println (strcount str 'l'))
+(println (strcmp "ab" "bc"))
 ```
 
 ## String / Character Operations

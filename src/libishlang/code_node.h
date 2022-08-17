@@ -631,6 +631,20 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class StringCompare : public CodeNode {
+    public:
+        StringCompare(CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs);
+        virtual ~StringCompare() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr lhs_;
+        CodeNode::SharedPtr rhs_;
+    };
+
+    // -------------------------------------------------------------
     class MakeArray : public CodeNode {
     public:
         MakeArray();

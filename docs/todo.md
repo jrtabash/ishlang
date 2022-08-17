@@ -55,7 +55,6 @@
 ### Add string functions
 - **strsort**: string sort
 - **strrev**: string reverse
-- **strcmp**: string compare
 
 ### Add array functions
 - **arrins**: array insert at index

@@ -26,6 +26,13 @@ __CODE__
 (println (strcount str 'e'))
 (println (strcount str ' '))
 
+;; strcmp
+(println (strcmp "a" "a"))
+(println (strcmp "a" "b"))
+(println (strcmp "b" "a"))
+(println (strcmp "a" "c"))
+(println (strcmp "c" "a"))
+
 __EXPECT__
 I am text! Read me...
 21
@@ -42,3 +49,8 @@ Read me...
 2
 3
 4
+0
+-1
+1
+-2
+2
