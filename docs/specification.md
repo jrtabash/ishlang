@@ -504,6 +504,11 @@ will clone the value resulting from executing expression
 (strcmp <string1> <string2>)
 ```
 
+**strsort**: Sort string
+```
+(strsort <string> [<descending>])
+```
+
 ### Examples:
 ```
 (var str "Hello!")
@@ -515,6 +520,9 @@ will clone the value resulting from executing expression
 (println (strfind str 'W'))
 (println (strcount str 'l'))
 (println (strcmp "ab" "bc"))
+(println (strsort str))
+(println (strsort str true))
+(println (strsort str false))
 ```
 
 ## String / Character Operations

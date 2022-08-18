@@ -76,6 +76,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeStringFind);
     ADD_TEST(testCodeNodeStringCount);
     ADD_TEST(testCodeNodeStringCompare);
+    ADD_TEST(testCodeNodeStringSort);
     ADD_TEST(testCodeNodeMakeArray);
     ADD_TEST(testCodeNodeMakeArraySV);
     ADD_TEST(testCodeNodeArrayLen);
@@ -137,6 +138,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserSubString);
     ADD_TEST(testParserStringFind);
     ADD_TEST(testParserStringCompare);
+    ADD_TEST(testParserStringSort);
     ADD_TEST(testParserStringCount);
     ADD_TEST(testParserMakeArray);
     ADD_TEST(testParserMakeArraySV);
@@ -3234,6 +3236,88 @@ void UnitTest::testCodeNodeStringCompare() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeStringSort() {
+    Environment::SharedPtr env(new Environment());
+    env->def("str0", Value(""));
+    env->def("str1", Value("a"));
+    env->def("str2", Value("ba"));
+    env->def("str3", Value("bca"));
+    env->def("str4", Value("dbca"));
+    env->def("str5", Value("bdcabdcdcd"));
+    env->def("num", Value::Zero);
+
+    CodeNode::SharedPtr str0 = std::make_shared<Variable>("str0");
+    CodeNode::SharedPtr str1 = std::make_shared<Variable>("str1");
+    CodeNode::SharedPtr str2 = std::make_shared<Variable>("str2");
+    CodeNode::SharedPtr str3 = std::make_shared<Variable>("str3");
+    CodeNode::SharedPtr str4 = std::make_shared<Variable>("str4");
+    CodeNode::SharedPtr str5 = std::make_shared<Variable>("str5");
+    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+
+    CodeNode::SharedPtr asc = std::make_shared<Literal>(false);
+    CodeNode::SharedPtr desc = std::make_shared<Literal>(true);
+    CodeNode::SharedPtr none = CodeNode::SharedPtr();
+
+    auto testcase =
+        [this, &env](auto str, auto desc, auto expect) {
+            auto value = std::make_shared<StringSort>(str, desc)->eval(env);
+            TEST_CASE_MSG(value == expect, "value actual=" << value);
+            TEST_CASE_MSG(str->eval(env) == expect, "str actual=" << str);
+        };
+
+    testcase(str0, asc, Value(""));
+    testcase(str1, asc, Value("a"));
+    testcase(str2, asc, Value("ab"));
+    testcase(str3, asc, Value("abc"));
+    testcase(str4, asc, Value("abcd"));
+    testcase(str5, asc, Value("abbcccdddd"));
+
+    testcase(str0, desc, Value(""));
+    testcase(str1, desc, Value("a"));
+    testcase(str2, desc, Value("ba"));
+    testcase(str3, desc, Value("cba"));
+    testcase(str4, desc, Value("dcba"));
+    testcase(str5, desc, Value("ddddcccbba"));
+
+    testcase(str0, none, Value(""));
+    testcase(str1, none, Value("a"));
+    testcase(str2, none, Value("ab"));
+    testcase(str3, none, Value("abc"));
+    testcase(str4, none, Value("abcd"));
+    testcase(str5, none, Value("abbcccdddd"));
+
+    try {
+        testcase(num, asc, Value::Null);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=String actual=int") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        testcase(str3, num, Value::Null);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=Boolean actual=int") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    Value check;
+    check = str0->eval(env); TEST_CASE_MSG(check == Value(""),           "actual=" << check);
+    check = str1->eval(env); TEST_CASE_MSG(check == Value("a"),          "actual=" << check);
+    check = str2->eval(env); TEST_CASE_MSG(check == Value("ab"),         "actual=" << check);
+    check = str3->eval(env); TEST_CASE_MSG(check == Value("abc"),        "actual=" << check);
+    check = str4->eval(env); TEST_CASE_MSG(check == Value("abcd"),       "actual=" << check);
+    check = str5->eval(env); TEST_CASE_MSG(check == Value("abbcccdddd"), "actual=" << check);
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeMakeArray() {
     Environment::SharedPtr env(new Environment());
 
@@ -5021,6 +5105,37 @@ void UnitTest::testParserStringCompare() {
     TEST_CASE(parserTest(parser, env, "(strcmp str1 'a')", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(strcmp 'a' str2)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(strcmp 5 10)",     Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserStringSort() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("str1", Value("badc"));
+    env->def("str2", Value("3421"));
+
+    TEST_CASE(parserTest(parser, env, "(progn (strsort str1) str1)",       Value("abcd"), true));
+    TEST_CASE(parserTest(parser, env, "(progn (strsort str1 true) str1)",  Value("dcba"), true));
+    TEST_CASE(parserTest(parser, env, "(progn (strsort str1 false) str1)", Value("abcd"), true));
+
+    TEST_CASE(parserTest(parser, env, "(progn (strsort str2) str2)",       Value("1234"), true));
+    TEST_CASE(parserTest(parser, env, "(progn (strsort str2 true) str2)",  Value("4321"), true));
+    TEST_CASE(parserTest(parser, env, "(progn (strsort str2 false) str2)", Value("1234"), true));
+
+    TEST_CASE(parserTest(parser, env, "(strsort \"34251\")",       Value("12345"), true));
+    TEST_CASE(parserTest(parser, env, "(strsort \"34251\" true)",  Value("54321"), true));
+    TEST_CASE(parserTest(parser, env, "(strsort \"34251\" false)", Value("12345"), true));
+
+    TEST_CASE(parserTest(parser, env, "(strsort \"333444422555551\")",       Value("122333444455555"), true));
+    TEST_CASE(parserTest(parser, env, "(strsort \"333444422555551\" true)",  Value("555554444333221"), true));
+    TEST_CASE(parserTest(parser, env, "(strsort \"333444422555551\" false)", Value("122333444455555"), true));
+
+    TEST_CASE(parserTest(parser, env, "(strsort 34251)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strsort 34251 true)",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strsort 34251 false)", Value::Null, false));
+
+    TEST_CASE(parserTest(parser, env, "(strsort str1 3)", Value::Null, false));
 }
 
 // -------------------------------------------------------------

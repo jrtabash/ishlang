@@ -10,6 +10,7 @@
 #include <cctype>
 #include <cmath>
 #include <cstring>
+#include <functional>
 #include <limits>
 #include <random>
 
@@ -779,6 +780,35 @@ Value StringCompare::exec(Environment::SharedPtr env) {
         auto const maxSize = std::max(rawLhs.size(), rawRhs.size());
 
         return Value(Value::Long(std::strncmp(rawLhs.c_str(), rawRhs.c_str(), maxSize)));
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+StringSort::StringSort(CodeNode::SharedPtr str, CodeNode::SharedPtr descending)
+    : CodeNode()
+    , str_(str)
+    , desc_(descending)
+{
+}
+
+Value StringSort::exec(Environment::SharedPtr env) {
+    if (str_.get()) {
+        Value str = str_->eval(env);
+        Value desc = desc_.get() ? desc_->eval(env) : Value::False;
+
+        if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
+        if (!desc.isBool()) { throw InvalidOperandType("Boolean", desc.typeToString()); }
+
+        auto & rawStr = str.text();
+
+        if (desc.boolean()) {
+            std::sort(rawStr.begin(), rawStr.end(), std::greater<char>());
+        }
+        else {
+            std::sort(rawStr.begin(), rawStr.end());
+        }
+        return str;
     }
     return Value::Null;
 }

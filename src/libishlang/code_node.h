@@ -645,6 +645,20 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class StringSort : public CodeNode {
+    public:
+        StringSort(CodeNode::SharedPtr str, CodeNode::SharedPtr descending);
+        virtual ~StringSort() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr str_;
+        CodeNode::SharedPtr desc_;
+    };
+
+    // -------------------------------------------------------------
     class MakeArray : public CodeNode {
     public:
         MakeArray();

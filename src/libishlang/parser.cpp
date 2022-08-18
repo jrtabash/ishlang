@@ -752,6 +752,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "strsort",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("strsort", 1, 2));
+              return std::make_shared<StringSort>(exprs[0], exprs.size() == 2 ? exprs[1] : CodeNode::SharedPtr());
+          }
+        },
+
         { "array",
           [this]() {
                 auto valueExprs(readExprList());

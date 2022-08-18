@@ -53,7 +53,6 @@
   - **omitems**: orderedmap items
 
 ### Add string functions
-- **strsort**: string sort
 - **strrev**: string reverse
 
 ### Add array functions
