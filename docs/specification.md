@@ -509,6 +509,11 @@ will clone the value resulting from executing expression
 (strsort <string> [<descending>])
 ```
 
+**strrev**: Reverse string
+```
+(strrev <string>)
+```
+
 ### Examples:
 ```
 (var str "Hello!")
@@ -523,6 +528,7 @@ will clone the value resulting from executing expression
 (println (strsort str))
 (println (strsort str true))
 (println (strsort str false))
+(println (strrev str))
 ```
 
 ## String / Character Operations

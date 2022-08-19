@@ -52,9 +52,6 @@
   - **omvals**: orderedmap values
   - **omitems**: orderedmap items
 
-### Add string functions
-- **strrev**: string reverse
-
 ### Add array functions
 - **arrins**: array insert at index
 - **arrrem**: array remove index

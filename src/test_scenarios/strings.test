@@ -42,6 +42,13 @@ __CODE__
 (println (strsort s1 false))
 (println s1)
 
+;; strrev
+(var s2 "tag")
+(println (strrev s2))
+(println s2)
+(println (strrev s2))
+(println s2)
+
 __EXPECT__
 I am text! Read me...
 21
@@ -69,3 +76,7 @@ cba
 cba
 abc
 abc
+gat
+gat
+tag
+tag

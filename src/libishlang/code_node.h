@@ -659,6 +659,19 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class StringReverse : public CodeNode {
+    public:
+        StringReverse(CodeNode::SharedPtr str);
+        virtual ~StringReverse() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr str_;
+    };
+
+    // -------------------------------------------------------------
     class MakeArray : public CodeNode {
     public:
         MakeArray();

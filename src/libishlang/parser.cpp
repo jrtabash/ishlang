@@ -759,6 +759,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "strrev",
+          [this] {
+              auto exprs(readAndCheckExprList("strrev", 1));
+              return make_shared<StringReverse>(exprs[0]);
+          }
+        },
+
         { "array",
           [this]() {
                 auto valueExprs(readExprList());

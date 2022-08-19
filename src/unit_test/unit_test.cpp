@@ -77,6 +77,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeStringCount);
     ADD_TEST(testCodeNodeStringCompare);
     ADD_TEST(testCodeNodeStringSort);
+    ADD_TEST(testCodeNodeStringReverse);
     ADD_TEST(testCodeNodeMakeArray);
     ADD_TEST(testCodeNodeMakeArraySV);
     ADD_TEST(testCodeNodeArrayLen);
@@ -139,6 +140,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserStringFind);
     ADD_TEST(testParserStringCompare);
     ADD_TEST(testParserStringSort);
+    ADD_TEST(testParserStringReverse);
     ADD_TEST(testParserStringCount);
     ADD_TEST(testParserMakeArray);
     ADD_TEST(testParserMakeArraySV);
@@ -3318,6 +3320,54 @@ void UnitTest::testCodeNodeStringSort() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeStringReverse() {
+    Environment::SharedPtr env(new Environment());
+    env->def("str0", Value(""));
+    env->def("str1", Value("a"));
+    env->def("str2", Value("ab"));
+    env->def("str3", Value("abc"));
+    env->def("str4", Value("abcd"));
+    env->def("num", Value::Zero);
+
+    CodeNode::SharedPtr str0 = std::make_shared<Variable>("str0");
+    CodeNode::SharedPtr str1 = std::make_shared<Variable>("str1");
+    CodeNode::SharedPtr str2 = std::make_shared<Variable>("str2");
+    CodeNode::SharedPtr str3 = std::make_shared<Variable>("str3");
+    CodeNode::SharedPtr str4 = std::make_shared<Variable>("str4");
+    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+
+    auto testcase =
+        [this, &env](auto str, auto expect) {
+            auto value = std::make_shared<StringReverse>(str)->eval(env);
+            TEST_CASE_MSG(value == expect, "value actual=" << value);
+            TEST_CASE_MSG(str->eval(env) == expect, "str actual=" << str);
+        };
+
+    testcase(str0, Value(""));
+    testcase(str1, Value("a"));
+    testcase(str2, Value("ba"));
+    testcase(str3, Value("cba"));
+    testcase(str4, Value("dcba"));
+
+    testcase(str0, Value(""));
+    testcase(str1, Value("a"));
+    testcase(str2, Value("ab"));
+    testcase(str3, Value("abc"));
+    testcase(str4, Value("abcd"));
+
+    try {
+        testcase(num, Value::Null);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=String actual=int") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeMakeArray() {
     Environment::SharedPtr env(new Environment());
 
@@ -5136,6 +5186,25 @@ void UnitTest::testParserStringSort() {
     TEST_CASE(parserTest(parser, env, "(strsort 34251 false)", Value::Null, false));
 
     TEST_CASE(parserTest(parser, env, "(strsort str1 3)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserStringReverse() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("str1", Value("abcd"));
+    env->def("str2", Value("1234"));
+
+    TEST_CASE(parserTest(parser, env, "(progn (strrev str1) str1)", Value("dcba"), true));
+    TEST_CASE(parserTest(parser, env, "(progn (strrev str1) str1)", Value("abcd"), true));
+    TEST_CASE(parserTest(parser, env, "(progn (strrev str2) str2)", Value("4321"), true));
+    TEST_CASE(parserTest(parser, env, "(progn (strrev str2) str2)", Value("1234"), true));
+
+    TEST_CASE(parserTest(parser, env, "(strrev \"12345\")", Value("54321"), true));
+    TEST_CASE(parserTest(parser, env, "(strrev \"54321\")", Value("12345"), true));
+
+    TEST_CASE(parserTest(parser, env, "(strsort 34251)", Value::Null, false));
 }
 
 // -------------------------------------------------------------

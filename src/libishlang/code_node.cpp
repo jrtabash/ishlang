@@ -814,6 +814,27 @@ Value StringSort::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+StringReverse::StringReverse(CodeNode::SharedPtr str)
+    : CodeNode()
+    , str_(str)
+{
+}
+
+Value StringReverse::exec(Environment::SharedPtr env) {
+    if (str_.get()) {
+        Value str = str_->eval(env);
+
+        if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
+
+        auto & rawStr = str.text();
+
+        std::reverse(rawStr.begin(), rawStr.end());
+        return str;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 MakeArray::MakeArray()
     : CodeNode()
     , values_()
