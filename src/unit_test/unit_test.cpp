@@ -38,6 +38,7 @@ UnitTest::UnitTest()
     ADD_TEST(testSequence);
     ADD_TEST(testSequenceFind);
     ADD_TEST(testSequenceCount);
+    ADD_TEST(testSequenceSort);
     ADD_TEST(testSequenceValue);
     ADD_TEST(testSequencePrint);
     ADD_TEST(testSequenceGenerate);
@@ -86,6 +87,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArrayAdd);
     ADD_TEST(testCodeNodeArrayFind);
     ADD_TEST(testCodeNodeArrayCount);
+    ADD_TEST(testCodeNodeArraySort);
     ADD_TEST(testCodeNodeStrCharCheck);
     ADD_TEST(testCodeNodeStrCharTransform);
     ADD_TEST(testCodeNodeImportModule);
@@ -150,6 +152,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArrayAdd);
     ADD_TEST(testParserArrayFind);
     ADD_TEST(testParserArrayCount);
+    ADD_TEST(testParserArraySort);
     ADD_TEST(testParserStrCharCheck);
     ADD_TEST(testParserStrCharTransform);
     ADD_TEST(testParserImportModule);
@@ -1292,6 +1295,21 @@ void UnitTest::testSequenceCount() {
     TEST_CASE_MSG(seq.count(v3) == 2, "actual=" << seq.count(v3));
     TEST_CASE_MSG(seq.count(v4) == 3, "actual=" << seq.count(v4));
     TEST_CASE_MSG(seq.count(v5) == 0, "actual=" << seq.count(v5));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testSequenceSort() {
+    const Value v0 = Value::Zero;
+    const Value v1 = Value(1ll);
+    const Value v2 = Value(2ll);
+    const Value v3 = Value(3ll);
+    const Value v4 = Value(4ll);
+    const Value v5 = Value(5ll);
+
+    Sequence seq({v4, v1, v0, v3, v5, v2});
+
+    seq.sort(true);  TEST_CASE_MSG(seq == Sequence({v5, v4, v3, v2, v1, v0}), "actual=" << seq);
+    seq.sort(false); TEST_CASE_MSG(seq == Sequence({v0, v1, v2, v3, v4, v5}), "actual=" << seq);
 }
 
 // -------------------------------------------------------------
@@ -3650,6 +3668,81 @@ void UnitTest::testCodeNodeArrayCount() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeArraySort() {
+    Environment::SharedPtr env(new Environment());
+
+    const Value v1(1ll);
+    const Value v2(2ll);
+    const Value v3(3ll);
+    const Value v4(4ll);
+
+    env->def("arr", Value::Null);
+    env->def("num", Value::Zero);
+
+    CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
+    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+
+    CodeNode::SharedPtr asc = std::make_shared<Literal>(false);
+    CodeNode::SharedPtr desc = std::make_shared<Literal>(true);
+    CodeNode::SharedPtr none = CodeNode::SharedPtr();
+
+    auto arrval = [](std::initializer_list<Value> && seq) { return Value(Sequence(std::move(seq))); };
+
+    auto mkarr =
+        [&](std::initializer_list<Value> && seq) {
+            env->set("arr", arrval(std::move(seq)));
+            return arr;
+        };
+
+    auto testcase =
+        [this, &env](auto arr, auto desc, auto expect) {
+            auto value = std::make_shared<ArraySort>(arr, desc)->eval(env);
+            TEST_CASE_MSG(value == expect, "value actual=" << value);
+            TEST_CASE_MSG(arr->eval(env) == expect, "str actual=" << arr);
+        };
+
+    testcase(mkarr({}),               none, arrval({}));
+    testcase(mkarr({v1}),             none, arrval({v1}));
+    testcase(mkarr({v2, v1}),         none, arrval({v1, v2}));
+    testcase(mkarr({v3, v2, v1}),     none, arrval({v1, v2, v3}));
+    testcase(mkarr({v4, v3, v2, v1}), none, arrval({v1, v2, v3, v4}));
+
+    testcase(mkarr({}),               asc, arrval({}));
+    testcase(mkarr({v1}),             asc, arrval({v1}));
+    testcase(mkarr({v2, v1}),         asc, arrval({v1, v2}));
+    testcase(mkarr({v3, v2, v1}),     asc, arrval({v1, v2, v3}));
+    testcase(mkarr({v4, v3, v2, v1}), asc, arrval({v1, v2, v3, v4}));
+
+    testcase(mkarr({}),               desc, arrval({}));
+    testcase(mkarr({v1}),             desc, arrval({v1}));
+    testcase(mkarr({v1, v2}),         desc, arrval({v2, v1}));
+    testcase(mkarr({v1, v2, v3}),     desc, arrval({v3, v2, v1}));
+    testcase(mkarr({v1, v2, v3, v4}), desc, arrval({v4, v3, v2, v1}));
+
+    try {
+        testcase(num, asc, Value::Null);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=Array actual=int") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        testcase(arr, num, Value::Null);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=Boolean actual=int") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeStrCharCheck() {
     Environment::SharedPtr env(new Environment());
 
@@ -5344,6 +5437,42 @@ void UnitTest::testParserArrayCount() {
     TEST_CASE(parserTest(parser, env, "(arrcount '5' 0)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(arrcount)",       Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(arrcount arr)",   Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserArraySort() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("arr1", Value(Sequence({Value('b'), Value('d'), Value('c'), Value('a')})));
+    env->def("arr2", Value(Sequence({Value(2ll), Value(3ll), Value(4ll), Value(1ll)})));
+
+    const Value arr1Asc(Sequence({Value('a'), Value('b'), Value('c'), Value('d')}));
+    const Value arr2Asc(Sequence({Value(1ll), Value(2ll), Value(3ll), Value(4ll)}));
+    const Value arr1Desc(Sequence({Value('d'), Value('c'), Value('b'), Value('a')}));
+    const Value arr2Desc(Sequence({Value(4ll), Value(3ll), Value(2ll), Value(1ll)}));
+
+    TEST_CASE(parserTest(parser, env, "(progn (arrsort arr1) arr1)",       arr1Asc,  true));
+    TEST_CASE(parserTest(parser, env, "(progn (arrsort arr1 true) arr1)",  arr1Desc, true));
+    TEST_CASE(parserTest(parser, env, "(progn (arrsort arr1 false) arr1)", arr1Asc,  true));
+
+    TEST_CASE(parserTest(parser, env, "(progn (arrsort arr2) arr2)",       arr2Asc,  true));
+    TEST_CASE(parserTest(parser, env, "(progn (arrsort arr2 true) arr2)",  arr2Desc, true));
+    TEST_CASE(parserTest(parser, env, "(progn (arrsort arr2 false) arr2)", arr2Asc,  true));
+
+    TEST_CASE(parserTest(parser, env, "(arrsort (array 3 1))",       Value(Sequence({Value(1ll), Value(3ll)})), true));
+    TEST_CASE(parserTest(parser, env, "(arrsort (array 1 3) true)",  Value(Sequence({Value(3ll), Value(1ll)})), true));
+    TEST_CASE(parserTest(parser, env, "(arrsort (array 1 3) false)", Value(Sequence({Value(1ll), Value(3ll)})), true));
+
+    TEST_CASE(parserTest(parser, env, "(arrsort (array 3 1 1))",       Value(Sequence({Value(1ll), Value(1ll), Value(3ll)})), true));
+    TEST_CASE(parserTest(parser, env, "(arrsort (array 1 1 3) true)",  Value(Sequence({Value(3ll), Value(1ll), Value(1ll)})), true));
+    TEST_CASE(parserTest(parser, env, "(arrsort (array 1 1 3) false)", Value(Sequence({Value(1ll), Value(1ll), Value(3ll)})), true));
+
+    TEST_CASE(parserTest(parser, env, "(arrsort 34251)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrsort 34251 true)",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrsort 34251 false)", Value::Null, false));
+
+    TEST_CASE(parserTest(parser, env, "(strsort arr1 3)", Value::Null, false));
 }
 
 // -------------------------------------------------------------

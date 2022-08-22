@@ -659,6 +659,11 @@ the check is true for every character in the string.
 (arrcount <array> <value>)
 ```
 
+**arrsort**: Sort array
+```
+(arrsort <array> [<descending>])
+```
+
 ### Examples:
 ```
 (var a (array))
@@ -673,6 +678,9 @@ the check is true for every character in the string.
 (println (arraysv 10 0))
 (println (arrfind a 2))
 (println (arrcount a 2))
+(println (arrsort a))
+(println (arrsort a true))
+(println (arrsort a false))
 ```
 
 ## Hashmap Operations

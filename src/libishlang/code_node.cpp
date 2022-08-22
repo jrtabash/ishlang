@@ -1035,6 +1035,30 @@ Value ArrayCount::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+ArraySort::ArraySort(CodeNode::SharedPtr arr, CodeNode::SharedPtr descending)
+    : CodeNode()
+    , arr_(arr)
+    , desc_(descending)
+{
+}
+
+Value ArraySort::exec(Environment::SharedPtr env) {
+    if (arr_.get()) {
+        Value arr = arr_->eval(env);
+        Value desc = desc_.get() ? desc_->eval(env) : Value::False;
+
+        if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
+        if (!desc.isBool()) { throw InvalidOperandType("Boolean", desc.typeToString()); }
+
+        auto & rawArr = arr.array();
+
+        rawArr.sort(desc.boolean());
+        return arr;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 StrCharCheck::StrCharCheck(Type type, CodeNode::SharedPtr operand)
     : CodeNode()
     , operand_(operand)

@@ -56,7 +56,6 @@
 - **arrins**: array insert at index
 - **arrrem**: array remove index
 - **arrclr**: array clear
-- **arrsort**: array sort
 - **arrrev**: array reverse
 
 ### Add generic functions

@@ -788,6 +788,20 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class ArraySort : public CodeNode {
+    public:
+        ArraySort(CodeNode::SharedPtr arr, CodeNode::SharedPtr descending);
+        virtual ~ArraySort() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr arr_;
+        CodeNode::SharedPtr desc_;
+    };
+
+    // -------------------------------------------------------------
     class StrCharCheck : public CodeNode {
     public:
         using CheckFtn = std::function<bool (unsigned char)>;

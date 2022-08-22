@@ -843,6 +843,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "arrsort",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("arrsort", 1, 2));
+              return std::make_shared<ArraySort>(exprs[0], exprs.size() == 2 ? exprs[1] : CodeNode::SharedPtr());
+          }
+        },
+
         { "isupper", MakeStrCharOp<StrCharCheck>("isupper", *this, StrCharCheck::Upper) },
         { "islower", MakeStrCharOp<StrCharCheck>("islower", *this, StrCharCheck::Lower) },
         { "isalpha", MakeStrCharOp<StrCharCheck>("isalpha", *this, StrCharCheck::Alpha) },

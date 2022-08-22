@@ -29,6 +29,14 @@ __CODE__
 (println (arrcount a 2))
 (println (arrcount (array 1 2 1) 1))
 
+(var a2 (array 5 4 3 2 1))
+(println (arrsort a2))
+(println a2)
+(println (arrsort a2 true))
+(println a2)
+(println (arrsort a2 false))
+(println a2)
+
 __EXPECT__
 []
 [1 2 3]
@@ -48,3 +56,9 @@ __EXPECT__
 0
 1
 2
+[1 2 3 4 5]
+[1 2 3 4 5]
+[5 4 3 2 1]
+[5 4 3 2 1]
+[1 2 3 4 5]
+[1 2 3 4 5]

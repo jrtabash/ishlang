@@ -2,6 +2,7 @@
 #include "exception.h"
 
 #include <algorithm>
+#include <functional>
 
 using namespace Ishlang;
 
@@ -29,4 +30,14 @@ std::optional<std::size_t> Sequence::find(const Value &val, std::size_t pos) con
 // -------------------------------------------------------------
 std::size_t Sequence::count(const Value &value) const {
     return std::count(vector_.begin(), vector_.end(), value);
+}
+
+// -------------------------------------------------------------
+void Sequence::sort(bool descending) {
+    if (descending) {
+        std::sort(vector_.begin(), vector_.end(), std::greater<Value>());
+    }
+    else {
+        std::sort(vector_.begin(), vector_.end());
+    }
 }
