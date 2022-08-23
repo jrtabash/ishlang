@@ -41,3 +41,8 @@ void Sequence::sort(bool descending) {
         std::sort(vector_.begin(), vector_.end());
     }
 }
+
+// -------------------------------------------------------------
+void Sequence::reverse() {
+    std::reverse(vector_.begin(), vector_.end());
+}

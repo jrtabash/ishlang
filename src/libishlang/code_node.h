@@ -802,6 +802,19 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class ArrayReverse : public CodeNode {
+    public:
+        ArrayReverse(CodeNode::SharedPtr arr);
+        virtual ~ArrayReverse() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr arr_;
+    };
+
+    // -------------------------------------------------------------
     class StrCharCheck : public CodeNode {
     public:
         using CheckFtn = std::function<bool (unsigned char)>;

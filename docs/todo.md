@@ -56,7 +56,6 @@
 - **arrins**: array insert at index
 - **arrrem**: array remove index
 - **arrclr**: array clear
-- **arrrev**: array reverse
 
 ### Add generic functions
 - Add generic get function with support for instances, strings, arrays and hashmaps

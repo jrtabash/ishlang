@@ -664,6 +664,11 @@ the check is true for every character in the string.
 (arrsort <array> [<descending>])
 ```
 
+**arrrev**: Reverse array
+```
+(arrrev <array>)
+```
+
 ### Examples:
 ```
 (var a (array))
@@ -681,6 +686,7 @@ the check is true for every character in the string.
 (println (arrsort a))
 (println (arrsort a true))
 (println (arrsort a false))
+(println (arrrev a))
 ```
 
 ## Hashmap Operations

@@ -850,6 +850,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "arrrev",
+          [this] {
+              auto exprs(readAndCheckExprList("arrrev", 1));
+              return make_shared<ArrayReverse>(exprs[0]);
+          }
+        },
+
         { "isupper", MakeStrCharOp<StrCharCheck>("isupper", *this, StrCharCheck::Upper) },
         { "islower", MakeStrCharOp<StrCharCheck>("islower", *this, StrCharCheck::Lower) },
         { "isalpha", MakeStrCharOp<StrCharCheck>("isalpha", *this, StrCharCheck::Alpha) },
