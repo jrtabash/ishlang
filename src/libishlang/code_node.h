@@ -815,6 +815,19 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class ArrayClear : public CodeNode {
+    public:
+        ArrayClear(CodeNode::SharedPtr arr);
+        virtual ~ArrayClear() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr arr_;
+    };
+
+    // -------------------------------------------------------------
     class StrCharCheck : public CodeNode {
     public:
         using CheckFtn = std::function<bool (unsigned char)>;

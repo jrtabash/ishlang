@@ -669,6 +669,11 @@ the check is true for every character in the string.
 (arrrev <array>)
 ```
 
+**arrclr**: Clear array
+```
+(arrclr <array>)
+```
+
 ### Examples:
 ```
 (var a (array))
@@ -687,6 +692,7 @@ the check is true for every character in the string.
 (println (arrsort a true))
 (println (arrsort a false))
 (println (arrrev a))
+(arrclr a)
 ```
 
 ## Hashmap Operations

@@ -40,6 +40,7 @@ UnitTest::UnitTest()
     ADD_TEST(testSequenceCount);
     ADD_TEST(testSequenceSort);
     ADD_TEST(testSequenceReverse);
+    ADD_TEST(testSequenceClear);
     ADD_TEST(testSequenceValue);
     ADD_TEST(testSequencePrint);
     ADD_TEST(testSequenceGenerate);
@@ -90,6 +91,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArrayCount);
     ADD_TEST(testCodeNodeArraySort);
     ADD_TEST(testCodeNodeArrayReverse);
+    ADD_TEST(testCodeNodeArrayClear);
     ADD_TEST(testCodeNodeStrCharCheck);
     ADD_TEST(testCodeNodeStrCharTransform);
     ADD_TEST(testCodeNodeImportModule);
@@ -156,6 +158,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArrayCount);
     ADD_TEST(testParserArraySort);
     ADD_TEST(testParserArrayReverse);
+    ADD_TEST(testParserArrayClear);
     ADD_TEST(testParserStrCharCheck);
     ADD_TEST(testParserStrCharTransform);
     ADD_TEST(testParserImportModule);
@@ -1328,6 +1331,23 @@ void UnitTest::testSequenceReverse() {
 
     seq.reverse(); TEST_CASE_MSG(seq == Sequence({v5, v4, v3, v2, v1, v0}), "actual=" << seq);
     seq.reverse(); TEST_CASE_MSG(seq == Sequence({v0, v1, v2, v3, v4, v5}), "actual=" << seq);
+}
+
+// -------------------------------------------------------------
+void UnitTest::testSequenceClear() {
+    const Value v0 = Value::Zero;
+    const Value v1 = Value(1ll);
+    const Value v2 = Value(2ll);
+
+    Sequence seq({v0, v1, v2});
+
+    TEST_CASE_MSG(seq.size() == 3, "size actual=" << seq.size());
+    TEST_CASE_MSG(seq == Sequence({v0, v1, v2}), "elements actual=" << seq);
+
+    seq.clear();
+
+    TEST_CASE_MSG(seq.size() == 0, "size actual=" << seq.size());
+    TEST_CASE_MSG(seq == Sequence(), "elements actual=" << seq);
 }
 
 // -------------------------------------------------------------
@@ -3815,6 +3835,40 @@ void UnitTest::testCodeNodeArrayReverse() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeArrayClear() {
+    Environment::SharedPtr env(new Environment());
+
+    const Value v1(1ll);
+    const Value v2(2ll);
+    const Value v3(3ll);
+
+    env->def("arr", Value(Sequence({v1, v2, v3})));
+
+    CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
+
+    auto arrVal = arr->eval(env);
+    TEST_CASE_MSG(arrVal == Value(Sequence({v1, v2, v3})), "array actual=" << arrVal);
+
+    auto result = std::make_shared<ArrayClear>(arr)->eval(env);
+    TEST_CASE_MSG(result.isNull(), "result actual=" << result);
+
+    arrVal = arr->eval(env);
+    TEST_CASE_MSG(arrVal == Value(Sequence()), "array actual=" << arrVal);
+
+    try {
+        std::make_shared<ArrayClear>(
+            std::make_shared<Literal>(Value(5ll)))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=Array actual=int") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeStrCharCheck() {
     Environment::SharedPtr env(new Environment());
 
@@ -5569,6 +5623,22 @@ void UnitTest::testParserArrayReverse() {
     TEST_CASE(parserTest(parser, env, "(arrrev (array 3 1 1))", Value(Sequence({Value(1ll), Value(1ll), Value(3ll)})), true));
 
     TEST_CASE(parserTest(parser, env, "(arrrev 34251)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserArrayClear() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("a", Value(Sequence({Value('a'), Value('b'), Value('c')})));
+
+    TEST_CASE(parserTest(parser, env, "(arrlen a)", Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(arrclr a)", Value::Null, true));
+    TEST_CASE(parserTest(parser, env, "(arrlen a)", Value(0ll),  true));
+
+    TEST_CASE(parserTest(parser, env, "(arrlen)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrlen a 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrlen 5)",   Value::Null, false));
 }
 
 // -------------------------------------------------------------

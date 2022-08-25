@@ -857,6 +857,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "arrclr",
+          [this] {
+              auto exprs(readAndCheckExprList("arrclr", 1));
+              return make_shared<ArrayClear>(exprs[0]);
+          }
+        },
+
         { "isupper", MakeStrCharOp<StrCharCheck>("isupper", *this, StrCharCheck::Upper) },
         { "islower", MakeStrCharOp<StrCharCheck>("islower", *this, StrCharCheck::Lower) },
         { "isalpha", MakeStrCharOp<StrCharCheck>("isalpha", *this, StrCharCheck::Alpha) },

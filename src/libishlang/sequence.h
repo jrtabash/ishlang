@@ -30,6 +30,7 @@ namespace Ishlang {
         inline const Value &get(std::size_t idx) const;
         inline void set(std::size_t idx, const Value &value);
         inline void add(const Value &value);
+        inline void clear();
 
         std::optional<std::size_t> find(const Value &val, std::size_t pos = 0) const;
         std::size_t count(const Value &value) const;
@@ -95,6 +96,10 @@ namespace Ishlang {
 
     inline void Sequence::add(const Value &value) {
         vector_.push_back(value);
+    }
+
+    inline void Sequence::clear() {
+        vector_.clear();
     }
 
     inline std::size_t Sequence::size() const {

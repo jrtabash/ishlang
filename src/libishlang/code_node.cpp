@@ -1080,6 +1080,24 @@ Value ArrayReverse::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+ArrayClear::ArrayClear(CodeNode::SharedPtr arr)
+    : CodeNode()
+    , arr_(arr)
+{
+}
+
+Value ArrayClear::exec(Environment::SharedPtr env) {
+    if (arr_.get()) {
+        Value arr = arr_->eval(env);
+
+        if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
+
+        arr.array().clear();
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 StrCharCheck::StrCharCheck(Type type, CodeNode::SharedPtr operand)
     : CodeNode()
     , operand_(operand)
