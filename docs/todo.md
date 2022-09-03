@@ -53,7 +53,6 @@
   - **omitems**: orderedmap items
 
 ### Add array functions
-- **arrins**: array insert at index
 - **arrrem**: array remove index
 
 ### Add generic functions

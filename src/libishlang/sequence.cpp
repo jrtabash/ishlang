@@ -19,6 +19,13 @@ Sequence::Sequence(std::size_t size, const Value &value)
 {}
 
 // -------------------------------------------------------------
+void Sequence::insert(std::size_t pos, const Value &value) {
+    auto iter = vector_.begin();
+    iter += pos;
+    vector_.insert(iter, value);
+}
+
+// -------------------------------------------------------------
 std::optional<std::size_t> Sequence::find(const Value &val, std::size_t pos) const {
     auto iter = std::find(vector_.begin() + pos, vector_.end(), val);
     if (iter != vector_.end()) {

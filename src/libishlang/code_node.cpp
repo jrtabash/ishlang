@@ -1080,6 +1080,39 @@ Value ArrayReverse::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+ArrayInsert::ArrayInsert(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeNode::SharedPtr item)
+    : CodeNode()
+    , arr_(arr)
+    , pos_(pos)
+    , item_(item)
+{
+}
+
+Value ArrayInsert::exec(Environment::SharedPtr env)
+{
+    if (arr_.get() && pos_.get() && item_.get()) {
+        Value arr = arr_->eval(env);
+        Value pos = pos_->eval(env);
+        Value item = item_->eval(env);
+
+        if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
+        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
+
+        const auto rawPos = pos.integer();
+        auto & rawArr = arr.array();
+
+        if (rawPos < 0 || static_cast<std::size_t>(rawPos) > rawArr.size()) {
+            throw OutOfRange("Array insert access");
+        }
+
+        rawArr.insert(static_cast<std::size_t>(rawPos), item);
+
+        return item;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 ArrayClear::ArrayClear(CodeNode::SharedPtr arr)
     : CodeNode()
     , arr_(arr)

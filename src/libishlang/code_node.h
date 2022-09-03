@@ -815,6 +815,21 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class ArrayInsert : public CodeNode {
+    public:
+        ArrayInsert(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeNode::SharedPtr item);
+        virtual ~ArrayInsert() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr arr_;
+        CodeNode::SharedPtr pos_;
+        CodeNode::SharedPtr item_;
+    };
+
+    // -------------------------------------------------------------
     class ArrayClear : public CodeNode {
     public:
         ArrayClear(CodeNode::SharedPtr arr);

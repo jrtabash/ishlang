@@ -674,6 +674,11 @@ the check is true for every character in the string.
 (arrclr <array>)
 ```
 
+**arrins**: Insert item into array before position
+```
+(arrins <array> <pos> <item>)
+```
+
 ### Examples:
 ```
 (var a (array))
@@ -692,6 +697,8 @@ the check is true for every character in the string.
 (println (arrsort a true))
 (println (arrsort a false))
 (println (arrrev a))
+(arrins a 0 100)
+(arrins a 1 200)
 (arrclr a)
 ```
 

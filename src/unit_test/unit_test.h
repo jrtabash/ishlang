@@ -61,6 +61,7 @@ namespace Ishlang {
         void testSequenceCount();
         void testSequenceSort();
         void testSequenceReverse();
+        void testSequenceInsert();
         void testSequenceClear();
         void testSequenceValue();
         void testSequencePrint();
@@ -116,6 +117,7 @@ namespace Ishlang {
         void testCodeNodeArraySort();
         void testCodeNodeArrayReverse();
         void testCodeNodeArrayClear();
+        void testCodeNodeArrayInsert();
         void testCodeNodeStrCharCheck();
         void testCodeNodeStrCharTransform();
         void testCodeNodeImportModule();
@@ -179,6 +181,7 @@ namespace Ishlang {
         void testParserArraySort();
         void testParserArrayReverse();
         void testParserArrayClear();
+        void testParserArrayInsert();
         void testParserStrCharCheck();
         void testParserStrCharTransform();
         void testParserImportModule();
