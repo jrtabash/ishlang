@@ -830,6 +830,20 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class ArrayRemove : public CodeNode {
+    public:
+        ArrayRemove(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos);
+        virtual ~ArrayRemove() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr arr_;
+        CodeNode::SharedPtr pos_;
+    };
+
+    // -------------------------------------------------------------
     class ArrayClear : public CodeNode {
     public:
         ArrayClear(CodeNode::SharedPtr arr);

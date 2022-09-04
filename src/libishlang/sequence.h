@@ -33,6 +33,7 @@ namespace Ishlang {
         inline void clear();
 
         void insert(std::size_t pos, const Value & value);
+        void erase(std::size_t pos);
         std::optional<std::size_t> find(const Value &val, std::size_t pos = 0) const;
         std::size_t count(const Value &value) const;
         void sort(bool descending);

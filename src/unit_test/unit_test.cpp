@@ -41,6 +41,7 @@ UnitTest::UnitTest()
     ADD_TEST(testSequenceSort);
     ADD_TEST(testSequenceReverse);
     ADD_TEST(testSequenceInsert);
+    ADD_TEST(testSequenceErase);
     ADD_TEST(testSequenceClear);
     ADD_TEST(testSequenceValue);
     ADD_TEST(testSequencePrint);
@@ -94,6 +95,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArrayReverse);
     ADD_TEST(testCodeNodeArrayClear);
     ADD_TEST(testCodeNodeArrayInsert);
+    ADD_TEST(testCodeNodeArrayRemove);
     ADD_TEST(testCodeNodeStrCharCheck);
     ADD_TEST(testCodeNodeStrCharTransform);
     ADD_TEST(testCodeNodeImportModule);
@@ -162,6 +164,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArrayReverse);
     ADD_TEST(testParserArrayClear);
     ADD_TEST(testParserArrayInsert);
+    ADD_TEST(testParserArrayRemove);
     ADD_TEST(testParserStrCharCheck);
     ADD_TEST(testParserStrCharTransform);
     ADD_TEST(testParserImportModule);
@@ -1354,6 +1357,26 @@ void UnitTest::testSequenceInsert() {
     seq.insert(0, v0); TEST_CASE_MSG(seq == Sequence({v0, v1, v3, v5}), "actual=" << seq);
     seq.insert(2, v2); TEST_CASE_MSG(seq == Sequence({v0, v1, v2, v3, v5}), "actual=" << seq);
     seq.insert(4, v4); TEST_CASE_MSG(seq == Sequence({v0, v1, v2, v3, v4, v5}), "actual=" << seq);
+}
+
+// -------------------------------------------------------------
+void UnitTest::testSequenceErase() {
+    const Value v0 = Value::Zero;
+    const Value v1 = Value(1ll);
+    const Value v2 = Value(2ll);
+    const Value v3 = Value(3ll);
+    const Value v4 = Value(4ll);
+    const Value v5 = Value(5ll);
+
+    Sequence seq({v0, v1, v2, v3, v4, v5});
+
+    seq.erase(4); TEST_CASE_MSG(seq == Sequence({v0, v1, v2, v3, v5}), "actual=" << seq);
+    seq.erase(2); TEST_CASE_MSG(seq == Sequence({v0, v1, v3, v5}), "actual=" << seq);
+    seq.erase(0); TEST_CASE_MSG(seq == Sequence({v1, v3, v5}), "actual=" << seq);
+
+    seq.erase(2); TEST_CASE_MSG(seq == Sequence({v1, v3}), "actual=" << seq);
+    seq.erase(0); TEST_CASE_MSG(seq == Sequence({v3}), "actual=" << seq);
+    seq.erase(0); TEST_CASE_MSG(seq == Sequence(), "actual=" << seq);
 }
 
 // -------------------------------------------------------------
@@ -3960,6 +3983,82 @@ void UnitTest::testCodeNodeArrayInsert() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeArrayRemove() {
+    Environment::SharedPtr env(new Environment());
+
+    CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
+    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+
+    const Value v0 = Value::Zero;
+    const Value v1 = Value(1ll);
+    const Value v2 = Value(2ll);
+    const Value v3 = Value(3ll);
+    const Value v4 = Value(4ll);
+    const Value v5 = Value(5ll);
+
+    env->def("arr", Value(Sequence({v0, v1, v2, v3, v4, v5})));
+    env->def("num", Value::Zero);
+
+    auto arrval = [](std::initializer_list<Value> seq) { return Value(Sequence(seq)); };
+
+    auto mkarr =
+        [&](std::initializer_list<Value> seq) {
+            env->set("arr", arrval(seq));
+            return arr;
+        };
+
+    auto mkpos =
+        [](Value::Long pos) { return std::make_shared<Literal>(Value(pos)); };
+
+    auto testcase =
+        [this, &env](auto arr, auto pos, auto expect) {
+            auto value = std::make_shared<ArrayRemove>(arr, pos)->eval(env);
+            TEST_CASE_MSG(value == Value::Null, "value actual=" << value);
+            TEST_CASE_MSG(arr->eval(env) == expect, "arr actual=" << arr);
+        };
+
+    testcase(mkarr({v0, v1, v2, v3, v4, v5}), mkpos(4), arrval({v0, v1, v2, v3, v5}));
+    testcase(mkarr({v0, v1, v2, v3, v5}),     mkpos(2), arrval({v0, v1, v3, v5}));
+    testcase(mkarr({v0, v1, v3, v5}),         mkpos(0), arrval({v1, v3, v5}));
+    testcase(mkarr({v1, v3, v5}),             mkpos(2), arrval({v1, v3}));
+    testcase(mkarr({v1, v3}),                 mkpos(0), arrval({v3}));
+    testcase(mkarr({v3}),                     mkpos(0), arrval({}));
+
+    try {
+        testcase(mkarr({v0, v1, v2}), mkpos(3), Value::Null);
+        TEST_CASE(false);
+    }
+    catch (const OutOfRange &ex) {
+        TEST_CASE(std::string("Out of range: Array remove access") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        testcase(num, mkpos(0), Value::Null);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=Array actual=int") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        testcase(arr, std::make_shared<Literal>('a'), Value::Null);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=Integer actual=char") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeStrCharCheck() {
     Environment::SharedPtr env(new Environment());
 
@@ -5768,6 +5867,44 @@ void UnitTest::testParserArrayInsert() {
 
     TEST_CASE(parserTest(parser, env, "(arrins 3 5 5)",     Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(arrins arr 'a' 5)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserArrayRemove() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    const Value v0 = Value::Zero;
+    const Value v1 = Value(1ll);
+    const Value v2 = Value(2ll);
+    const Value v3 = Value(3ll);
+    const Value v4 = Value(4ll);
+    const Value v5 = Value(5ll);
+
+    auto arrval = [](std::initializer_list<Value> seq) { return Value(Sequence(seq)); };
+
+    env->def("arr", arrval({v0, v1, v2, v3, v4, v5}));
+
+    TEST_CASE(parserTest(parser, env, "(arrrem arr 4)", Value::Null,                  true));
+    TEST_CASE(parserTest(parser, env, "arr",            arrval({v0, v1, v2, v3, v5}), true));
+
+    TEST_CASE(parserTest(parser, env, "(arrrem arr 2)", Value::Null,              true));
+    TEST_CASE(parserTest(parser, env, "arr",            arrval({v0, v1, v3, v5}), true));
+
+    TEST_CASE(parserTest(parser, env, "(arrrem arr 0)", Value::Null,              true));
+    TEST_CASE(parserTest(parser, env, "arr",            arrval({v1, v3, v5}),     true));
+
+    TEST_CASE(parserTest(parser, env, "(arrrem arr 2)", Value::Null,      true));
+    TEST_CASE(parserTest(parser, env, "arr",            arrval({v1, v3}), true));
+
+    TEST_CASE(parserTest(parser, env, "(arrrem arr 0)", Value::Null,  true));
+    TEST_CASE(parserTest(parser, env, "arr",            arrval({v3}), true));
+
+    TEST_CASE(parserTest(parser, env, "(arrrem arr 0)", Value::Null,  true));
+    TEST_CASE(parserTest(parser, env, "arr",            arrval({}),   true));
+
+    TEST_CASE(parserTest(parser, env, "(arrrem 3 5)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrrem arr 'a')", Value::Null, false));
 }
 
 // -------------------------------------------------------------

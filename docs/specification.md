@@ -679,6 +679,11 @@ the check is true for every character in the string.
 (arrins <array> <pos> <item>)
 ```
 
+**arrrem**: Remove item from array at position
+```
+(arrrem <array> <pos>)
+```
+
 ### Examples:
 ```
 (var a (array))
