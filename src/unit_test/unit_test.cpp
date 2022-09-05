@@ -3770,8 +3770,6 @@ void UnitTest::testCodeNodeArraySort() {
     CodeNode::SharedPtr desc = std::make_shared<Literal>(true);
     CodeNode::SharedPtr none = CodeNode::SharedPtr();
 
-    auto arrval = [](std::initializer_list<Value> seq) { return Value(Sequence(seq)); };
-
     auto mkarr =
         [&](std::initializer_list<Value> seq) {
             env->set("arr", arrval(seq));
@@ -3840,8 +3838,6 @@ void UnitTest::testCodeNodeArrayReverse() {
 
     CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
     CodeNode::SharedPtr num = std::make_shared<Variable>("num");
-
-    auto arrval = [](std::initializer_list<Value> seq) { return Value(Sequence(seq)); };
 
     auto mkarr =
         [&](std::initializer_list<Value> seq) {
@@ -3931,36 +3927,27 @@ void UnitTest::testCodeNodeArrayInsert() {
     env->def("arr", Value(Sequence()));
     env->def("num", Value::Zero);
 
-    auto arrval = [](std::initializer_list<Value> seq) { return Value(Sequence(seq)); };
-
-    auto mkarr =
-        [&](std::initializer_list<Value> seq) {
-            env->set("arr", arrval(seq));
-            return arr;
-        };
-
-    auto mkpos =
-        [](Value::Long pos) { return std::make_shared<Literal>(Value(pos)); };
-
-    auto mkitem =
-        [](const Value & v) { return std::make_shared<Literal>(v); };
-
     auto testcase =
-        [this, &env](auto arr, auto pos, auto item, auto expect) {
-            auto value = std::make_shared<ArrayInsert>(arr, pos, item)->eval(env);
-            TEST_CASE_MSG(value == item->eval(env), "value actual=" << value);
-            TEST_CASE_MSG(arr->eval(env) == expect, "arr actual=" << arr);
+        [this, &env](CodeNode::SharedPtr arrCode, const Value &pos, const Value &item, const Value &expect) {
+            auto posCode = std::make_shared<Literal>(pos);
+            auto itemCode = std::make_shared<Literal>(item);
+
+            auto result = std::make_shared<ArrayInsert>(arrCode, posCode, itemCode)->eval(env);
+            TEST_CASE_MSG(result == item, "result actual=" << result);
+
+            auto arr = arrCode->eval(env);
+            TEST_CASE_MSG(arr == expect, "arr actual=" << arr);
         };
 
-    testcase(mkarr({}),                   mkpos(0), mkitem(v3), arrval({v3}));
-    testcase(mkarr({v3}),                 mkpos(0), mkitem(v1), arrval({v1, v3}));
-    testcase(mkarr({v1, v3}),             mkpos(2), mkitem(v5), arrval({v1, v3, v5}));
-    testcase(mkarr({v1, v3, v5}),         mkpos(0), mkitem(v0), arrval({v0, v1, v3, v5}));
-    testcase(mkarr({v0, v1, v3, v5}),     mkpos(2), mkitem(v2), arrval({v0, v1, v2, v3, v5}));
-    testcase(mkarr({v0, v1, v2, v3, v5}), mkpos(4), mkitem(v4), arrval({v0, v1, v2, v3, v4, v5}));
+    testcase(arr, v0, v3, arrval({v3}));
+    testcase(arr, v0, v1, arrval({v1, v3}));
+    testcase(arr, v2, v5, arrval({v1, v3, v5}));
+    testcase(arr, v0, v0, arrval({v0, v1, v3, v5}));
+    testcase(arr, v2, v2, arrval({v0, v1, v2, v3, v5}));
+    testcase(arr, v4, v4, arrval({v0, v1, v2, v3, v4, v5}));
 
     try {
-        testcase(num, mkpos(0), mkitem(v5), Value::Null);
+        testcase(num, v0, v5, Value::Null);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
@@ -3971,7 +3958,7 @@ void UnitTest::testCodeNodeArrayInsert() {
     }
 
     try {
-        testcase(arr, std::make_shared<Literal>('a'), mkitem(v5), Value::Null);
+        testcase(arr, Value('a'), v5, Value::Null);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
@@ -3999,33 +3986,25 @@ void UnitTest::testCodeNodeArrayRemove() {
     env->def("arr", Value(Sequence({v0, v1, v2, v3, v4, v5})));
     env->def("num", Value::Zero);
 
-    auto arrval = [](std::initializer_list<Value> seq) { return Value(Sequence(seq)); };
-
-    auto mkarr =
-        [&](std::initializer_list<Value> seq) {
-            env->set("arr", arrval(seq));
-            return arr;
-        };
-
-    auto mkpos =
-        [](Value::Long pos) { return std::make_shared<Literal>(Value(pos)); };
-
     auto testcase =
-        [this, &env](auto arr, auto pos, auto expect) {
-            auto value = std::make_shared<ArrayRemove>(arr, pos)->eval(env);
-            TEST_CASE_MSG(value == Value::Null, "value actual=" << value);
-            TEST_CASE_MSG(arr->eval(env) == expect, "arr actual=" << arr);
+        [this, &env](CodeNode::SharedPtr arrCode, const Value &pos, const Value &expect) {
+            auto posCode = std::make_shared<Literal>(pos);
+            auto result = std::make_shared<ArrayRemove>(arrCode, posCode)->eval(env);
+            TEST_CASE_MSG(result.isNull(), "value actual=" << result);
+
+            auto arr = arrCode->eval(env);
+            TEST_CASE_MSG(arr == expect, "arr actual=" << arr);
         };
 
-    testcase(mkarr({v0, v1, v2, v3, v4, v5}), mkpos(4), arrval({v0, v1, v2, v3, v5}));
-    testcase(mkarr({v0, v1, v2, v3, v5}),     mkpos(2), arrval({v0, v1, v3, v5}));
-    testcase(mkarr({v0, v1, v3, v5}),         mkpos(0), arrval({v1, v3, v5}));
-    testcase(mkarr({v1, v3, v5}),             mkpos(2), arrval({v1, v3}));
-    testcase(mkarr({v1, v3}),                 mkpos(0), arrval({v3}));
-    testcase(mkarr({v3}),                     mkpos(0), arrval({}));
+    testcase(arr, v4, arrval({v0, v1, v2, v3, v5}));
+    testcase(arr, v2, arrval({v0, v1, v3, v5}));
+    testcase(arr, v0, arrval({v1, v3, v5}));
+    testcase(arr, v2, arrval({v1, v3}));
+    testcase(arr, v0, arrval({v3}));
+    testcase(arr, v0, arrval({}));
 
     try {
-        testcase(mkarr({v0, v1, v2}), mkpos(3), Value::Null);
+        testcase(arr, v3, Value::Null);
         TEST_CASE(false);
     }
     catch (const OutOfRange &ex) {
@@ -4036,7 +4015,7 @@ void UnitTest::testCodeNodeArrayRemove() {
     }
 
     try {
-        testcase(num, mkpos(0), Value::Null);
+        testcase(num, v0, Value::Null);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
@@ -4047,7 +4026,7 @@ void UnitTest::testCodeNodeArrayRemove() {
     }
 
     try {
-        testcase(arr, std::make_shared<Literal>('a'), Value::Null);
+        testcase(arr, Value('a'), Value::Null);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
@@ -5845,8 +5824,6 @@ void UnitTest::testParserArrayInsert() {
     const Value v4 = Value(4ll);
     const Value v5 = Value(5ll);
 
-    auto arrval = [](std::initializer_list<Value> seq) { return Value(Sequence(seq)); };
-
     TEST_CASE(parserTest(parser, env, "(arrins arr 0 3)", v3,           true));
     TEST_CASE(parserTest(parser, env, "arr",              arrval({v3}), true));
 
@@ -5880,8 +5857,6 @@ void UnitTest::testParserArrayRemove() {
     const Value v3 = Value(3ll);
     const Value v4 = Value(4ll);
     const Value v5 = Value(5ll);
-
-    auto arrval = [](std::initializer_list<Value> seq) { return Value(Sequence(seq)); };
 
     env->def("arr", arrval({v0, v1, v2, v3, v4, v5}));
 
