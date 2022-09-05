@@ -41,7 +41,8 @@ namespace Ishlang {
         Util::TemporaryFile createTempModuleFile(const std::string &name, const std::string &code = "");
 
     private:
-        inline Value arrval(std::initializer_list<Value> seq) { return Value(Sequence(seq));}
+        inline Value arrval(const auto &... vs) { return Value(Sequence({vs...})); }
+        inline Value arrval() { return Value(Sequence()); }
 
     private:
         void testToken();
