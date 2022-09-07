@@ -28,6 +28,23 @@ void Interpreter::ParserCB::operator()(CodeNode::SharedPtr &code) {
 }
 
 // -------------------------------------------------------------
+//                       BatchScope
+// -------------------------------------------------------------
+
+// -------------------------------------------------------------
+Interpreter::BatchScope::BatchScope(bool &batch, bool newValue)
+    : batch_(batch)
+    , oldValue_(batch)
+{
+    batch_ = newValue;
+}
+
+// -------------------------------------------------------------
+Interpreter::BatchScope::~BatchScope() {
+    batch_ = oldValue_;
+}
+
+// -------------------------------------------------------------
 //                       INTERPRETER
 // -------------------------------------------------------------
 
@@ -76,19 +93,9 @@ bool Interpreter::readEvalPrintLoop() {
 }
 
 // -------------------------------------------------------------
-bool Interpreter::loadFile(const std::string &filename) {
-    try {
-        parser_.readFile(filename, parserCB_);
-    }
-    catch (const Exception &ex) {
-        ex.printError();
-        return false;
-    }
-    catch (const std::exception &ex) {
-        std::cerr << "System error: " << ex.what() << std::endl;
-        return false;
-    }
-    return true;
+void Interpreter::loadFile(const std::string &filename) {
+    auto _ = BatchScope(batch_, true);
+    parser_.readFile(filename, parserCB_);
 }
 
 // -------------------------------------------------------------
@@ -150,7 +157,7 @@ void Interpreter::handleREPLCommand(const std::string &expr) {
         else if (size > 2) {
             throw InvalidCommand(cmd, "too many arguments");
         }
-        parser_.readFile(cmdTokens.front(), parserCB_);
+        loadFile(cmdTokens.front());
     }
     else if (cmd == ":batch") {
         if (size == 1) {

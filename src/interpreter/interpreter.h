@@ -14,7 +14,7 @@ namespace Ishlang {
         const Interpreter &operator=(const Interpreter &) = delete;
 
         bool readEvalPrintLoop();
-        bool loadFile(const std::string &filename);
+        void loadFile(const std::string &filename);
         bool evalExpr(const std::string &expression);
 
         void setArguments(char ** argv, int begin, int end);
@@ -35,6 +35,19 @@ namespace Ishlang {
             Environment::SharedPtr  env;
             std::string            &lastResult;
             const bool             &batch;
+        };
+
+    private:
+        struct BatchScope {
+            BatchScope(bool &batch, bool newValue);
+            ~BatchScope();
+
+            BatchScope(const BatchScope &) = delete;
+            BatchScope & operator=(const BatchScope &) = delete;
+
+        private:
+            bool &batch_;
+            bool oldValue_;
         };
 
     private:
