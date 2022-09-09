@@ -814,10 +814,10 @@ void Parser::initAppFtns() {
           }
         },
 
-        { "arradd",
+        { "arrpush",
           [this]() {
-                auto exprs(readAndCheckExprList("arradd", 2));
-                return std::make_shared<ArrayAdd>(exprs[0], exprs[1]);
+                auto exprs(readAndCheckExprList("arrpush", 2));
+                return std::make_shared<ArrayPush>(exprs[0], exprs[1]);
           }
         },
 

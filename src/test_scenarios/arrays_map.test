@@ -2,7 +2,7 @@ __CODE__
 (defun map_array (ftn arr)
   (var ret (array))
   (loop (var i 0) (< i (arrlen arr)) (= i (+ i 1))
-    (arradd ret (ftn (arrget arr i)))))
+    (arrpush ret (ftn (arrget arr i)))))
 
 (defun triple (x) (* 3 x))
 

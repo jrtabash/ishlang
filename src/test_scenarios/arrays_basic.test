@@ -18,8 +18,8 @@ __CODE__
 (arrset a 4 10)
 (println a)
 
-(println (arradd a 12))
-(println (arradd a 14))
+(println (arrpush a 12))
+(println (arrpush a 14))
 (println a)
 
 (println (arrclr a))

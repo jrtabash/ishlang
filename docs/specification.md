@@ -644,9 +644,9 @@ the check is true for every character in the string.
 (arrset <array> <position> <value>)
 ```
 
-**arradd**: Add element to end of array
+**arrpush**: Push element to end of array
 ```
-(arradd <array> <value>)
+(arrpush <array> <value>)
 ```
 
 **arrfind**: Find position of value in array
@@ -687,8 +687,8 @@ the check is true for every character in the string.
 ### Examples:
 ```
 (var a (array))
-(arradd a 1)
-(arradd a 2)
+(arrpush a 1)
+(arrpush a 2)
 (println (arrlen a))
 (println (arrget a 0))
 (arrset a 1 20)

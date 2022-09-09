@@ -122,7 +122,7 @@ bool Interpreter::evalExpr(const std::string &expression) {
 void Interpreter::setArguments(char ** argv, int begin, int end) {
     Sequence arguments;
     for (int i = begin; i < end; ++i) {
-        arguments.add(Value(argv[i]));
+        arguments.push(Value(argv[i]));
     }
     env_->def("argv", Value(arguments));
 }

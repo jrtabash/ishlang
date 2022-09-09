@@ -4,7 +4,7 @@
 (defun matrix (n m)
   (var mat (makeinstance Matrix (data (array))))
   (loop (var r 0) (< r n) (= r (+ r 1))
-        (arradd (memget mat data) (arraysv m 0)))
+        (arrpush (memget mat data) (arraysv m 0)))
   mat)
 
 (defun matrix_n (mat)

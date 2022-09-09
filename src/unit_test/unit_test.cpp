@@ -88,7 +88,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArrayLen);
     ADD_TEST(testCodeNodeArrayGet);
     ADD_TEST(testCodeNodeArraySet);
-    ADD_TEST(testCodeNodeArrayAdd);
+    ADD_TEST(testCodeNodeArrayPush);
     ADD_TEST(testCodeNodeArrayFind);
     ADD_TEST(testCodeNodeArrayCount);
     ADD_TEST(testCodeNodeArraySort);
@@ -157,7 +157,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArrayLen);
     ADD_TEST(testParserArrayGet);
     ADD_TEST(testParserArraySet);
-    ADD_TEST(testParserArrayAdd);
+    ADD_TEST(testParserArrayPush);
     ADD_TEST(testParserArrayFind);
     ADD_TEST(testParserArrayCount);
     ADD_TEST(testParserArraySort);
@@ -1242,7 +1242,7 @@ void UnitTest::testSequence() {
 
     TEST_CASE_MSG(seq.size() == 0lu, "actual=" << seq.size());
 
-    seq.add(Value(1ll));
+    seq.push(Value(1ll));
     TEST_CASE_MSG(seq.size() == 1lu, "actual=" << seq.size());
     TEST_CASE_MSG(seq.get(0lu) == Value(1ll), "actual=" << seq.get(0lu));
 
@@ -1250,7 +1250,7 @@ void UnitTest::testSequence() {
     TEST_CASE_MSG(seq.size() == 1lu, "actual=" << seq.size());
     TEST_CASE_MSG(seq.get(0lu) == Value(2ll), "actual=" << seq.get(0lu));
 
-    seq.add(Value(3ll));
+    seq.push(Value(3ll));
     TEST_CASE_MSG(seq.size() == 2lu, "actual=" << seq.size());
     TEST_CASE_MSG(seq.get(0lu) == Value(2ll), "actual=" << seq.get(0lu));
     TEST_CASE_MSG(seq.get(1lu) == Value(3ll), "actual=" << seq.get(1lu));
@@ -1399,8 +1399,8 @@ void UnitTest::testSequenceClear() {
 // -------------------------------------------------------------
 void UnitTest::testSequenceValue() {
     Sequence seq;
-    seq.add(1ll);
-    seq.add(2ll);
+    seq.push(1ll);
+    seq.push(2ll);
 
     try {
         Value sValue(seq);
@@ -3639,7 +3639,7 @@ void UnitTest::testCodeNodeArraySet() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testCodeNodeArrayAdd() {
+void UnitTest::testCodeNodeArrayPush() {
     Environment::SharedPtr env(new Environment());
     env->def("arr", Value(Sequence()));
 
@@ -3648,15 +3648,15 @@ void UnitTest::testCodeNodeArrayAdd() {
     auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
     auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
 
-    Value value = std::make_shared<ArrayAdd>(var, ilit(10))->eval(env);
+    Value value = std::make_shared<ArrayPush>(var, ilit(10))->eval(env);
     Value expected = Value(Sequence({Value(10ll)}));
     TEST_CASE_MSG(value == expected, "actual=" << value);
 
-    value = std::make_shared<ArrayAdd>(var, clit('b'))->eval(env);
+    value = std::make_shared<ArrayPush>(var, clit('b'))->eval(env);
     expected = Value(Sequence({Value(10ll), Value('b')}));
     TEST_CASE_MSG(value == expected, "actual=" << value);
 
-    value = std::make_shared<ArrayAdd>(var, ilit(25ll))->eval(env);
+    value = std::make_shared<ArrayPush>(var, ilit(25ll))->eval(env);
     expected = Value(Sequence({Value(10ll), Value('b'), Value(25ll)}));
     TEST_CASE_MSG(value == expected, "actual=" << value);
 }
@@ -5672,20 +5672,20 @@ void UnitTest::testParserArraySet() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testParserArrayAdd() {
+void UnitTest::testParserArrayPush() {
     Environment::SharedPtr env(new Environment());
     Parser parser;
 
     env->def("arr", Value(Sequence()));
 
     Value expected = Value(Sequence({Value(1ll)}));
-    TEST_CASE(parserTest(parser, env, "(arradd arr 1)", expected, true));
+    TEST_CASE(parserTest(parser, env, "(arrpush arr 1)", expected, true));
 
     expected = Value(Sequence({Value(1ll), Value(2ll)}));
-    TEST_CASE(parserTest(parser, env, "(arradd arr 2)", expected, true));
+    TEST_CASE(parserTest(parser, env, "(arrpush arr 2)", expected, true));
 
-    TEST_CASE(parserTest(parser, env, "(arradd)",      Value::Null, false));
-    TEST_CASE(parserTest(parser, env, "(arradd arr)",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrpush)",      Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrpush arr)",  Value::Null, false));
 }
 
 // -------------------------------------------------------------

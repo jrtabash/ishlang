@@ -35,7 +35,7 @@
   (defun add_token ()
     (when (> (strlen token) 0)
       (progn
-        (arradd tokens token)
+        (arrpush tokens token)
         (= token ""))))
 
   (loop (var i 0) (< i size) (= i (+ i 1))

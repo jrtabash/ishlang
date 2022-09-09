@@ -744,10 +744,10 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
-    class ArrayAdd : public CodeNode {
+    class ArrayPush : public CodeNode {
     public:
-        ArrayAdd(CodeNode::SharedPtr arr, CodeNode::SharedPtr val);
-        virtual ~ArrayAdd() {}
+        ArrayPush(CodeNode::SharedPtr arr, CodeNode::SharedPtr val);
+        virtual ~ArrayPush() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) override;

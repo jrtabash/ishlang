@@ -1,5 +1,8 @@
 ## TODO
 
+### Array update
+- Add arrpop operation (pop element from end of array)
+
 ### Add support for file IO
 - Add file type
 - File functions
@@ -30,7 +33,8 @@
   - **lispopb**: list pop back
   - **lisget**: list get item at index
   - **lisset**: list set item at index
-  - **lisadd**: list append
+  - **lispush**: list push
+  - **lispop**: list pop
   - **lisins**: list insert at index
   - **lisrem**: list remove index
   - **lisclr**: list clear

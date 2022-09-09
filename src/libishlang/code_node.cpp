@@ -956,20 +956,20 @@ Value ArraySet::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-ArrayAdd::ArrayAdd(CodeNode::SharedPtr arr, CodeNode::SharedPtr val)
+ArrayPush::ArrayPush(CodeNode::SharedPtr arr, CodeNode::SharedPtr val)
     : CodeNode()
     , arr_(arr)
     , val_(val)
 {}
 
-Value ArrayAdd::exec(Environment::SharedPtr env) {
+Value ArrayPush::exec(Environment::SharedPtr env) {
     if (arr_.get() && val_.get()) {
         Value arr = arr_->eval(env);
         Value val = val_->eval(env);
 
         if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
 
-        arr.array().add(val);
+        arr.array().push(val);
         return arr;
     }
     return Value::Null;
