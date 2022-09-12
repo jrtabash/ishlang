@@ -758,6 +758,19 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class ArrayPop : public CodeNode {
+    public:
+        ArrayPop(CodeNode::SharedPtr arr);
+        virtual ~ArrayPop() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr arr_;
+    };
+
+    // -------------------------------------------------------------
     class ArrayFind : public CodeNode {
     public:
         ArrayFind(CodeNode::SharedPtr arr, CodeNode::SharedPtr val);

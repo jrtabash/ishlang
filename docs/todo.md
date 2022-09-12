@@ -1,8 +1,5 @@
 ## TODO
 
-### Array update
-- Add arrpop operation (pop element from end of array)
-
 ### Add support for file IO
 - Add file type
 - File functions

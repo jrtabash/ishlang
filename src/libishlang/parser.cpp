@@ -821,6 +821,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "arrpop",
+          [this]() {
+              auto exprs(readAndCheckExprList("arrpop", 1));
+              return std::make_shared<ArrayPop>(exprs[0]);
+          }
+        },
+
         { "arrfind",
           [this]() {
                 auto exprs(readExprList());

@@ -89,6 +89,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeArrayGet);
     ADD_TEST(testCodeNodeArraySet);
     ADD_TEST(testCodeNodeArrayPush);
+    ADD_TEST(testCodeNodeArrayPop);
     ADD_TEST(testCodeNodeArrayFind);
     ADD_TEST(testCodeNodeArrayCount);
     ADD_TEST(testCodeNodeArraySort);
@@ -158,6 +159,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserArrayGet);
     ADD_TEST(testParserArraySet);
     ADD_TEST(testParserArrayPush);
+    ADD_TEST(testParserArrayPop);
     ADD_TEST(testParserArrayFind);
     ADD_TEST(testParserArrayCount);
     ADD_TEST(testParserArraySort);
@@ -1254,6 +1256,13 @@ void UnitTest::testSequence() {
     TEST_CASE_MSG(seq.size() == 2lu, "actual=" << seq.size());
     TEST_CASE_MSG(seq.get(0lu) == Value(2ll), "actual=" << seq.get(0lu));
     TEST_CASE_MSG(seq.get(1lu) == Value(3ll), "actual=" << seq.get(1lu));
+
+    seq.pop();
+    TEST_CASE_MSG(seq.size() == 1lu, "actual=" << seq.size());
+    TEST_CASE_MSG(seq.get(0lu) == Value(2ll), "actual=" << seq.get(0lu));
+
+    seq.pop();
+    TEST_CASE_MSG(seq.size() == 0lu, "actual=" << seq.size());
 
     Sequence seq2(std::vector({Value('a'), Value('b'), Value('c')}));
     TEST_CASE_MSG(seq2.size() == 3lu, "actual=" << seq2.size());
@@ -3662,6 +3671,35 @@ void UnitTest::testCodeNodeArrayPush() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeArrayPop() {
+    Environment::SharedPtr env(new Environment());
+    env->def("arr", arrval(Value(0ll), Value(1ll)));
+
+    CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
+
+    Value value = std::make_shared<ArrayPop>(var)->eval(env);
+    Value arrValue = var->eval(env);
+    TEST_CASE_MSG(value == Value(1ll), "actual" << value);
+    TEST_CASE_MSG(arrValue == arrval(Value(0ll)), "actual" << arrValue);
+
+    value = std::make_shared<ArrayPop>(var)->eval(env);
+    arrValue = var->eval(env);
+    TEST_CASE_MSG(value == Value(0ll), "actual" << value);
+    TEST_CASE_MSG(arrValue == arrval(), "actual" << arrValue);
+
+    try {
+        value = std::make_shared<ArrayPop>(var)->eval(env);
+        TEST_CASE(false);
+    }
+    catch (OutOfRange const & ex) {
+        TEST_CASE_MSG(std::string(ex.what()) == "Out of range: Pop empty array", "actual=" << ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayFind() {
     Environment::SharedPtr env(new Environment());
 
@@ -5686,6 +5724,22 @@ void UnitTest::testParserArrayPush() {
 
     TEST_CASE(parserTest(parser, env, "(arrpush)",      Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(arrpush arr)",  Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserArrayPop() {
+    Environment::SharedPtr env(new Environment());
+    Parser parser;
+
+    env->def("arr", arrval(Value(0ll), Value(1ll)));
+
+    TEST_CASE(parserTest(parser, env, "(arrpop arr)", Value(1ll),         true));
+    TEST_CASE(parserTest(parser, env, "arr",          arrval(Value(0ll)), true));
+    TEST_CASE(parserTest(parser, env, "(arrpop arr)", Value(0ll),         true));
+    TEST_CASE(parserTest(parser, env, "arr",          arrval(),           true));
+
+    TEST_CASE(parserTest(parser, env, "(arrpop arr)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arrpop)",     Value::Null, false));
 }
 
 // -------------------------------------------------------------

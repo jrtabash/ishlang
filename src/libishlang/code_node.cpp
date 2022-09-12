@@ -976,6 +976,30 @@ Value ArrayPush::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+ArrayPop::ArrayPop(CodeNode::SharedPtr arr)
+    : CodeNode()
+    , arr_(arr)
+{}
+
+Value ArrayPop::exec(Environment::SharedPtr env) {
+    if (arr_.get()) {
+        Value arr = arr_->eval(env);
+
+        if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
+
+        auto &rawArray = arr.array();
+        auto const rawSize = rawArray.size();
+
+        if (rawSize == 0) { throw OutOfRange("Pop empty array"); }
+
+        Value back = rawArray.get(rawSize - 1);
+        rawArray.pop();
+        return back;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 ArrayFind::ArrayFind(CodeNode::SharedPtr arr, CodeNode::SharedPtr chr)
     : CodeNode()
     , arr_(arr)

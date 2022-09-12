@@ -117,6 +117,7 @@ namespace Ishlang {
         void testCodeNodeArrayGet();
         void testCodeNodeArraySet();
         void testCodeNodeArrayPush();
+        void testCodeNodeArrayPop();
         void testCodeNodeArrayFind();
         void testCodeNodeArrayCount();
         void testCodeNodeArraySort();
@@ -182,6 +183,7 @@ namespace Ishlang {
         void testParserArrayGet();
         void testParserArraySet();
         void testParserArrayPush();
+        void testParserArrayPop();
         void testParserArrayFind();
         void testParserArrayCount();
         void testParserArraySort();

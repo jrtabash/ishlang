@@ -22,6 +22,11 @@ __CODE__
 (println (arrpush a 14))
 (println a)
 
+(println (arrpop a))
+(println a)
+(println (arrpop a))
+(println a)
+
 (println (arrclr a))
 (println a)
 
@@ -38,5 +43,9 @@ __EXPECT__
 [2 4 6 8 10 12]
 [2 4 6 8 10 12 14]
 [2 4 6 8 10 12 14]
+14
+[2 4 6 8 10 12]
+12
+[2 4 6 8 10]
 null
 []

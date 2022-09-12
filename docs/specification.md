@@ -649,6 +649,11 @@ the check is true for every character in the string.
 (arrpush <array> <value>)
 ```
 
+**arrpop**: Pop element from end of array
+```
+(arrpop <array>)
+```
+
 **arrfind**: Find position of value in array
 ```
 (arrfind <array> <value> [<position>])

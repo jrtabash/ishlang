@@ -30,6 +30,7 @@ namespace Ishlang {
         inline const Value &get(std::size_t idx) const;
         inline void set(std::size_t idx, const Value &value);
         inline void push(const Value &value);
+        inline void pop();
         inline void clear();
 
         void insert(std::size_t pos, const Value & value);
@@ -98,6 +99,12 @@ namespace Ishlang {
 
     inline void Sequence::push(const Value &value) {
         vector_.push_back(value);
+    }
+
+    inline void Sequence::pop() {
+        if (!vector_.empty()) {
+            vector_.pop_back();
+        }
     }
 
     inline void Sequence::clear() {
