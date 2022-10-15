@@ -178,7 +178,7 @@ namespace Ishlang {
 
     inline Value::Value(Long i)
         : type_(eInteger)
-        ,   value_(i)
+        , value_(i)
     {}
 
     inline Value::Value(Double r)
