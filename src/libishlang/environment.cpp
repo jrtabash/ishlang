@@ -38,9 +38,3 @@ const Value &Environment::get(const std::string &name) const {
     }
     return iter->second;
 }
-
-void Environment::foreach(ForeachFtn ftn) const {
-    for (const auto & nameValue : table_) {
-        ftn(nameValue.first, nameValue.second);
-    }
-}

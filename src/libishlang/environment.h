@@ -1,7 +1,7 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 
-#include <functional>
+#include <concepts>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -10,12 +10,14 @@
 #include "value.h"
 
 namespace Ishlang {
-    
+
+    template <typename Function>
+    concept EnvForeachInvocable = std::invocable<Function, const std::string &, const Value &>;
+
     class Environment {
     public:
         using SharedPtr = std::shared_ptr<Environment>;
-        using ForeachFtn = std::function<void (const std::string &, const Value &)>;
-        
+
     public:
         Environment(SharedPtr parent=SharedPtr());
         
@@ -27,7 +29,7 @@ namespace Ishlang {
         inline bool empty() const noexcept;
         inline std::size_t size() const noexcept;
 
-        void foreach(ForeachFtn ftn) const;
+        inline void foreach(EnvForeachInvocable auto && ftn) const;
         
     private:
         using Table = std::unordered_map<std::string, Value>;
@@ -49,6 +51,12 @@ namespace Ishlang {
 
     inline std::size_t Environment::size() const noexcept {
         return table_.size();
+    }
+
+    inline void Environment::foreach(EnvForeachInvocable auto && ftn) const {
+        for (const auto & nameValue : table_) {
+            ftn(nameValue.first, nameValue.second);
+        }
     }
 
 }
