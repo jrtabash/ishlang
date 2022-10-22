@@ -6,9 +6,20 @@
 #include <optional>
 #include <ostream>
 #include <string>
+#include <ranges>
 #include <vector>
 
 namespace fs = std::filesystem;
+
+template <typename C>
+concept Container = requires (C c) {
+    std::ranges::range<C>;
+    c.size();
+    c.empty();
+};
+
+template <typename P, typename C>
+concept ItemPrinter = std::invocable<P, std::ostream &, const std::ranges::range_value_t<C> &>;
 
 namespace Ishlang {
 
@@ -35,10 +46,9 @@ namespace Ishlang {
         static bool setBoolFromString(bool &out, const std::string &str);
 
     public:
-        template <typename Container, typename ItemPrinter>
         static inline std::ostream &printContainer(std::ostream &out,
-                                                   const Container &container,
-                                                   const ItemPrinter &itemPrinter,
+                                                   Container auto const &container,
+                                                   ItemPrinter<decltype(container)> auto const &itemPrinter,
                                                    char leftWrapper,
                                                    char rightWrapper,
                                                    std::size_t maxItems = 10);
@@ -68,10 +78,9 @@ namespace Ishlang {
     // --------------------------------------------------------------------------------
     // INLINE
 
-    template <typename Container, typename ItemPrinter>
     inline std::ostream &Util::printContainer(std::ostream &out,
-                                              const Container &container,
-                                              const ItemPrinter &itemPrinter,
+                                              Container auto const &container,
+                                              ItemPrinter<decltype(container)> auto const &itemPrinter,
                                               char leftWrapper,
                                               char rightWrapper,
                                               std::size_t maxItems) {
