@@ -354,12 +354,9 @@ Value LambdaApp::exec(Environment::SharedPtr env) {
         throw InvalidExpressionType("Closure", closureVar_.typeToString());
     }
 
-    Environment::SharedPtr appEnv(std::make_shared<Environment>(env));
-    Lambda::ArgList args;
-    for (SharedPtrList::iterator iter = argExprs_.begin(); iter != argExprs_.end(); ++iter) {
-        args.push_back((*iter)->eval(appEnv));
-    }
-    
+    Lambda::ArgList args(argExprs_.size());
+    std::transform(argExprs_.begin(), argExprs_.end(), args.begin(), [&env](auto const & arg) { return arg->eval(env); });
+
     return closureVar_.closure().exec(args);
 }
 
