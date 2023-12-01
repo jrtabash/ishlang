@@ -15,7 +15,7 @@ Parser Module::parser_ = Parser();
 Module::Module(const std::string &name, const std::string &sourceFile)
     : name_(name)
     , sourceFile_(sourceFile)
-    , env_(std::make_shared<Environment>())
+    , env_(Environment::make())
 {
 }
 

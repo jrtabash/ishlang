@@ -225,7 +225,7 @@ Block::Block(CodeNode::SharedPtrList exprs)
 {}
 
 Value Block::exec(Environment::SharedPtr env) {
-    Environment::SharedPtr blockEnv(std::make_shared<Environment>(env));
+    auto blockEnv = Environment::make(env);
     return ProgN::exec(blockEnv);
 }
 
@@ -246,7 +246,7 @@ If::If(CodeNode::SharedPtr pred, CodeNode::SharedPtr tCode, CodeNode::SharedPtr 
 
 Value If::exec(Environment::SharedPtr env) {
     if (pred_) {
-        Environment::SharedPtr ifEnv(std::make_shared<Environment>(env));
+        auto ifEnv = Environment::make(env);
 
         const Value pVal = pred_->eval(ifEnv);
         if (!pVal.isBool()) { throw InvalidExpressionType("Boolean", pVal.typeToString()); }
@@ -302,7 +302,7 @@ Loop::Loop(CodeNode::SharedPtr cond, CodeNode::SharedPtr body)
 
 Value Loop::exec(Environment::SharedPtr env) {
     if (cond_ && body_) {
-        Environment::SharedPtr loopEnv(std::make_shared<Environment>(env));
+        auto loopEnv = Environment::make(env);
         
         Value result;
         Value condVal;

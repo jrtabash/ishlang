@@ -20,7 +20,7 @@ namespace Ishlang {
 
     public:
         Environment(SharedPtr parent=SharedPtr());
-        
+
         const Value &def(const std::string &name, const Value &value);
         const Value &set(const std::string &name, const Value &value);
         const Value &get(const std::string &name) const;
@@ -30,10 +30,13 @@ namespace Ishlang {
         inline std::size_t size() const noexcept;
 
         inline void foreach(EnvForeachInvocable auto && ftn) const;
-        
+
+    public:
+        static inline SharedPtr make(SharedPtr parent=SharedPtr());
+
     private:
         using Table = std::unordered_map<std::string, Value>;
-        
+
         SharedPtr parent_;
         Table     table_;
     };
@@ -57,6 +60,10 @@ namespace Ishlang {
         for (const auto & nameValue : table_) {
             ftn(nameValue.first, nameValue.second);
         }
+    }
+
+    inline auto Environment::make(SharedPtr parent) -> SharedPtr {
+        return std::make_shared<Environment>(parent);
     }
 
 }

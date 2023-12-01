@@ -51,7 +51,7 @@ Interpreter::BatchScope::~BatchScope() {
 // -------------------------------------------------------------
 Interpreter::Interpreter(bool batch, const std::string &path)
     : parser_()
-    , env_(std::make_shared<Environment>())
+    , env_(Environment::make())
     , prompt_(">>")
     , contPrompt_("..")
     , lastResult_("*")

@@ -16,7 +16,7 @@ Value Lambda::exec(const ArgList &args) const {
             throw InvalidArgsSize(params_.size(), args.size());
         }
 
-        Environment::SharedPtr lambdaEnv(std::make_shared<Environment>(env_));
+        auto lambdaEnv = Environment::make(env_);
 
         ParamList::const_iterator pIter = params_.begin();
         ArgList::const_iterator aIter = args.begin();

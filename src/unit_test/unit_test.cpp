@@ -969,7 +969,7 @@ void UnitTest::testValuePair() {
 
 // -------------------------------------------------------------
 void UnitTest::testEnvironment() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     TEST_CASE(env->empty());
     TEST_CASE(env->size() == 0);
 
@@ -994,7 +994,7 @@ void UnitTest::testEnvironment() {
     catch (...) { TEST_CASE(false); }
 
     try {
-        Environment::SharedPtr childEnv(new Environment(env));
+        auto childEnv = Environment::make(env);
         childEnv->def("x", Value::True);
     }
     catch (const DuplicateDef &ex) { TEST_CASE(false); }
@@ -1033,7 +1033,7 @@ void UnitTest::testEnvironment() {
     catch (const UnknownSymbol &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
     
-    Environment::SharedPtr child(new Environment(env));
+    auto child = Environment::make(env);
     
     try {
         child->get("nothing");
@@ -1091,7 +1091,7 @@ void UnitTest::testEnvironment() {
 
 // -------------------------------------------------------------
 void UnitTest::testEnvironmentForeach() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("one", Value(1ll));
     env->def("two", Value(2ll));
     env->def("three", Value(3ll));
@@ -1121,7 +1121,7 @@ void UnitTest::testEnvironmentForeach() {
 
 // -------------------------------------------------------------
 void UnitTest::testLambda() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("x", Value::Zero);
 
     const Lambda::ParamList params({"x", "y"});    
@@ -1631,7 +1631,7 @@ void UnitTest::testModule() {
     const std::string moduleCode = defaultModuleCode();
 
     { // Test import and alias
-        Environment::SharedPtr testEnv(new Environment());
+        auto testEnv = Environment::make();
         Module::SharedPtr module(new Module("test", ""));
 
         TEST_CASE_MSG(module->name() == "test", "name actual=" << module->name());
@@ -1670,7 +1670,7 @@ void UnitTest::testModule() {
     }
 
     { // Test alias list
-        Environment::SharedPtr testEnv(new Environment());
+        auto testEnv = Environment::make();
         Module::SharedPtr module(new Module("test", ""));
 
         Value value = module->loadFromString(moduleCode);
@@ -1684,7 +1684,7 @@ void UnitTest::testModule() {
     }
 
     { // Test import and alias with as name
-        Environment::SharedPtr testEnv(new Environment());
+        auto testEnv = Environment::make();
         Module::SharedPtr module(new Module("test", ""));
 
         Value value = module->loadFromString(moduleCode);
@@ -1778,7 +1778,7 @@ void UnitTest::testModuleStorage() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeBasic() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     CodeNode::SharedPtr literal(new Literal(Value('c')));
     Value result = literal->eval(env);
@@ -1815,7 +1815,7 @@ void UnitTest::testCodeNodeBasic() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeClone() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     CodeNode::SharedPtr definition(new Define("var", CodeNode::SharedPtr(new Literal(Value("foobar")))));
     Value result1 = definition->eval(env);
@@ -1834,7 +1834,7 @@ void UnitTest::testCodeNodeClone() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeIsType() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     Value lambdaValue(
         Lambda(CodeNode::ParamList(), 
@@ -1889,7 +1889,7 @@ void UnitTest::testCodeNodeIsType() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeTypeName() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     Value lambdaValue(
         Lambda(CodeNode::ParamList(),
@@ -1927,7 +1927,7 @@ void UnitTest::testCodeNodeTypeName() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeAsType() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Value int1(1ll);
     const Value int98(98ll);
@@ -1976,7 +1976,7 @@ void UnitTest::testCodeNodeAsType() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArithOp() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     
     CodeNode::SharedPtr iLit1(new Literal(Value(1ll)));
     CodeNode::SharedPtr iLit2(new Literal(Value(2ll)));
@@ -2123,7 +2123,7 @@ void UnitTest::testCodeNodeArithOp() {
     TEST_CASE_MSG(result.isBool(), "actual=" << result.typeToString()); \
     TEST_CASE_MSG(result.boolean() == RVALUE, "actual=" << result);
 void UnitTest::testCodeNodeCompOp() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     
     CodeNode::SharedPtr iLit0(new Literal(Value(0ll)));
     CodeNode::SharedPtr iLit1(new Literal(Value(1ll)));
@@ -2250,7 +2250,7 @@ void UnitTest::testCodeNodeCompOp() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeLogicOp() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     
     struct Case {
         LogicOp::Type type;
@@ -2306,7 +2306,7 @@ void UnitTest::testCodeNodeLogicOp() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeNot() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     Value value =
         std::make_shared<Not>(std::make_shared<Literal>(Value::True))
@@ -2334,7 +2334,7 @@ void UnitTest::testCodeNodeNot() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeNegativeOf() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     auto iVal = std::make_shared<Literal>(Value(5ll));
     auto fVal = std::make_shared<Literal>(Value(3.5));
@@ -2359,7 +2359,7 @@ void UnitTest::testCodeNodeNegativeOf() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeSequence() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     
     env->def("x", Value(1ll));
     env->def("y", Value(2ll));
@@ -2408,7 +2408,7 @@ void UnitTest::testCodeNodeSequence() {
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeCond() {
     { // If
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
 
         {
             CodeNode::SharedPtr bLitT(new Literal(Value::True));
@@ -2462,7 +2462,7 @@ void UnitTest::testCodeNodeCond() {
     }
     
     { // Cond
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
         
         {
             CodeNode::SharedPtrPairs cases;
@@ -2554,7 +2554,7 @@ void UnitTest::testCodeNodeCond() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeLoop() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     { // For
         env->def("sum", Value(0ll));
@@ -2640,7 +2640,7 @@ void UnitTest::testCodeNodeLoop() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeLambdaExpr() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("foo", Value(1ll));
 
     const Lambda::ParamList params({"x", "y"});
@@ -2669,7 +2669,7 @@ void UnitTest::testCodeNodeLambdaExpr() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeLambdaApp() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Lambda::ParamList params({"x", "y"});
 
@@ -2692,7 +2692,7 @@ void UnitTest::testCodeNodeLambdaApp() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeFunctionExpr() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Lambda::ParamList params({"x", "y"});
 
@@ -2719,7 +2719,7 @@ void UnitTest::testCodeNodeFunctionExpr() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeFunctionApp() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     CodeNode::SharedPtr ftnExpr(
         std::make_shared<FunctionExpr>(
@@ -2746,7 +2746,7 @@ void UnitTest::testCodeNodeFunctionApp() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStruct() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     CodeNode::SharedPtr structExpr(
         std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})));
@@ -2762,7 +2762,7 @@ void UnitTest::testCodeNodeStruct() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeIsStructName() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     CodeNode::SharedPtr isStructName(
         std::make_shared<IsStructName>(
@@ -2776,7 +2776,7 @@ void UnitTest::testCodeNodeIsStructName() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeMakeInstance() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     CodeNode::SharedPtr structExpr(
         std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})));
@@ -2801,7 +2801,7 @@ void UnitTest::testCodeNodeMakeInstance() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeMakeInstanceWithInitArgs() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     CodeNode::SharedPtr structExpr(
         std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})));
@@ -2839,7 +2839,7 @@ void UnitTest::testCodeNodeMakeInstanceWithInitArgs() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeIsInstanceOf() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"}))
         ->eval(env);
@@ -2854,7 +2854,7 @@ void UnitTest::testCodeNodeIsInstanceOf() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStructName() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"}))
         ->eval(env);
@@ -2886,7 +2886,7 @@ void UnitTest::testCodeNodeStructName() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeGetSetMember() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"}))
         ->eval(env);
@@ -2928,7 +2928,7 @@ void UnitTest::testCodeNodeGetSetMember() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStringLen() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     Value value =
         std::make_shared<StringLen>(
@@ -2961,7 +2961,7 @@ void UnitTest::testCodeNodeStringLen() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStringGet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     Value value =
         std::make_shared<StringGet>(
@@ -3009,7 +3009,7 @@ void UnitTest::testCodeNodeStringGet() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStringSet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("str", Value("abc"));
 
     CodeNode::SharedPtr var = std::make_shared<Variable>("str");
@@ -3077,7 +3077,7 @@ void UnitTest::testCodeNodeStringSet() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStringCat() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("str", Value("abc"));
 
     CodeNode::SharedPtr var = std::make_shared<Variable>("str");
@@ -3119,7 +3119,7 @@ void UnitTest::testCodeNodeStringCat() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeSubString() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("str", Value("0123456789"));
 
     CodeNode::SharedPtr var = std::make_shared<Variable>("str");
@@ -3185,7 +3185,7 @@ void UnitTest::testCodeNodeSubString() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStringFind() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("str", Value("0123456789"));
 
     CodeNode::SharedPtr var = std::make_shared<Variable>("str");
@@ -3257,7 +3257,7 @@ void UnitTest::testCodeNodeStringFind() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStringCount() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("str", Value("0120344501223678910"));
 
     CodeNode::SharedPtr var = std::make_shared<Variable>("str");
@@ -3300,7 +3300,7 @@ void UnitTest::testCodeNodeStringCount() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStringCompare() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("str1", Value("abcde"));
     env->def("str2", Value("bcdef"));
     env->def("str3", Value("cdefg"));
@@ -3350,7 +3350,7 @@ void UnitTest::testCodeNodeStringCompare() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStringSort() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("str0", Value(""));
     env->def("str1", Value("a"));
     env->def("str2", Value("ba"));
@@ -3432,7 +3432,7 @@ void UnitTest::testCodeNodeStringSort() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStringReverse() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("str0", Value(""));
     env->def("str1", Value("a"));
     env->def("str2", Value("ab"));
@@ -3480,7 +3480,7 @@ void UnitTest::testCodeNodeStringReverse() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeMakeArray() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     Value value = std::make_shared<MakeArray>()->eval(env);
     TEST_CASE_MSG(value.isArray(), "actual=" << value.typeToString());
@@ -3502,7 +3502,7 @@ void UnitTest::testCodeNodeMakeArray() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeMakeArraySV() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     Value value =
         std::make_shared<MakeArraySV>(
@@ -3529,7 +3529,7 @@ void UnitTest::testCodeNodeMakeArraySV() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayLen() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     Value value =
         std::make_shared<ArrayLen>(
@@ -3562,7 +3562,7 @@ void UnitTest::testCodeNodeArrayLen() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayGet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
 
     const CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
@@ -3597,7 +3597,7 @@ void UnitTest::testCodeNodeArrayGet() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArraySet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
 
     CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
@@ -3649,7 +3649,7 @@ void UnitTest::testCodeNodeArraySet() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayPush() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("arr", Value(Sequence()));
 
     CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
@@ -3672,7 +3672,7 @@ void UnitTest::testCodeNodeArrayPush() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayPop() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("arr", arrval(Value(0ll), Value(1ll)));
 
     CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
@@ -3701,7 +3701,7 @@ void UnitTest::testCodeNodeArrayPop() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayFind() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     Value const a('a');
     Value const b('b');
@@ -3757,7 +3757,7 @@ void UnitTest::testCodeNodeArrayFind() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayCount() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Value v1(1ll);
     const Value v2(2ll);
@@ -3791,7 +3791,7 @@ void UnitTest::testCodeNodeArrayCount() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArraySort() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Value v1(1ll);
     const Value v2(2ll);
@@ -3864,7 +3864,7 @@ void UnitTest::testCodeNodeArraySort() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayReverse() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Value v1(1ll);
     const Value v2(2ll);
@@ -3916,7 +3916,7 @@ void UnitTest::testCodeNodeArrayReverse() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayClear() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Value v1(1ll);
     const Value v2(2ll);
@@ -3950,7 +3950,7 @@ void UnitTest::testCodeNodeArrayClear() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayInsert() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
     CodeNode::SharedPtr num = std::make_shared<Variable>("num");
@@ -4009,7 +4009,7 @@ void UnitTest::testCodeNodeArrayInsert() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeArrayRemove() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
     CodeNode::SharedPtr num = std::make_shared<Variable>("num");
@@ -4077,7 +4077,7 @@ void UnitTest::testCodeNodeArrayRemove() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStrCharCheck() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Value cUp = Value('U');
     const Value cLo = Value('l');
@@ -4153,7 +4153,7 @@ void UnitTest::testCodeNodeStrCharCheck() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeStrCharTransform() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Value a = Value('a');
     const Value A = Value('A');
@@ -4200,7 +4200,7 @@ void UnitTest::testCodeNodeImportModule() {
     auto tempFile(createTempModuleFile(moduleName));
 
     {
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
 
         auto varName = [&moduleName](const char *name) { return moduleName + '.' + name; };
 
@@ -4218,7 +4218,7 @@ void UnitTest::testCodeNodeImportModule() {
     }
 
     {
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
 
         const std::string asName = "testmod";
         auto varAsName = [&asName](const char *name) { return asName + '.' + name; };
@@ -4243,7 +4243,7 @@ void UnitTest::testCodeNodeFromModuleImport() {
     auto tempFile(createTempModuleFile(moduleName));
 
     {
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
 
         auto fromImport = std::make_shared<FromModuleImport>(moduleName, "add");
         TEST_CASE(fromImport->eval(env) == Value::True);
@@ -4264,7 +4264,7 @@ void UnitTest::testCodeNodeFromModuleImport() {
     }
 
     {
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
 
         auto fromImport = std::make_shared<FromModuleImport>(
             moduleName,
@@ -4283,7 +4283,7 @@ void UnitTest::testCodeNodeFromModuleImport() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeRandom() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     auto lit = [](const Value &val) { return std::make_shared<Literal>(val); };
 
@@ -4327,7 +4327,7 @@ void UnitTest::testCodeNodeRandom() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHash() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     auto hash = [&env](const Value &value) {
                     auto lit = std::make_shared<Literal>(value);
@@ -4351,7 +4351,7 @@ void UnitTest::testCodeNodeHash() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeMakeHashMap() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     auto ilit = [](Value::Long value) { return std::make_shared<Literal>(Value(value)); };
     auto slit = [](const Value::Text &value) { return std::make_shared<Literal>(Value(value)); };
@@ -4430,7 +4430,7 @@ void UnitTest::testCodeNodeMakeHashMap() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapLen() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     auto ht = [](int count) {
                   Hashtable table;
@@ -4471,7 +4471,7 @@ void UnitTest::testCodeNodeHashMapLen() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapContains() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Value one("one");
     const Value two("two");
@@ -4517,7 +4517,7 @@ void UnitTest::testCodeNodeHashMapContains() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapGet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     const Value kOne("one");
     const Value kTwo("two");
@@ -4567,7 +4567,7 @@ void UnitTest::testCodeNodeHashMapGet() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapSet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     env->def("ht", Value(Hashtable()));
 
     CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
@@ -4614,7 +4614,7 @@ void UnitTest::testCodeNodeHashMapSet() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapRemove() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     {
         Hashtable ht;
@@ -4669,7 +4669,7 @@ void UnitTest::testCodeNodeHashMapRemove() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapClear() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     {
         Hashtable ht;
@@ -4712,7 +4712,7 @@ void UnitTest::testCodeNodeHashMapClear() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapFind() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     {
         Hashtable ht;
@@ -4748,7 +4748,7 @@ void UnitTest::testCodeNodeHashMapFind() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapCount() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     {
         Hashtable ht;
@@ -4785,7 +4785,7 @@ void UnitTest::testCodeNodeHashMapCount() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapKeys() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     {
         Hashtable ht;
@@ -4824,7 +4824,7 @@ void UnitTest::testCodeNodeHashMapKeys() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapValues() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     {
         Hashtable ht;
@@ -4864,7 +4864,7 @@ void UnitTest::testCodeNodeHashMapValues() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodeHashMapItems() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     {
         Hashtable ht;
@@ -4905,7 +4905,7 @@ void UnitTest::testCodeNodeHashMapItems() {
 
 // -------------------------------------------------------------
 void UnitTest::testCodeNodePairOperations() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
 
     auto ilit = [](Value::Long value) { return std::make_shared<Literal>(Value(value)); };
 
@@ -5019,7 +5019,7 @@ bool parserTest(Parser &parser, Environment::SharedPtr env, const std::string &e
 
 // -------------------------------------------------------------
 void UnitTest::testParserBasic() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "'a'",      Value('a'),     true));
@@ -5042,7 +5042,7 @@ void UnitTest::testParserBasic() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserClone() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(var str1 \"hello\")",    Value("hello"), true));
@@ -5062,7 +5062,7 @@ void UnitTest::testParserClone() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserIsType() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(istypeof null none)",                     Value::True, true));
@@ -5089,7 +5089,7 @@ void UnitTest::testParserIsType() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserTypeName() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(typename null)",                   Value("none"),       true));
@@ -5109,7 +5109,7 @@ void UnitTest::testParserTypeName() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserAsType() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(astype 1 real)",        Value(1.0),        true));
@@ -5139,7 +5139,7 @@ void UnitTest::testParserAsType() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserVar() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "foo",         Value::Null, false));
@@ -5156,7 +5156,7 @@ void UnitTest::testParserVar() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArith() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(+ 1 2)",     Value(3ll),  true));
@@ -5175,7 +5175,7 @@ void UnitTest::testParserArith() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserComp() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(== 2 2)",     Value::True,  true));
@@ -5196,7 +5196,7 @@ void UnitTest::testParserComp() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserLogic() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(and true true)",    Value::True,  true));
@@ -5211,7 +5211,7 @@ void UnitTest::testParserLogic() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserNot() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(not true)",     Value::False, true));
@@ -5226,7 +5226,7 @@ void UnitTest::testParserNot() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserNegativeOf() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(neg 0)",    Value::Zero, true));
@@ -5241,7 +5241,7 @@ void UnitTest::testParserNegativeOf() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserBlock() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(progn (var c 'a') (= c 'b') c)",   Value('b'),  true));
@@ -5252,7 +5252,7 @@ void UnitTest::testParserBlock() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserCond() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(if true 1)",                   Value(1ll),  true));
@@ -5285,7 +5285,7 @@ void UnitTest::testParserCond() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserLoop() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(loop false 10)",                                                              Value::Null, true));
@@ -5302,7 +5302,7 @@ void UnitTest::testParserLoop() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserLambda() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "((lambda (x) (+ x 1)) 3)",           Value(4ll),  true));
@@ -5312,7 +5312,7 @@ void UnitTest::testParserLambda() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserFtn() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(block (defun add (x y) (+ x y)) (add 1 2))",                                          Value(3ll),  true));
@@ -5326,7 +5326,7 @@ void UnitTest::testParserFtn() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStruct() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Struct stest("Person", {"name", "age"});
@@ -5344,7 +5344,7 @@ void UnitTest::testParserStruct() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserIsStructName() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Struct stest("Person", {"name", "age"});
@@ -5359,7 +5359,7 @@ void UnitTest::testParserIsStructName() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserMakeInstance() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Struct stest("Person", {"name", "age"});
@@ -5371,7 +5371,7 @@ void UnitTest::testParserMakeInstance() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserMakeInstanceWithInitArgs() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Struct stest("Person", {"name", "age"});
@@ -5387,7 +5387,7 @@ void UnitTest::testParserMakeInstanceWithInitArgs() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserIsInstanceOf() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Struct stest("Person", {"name", "age"});
@@ -5399,7 +5399,7 @@ void UnitTest::testParserIsInstanceOf() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStructName() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Struct stest("Person", {"name", "age"});
@@ -5416,7 +5416,7 @@ void UnitTest::testParserStructName() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserGetSetMember() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Struct stest("Person", {"name", "age"});
@@ -5434,7 +5434,7 @@ void UnitTest::testParserGetSetMember() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStringLen() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(strlen \"\")",        Value::Zero, true));
@@ -5447,7 +5447,7 @@ void UnitTest::testParserStringLen() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStrGet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(strget \"By\" 0)",   Value('B'),  true));
@@ -5460,7 +5460,7 @@ void UnitTest::testParserStrGet() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStrSrt() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("str", Value("12345"));
@@ -5478,7 +5478,7 @@ void UnitTest::testParserStrSrt() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStringCat() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("str", Value("abc"));
@@ -5496,7 +5496,7 @@ void UnitTest::testParserStringCat() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserSubString() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("str", Value("0123456789"));
@@ -5516,7 +5516,7 @@ void UnitTest::testParserSubString() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStringFind() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("str", Value("0123456789"));
@@ -5537,7 +5537,7 @@ void UnitTest::testParserStringFind() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStringCount() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("str", Value("0120344501223678910"));
@@ -5561,7 +5561,7 @@ void UnitTest::testParserStringCount() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStringCompare() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("str1", Value("abcde"));
@@ -5585,7 +5585,7 @@ void UnitTest::testParserStringCompare() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStringSort() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("str1", Value("badc"));
@@ -5616,7 +5616,7 @@ void UnitTest::testParserStringSort() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStringReverse() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("str1", Value("abcd"));
@@ -5635,7 +5635,7 @@ void UnitTest::testParserStringReverse() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserMakeArray() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Value v1(1ll);
@@ -5650,7 +5650,7 @@ void UnitTest::testParserMakeArray() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserMakeArraySV() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Value v0(0ll);
@@ -5668,7 +5668,7 @@ void UnitTest::testParserMakeArraySV() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArrayLen() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(arrlen (array))",         Value::Zero, true));
@@ -5681,7 +5681,7 @@ void UnitTest::testParserArrayLen() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArrayGet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(arrget (array 'B' 'y') 0)", Value('B'),  true));
@@ -5693,7 +5693,7 @@ void UnitTest::testParserArrayGet() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArraySet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("arr", Value(Sequence({Value(1ll), Value(2ll), Value(3ll), Value(4ll), Value(5ll)})));
@@ -5711,7 +5711,7 @@ void UnitTest::testParserArraySet() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArrayPush() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("arr", Value(Sequence()));
@@ -5728,7 +5728,7 @@ void UnitTest::testParserArrayPush() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArrayPop() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("arr", arrval(Value(0ll), Value(1ll)));
@@ -5744,7 +5744,7 @@ void UnitTest::testParserArrayPop() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArrayFind() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c'), Value('a')})));
@@ -5767,7 +5767,7 @@ void UnitTest::testParserArrayFind() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArrayCount() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Value v1(1ll);
@@ -5790,7 +5790,7 @@ void UnitTest::testParserArrayCount() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArraySort() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("arr1", Value(Sequence({Value('b'), Value('d'), Value('c'), Value('a')})));
@@ -5826,7 +5826,7 @@ void UnitTest::testParserArraySort() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArrayReverse() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("arr1", Value(Sequence({Value('b'), Value('d'), Value('c'), Value('a')})));
@@ -5850,7 +5850,7 @@ void UnitTest::testParserArrayReverse() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArrayClear() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("a", Value(Sequence({Value('a'), Value('b'), Value('c')})));
@@ -5866,7 +5866,7 @@ void UnitTest::testParserArrayClear() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArrayInsert() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("arr", Value(Sequence()));
@@ -5902,7 +5902,7 @@ void UnitTest::testParserArrayInsert() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserArrayRemove() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     const Value v0 = Value::Zero;
@@ -5938,7 +5938,7 @@ void UnitTest::testParserArrayRemove() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStrCharCheck() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("cUp", Value('U'));
@@ -6006,7 +6006,7 @@ void UnitTest::testParserStrCharCheck() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserStrCharTransform() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("cUp", Value('A'));
@@ -6042,7 +6042,7 @@ void UnitTest::testParserImportModule() {
     Parser parser;
 
     {
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
         const std::string asName = "test";
 
         auto varName = [&moduleName](const char * var) { return moduleName + '.' + var; };
@@ -6065,7 +6065,7 @@ void UnitTest::testParserImportModule() {
     }
 
     {
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
         TEST_CASE(parserTest(parser, env, "(import)",                Value::Null, false));
         TEST_CASE(parserTest(parser, env, "(import as)",             Value::Null, false));
         TEST_CASE(parserTest(parser, env, "(import pimporttest as)", Value::Null, false));
@@ -6082,7 +6082,7 @@ void UnitTest::testParserFromModuleImport() {
     Parser parser;
 
     {
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
 
         TEST_CASE(parserTest(parser, env, "(from pfromtest import add)", Value::True, true));
         TEST_CASE(parserTest(parser, env, "(from pfromtest import sub)", Value::True, true));
@@ -6104,7 +6104,7 @@ void UnitTest::testParserFromModuleImport() {
     }
 
     {
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
 
         TEST_CASE(parserTest(parser, env, "(from pfromtest import add sub)", Value::True, true));
 
@@ -6119,7 +6119,7 @@ void UnitTest::testParserFromModuleImport() {
     }
 
     {
-        Environment::SharedPtr env(new Environment());
+        auto env = Environment::make();
 
         TEST_CASE(parserTest(parser, env, "(from)",                                     Value::Null, false));
         TEST_CASE(parserTest(parser, env, "(from pfromtest)",                           Value::Null, false));
@@ -6135,7 +6135,7 @@ void UnitTest::testParserFromModuleImport() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserRandom() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(rand 0)",   Value::Zero, true));
@@ -6146,7 +6146,7 @@ void UnitTest::testParserRandom() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHash() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(hash null)", Value::Zero, true));
@@ -6157,7 +6157,7 @@ void UnitTest::testParserHash() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserMakeHashMap() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     auto ht = [](int count) {
@@ -6186,7 +6186,7 @@ void UnitTest::testParserMakeHashMap() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapLen() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     TEST_CASE(parserTest(parser, env, "(hmlen (hashmap))",                                           Value::Zero, true));
@@ -6200,7 +6200,7 @@ void UnitTest::testParserHashMapLen() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapContains() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     Hashtable ht;
@@ -6223,7 +6223,7 @@ void UnitTest::testParserHashMapContains() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapGet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     Hashtable ht;
@@ -6252,7 +6252,7 @@ void UnitTest::testParserHashMapGet() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapSet() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     Hashtable ht;
@@ -6288,7 +6288,7 @@ void UnitTest::testParserHashMapSet() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapRemove() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     Hashtable ht;
@@ -6332,7 +6332,7 @@ void UnitTest::testParserHashMapRemove() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapClear() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     Hashtable ht;
@@ -6365,7 +6365,7 @@ void UnitTest::testParserHashMapClear() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapFind() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     Hashtable ht;
@@ -6387,7 +6387,7 @@ void UnitTest::testParserHashMapFind() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapCount() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     Hashtable ht;
@@ -6410,7 +6410,7 @@ void UnitTest::testParserHashMapCount() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapKeys() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     Hashtable ht;
@@ -6429,7 +6429,7 @@ void UnitTest::testParserHashMapKeys() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapVals() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     Hashtable ht;
@@ -6449,7 +6449,7 @@ void UnitTest::testParserHashMapVals() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserHashMapItems() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     Hashtable ht;
@@ -6469,7 +6469,7 @@ void UnitTest::testParserHashMapItems() {
 
 // -------------------------------------------------------------
 void UnitTest::testParserPairOperations() {
-    Environment::SharedPtr env(new Environment());
+    auto env = Environment::make();
     Parser parser;
 
     env->def("p", Value(Value::Pair(Value('a'), Value('b'))));
