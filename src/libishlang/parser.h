@@ -101,7 +101,7 @@ namespace Ishlang {
     template <typename ExprType, typename ExprOp>
     inline CodeNode::SharedPtr Parser::MakeBinaryExpression<ExprType, ExprOp>::operator()() {
         auto exprs(parser_.readAndCheckExprList(name_.c_str(), 2));
-        return std::make_shared<ExprType>(exprOp_, exprs[0], exprs[1]);
+        return CodeNode::make<ExprType>(exprOp_, exprs[0], exprs[1]);
     }
 
     template <typename CodeNodeType>
@@ -114,7 +114,7 @@ namespace Ishlang {
     template <typename CodeNodeType>
     inline CodeNode::SharedPtr Parser::MakeStrCharOp<CodeNodeType>::operator()() {
         auto exprs(parser_.readAndCheckExprList(name_.c_str(), 1));
-        return std::make_shared<CodeNodeType>(opType_, exprs[0]);
+        return CodeNode::make<CodeNodeType>(opType_, exprs[0]);
     }
 
 } // Int

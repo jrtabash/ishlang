@@ -1967,8 +1967,8 @@ void UnitTest::testCodeNodeAsType() {
 
     for (auto const & fromAndTo : testCases) {
         CodeNode::SharedPtr asType =
-            std::make_shared<AsType>(
-                std::make_shared<Literal>(fromAndTo.first), fromAndTo.second.type());
+            CodeNode::make<AsType>(
+                CodeNode::make<Literal>(fromAndTo.first), fromAndTo.second.type());
         Value value = asType->eval(env);
         TEST_CASE_MSG(value == fromAndTo.second, "actual=" << value << " expected=" << fromAndTo.second);
     }
@@ -2309,20 +2309,20 @@ void UnitTest::testCodeNodeNot() {
     auto env = Environment::make();
 
     Value value =
-        std::make_shared<Not>(std::make_shared<Literal>(Value::True))
+        CodeNode::make<Not>(CodeNode::make<Literal>(Value::True))
         ->eval(env);
     TEST_CASE_MSG(value.isBool(), "actual=" << value.typeToString());
     TEST_CASE_MSG(value == Value::False, "actual=" << value);
 
     value =
-        std::make_shared<Not>(std::make_shared<Literal>(Value::False))
+        CodeNode::make<Not>(CodeNode::make<Literal>(Value::False))
         ->eval(env);
     TEST_CASE_MSG(value.isBool(), "actual=" << value.typeToString());
     TEST_CASE_MSG(value == Value::True, "actual=" << value);
 
     try {
         value =
-            std::make_shared<Not>(std::make_shared<Literal>(Value::Zero))
+            CodeNode::make<Not>(CodeNode::make<Literal>(Value::Zero))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -2336,10 +2336,10 @@ void UnitTest::testCodeNodeNot() {
 void UnitTest::testCodeNodeNegativeOf() {
     auto env = Environment::make();
 
-    auto iVal = std::make_shared<Literal>(Value(5ll));
-    auto fVal = std::make_shared<Literal>(Value(3.5));
+    auto iVal = CodeNode::make<Literal>(Value(5ll));
+    auto fVal = CodeNode::make<Literal>(Value(3.5));
 
-    auto inv = [env](CodeNode::SharedPtr operand) { return std::make_shared<NegativeOf>(operand)->eval(env); };
+    auto inv = [env](CodeNode::SharedPtr operand) { return CodeNode::make<NegativeOf>(operand)->eval(env); };
 
     Value value = inv(iVal);
     TEST_CASE_MSG(value == Value(-5ll), "actual=" << value);
@@ -2348,7 +2348,7 @@ void UnitTest::testCodeNodeNegativeOf() {
     TEST_CASE_MSG(value == Value(-3.5), "actual=" << value);
 
     try {
-        value = inv(std::make_shared<Literal>(Value('a')));
+        value = inv(CodeNode::make<Literal>(Value('a')));
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -2722,22 +2722,22 @@ void UnitTest::testCodeNodeFunctionApp() {
     auto env = Environment::make();
 
     CodeNode::SharedPtr ftnExpr(
-        std::make_shared<FunctionExpr>(
+        CodeNode::make<FunctionExpr>(
             "myfunc",
             Lambda::ParamList({"x", "y"}),
-            std::make_shared<ArithOp>(
+            CodeNode::make<ArithOp>(
                 ArithOp::Add,
-                std::make_shared<Variable>("x"),
-                std::make_shared<Variable>("y"))));
+                CodeNode::make<Variable>("x"),
+                CodeNode::make<Variable>("y"))));
     Value ftnVal = ftnExpr->eval(env);
     TEST_CASE_MSG(ftnVal.isClosure(), "actual=" << ftnVal.typeToString());
 
     CodeNode::SharedPtr ftnApp(
-        std::make_shared<FunctionApp>(
+        CodeNode::make<FunctionApp>(
             "myfunc",
             CodeNode::SharedPtrList({
-                    std::make_shared<Literal>(Value(3ll)),
-                        std::make_shared<Literal>(Value(4ll))})));
+                    CodeNode::make<Literal>(Value(3ll)),
+                        CodeNode::make<Literal>(Value(4ll))})));
 
     Value result = ftnApp->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
@@ -2749,7 +2749,7 @@ void UnitTest::testCodeNodeStruct() {
     auto env = Environment::make();
 
     CodeNode::SharedPtr structExpr(
-        std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})));
+        CodeNode::make<StructExpr>("Person", Struct::MemberList({"name", "age"})));
     Value structVal = structExpr->eval(env);
     TEST_CASE_MSG(structVal.isUserType(), "actual=" << structVal.typeToString());
 
@@ -2765,8 +2765,8 @@ void UnitTest::testCodeNodeIsStructName() {
     auto env = Environment::make();
 
     CodeNode::SharedPtr isStructName(
-        std::make_shared<IsStructName>(
-            std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})),
+        CodeNode::make<IsStructName>(
+            CodeNode::make<StructExpr>("Person", Struct::MemberList({"name", "age"})),
             "Person"));
 
     Value result = isStructName->eval(env);
@@ -2779,14 +2779,14 @@ void UnitTest::testCodeNodeMakeInstance() {
     auto env = Environment::make();
 
     CodeNode::SharedPtr structExpr(
-        std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})));
+        CodeNode::make<StructExpr>("Person", Struct::MemberList({"name", "age"})));
 
     Value structValue = structExpr->eval(env);
     TEST_CASE_MSG(structValue.isUserType(), "actual=" << structValue.typeToString());
     TEST_CASE_MSG(structValue.userType().name() == "Person", "actual=" << structValue.userType().name());
 
     CodeNode::SharedPtr makeInstance(
-        std::make_shared<MakeInstance>("Person"));
+        CodeNode::make<MakeInstance>("Person"));
 
     Value instValue = makeInstance->eval(env);
     TEST_CASE_MSG(instValue.isUserObject(), "actual=" << instValue.typeToString());
@@ -2804,17 +2804,17 @@ void UnitTest::testCodeNodeMakeInstanceWithInitArgs() {
     auto env = Environment::make();
 
     CodeNode::SharedPtr structExpr(
-        std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"})));
+        CodeNode::make<StructExpr>("Person", Struct::MemberList({"name", "age"})));
 
     Value structValue = structExpr->eval(env);
     TEST_CASE_MSG(structValue.isUserType(), "actual=" << structValue.typeToString());
     TEST_CASE_MSG(structValue.userType().name() == "Person", "actual=" << structValue.userType().name());
 
-    CodeNode::SharedPtr nameInit = std::make_shared<Literal>(Value("John"));
-    CodeNode::SharedPtr ageInit = std::make_shared<Literal>(Value(30ll));
+    CodeNode::SharedPtr nameInit = CodeNode::make<Literal>(Value("John"));
+    CodeNode::SharedPtr ageInit = CodeNode::make<Literal>(Value(30ll));
 
     CodeNode::SharedPtr makeInstance(
-        std::make_shared<MakeInstance>("Person", CodeNode::NameSharedPtrs{{"name", nameInit}, {"age", ageInit}}));
+        CodeNode::make<MakeInstance>("Person", CodeNode::NameSharedPtrs{{"name", nameInit}, {"age", ageInit}}));
 
     Value instValue = makeInstance->eval(env);
     TEST_CASE_MSG(instValue.isUserObject(), "actual=" << instValue.typeToString());
@@ -2827,7 +2827,7 @@ void UnitTest::testCodeNodeMakeInstanceWithInitArgs() {
     TEST_CASE_MSG(inst.get("age") == Value(30ll), "actual=" << inst.get("age"));
 
     // Partial init args
-    makeInstance = std::make_shared<MakeInstance>("Person", CodeNode::NameSharedPtrs{{"name", nameInit}});
+    makeInstance = CodeNode::make<MakeInstance>("Person", CodeNode::NameSharedPtrs{{"name", nameInit}});
 
     instValue = makeInstance->eval(env);
     TEST_CASE_MSG(instValue.isUserObject(), "actual=" << instValue.typeToString());
@@ -2841,12 +2841,12 @@ void UnitTest::testCodeNodeMakeInstanceWithInitArgs() {
 void UnitTest::testCodeNodeIsInstanceOf() {
     auto env = Environment::make();
 
-    std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"}))
+    CodeNode::make<StructExpr>("Person", Struct::MemberList({"name", "age"}))
         ->eval(env);
 
     Value value = 
-        std::make_shared<IsInstanceOf>(
-            std::make_shared<MakeInstance>("Person"),
+        CodeNode::make<IsInstanceOf>(
+            CodeNode::make<MakeInstance>("Person"),
             "Person")
         ->eval(env);
     TEST_CASE_MSG(value == Value::True, "actual=" << value);
@@ -2856,25 +2856,25 @@ void UnitTest::testCodeNodeIsInstanceOf() {
 void UnitTest::testCodeNodeStructName() {
     auto env = Environment::make();
 
-    std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"}))
+    CodeNode::make<StructExpr>("Person", Struct::MemberList({"name", "age"}))
         ->eval(env);
 
     Value value =
-        std::make_shared<StructName>(
-            std::make_shared<MakeInstance>("Person"))
+        CodeNode::make<StructName>(
+            CodeNode::make<MakeInstance>("Person"))
         ->eval(env);
     TEST_CASE_MSG(value == Value("Person"), "actual=" << value);
 
     value =
-        std::make_shared<StructName>(
-            std::make_shared<Variable>("Person"))
+        CodeNode::make<StructName>(
+            CodeNode::make<Variable>("Person"))
         ->eval(env);
     TEST_CASE_MSG(value == Value("Person"), "actual" << value);
 
     try {
         value =
-            std::make_shared<StructName>(
-                std::make_shared<Literal>(Value::Zero))
+            CodeNode::make<StructName>(
+                CodeNode::make<Literal>(Value::Zero))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -2888,39 +2888,39 @@ void UnitTest::testCodeNodeStructName() {
 void UnitTest::testCodeNodeGetSetMember() {
     auto env = Environment::make();
 
-    std::make_shared<StructExpr>("Person", Struct::MemberList({"name", "age"}))
+    CodeNode::make<StructExpr>("Person", Struct::MemberList({"name", "age"}))
         ->eval(env);
 
-    std::make_shared<Define>(
+    CodeNode::make<Define>(
         "inst",
-        std::make_shared<MakeInstance>("Person"))
+        CodeNode::make<MakeInstance>("Person"))
         ->eval(env);
 
     Value value = 
-        std::make_shared<IsInstanceOf>(
-            std::make_shared<Variable>("inst"),
+        CodeNode::make<IsInstanceOf>(
+            CodeNode::make<Variable>("inst"),
             "Person")
         ->eval(env);
     TEST_CASE_MSG(value == Value::True, "actual=" << value);
 
     value = 
-        std::make_shared<GetMember>(
-            std::make_shared<Variable>("inst"),
+        CodeNode::make<GetMember>(
+            CodeNode::make<Variable>("inst"),
             "name")
         ->eval(env);
     TEST_CASE_MSG(value == Value::Null, "actual=" << value);
 
     value = 
-        std::make_shared<SetMember>(
-            std::make_shared<Variable>("inst"),
+        CodeNode::make<SetMember>(
+            CodeNode::make<Variable>("inst"),
             "name",
-            std::make_shared<Literal>(Value("John")))
+            CodeNode::make<Literal>(Value("John")))
         ->eval(env);
     TEST_CASE_MSG(value == Value("John"), "actual=" << value);
 
     value = 
-        std::make_shared<GetMember>(
-            std::make_shared<Variable>("inst"),
+        CodeNode::make<GetMember>(
+            CodeNode::make<Variable>("inst"),
             "name")
         ->eval(env);
     TEST_CASE_MSG(value == Value("John"), "actual=" << value);
@@ -2931,27 +2931,27 @@ void UnitTest::testCodeNodeStringLen() {
     auto env = Environment::make();
 
     Value value =
-        std::make_shared<StringLen>(
-            std::make_shared<Literal>(Value("")))
+        CodeNode::make<StringLen>(
+            CodeNode::make<Literal>(Value("")))
         ->eval(env);
     TEST_CASE_MSG(value == Value::Zero, "actual=" << value);
 
     value =
-        std::make_shared<StringLen>(
-            std::make_shared<Literal>("a"))
+        CodeNode::make<StringLen>(
+            CodeNode::make<Literal>("a"))
         ->eval(env);
     TEST_CASE_MSG(value == Value(1ll), "actual=" << value);
 
     value =
-        std::make_shared<StringLen>(
-            std::make_shared<Literal>("abcde"))
+        CodeNode::make<StringLen>(
+            CodeNode::make<Literal>("abcde"))
         ->eval(env);
     TEST_CASE_MSG(value == Value(5ll), "actual=" << value);
 
     try {
         value =
-            std::make_shared<StringLen>(
-                std::make_shared<Literal>(Value::Zero))
+            CodeNode::make<StringLen>(
+                CodeNode::make<Literal>(Value::Zero))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -2964,31 +2964,31 @@ void UnitTest::testCodeNodeStringGet() {
     auto env = Environment::make();
 
     Value value =
-        std::make_shared<StringGet>(
-            std::make_shared<Literal>(Value("abc")),
-            std::make_shared<Literal>(Value(0ll)))
+        CodeNode::make<StringGet>(
+            CodeNode::make<Literal>(Value("abc")),
+            CodeNode::make<Literal>(Value(0ll)))
         ->eval(env);
     TEST_CASE_MSG(value == Value('a'), "actual=" << value);
 
     value =
-        std::make_shared<StringGet>(
-            std::make_shared<Literal>(Value("abc")),
-            std::make_shared<Literal>(Value(1ll)))
+        CodeNode::make<StringGet>(
+            CodeNode::make<Literal>(Value("abc")),
+            CodeNode::make<Literal>(Value(1ll)))
         ->eval(env);
     TEST_CASE_MSG(value == Value('b'), "actual=" << value);
 
     value =
-        std::make_shared<StringGet>(
-            std::make_shared<Literal>(Value("abc")),
-            std::make_shared<Literal>(Value(2ll)))
+        CodeNode::make<StringGet>(
+            CodeNode::make<Literal>(Value("abc")),
+            CodeNode::make<Literal>(Value(2ll)))
         ->eval(env);
     TEST_CASE_MSG(value == Value('c'), "actual=" << value);
 
     try {
         value =
-            std::make_shared<StringGet>(
-                std::make_shared<Literal>(Value("abc")),
-                std::make_shared<Literal>(Value(3ll)))
+            CodeNode::make<StringGet>(
+                CodeNode::make<Literal>(Value("abc")),
+                CodeNode::make<Literal>(Value(3ll)))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -2997,9 +2997,9 @@ void UnitTest::testCodeNodeStringGet() {
 
     try {
         value =
-            std::make_shared<StringGet>(
-                std::make_shared<Literal>(Value("abc")),
-                std::make_shared<Literal>(Value(-1ll)))
+            CodeNode::make<StringGet>(
+                CodeNode::make<Literal>(Value("abc")),
+                CodeNode::make<Literal>(Value(-1ll)))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -3012,13 +3012,13 @@ void UnitTest::testCodeNodeStringSet() {
     auto env = Environment::make();
     env->def("str", Value("abc"));
 
-    CodeNode::SharedPtr var = std::make_shared<Variable>("str");
+    CodeNode::SharedPtr var = CodeNode::make<Variable>("str");
 
     Value value =
-        std::make_shared<StringSet>(
+        CodeNode::make<StringSet>(
             var,
-            std::make_shared<Literal>(Value(0ll)),
-            std::make_shared<Literal>(Value('A')))
+            CodeNode::make<Literal>(Value(0ll)),
+            CodeNode::make<Literal>(Value('A')))
         ->eval(env);
     TEST_CASE_MSG(value == Value('A'), "actual=" << value);
 
@@ -3026,10 +3026,10 @@ void UnitTest::testCodeNodeStringSet() {
     TEST_CASE_MSG(value == Value("Abc"), "actual=" << value);
 
     value =
-        std::make_shared<StringSet>(
+        CodeNode::make<StringSet>(
             var,
-            std::make_shared<Literal>(Value(1ll)),
-            std::make_shared<Literal>(Value('B')))
+            CodeNode::make<Literal>(Value(1ll)),
+            CodeNode::make<Literal>(Value('B')))
         ->eval(env);
     TEST_CASE_MSG(value == Value('B'), "actual=" << value);
 
@@ -3037,10 +3037,10 @@ void UnitTest::testCodeNodeStringSet() {
     TEST_CASE_MSG(value == Value("ABc"), "actual=" << value);
 
     value =
-        std::make_shared<StringSet>(
+        CodeNode::make<StringSet>(
             var,
-            std::make_shared<Literal>(Value(2ll)),
-            std::make_shared<Literal>(Value('C')))
+            CodeNode::make<Literal>(Value(2ll)),
+            CodeNode::make<Literal>(Value('C')))
         ->eval(env);
     TEST_CASE_MSG(value == Value('C'), "actual=" << value);
 
@@ -3049,10 +3049,10 @@ void UnitTest::testCodeNodeStringSet() {
 
     try {
         value =
-            std::make_shared<StringSet>(
+            CodeNode::make<StringSet>(
                 var,
-                std::make_shared<Literal>(Value(-1ll)),
-                std::make_shared<Literal>(Value('X')))
+                CodeNode::make<Literal>(Value(-1ll)),
+                CodeNode::make<Literal>(Value('X')))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -3061,10 +3061,10 @@ void UnitTest::testCodeNodeStringSet() {
 
     try {
         value =
-            std::make_shared<StringSet>(
+            CodeNode::make<StringSet>(
                 var,
-                std::make_shared<Literal>(Value(3ll)),
-                std::make_shared<Literal>(Value('Y')))
+                CodeNode::make<Literal>(Value(3ll)),
+                CodeNode::make<Literal>(Value('Y')))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -3080,12 +3080,12 @@ void UnitTest::testCodeNodeStringCat() {
     auto env = Environment::make();
     env->def("str", Value("abc"));
 
-    CodeNode::SharedPtr var = std::make_shared<Variable>("str");
+    CodeNode::SharedPtr var = CodeNode::make<Variable>("str");
 
     Value value =
-        std::make_shared<StringCat>(
+        CodeNode::make<StringCat>(
             var,
-            std::make_shared<Literal>(Value("de")))
+            CodeNode::make<Literal>(Value("de")))
         ->eval(env);
     TEST_CASE_MSG(value == Value("abcde"), "actual=" << value);
 
@@ -3093,9 +3093,9 @@ void UnitTest::testCodeNodeStringCat() {
     TEST_CASE_MSG(value == Value("abcde"), "actual=" << value);
 
     value =
-        std::make_shared<StringCat>(
+        CodeNode::make<StringCat>(
             var,
-            std::make_shared<Literal>(Value('f')))
+            CodeNode::make<Literal>(Value('f')))
         ->eval(env);
     TEST_CASE_MSG(value == Value("abcdef"), "actual=" << value);
 
@@ -3104,9 +3104,9 @@ void UnitTest::testCodeNodeStringCat() {
 
     try {
         value =
-            std::make_shared<StringCat>(
+            CodeNode::make<StringCat>(
                 var,
-                std::make_shared<Literal>(Value::Zero))
+                CodeNode::make<Literal>(Value::Zero))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -3122,32 +3122,32 @@ void UnitTest::testCodeNodeSubString() {
     auto env = Environment::make();
     env->def("str", Value("0123456789"));
 
-    CodeNode::SharedPtr var = std::make_shared<Variable>("str");
-    CodeNode::SharedPtr minus1 = std::make_shared<Literal>(Value(-1ll));
-    CodeNode::SharedPtr zero = std::make_shared<Literal>(Value::Zero);
-    CodeNode::SharedPtr three = std::make_shared<Literal>(Value(3ll));
-    CodeNode::SharedPtr four = std::make_shared<Literal>(Value(4ll));
-    CodeNode::SharedPtr five = std::make_shared<Literal>(Value(5ll));
-    CodeNode::SharedPtr ten = std::make_shared<Literal>(Value(10ll));
-    CodeNode::SharedPtr eleven = std::make_shared<Literal>(Value(11ll));
+    CodeNode::SharedPtr var = CodeNode::make<Variable>("str");
+    CodeNode::SharedPtr minus1 = CodeNode::make<Literal>(Value(-1ll));
+    CodeNode::SharedPtr zero = CodeNode::make<Literal>(Value::Zero);
+    CodeNode::SharedPtr three = CodeNode::make<Literal>(Value(3ll));
+    CodeNode::SharedPtr four = CodeNode::make<Literal>(Value(4ll));
+    CodeNode::SharedPtr five = CodeNode::make<Literal>(Value(5ll));
+    CodeNode::SharedPtr ten = CodeNode::make<Literal>(Value(10ll));
+    CodeNode::SharedPtr eleven = CodeNode::make<Literal>(Value(11ll));
 
-    Value value = std::make_shared<SubString>(var, zero)->eval(env);
+    Value value = CodeNode::make<SubString>(var, zero)->eval(env);
     TEST_CASE_MSG(value == Value("0123456789"), "actual=" << value);
 
-    value = std::make_shared<SubString>(var, five)->eval(env);
+    value = CodeNode::make<SubString>(var, five)->eval(env);
     TEST_CASE_MSG(value == Value("56789"), "actual=" << value);
 
-    value = std::make_shared<SubString>(var, zero, ten)->eval(env);
+    value = CodeNode::make<SubString>(var, zero, ten)->eval(env);
     TEST_CASE_MSG(value == Value("0123456789"), "actual=" << value);
 
-    value = std::make_shared<SubString>(var, zero, five)->eval(env);
+    value = CodeNode::make<SubString>(var, zero, five)->eval(env);
     TEST_CASE_MSG(value == Value("01234"), "actual=" << value);
 
-    value = std::make_shared<SubString>(var, four, three)->eval(env);
+    value = CodeNode::make<SubString>(var, four, three)->eval(env);
     TEST_CASE_MSG(value == Value("456"), "actual=" << value);
 
     try {
-        std::make_shared<SubString>(var, minus1)->eval(env);
+        CodeNode::make<SubString>(var, minus1)->eval(env);
         TEST_CASE(false);
     }
     catch (OutOfRange const &) {}
@@ -3156,7 +3156,7 @@ void UnitTest::testCodeNodeSubString() {
     }
 
     try {
-        std::make_shared<SubString>(var, ten)->eval(env);
+        CodeNode::make<SubString>(var, ten)->eval(env);
         TEST_CASE(false);
     }
     catch (OutOfRange const &) {}
@@ -3165,7 +3165,7 @@ void UnitTest::testCodeNodeSubString() {
     }
 
     try {
-        std::make_shared<SubString>(var, zero, minus1)->eval(env);
+        CodeNode::make<SubString>(var, zero, minus1)->eval(env);
         TEST_CASE(false);
     }
     catch (OutOfRange const &) {}
@@ -3174,7 +3174,7 @@ void UnitTest::testCodeNodeSubString() {
     }
 
     try {
-        std::make_shared<SubString>(var, zero, eleven)->eval(env);
+        CodeNode::make<SubString>(var, zero, eleven)->eval(env);
         TEST_CASE(false);
     }
     catch (OutOfRange const &) {}
@@ -3188,14 +3188,14 @@ void UnitTest::testCodeNodeStringFind() {
     auto env = Environment::make();
     env->def("str", Value("0123456789"));
 
-    CodeNode::SharedPtr var = std::make_shared<Variable>("str");
+    CodeNode::SharedPtr var = CodeNode::make<Variable>("str");
 
-    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
-    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
+    auto clit = [](Value::Char c) { return CodeNode::make<Literal>(Value(c)); };
+    auto ilit = [](Value::Long i) { return CodeNode::make<Literal>(Value(i)); };
     auto find = [env, var, clit, ilit](Value::Char c, std::optional<Value::Long> i = std::nullopt) {
         return (i
-                ? std::make_shared<StringFind>(var, clit(c), ilit(*i))
-                : std::make_shared<StringFind>(var, clit(c)));
+                ? CodeNode::make<StringFind>(var, clit(c), ilit(*i))
+                : CodeNode::make<StringFind>(var, clit(c)));
     };
 
     Value value;
@@ -3219,7 +3219,7 @@ void UnitTest::testCodeNodeStringFind() {
     value = find('B', 5)->eval(env); TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
 
     try {
-        std::make_shared<StringFind>(var, ilit(0))->eval(env);
+        CodeNode::make<StringFind>(var, ilit(0))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -3228,7 +3228,7 @@ void UnitTest::testCodeNodeStringFind() {
     }
 
     try {
-        std::make_shared<StringFind>(var, clit('0'), clit('0'))->eval(env);
+        CodeNode::make<StringFind>(var, clit('0'), clit('0'))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -3237,7 +3237,7 @@ void UnitTest::testCodeNodeStringFind() {
     }
 
     try {
-        std::make_shared<StringFind>(var, clit('0'), ilit(10))->eval(env);
+        CodeNode::make<StringFind>(var, clit('0'), ilit(10))->eval(env);
         TEST_CASE(false);
     }
     catch (const OutOfRange &) {}
@@ -3246,7 +3246,7 @@ void UnitTest::testCodeNodeStringFind() {
     }
 
     try {
-        std::make_shared<StringFind>(var, clit('0'), ilit(-1))->eval(env);
+        CodeNode::make<StringFind>(var, clit('0'), ilit(-1))->eval(env);
         TEST_CASE(false);
     }
     catch (const OutOfRange &) {}
@@ -3260,10 +3260,10 @@ void UnitTest::testCodeNodeStringCount() {
     auto env = Environment::make();
     env->def("str", Value("0120344501223678910"));
 
-    CodeNode::SharedPtr var = std::make_shared<Variable>("str");
+    CodeNode::SharedPtr var = CodeNode::make<Variable>("str");
 
-    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
-    auto count = [var, clit](Value::Char c) { return std::make_shared<StringCount>(var, clit(c)); };
+    auto clit = [](Value::Char c) { return CodeNode::make<Literal>(Value(c)); };
+    auto count = [var, clit](Value::Char c) { return CodeNode::make<StringCount>(var, clit(c)); };
 
     Value value;
 
@@ -3280,7 +3280,7 @@ void UnitTest::testCodeNodeStringCount() {
     value = count('a')->eval(env); TEST_CASE_MSG(value == Value::Zero, "actual=" << value);
 
     try {
-        std::make_shared<StringCount>(clit('b'), clit('0'))->eval(env);
+        CodeNode::make<StringCount>(clit('b'), clit('0'))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -3289,7 +3289,7 @@ void UnitTest::testCodeNodeStringCount() {
     }
 
     try {
-        std::make_shared<StringCount>(var, std::make_shared<Literal>(Value::Zero))->eval(env);
+        CodeNode::make<StringCount>(var, CodeNode::make<Literal>(Value::Zero))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -3307,13 +3307,13 @@ void UnitTest::testCodeNodeStringCompare() {
     env->def("str4", Value("cdefg"));
     env->def("num", Value::Zero);
 
-    CodeNode::SharedPtr str1 = std::make_shared<Variable>("str1");
-    CodeNode::SharedPtr str2 = std::make_shared<Variable>("str2");
-    CodeNode::SharedPtr str3 = std::make_shared<Variable>("str3");
-    CodeNode::SharedPtr str4 = std::make_shared<Variable>("str4");
-    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+    CodeNode::SharedPtr str1 = CodeNode::make<Variable>("str1");
+    CodeNode::SharedPtr str2 = CodeNode::make<Variable>("str2");
+    CodeNode::SharedPtr str3 = CodeNode::make<Variable>("str3");
+    CodeNode::SharedPtr str4 = CodeNode::make<Variable>("str4");
+    CodeNode::SharedPtr num = CodeNode::make<Variable>("num");
 
-    auto compare = [](auto lhs, auto rhs) { return std::make_shared<StringCompare>(lhs, rhs); };
+    auto compare = [](auto lhs, auto rhs) { return CodeNode::make<StringCompare>(lhs, rhs); };
 
     Value value;
 
@@ -3359,21 +3359,21 @@ void UnitTest::testCodeNodeStringSort() {
     env->def("str5", Value("bdcabdcdcd"));
     env->def("num", Value::Zero);
 
-    CodeNode::SharedPtr str0 = std::make_shared<Variable>("str0");
-    CodeNode::SharedPtr str1 = std::make_shared<Variable>("str1");
-    CodeNode::SharedPtr str2 = std::make_shared<Variable>("str2");
-    CodeNode::SharedPtr str3 = std::make_shared<Variable>("str3");
-    CodeNode::SharedPtr str4 = std::make_shared<Variable>("str4");
-    CodeNode::SharedPtr str5 = std::make_shared<Variable>("str5");
-    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+    CodeNode::SharedPtr str0 = CodeNode::make<Variable>("str0");
+    CodeNode::SharedPtr str1 = CodeNode::make<Variable>("str1");
+    CodeNode::SharedPtr str2 = CodeNode::make<Variable>("str2");
+    CodeNode::SharedPtr str3 = CodeNode::make<Variable>("str3");
+    CodeNode::SharedPtr str4 = CodeNode::make<Variable>("str4");
+    CodeNode::SharedPtr str5 = CodeNode::make<Variable>("str5");
+    CodeNode::SharedPtr num = CodeNode::make<Variable>("num");
 
-    CodeNode::SharedPtr asc = std::make_shared<Literal>(false);
-    CodeNode::SharedPtr desc = std::make_shared<Literal>(true);
+    CodeNode::SharedPtr asc = CodeNode::make<Literal>(false);
+    CodeNode::SharedPtr desc = CodeNode::make<Literal>(true);
     CodeNode::SharedPtr none = CodeNode::SharedPtr();
 
     auto testcase =
         [this, &env](auto str, auto desc, auto expect) {
-            auto value = std::make_shared<StringSort>(str, desc)->eval(env);
+            auto value = CodeNode::make<StringSort>(str, desc)->eval(env);
             TEST_CASE_MSG(value == expect, "value actual=" << value);
             TEST_CASE_MSG(str->eval(env) == expect, "str actual=" << str);
         };
@@ -3440,16 +3440,16 @@ void UnitTest::testCodeNodeStringReverse() {
     env->def("str4", Value("abcd"));
     env->def("num", Value::Zero);
 
-    CodeNode::SharedPtr str0 = std::make_shared<Variable>("str0");
-    CodeNode::SharedPtr str1 = std::make_shared<Variable>("str1");
-    CodeNode::SharedPtr str2 = std::make_shared<Variable>("str2");
-    CodeNode::SharedPtr str3 = std::make_shared<Variable>("str3");
-    CodeNode::SharedPtr str4 = std::make_shared<Variable>("str4");
-    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+    CodeNode::SharedPtr str0 = CodeNode::make<Variable>("str0");
+    CodeNode::SharedPtr str1 = CodeNode::make<Variable>("str1");
+    CodeNode::SharedPtr str2 = CodeNode::make<Variable>("str2");
+    CodeNode::SharedPtr str3 = CodeNode::make<Variable>("str3");
+    CodeNode::SharedPtr str4 = CodeNode::make<Variable>("str4");
+    CodeNode::SharedPtr num = CodeNode::make<Variable>("num");
 
     auto testcase =
         [this, &env](auto str, auto expect) {
-            auto value = std::make_shared<StringReverse>(str)->eval(env);
+            auto value = CodeNode::make<StringReverse>(str)->eval(env);
             TEST_CASE_MSG(value == expect, "value actual=" << value);
             TEST_CASE_MSG(str->eval(env) == expect, "str actual=" << str);
         };
@@ -3482,16 +3482,16 @@ void UnitTest::testCodeNodeStringReverse() {
 void UnitTest::testCodeNodeMakeArray() {
     auto env = Environment::make();
 
-    Value value = std::make_shared<MakeArray>()->eval(env);
+    Value value = CodeNode::make<MakeArray>()->eval(env);
     TEST_CASE_MSG(value.isArray(), "actual=" << value.typeToString());
     TEST_CASE_MSG(value.array().size() == 0lu, "actual=" << value.array().size());
 
     value =
-        std::make_shared<MakeArray>(
+        CodeNode::make<MakeArray>(
             CodeNode::SharedPtrList(
-                { std::make_shared<Literal>(Value('a')),
-                  std::make_shared<Literal>(Value('b')),
-                  std::make_shared<Literal>(Value('c')) }))
+                { CodeNode::make<Literal>(Value('a')),
+                  CodeNode::make<Literal>(Value('b')),
+                  CodeNode::make<Literal>(Value('c')) }))
         ->eval(env);
     TEST_CASE_MSG(value.isArray(), "actual=" << value.typeToString());
     TEST_CASE_MSG(value.array().size() == 3lu, "actual=" << value.array().size());
@@ -3505,9 +3505,9 @@ void UnitTest::testCodeNodeMakeArraySV() {
     auto env = Environment::make();
 
     Value value =
-        std::make_shared<MakeArraySV>(
-            std::make_shared<Literal>(Value(3ll)),
-            std::make_shared<Literal>(Value('0')))
+        CodeNode::make<MakeArraySV>(
+            CodeNode::make<Literal>(Value(3ll)),
+            CodeNode::make<Literal>(Value('0')))
         ->eval(env);
 
     TEST_CASE_MSG(value.isArray(), "actual=" << value.typeToString());
@@ -3517,8 +3517,8 @@ void UnitTest::testCodeNodeMakeArraySV() {
     TEST_CASE_MSG(value.array().get(2lu) == Value('0'), "actual=" << value.array().get(2lu));
 
     value =
-        std::make_shared<MakeArraySV>(
-            std::make_shared<Literal>(Value(2ll)))
+        CodeNode::make<MakeArraySV>(
+            CodeNode::make<Literal>(Value(2ll)))
         ->eval(env);
 
     TEST_CASE_MSG(value.isArray(), "actual=" << value.typeToString());
@@ -3532,27 +3532,27 @@ void UnitTest::testCodeNodeArrayLen() {
     auto env = Environment::make();
 
     Value value =
-        std::make_shared<ArrayLen>(
-            std::make_shared<Literal>(Value(Sequence())))
+        CodeNode::make<ArrayLen>(
+            CodeNode::make<Literal>(Value(Sequence())))
         ->eval(env);
     TEST_CASE_MSG(value == Value::Zero, "actual=" << value);
 
     value =
-        std::make_shared<ArrayLen>(
-            std::make_shared<Literal>(Value(Sequence({Value::Zero}))))
+        CodeNode::make<ArrayLen>(
+            CodeNode::make<Literal>(Value(Sequence({Value::Zero}))))
         ->eval(env);
     TEST_CASE_MSG(value == Value(1ll), "actual=" << value);
 
     value =
-        std::make_shared<ArrayLen>(
-            std::make_shared<Literal>(Value(Sequence({Value::Zero, Value::True, Value::False}))))
+        CodeNode::make<ArrayLen>(
+            CodeNode::make<Literal>(Value(Sequence({Value::Zero, Value::True, Value::False}))))
         ->eval(env);
     TEST_CASE_MSG(value == Value(3ll), "actual=" << value);
 
     try {
         value =
-            std::make_shared<ArrayLen>(
-                std::make_shared<Literal>(Value::Zero))
+            CodeNode::make<ArrayLen>(
+                CodeNode::make<Literal>(Value::Zero))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -3565,30 +3565,30 @@ void UnitTest::testCodeNodeArrayGet() {
     auto env = Environment::make();
     env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
 
-    const CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
+    const CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
     auto ilit = [](Value::Long i) {
-        return std::make_shared<Literal>(Value(i));
+        return CodeNode::make<Literal>(Value(i));
     };
 
-    Value value = std::make_shared<ArrayGet>(var, ilit(0))->eval(env);
+    Value value = CodeNode::make<ArrayGet>(var, ilit(0))->eval(env);
     TEST_CASE_MSG(value == Value('a'), "actual=" << value);
 
-    value = std::make_shared<ArrayGet>(var, ilit(1))->eval(env);
+    value = CodeNode::make<ArrayGet>(var, ilit(1))->eval(env);
     TEST_CASE_MSG(value == Value('b'), "actual=" << value);
 
-    value = std::make_shared<ArrayGet>(var, ilit(2))->eval(env);
+    value = CodeNode::make<ArrayGet>(var, ilit(2))->eval(env);
     TEST_CASE_MSG(value == Value('c'), "actual=" << value);
 
     try {
-        std::make_shared<ArrayGet>(var, ilit(3))->eval(env);
+        CodeNode::make<ArrayGet>(var, ilit(3))->eval(env);
         TEST_CASE(false);
     }
     catch (OutOfRange const &) {}
     catch (...) { TEST_CASE(false); }
 
     try {
-        std::make_shared<ArrayGet>(var, ilit(-1))->eval(env);
+        CodeNode::make<ArrayGet>(var, ilit(-1))->eval(env);
         TEST_CASE(false);
     }
     catch (OutOfRange const &) {}
@@ -3600,29 +3600,29 @@ void UnitTest::testCodeNodeArraySet() {
     auto env = Environment::make();
     env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
 
-    CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
+    CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
     Value expectedValue(Sequence({Value('a'), Value('b'), Value('c')}));
     auto &expected = expectedValue.array();
 
-    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
-    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
+    auto ilit = [](Value::Long i) { return CodeNode::make<Literal>(Value(i)); };
+    auto clit = [](Value::Char c) { return CodeNode::make<Literal>(Value(c)); };
 
-    Value value = std::make_shared<ArraySet>(var, ilit(0), clit('A'))->eval(env);
+    Value value = CodeNode::make<ArraySet>(var, ilit(0), clit('A'))->eval(env);
     TEST_CASE_MSG(value == Value('A'), "actual=" << value);
 
     value = var->eval(env);
     expected.set(0, 'A');
     TEST_CASE_MSG(value == expectedValue, "actual=" << value);
 
-    value = std::make_shared<ArraySet>(var, ilit(1), clit('B'))->eval(env);
+    value = CodeNode::make<ArraySet>(var, ilit(1), clit('B'))->eval(env);
     TEST_CASE_MSG(value == Value('B'), "actual=" << value);
 
     value = var->eval(env);
     expected.set(1, 'B');
     TEST_CASE_MSG(value == expectedValue, "actual=" << value);
 
-    value = std::make_shared<ArraySet>(var, ilit(2), clit('C'))->eval(env);
+    value = CodeNode::make<ArraySet>(var, ilit(2), clit('C'))->eval(env);
     TEST_CASE_MSG(value == Value('C'), "actual=" << value);
 
     value = var->eval(env);
@@ -3630,14 +3630,14 @@ void UnitTest::testCodeNodeArraySet() {
     TEST_CASE_MSG(value == expectedValue, "actual=" << value);
 
     try {
-        std::make_shared<ArraySet>(var, ilit(-1), clit('X'))->eval(env);
+        CodeNode::make<ArraySet>(var, ilit(-1), clit('X'))->eval(env);
         TEST_CASE(false);
     }
     catch (OutOfRange const &) {}
     catch (...) { TEST_CASE(false); }
 
     try {
-        std::make_shared<ArraySet>(var, ilit(3), clit('Y'))->eval(env);
+        CodeNode::make<ArraySet>(var, ilit(3), clit('Y'))->eval(env);
         TEST_CASE(false);
     }
     catch (OutOfRange const &) {}
@@ -3652,20 +3652,20 @@ void UnitTest::testCodeNodeArrayPush() {
     auto env = Environment::make();
     env->def("arr", Value(Sequence()));
 
-    CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
+    CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
-    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
-    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
+    auto ilit = [](Value::Long i) { return CodeNode::make<Literal>(Value(i)); };
+    auto clit = [](Value::Char c) { return CodeNode::make<Literal>(Value(c)); };
 
-    Value value = std::make_shared<ArrayPush>(var, ilit(10))->eval(env);
+    Value value = CodeNode::make<ArrayPush>(var, ilit(10))->eval(env);
     Value expected = Value(Sequence({Value(10ll)}));
     TEST_CASE_MSG(value == expected, "actual=" << value);
 
-    value = std::make_shared<ArrayPush>(var, clit('b'))->eval(env);
+    value = CodeNode::make<ArrayPush>(var, clit('b'))->eval(env);
     expected = Value(Sequence({Value(10ll), Value('b')}));
     TEST_CASE_MSG(value == expected, "actual=" << value);
 
-    value = std::make_shared<ArrayPush>(var, ilit(25ll))->eval(env);
+    value = CodeNode::make<ArrayPush>(var, ilit(25ll))->eval(env);
     expected = Value(Sequence({Value(10ll), Value('b'), Value(25ll)}));
     TEST_CASE_MSG(value == expected, "actual=" << value);
 }
@@ -3675,20 +3675,20 @@ void UnitTest::testCodeNodeArrayPop() {
     auto env = Environment::make();
     env->def("arr", arrval(Value(0ll), Value(1ll)));
 
-    CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
+    CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
-    Value value = std::make_shared<ArrayPop>(var)->eval(env);
+    Value value = CodeNode::make<ArrayPop>(var)->eval(env);
     Value arrValue = var->eval(env);
     TEST_CASE_MSG(value == Value(1ll), "actual" << value);
     TEST_CASE_MSG(arrValue == arrval(Value(0ll)), "actual" << arrValue);
 
-    value = std::make_shared<ArrayPop>(var)->eval(env);
+    value = CodeNode::make<ArrayPop>(var)->eval(env);
     arrValue = var->eval(env);
     TEST_CASE_MSG(value == Value(0ll), "actual" << value);
     TEST_CASE_MSG(arrValue == arrval(), "actual" << arrValue);
 
     try {
-        value = std::make_shared<ArrayPop>(var)->eval(env);
+        value = CodeNode::make<ArrayPop>(var)->eval(env);
         TEST_CASE(false);
     }
     catch (OutOfRange const & ex) {
@@ -3710,43 +3710,43 @@ void UnitTest::testCodeNodeArrayFind() {
 
     env->def("arr", Value(Sequence({a, b, c, a, b, c})));
 
-    CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
+    CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
-    auto ilit = [](Value::Long pos) { return std::make_shared<Literal>(Value(pos)); };
-    auto clit = [](Value const & chr) { return std::make_shared<Literal>(chr); };
+    auto ilit = [](Value::Long pos) { return CodeNode::make<Literal>(Value(pos)); };
+    auto clit = [](Value const & chr) { return CodeNode::make<Literal>(chr); };
 
-    Value value = std::make_shared<ArrayFind>(var, clit(a))->eval(env);
+    Value value = CodeNode::make<ArrayFind>(var, clit(a))->eval(env);
     TEST_CASE_MSG(value == Value(0ll), "actual=" << value);
 
-    value = std::make_shared<ArrayFind>(var, clit(b))->eval(env);
+    value = CodeNode::make<ArrayFind>(var, clit(b))->eval(env);
     TEST_CASE_MSG(value == Value(1ll), "actual=" << value);
 
-    value = std::make_shared<ArrayFind>(var, clit(c))->eval(env);
+    value = CodeNode::make<ArrayFind>(var, clit(c))->eval(env);
     TEST_CASE_MSG(value == Value(2ll), "actual=" << value);
 
-    value = std::make_shared<ArrayFind>(var, clit(d))->eval(env);
+    value = CodeNode::make<ArrayFind>(var, clit(d))->eval(env);
     TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
 
-    value = std::make_shared<ArrayFind>(var, clit(a), ilit(1))->eval(env);
+    value = CodeNode::make<ArrayFind>(var, clit(a), ilit(1))->eval(env);
     TEST_CASE_MSG(value == Value(3ll), "actual=" << value);
 
-    value = std::make_shared<ArrayFind>(var, clit(b), ilit(2))->eval(env);
+    value = CodeNode::make<ArrayFind>(var, clit(b), ilit(2))->eval(env);
     TEST_CASE_MSG(value == Value(4ll), "actual=" << value);
 
-    value = std::make_shared<ArrayFind>(var, clit(c), ilit(3))->eval(env);
+    value = CodeNode::make<ArrayFind>(var, clit(c), ilit(3))->eval(env);
     TEST_CASE_MSG(value == Value(5ll), "actual=" << value);
 
-    value = std::make_shared<ArrayFind>(var, clit(d), ilit(3))->eval(env);
+    value = CodeNode::make<ArrayFind>(var, clit(d), ilit(3))->eval(env);
     TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
 
-    value = std::make_shared<ArrayFind>(var, clit(a), ilit(4))->eval(env);
+    value = CodeNode::make<ArrayFind>(var, clit(a), ilit(4))->eval(env);
     TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
 
-    value = std::make_shared<ArrayFind>(var, clit(b), ilit(5))->eval(env);
+    value = CodeNode::make<ArrayFind>(var, clit(b), ilit(5))->eval(env);
     TEST_CASE_MSG(value == Value(-1ll), "actual=" << value);
 
     try {
-        value = std::make_shared<ArrayFind>(var, clit(c), ilit(6))->eval(env);
+        value = CodeNode::make<ArrayFind>(var, clit(c), ilit(6))->eval(env);
         TEST_CASE(false);
     }
     catch (OutOfRange const & ex) {
@@ -3766,10 +3766,10 @@ void UnitTest::testCodeNodeArrayCount() {
 
     env->def("arr", Value(Sequence({v1, v2, v3, v2, v3, v4, v3, v4, v4, v4})));
 
-    CodeNode::SharedPtr var = std::make_shared<Variable>("arr");
+    CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
-    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
-    auto count = [var, ilit](Value::Long i) { return std::make_shared<ArrayCount>(var, ilit(i)); };
+    auto ilit = [](Value::Long i) { return CodeNode::make<Literal>(Value(i)); };
+    auto count = [var, ilit](Value::Long i) { return CodeNode::make<ArrayCount>(var, ilit(i)); };
 
     Value value;
 
@@ -3780,7 +3780,7 @@ void UnitTest::testCodeNodeArrayCount() {
     value = count(5)->eval(env); TEST_CASE_MSG(value == Value(0ll), "actual=" << value);
 
     try {
-        std::make_shared<ArrayCount>(ilit(1), ilit(0))->eval(env);
+        CodeNode::make<ArrayCount>(ilit(1), ilit(0))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -3801,11 +3801,11 @@ void UnitTest::testCodeNodeArraySort() {
     env->def("arr", Value::Null);
     env->def("num", Value::Zero);
 
-    CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
-    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+    CodeNode::SharedPtr arr = CodeNode::make<Variable>("arr");
+    CodeNode::SharedPtr num = CodeNode::make<Variable>("num");
 
-    CodeNode::SharedPtr asc = std::make_shared<Literal>(false);
-    CodeNode::SharedPtr desc = std::make_shared<Literal>(true);
+    CodeNode::SharedPtr asc = CodeNode::make<Literal>(false);
+    CodeNode::SharedPtr desc = CodeNode::make<Literal>(true);
     CodeNode::SharedPtr none = CodeNode::SharedPtr();
 
     auto mkarr =
@@ -3816,7 +3816,7 @@ void UnitTest::testCodeNodeArraySort() {
 
     auto testcase =
         [this, &env](auto arr, auto desc, auto expect) {
-            auto value = std::make_shared<ArraySort>(arr, desc)->eval(env);
+            auto value = CodeNode::make<ArraySort>(arr, desc)->eval(env);
             TEST_CASE_MSG(value == expect, "value actual=" << value);
             TEST_CASE_MSG(arr->eval(env) == expect, "arr actual=" << arr);
         };
@@ -3874,8 +3874,8 @@ void UnitTest::testCodeNodeArrayReverse() {
     env->def("arr", Value::Null);
     env->def("num", Value::Zero);
 
-    CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
-    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+    CodeNode::SharedPtr arr = CodeNode::make<Variable>("arr");
+    CodeNode::SharedPtr num = CodeNode::make<Variable>("num");
 
     auto mkarr =
         [&](std::initializer_list<Value> seq) {
@@ -3885,7 +3885,7 @@ void UnitTest::testCodeNodeArrayReverse() {
 
     auto testcase =
         [this, &env](auto arr, auto expect) {
-            auto value = std::make_shared<ArrayReverse>(arr)->eval(env);
+            auto value = CodeNode::make<ArrayReverse>(arr)->eval(env);
             TEST_CASE_MSG(value == expect, "value actual=" << value);
             TEST_CASE_MSG(arr->eval(env) == expect, "arr actual=" << arr);
         };
@@ -3924,20 +3924,20 @@ void UnitTest::testCodeNodeArrayClear() {
 
     env->def("arr", Value(Sequence({v1, v2, v3})));
 
-    CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
+    CodeNode::SharedPtr arr = CodeNode::make<Variable>("arr");
 
     auto arrVal = arr->eval(env);
     TEST_CASE_MSG(arrVal == Value(Sequence({v1, v2, v3})), "array actual=" << arrVal);
 
-    auto result = std::make_shared<ArrayClear>(arr)->eval(env);
+    auto result = CodeNode::make<ArrayClear>(arr)->eval(env);
     TEST_CASE_MSG(result.isNull(), "result actual=" << result);
 
     arrVal = arr->eval(env);
     TEST_CASE_MSG(arrVal == Value(Sequence()), "array actual=" << arrVal);
 
     try {
-        std::make_shared<ArrayClear>(
-            std::make_shared<Literal>(Value(5ll)))->eval(env);
+        CodeNode::make<ArrayClear>(
+            CodeNode::make<Literal>(Value(5ll)))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
@@ -3952,8 +3952,8 @@ void UnitTest::testCodeNodeArrayClear() {
 void UnitTest::testCodeNodeArrayInsert() {
     auto env = Environment::make();
 
-    CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
-    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+    CodeNode::SharedPtr arr = CodeNode::make<Variable>("arr");
+    CodeNode::SharedPtr num = CodeNode::make<Variable>("num");
 
     const Value v0 = Value::Zero;
     const Value v1 = Value(1ll);
@@ -3967,10 +3967,10 @@ void UnitTest::testCodeNodeArrayInsert() {
 
     auto testcase =
         [this, &env](CodeNode::SharedPtr arrCode, const Value &pos, const Value &item, const Value &expect) {
-            auto posCode = std::make_shared<Literal>(pos);
-            auto itemCode = std::make_shared<Literal>(item);
+            auto posCode = CodeNode::make<Literal>(pos);
+            auto itemCode = CodeNode::make<Literal>(item);
 
-            auto result = std::make_shared<ArrayInsert>(arrCode, posCode, itemCode)->eval(env);
+            auto result = CodeNode::make<ArrayInsert>(arrCode, posCode, itemCode)->eval(env);
             TEST_CASE_MSG(result == item, "result actual=" << result);
 
             auto arr = arrCode->eval(env);
@@ -4011,8 +4011,8 @@ void UnitTest::testCodeNodeArrayInsert() {
 void UnitTest::testCodeNodeArrayRemove() {
     auto env = Environment::make();
 
-    CodeNode::SharedPtr arr = std::make_shared<Variable>("arr");
-    CodeNode::SharedPtr num = std::make_shared<Variable>("num");
+    CodeNode::SharedPtr arr = CodeNode::make<Variable>("arr");
+    CodeNode::SharedPtr num = CodeNode::make<Variable>("num");
 
     const Value v0 = Value::Zero;
     const Value v1 = Value(1ll);
@@ -4026,8 +4026,8 @@ void UnitTest::testCodeNodeArrayRemove() {
 
     auto testcase =
         [this, &env](CodeNode::SharedPtr arrCode, const Value &pos, const Value &expect) {
-            auto posCode = std::make_shared<Literal>(pos);
-            auto result = std::make_shared<ArrayRemove>(arrCode, posCode)->eval(env);
+            auto posCode = CodeNode::make<Literal>(pos);
+            auto result = CodeNode::make<ArrayRemove>(arrCode, posCode)->eval(env);
             TEST_CASE_MSG(result.isNull(), "value actual=" << result);
 
             auto arr = arrCode->eval(env);
@@ -4092,9 +4092,9 @@ void UnitTest::testCodeNodeStrCharCheck() {
     const Value sSp = Value(" \t\n");
     const Value mix = Value("Ul5? ");
 
-    auto lit = [](const Value &val) { return std::make_shared<Literal>(val); };
+    auto lit = [](const Value &val) { return CodeNode::make<Literal>(val); };
     auto check = [lit](StrCharCheck::Type chkType, const Value &val) {
-        return std::make_shared<StrCharCheck>(chkType, lit(val));
+        return CodeNode::make<StrCharCheck>(chkType, lit(val));
     };
 
     Value value;
@@ -4163,9 +4163,9 @@ void UnitTest::testCodeNodeStrCharTransform() {
     const Value STR = Value("STR");
     const Value num = Value("525");
 
-    auto lit = [](const Value &val) { return std::make_shared<Literal>(val); };
+    auto lit = [](const Value &val) { return CodeNode::make<Literal>(val); };
     auto trans = [lit](StrCharTransform::Type type, const Value &val) {
-        return std::make_shared<StrCharTransform>(type, lit(val));
+        return CodeNode::make<StrCharTransform>(type, lit(val));
     };
 
     Value value;
@@ -4204,7 +4204,7 @@ void UnitTest::testCodeNodeImportModule() {
 
         auto varName = [&moduleName](const char *name) { return moduleName + '.' + name; };
 
-        auto import = std::make_shared<ImportModule>(moduleName);
+        auto import = CodeNode::make<ImportModule>(moduleName);
         TEST_CASE(import->eval(env) == Value::True);
 
         TEST_CASE_MSG(env->size() == 3, "actual=" << env->size());
@@ -4223,7 +4223,7 @@ void UnitTest::testCodeNodeImportModule() {
         const std::string asName = "testmod";
         auto varAsName = [&asName](const char *name) { return asName + '.' + name; };
 
-        auto import = std::make_shared<ImportModule>(moduleName, asName);
+        auto import = CodeNode::make<ImportModule>(moduleName, asName);
         TEST_CASE(import->eval(env) == Value::True);
 
         TEST_CASE_MSG(env->size() == 3, "actual=" << env->size());
@@ -4245,13 +4245,13 @@ void UnitTest::testCodeNodeFromModuleImport() {
     {
         auto env = Environment::make();
 
-        auto fromImport = std::make_shared<FromModuleImport>(moduleName, "add");
+        auto fromImport = CodeNode::make<FromModuleImport>(moduleName, "add");
         TEST_CASE(fromImport->eval(env) == Value::True);
 
         TEST_CASE_MSG(env->size() == 1, "actual=" << env->size());
         TEST_CASE(env->exists("add"));
 
-        fromImport = std::make_shared<FromModuleImport>(moduleName, "add", "plus");
+        fromImport = CodeNode::make<FromModuleImport>(moduleName, "add", "plus");
         TEST_CASE(fromImport->eval(env) == Value::True);
 
         TEST_CASE_MSG(env->size() == 2, "actual=" << env->size());
@@ -4266,7 +4266,7 @@ void UnitTest::testCodeNodeFromModuleImport() {
     {
         auto env = Environment::make();
 
-        auto fromImport = std::make_shared<FromModuleImport>(
+        auto fromImport = CodeNode::make<FromModuleImport>(
             moduleName,
             Module::AliasList({ { "add", Module::OptionalName() }, { "sub", "minus" } }));
 
@@ -4285,10 +4285,10 @@ void UnitTest::testCodeNodeFromModuleImport() {
 void UnitTest::testCodeNodeRandom() {
     auto env = Environment::make();
 
-    auto lit = [](const Value &val) { return std::make_shared<Literal>(val); };
+    auto lit = [](const Value &val) { return CodeNode::make<Literal>(val); };
 
     auto test = [&env, lit](Value::Long mod, std::unordered_set<Value::Long> expectedSet) {
-                    auto randCode = std::make_shared<Random>(lit(Value(mod)));
+                    auto randCode = CodeNode::make<Random>(lit(Value(mod)));
                     for (int i = 0; i < 1000; ++i) {
                         if (expectedSet.find(randCode->eval(env).integer()) == expectedSet.end()) {
                             return false;
@@ -4303,7 +4303,7 @@ void UnitTest::testCodeNodeRandom() {
     TEST_CASE_MSG(test(10, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }), "rand(10)");
 
     try {
-        std::make_shared<Random>(lit(Value(-1ll)))->eval(env);
+        CodeNode::make<Random>(lit(Value(-1ll)))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidExpression &ex) {
@@ -4314,7 +4314,7 @@ void UnitTest::testCodeNodeRandom() {
     }
 
     try {
-        std::make_shared<Random>(lit(Value('a')))->eval(env);
+        CodeNode::make<Random>(lit(Value('a')))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
@@ -4330,8 +4330,8 @@ void UnitTest::testCodeNodeHash() {
     auto env = Environment::make();
 
     auto hash = [&env](const Value &value) {
-                    auto lit = std::make_shared<Literal>(value);
-                    return std::make_shared<Hash>(lit)->eval(env);
+                    auto lit = CodeNode::make<Literal>(value);
+                    return CodeNode::make<Hash>(lit)->eval(env);
                 };
 
     auto test = [hash](const Value &value) {
@@ -4353,19 +4353,19 @@ void UnitTest::testCodeNodeHash() {
 void UnitTest::testCodeNodeMakeHashMap() {
     auto env = Environment::make();
 
-    auto ilit = [](Value::Long value) { return std::make_shared<Literal>(Value(value)); };
-    auto slit = [](const Value::Text &value) { return std::make_shared<Literal>(Value(value)); };
+    auto ilit = [](Value::Long value) { return CodeNode::make<Literal>(Value(value)); };
+    auto slit = [](const Value::Text &value) { return CodeNode::make<Literal>(Value(value)); };
 
-    Value value = std::make_shared<MakeHashMap>()->eval(env);
+    Value value = CodeNode::make<MakeHashMap>()->eval(env);
     TEST_CASE_MSG(value.isHashMap(), "actual=" << value.typeToString());
     TEST_CASE_MSG(value.hashMap().size() == 0lu, "actual=" << value.hashMap().size());
 
     value =
-        std::make_shared<MakeHashMap>(
+        CodeNode::make<MakeHashMap>(
             CodeNode::SharedPtrList(
-                { std::make_shared<MakeArray>(CodeNode::SharedPtrList({slit("one"), ilit(1)})),
-                  std::make_shared<MakeArray>(CodeNode::SharedPtrList({slit("two"), ilit(2)})),
-                  std::make_shared<MakeArray>(CodeNode::SharedPtrList({slit("three"), ilit(3)}))
+                { CodeNode::make<MakeArray>(CodeNode::SharedPtrList({slit("one"), ilit(1)})),
+                  CodeNode::make<MakeArray>(CodeNode::SharedPtrList({slit("two"), ilit(2)})),
+                  CodeNode::make<MakeArray>(CodeNode::SharedPtrList({slit("three"), ilit(3)}))
                 }))
         ->eval(env);
     TEST_CASE_MSG(value.isHashMap(), "actual=" << value.typeToString());
@@ -4375,11 +4375,11 @@ void UnitTest::testCodeNodeMakeHashMap() {
     TEST_CASE_MSG(value.hashMap().get(Value("three")) == Value(3ll), "actual=" << value.hashMap().get(Value("three")));
 
     value =
-        std::make_shared<MakeHashMap>(
+        CodeNode::make<MakeHashMap>(
             CodeNode::SharedPtrList(
-                { std::make_shared<MakePair>(slit("a"), ilit(10)),
-                  std::make_shared<MakePair>(slit("b"), ilit(20)),
-                  std::make_shared<MakePair>(slit("c"), ilit(30))
+                { CodeNode::make<MakePair>(slit("a"), ilit(10)),
+                  CodeNode::make<MakePair>(slit("b"), ilit(20)),
+                  CodeNode::make<MakePair>(slit("c"), ilit(30))
                 }))
         ->eval(env);
     TEST_CASE_MSG(value.isHashMap(), "actual=" << value.typeToString());
@@ -4389,7 +4389,7 @@ void UnitTest::testCodeNodeMakeHashMap() {
     TEST_CASE_MSG(value.hashMap().get(Value("c")) == Value(30ll), "actual=" << value.hashMap().get(Value("c")));
 
     try {
-        std::make_shared<MakeHashMap>(CodeNode::SharedPtrList({ilit(5)}))->eval(env);
+        CodeNode::make<MakeHashMap>(CodeNode::SharedPtrList({ilit(5)}))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
@@ -4400,9 +4400,9 @@ void UnitTest::testCodeNodeMakeHashMap() {
     }
 
     try {
-        std::make_shared<MakeHashMap>(
+        CodeNode::make<MakeHashMap>(
             CodeNode::SharedPtrList(
-                { std::make_shared<MakeArray>(CodeNode::SharedPtrList({slit("one")})) }))
+                { CodeNode::make<MakeArray>(CodeNode::SharedPtrList({slit("one")})) }))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -4414,9 +4414,9 @@ void UnitTest::testCodeNodeMakeHashMap() {
     }
 
     try {
-        std::make_shared<MakeHashMap>(
+        CodeNode::make<MakeHashMap>(
             CodeNode::SharedPtrList(
-                { std::make_shared<MakeArray>(CodeNode::SharedPtrList({slit("one"), ilit(1), ilit(2)})) }))
+                { CodeNode::make<MakeArray>(CodeNode::SharedPtrList({slit("one"), ilit(1), ilit(2)})) }))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -4441,27 +4441,27 @@ void UnitTest::testCodeNodeHashMapLen() {
               };
 
     Value value =
-        std::make_shared<HashMapLen>(
-            std::make_shared<Literal>(Value(ht(0))))
+        CodeNode::make<HashMapLen>(
+            CodeNode::make<Literal>(Value(ht(0))))
         ->eval(env);
     TEST_CASE_MSG(value == Value::Zero, "actual=" << value);
 
     value =
-        std::make_shared<HashMapLen>(
-            std::make_shared<Literal>(Value(ht(1))))
+        CodeNode::make<HashMapLen>(
+            CodeNode::make<Literal>(Value(ht(1))))
         ->eval(env);
     TEST_CASE_MSG(value == Value(1ll), "actual=" << value);
 
     value =
-        std::make_shared<HashMapLen>(
-            std::make_shared<Literal>(Value(ht(3))))
+        CodeNode::make<HashMapLen>(
+            CodeNode::make<Literal>(Value(ht(3))))
         ->eval(env);
     TEST_CASE_MSG(value == Value(3ll), "actual=" << value);
 
     try {
         value =
-            std::make_shared<HashMapLen>(
-                std::make_shared<Literal>(Value::Zero))
+            CodeNode::make<HashMapLen>(
+                CodeNode::make<Literal>(Value::Zero))
             ->eval(env);
         TEST_CASE(false);
     }
@@ -4483,11 +4483,11 @@ void UnitTest::testCodeNodeHashMapContains() {
                      if (count >= 1) { table.set(one, Value(1ll)); }
                      if (count >= 2) { table.set(two, Value(2ll)); }
                      if (count >= 3) { table.set(three, Value(3ll)); }
-                     return std::make_shared<Literal>(Value(table));
+                     return CodeNode::make<Literal>(Value(table));
                  };
 
     auto exists = [htlit, &env](int count, const Value &key) {
-                      return std::make_shared<HashMapContains>(htlit(count), std::make_shared<Literal>(key))->eval(env);
+                      return CodeNode::make<HashMapContains>(htlit(count), CodeNode::make<Literal>(key))->eval(env);
                   };
 
     Value result;
@@ -4504,9 +4504,9 @@ void UnitTest::testCodeNodeHashMapContains() {
     result = exists(3, four);  TEST_CASE_MSG(result == Value::False, "actual=" << result);
 
     try {
-        std::make_shared<HashMapContains>(
-            std::make_shared<Literal>(one),
-            std::make_shared<Literal>(two))->eval(env);
+        CodeNode::make<HashMapContains>(
+            CodeNode::make<Literal>(one),
+            CodeNode::make<Literal>(two))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4535,12 +4535,12 @@ void UnitTest::testCodeNodeHashMapGet() {
     env->def("ht", Value(ht));
 
     auto get = [&env](const Value &key, const std::optional<Value> &defaultValue = std::nullopt) {
-                   return std::make_shared<HashMapGet>(std::make_shared<Variable>("ht"),
-                                                       std::make_shared<Literal>(key),
-                                                       (defaultValue
-                                                        ? std::make_shared<Literal>(*defaultValue)
-                                                        : CodeNode::SharedPtr()))->eval(env);
-               };
+        return CodeNode::make<HashMapGet>(CodeNode::make<Variable>("ht"),
+                                                     CodeNode::make<Literal>(key),
+                                                     (defaultValue
+                                                      ? CodeNode::make<Literal>(*defaultValue)
+                                                      : CodeNode::SharedPtr()))->eval(env);
+    };
 
     Value result;
 
@@ -4555,8 +4555,8 @@ void UnitTest::testCodeNodeHashMapGet() {
     result = get(kFour,  Value::Zero); TEST_CASE_MSG(result == Value::Zero, "actual=" << result);
 
     try {
-        std::make_shared<HashMapGet>(std::make_shared<Literal>(Value::Zero),
-                                     std::make_shared<Literal>(kOne))->eval(env);
+        CodeNode::make<HashMapGet>(CodeNode::make<Literal>(Value::Zero),
+                                   CodeNode::make<Literal>(kOne))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4570,13 +4570,13 @@ void UnitTest::testCodeNodeHashMapSet() {
     auto env = Environment::make();
     env->def("ht", Value(Hashtable()));
 
-    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+    CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
 
-    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
-    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(Value(i)); };
+    auto clit = [](Value::Char c) { return CodeNode::make<Literal>(Value(c)); };
+    auto ilit = [](Value::Long i) { return CodeNode::make<Literal>(Value(i)); };
 
     auto set = [&env, &ht, clit, ilit](Value::Char key, Value::Long val) {
-                   return std::make_shared<HashMapSet>(ht, clit(key), ilit(val))->eval(env);
+                   return CodeNode::make<HashMapSet>(ht, clit(key), ilit(val))->eval(env);
                };
 
     auto htget = [&env](Value::Char key) { return env->get("ht").hashMap().get(Value(key)); };
@@ -4603,7 +4603,7 @@ void UnitTest::testCodeNodeHashMapSet() {
     TEST_CASE_MSG(htlen() == 3, "actual=" << htlen());
 
     try {
-        std::make_shared<HashMapSet>(ilit(0), ilit(1), ilit(2))->eval(env);
+        CodeNode::make<HashMapSet>(ilit(0), ilit(1), ilit(2))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4624,12 +4624,12 @@ void UnitTest::testCodeNodeHashMapRemove() {
         env->def("ht", Value(ht));
     }
 
-    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+    CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
 
-    auto clit = [](Value::Char c) { return std::make_shared<Literal>(Value(c)); };
+    auto clit = [](Value::Char c) { return CodeNode::make<Literal>(Value(c)); };
 
     auto remove = [&env, &ht, clit](Value::Char key) {
-                      return std::make_shared<HashMapRemove>(ht, clit(key))->eval(env);
+                      return CodeNode::make<HashMapRemove>(ht, clit(key))->eval(env);
                   };
 
     auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
@@ -4658,7 +4658,7 @@ void UnitTest::testCodeNodeHashMapRemove() {
     TEST_CASE_MSG(htlen() == 0, "actual=" << htlen());
 
     try {
-        std::make_shared<HashMapRemove>(clit('a'), clit('b'))->eval(env);
+        CodeNode::make<HashMapRemove>(clit('a'), clit('b'))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4679,10 +4679,10 @@ void UnitTest::testCodeNodeHashMapClear() {
         env->def("ht", Value(ht));
     }
 
-    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+    CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
 
     auto clear = [&env, &ht]() {
-                     return std::make_shared<HashMapClear>(ht)->eval(env);
+                     return CodeNode::make<HashMapClear>(ht)->eval(env);
                  };
 
     auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
@@ -4701,7 +4701,7 @@ void UnitTest::testCodeNodeHashMapClear() {
     TEST_CASE(!hthas('c'));
 
     try {
-        std::make_shared<HashMapClear>(std::make_shared<Literal>(Value('a')))->eval(env);
+        CodeNode::make<HashMapClear>(CodeNode::make<Literal>(Value('a')))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4722,12 +4722,12 @@ void UnitTest::testCodeNodeHashMapFind() {
         env->def("ht", Value(ht));
     }
 
-    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+    CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
 
-    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(i); };
+    auto ilit = [](Value::Long i) { return CodeNode::make<Literal>(i); };
 
     auto find = [&env, &ht, ilit](Value::Long value) {
-                    return std::make_shared<HashMapFind>(ht, ilit(value))->eval(env);
+                    return CodeNode::make<HashMapFind>(ht, ilit(value))->eval(env);
                 };
 
     Value result;
@@ -4737,7 +4737,7 @@ void UnitTest::testCodeNodeHashMapFind() {
     result = find(4); TEST_CASE_MSG(result == Value::Null, "actual=" << result);
 
     try {
-        std::make_shared<HashMapFind>(ilit(1), ilit(2))->eval(env);
+        CodeNode::make<HashMapFind>(ilit(1), ilit(2))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4759,12 +4759,12 @@ void UnitTest::testCodeNodeHashMapCount() {
         env->def("ht", Value(ht));
     }
 
-    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+    CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
 
-    auto ilit = [](Value::Long i) { return std::make_shared<Literal>(i); };
+    auto ilit = [](Value::Long i) { return CodeNode::make<Literal>(i); };
 
     auto count = [&env, &ht, ilit](Value::Long value) {
-                     return std::make_shared<HashMapCount>(ht, ilit(value))->eval(env);
+                     return CodeNode::make<HashMapCount>(ht, ilit(value))->eval(env);
                  };
 
     Value result;
@@ -4774,7 +4774,7 @@ void UnitTest::testCodeNodeHashMapCount() {
     result = count(4); TEST_CASE_MSG(result == Value::Zero, "actual=" << result);
 
     try {
-        std::make_shared<HashMapCount>(ilit(1), ilit(2))->eval(env);
+        CodeNode::make<HashMapCount>(ilit(1), ilit(2))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4795,10 +4795,10 @@ void UnitTest::testCodeNodeHashMapKeys() {
         env->def("ht", Value(ht));
     }
 
-    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+    CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
 
     auto keys = [&env, &ht]() {
-                    return std::make_shared<HashMapKeys>(ht)->eval(env);
+                    return CodeNode::make<HashMapKeys>(ht)->eval(env);
                 };
 
     const Value ks = keys();
@@ -4813,7 +4813,7 @@ void UnitTest::testCodeNodeHashMapKeys() {
     cnt = seq.count(Value('c')); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
 
     try {
-        std::make_shared<HashMapKeys>(std::make_shared<Literal>(Value('a')))->eval(env);
+        CodeNode::make<HashMapKeys>(CodeNode::make<Literal>(Value('a')))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4835,10 +4835,10 @@ void UnitTest::testCodeNodeHashMapValues() {
         env->def("ht", Value(ht));
     }
 
-    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+    CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
 
     auto values = [&env, &ht]() {
-                      return std::make_shared<HashMapValues>(ht)->eval(env);
+                      return CodeNode::make<HashMapValues>(ht)->eval(env);
                   };
 
     const Value vs = values();
@@ -4853,7 +4853,7 @@ void UnitTest::testCodeNodeHashMapValues() {
     cnt = vals.count(Value(3ll)); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
 
     try {
-        std::make_shared<HashMapValues>(std::make_shared<Literal>(Value(1ll)))->eval(env);
+        CodeNode::make<HashMapValues>(CodeNode::make<Literal>(Value(1ll)))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4875,10 +4875,10 @@ void UnitTest::testCodeNodeHashMapItems() {
         env->def("ht", Value(ht));
     }
 
-    CodeNode::SharedPtr ht = std::make_shared<Variable>("ht");
+    CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
 
     auto items = [&env, &ht]() {
-                     return std::make_shared<HashMapItems>(ht)->eval(env);
+                     return CodeNode::make<HashMapItems>(ht)->eval(env);
                  };
 
     const Value itms = items();
@@ -4894,7 +4894,7 @@ void UnitTest::testCodeNodeHashMapItems() {
     cnt = pairs.count(Value(Value::Pair(Value('2'), Value(2ll)))); TEST_CASE_MSG(cnt == 1, "actual=" << cnt);
 
     try {
-        std::make_shared<HashMapItems>(std::make_shared<Literal>(Value(1ll)))->eval(env);
+        CodeNode::make<HashMapItems>(CodeNode::make<Literal>(Value(1ll)))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4907,23 +4907,23 @@ void UnitTest::testCodeNodeHashMapItems() {
 void UnitTest::testCodeNodePairOperations() {
     auto env = Environment::make();
 
-    auto ilit = [](Value::Long value) { return std::make_shared<Literal>(Value(value)); };
+    auto ilit = [](Value::Long value) { return CodeNode::make<Literal>(Value(value)); };
 
-    Value value = std::make_shared<MakePair>(ilit(1), ilit(2))->eval(env);
+    Value value = CodeNode::make<MakePair>(ilit(1), ilit(2))->eval(env);
     TEST_CASE_MSG(value.isPair(), "actual=" << value.isPair());
     TEST_CASE_MSG(value.pair().first() == Value(1ll), "actual=" << value.pair().first());
     TEST_CASE_MSG(value.pair().second() == Value(2ll), "actual=" << value.pair().second());
 
     env->def("p", value);
 
-    Value fValue = std::make_shared<PairFirst>(std::make_shared<Variable>("p"))->eval(env);
+    Value fValue = CodeNode::make<PairFirst>(CodeNode::make<Variable>("p"))->eval(env);
     TEST_CASE_MSG(fValue == Value(1ll), "actual=" << fValue);
 
-    Value sValue = std::make_shared<PairSecond>(std::make_shared<Variable>("p"))->eval(env);
+    Value sValue = CodeNode::make<PairSecond>(CodeNode::make<Variable>("p"))->eval(env);
     TEST_CASE_MSG(sValue == Value(2ll), "actual=" << sValue);
 
     try {
-        std::make_shared<PairFirst>(std::make_shared<Literal>(Value(1ll)))->eval(env);
+        CodeNode::make<PairFirst>(CodeNode::make<Literal>(Value(1ll)))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -4932,7 +4932,7 @@ void UnitTest::testCodeNodePairOperations() {
     }
 
     try {
-        std::make_shared<PairSecond>(std::make_shared<Literal>(Value(1ll)))->eval(env);
+        CodeNode::make<PairSecond>(CodeNode::make<Literal>(Value(1ll)))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}

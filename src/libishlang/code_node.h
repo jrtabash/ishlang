@@ -35,6 +35,12 @@ namespace Ishlang {
             return this->exec(env);
         }
 
+    public:
+        template <typename CodeType, typename ... Args>
+        static SharedPtr make(Args && ... args) {
+            return std::make_shared<CodeType>(std::forward<Args>(args)...);
+        }
+
     protected:
         virtual Value exec(Environment::SharedPtr env) = 0;
     };
