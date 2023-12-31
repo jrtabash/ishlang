@@ -4990,7 +4990,7 @@ void UnitTest::testTokenType() {
 bool parserTest(Parser &parser, Environment::SharedPtr env, const std::string &expr, const Value &value, bool success) {
     try {
         CodeNode::SharedPtr code(parser.read(expr));
-        if (code.get()) {
+        if (code) {
             Value result = code->eval(env);
             if (result.type() != value.type()) {
                 std::cerr << "Parser - " << expr << ": type expected=" << value.typeToString() << " actual=" << result.typeToString() << '\n';

@@ -43,11 +43,11 @@ namespace Ishlang {
     // INLINE
 
     inline bool Lambda::operator==(const Lambda &rhs) const {
-        return paramEqual(params_, rhs.params_) && body_.get() == rhs.body_.get() && env_.get() == rhs.env_.get();
+        return paramEqual(params_, rhs.params_) && body_ == rhs.body_ && env_ == rhs.env_;
     }
 
     inline bool Lambda::operator!=(const Lambda &rhs) const {
-        return !paramEqual(params_, rhs.params_) || body_.get() != rhs.body_.get() || env_.get() != rhs.env_.get();
+        return !paramEqual(params_, rhs.params_) || body_ != rhs.body_ || env_ != rhs.env_;
     }
 
     inline bool Lambda::operator<(const Lambda &rhs) const {

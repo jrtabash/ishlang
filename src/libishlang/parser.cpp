@@ -51,7 +51,7 @@ void Parser::readMulti(const std::string &expr, CallBack callback) {
         }
 
         auto code = readExpr();
-        if (code.get()) {
+        if (code) {
             callback(code);
         }
     }
@@ -186,7 +186,7 @@ CodeNode::SharedPtr Parser::readApp(const std::string &expected) {
 CodeNode::SharedPtrList Parser::readExprList() {
     CodeNode::SharedPtrList forms;
     auto form = readExpr();
-    while (form.get()) {
+    while (form) {
         forms.push_back(form);
         form = readExpr();
     }
@@ -219,7 +219,7 @@ CodeNode::SharedPtrPairs Parser::readExprPairs() {
     cons.first = readExpr();
     cons.second = readExpr();
     ignoreRightP();
-    while (cons.first.get() && cons.second.get()) {
+    while (cons.first && cons.second) {
         pairs.push_back(cons);
         if (ignoreLeftP(true)) { break; }
         cons.first = readExpr();
@@ -239,7 +239,7 @@ CodeNode::NameSharedPtrs Parser::readNameExprPairs() {
         cons.first = readName();
         cons.second = readExpr();
         ignoreRightP();
-        while (cons.second.get()) {
+        while (cons.second) {
             nameExprs.push_back(cons);
             if (ignoreLeftP(true)) {
                 rpseen = true;

@@ -31,7 +31,7 @@ namespace Ishlang {
         virtual ~CodeNode() {}
         
         Value eval(Environment::SharedPtr env) {
-            if (!env.get()) { throw NullEnvironment(); }
+            if (!env) { throw NullEnvironment(); }
             return this->exec(env);
         }
 

@@ -24,7 +24,7 @@ IsType::IsType(CodeNode::SharedPtr expr, Value::Type type)
 {}
 
 Value IsType::exec(Environment::SharedPtr env) {
-    if (expr_.get()) {
+    if (expr_) {
         Value exprValue = expr_->eval(env);
         return exprValue.type() == type_ ? Value::True : Value::False;
     }
@@ -38,7 +38,7 @@ TypeName::TypeName(CodeNode::SharedPtr expr)
 {}
 
 Value TypeName::exec(Environment::SharedPtr env) {
-    if (expr_.get()) {
+    if (expr_) {
         Value exprValue = expr_->eval(env);
         return Value(Value::typeToString(exprValue.type()));
     }
@@ -53,7 +53,7 @@ AsType::AsType(CodeNode::SharedPtr expr, Value::Type type)
 {}
 
 Value AsType::exec(Environment::SharedPtr env) {
-    if (expr_.get()) {
+    if (expr_) {
         Value exprValue = expr_->eval(env);
         return exprValue.asType(type_);
     }
@@ -174,7 +174,7 @@ Not::Not(CodeNode::SharedPtr operand)
 }
 
 Value Not::exec(Environment::SharedPtr env) {
-    if (operand_.get()) {
+    if (operand_) {
         Value operand = operand_->eval(env);
 
         if (!operand.isBool()) { throw InvalidOperandType("Boolean", operand.typeToString()); }
@@ -192,7 +192,7 @@ NegativeOf::NegativeOf(CodeNode::SharedPtr operand)
 }
 
 Value NegativeOf::exec(Environment::SharedPtr env) {
-    if (operand_.get()) {
+    if (operand_) {
         Value operand = operand_->eval(env);
 
         if (!operand.isNumber()) { throw InvalidOperandType("Number", operand.typeToString()); }
@@ -271,7 +271,7 @@ Value Cond::exec(Environment::SharedPtr env) {
     const size_t numCases = cases_.size();
     if (numCases > 0) {
         for (CodeNode::SharedPtrPairs::iterator iter = cases_.begin(); iter != cases_.end(); ++iter) {
-            if (!iter->first.get()) { throw InvalidExpressionType("Boolean", "Null"); }
+            if (!iter->first) { throw InvalidExpressionType("Boolean", "Null"); }
 
             const Value pred = iter->first->eval(env);
             if (!pred.isBool()) { throw InvalidExpressionType("Boolean", pred.typeToString()); }
@@ -346,7 +346,7 @@ LambdaApp::LambdaApp(CodeNode::SharedPtr closure, SharedPtrList args)
 {}
 
 Value LambdaApp::exec(Environment::SharedPtr env) {
-    if (!closureVar_.isClosure() && closure_.get()) {
+    if (!closureVar_.isClosure() && closure_) {
         closureVar_ = closure_->eval(env);
     }
 
@@ -430,7 +430,7 @@ IsStructName::IsStructName(CodeNode::SharedPtr expr, const std::string &name)
 {}
 
 Value IsStructName::exec(Environment::SharedPtr env) {
-    if (expr_.get()) {
+    if (expr_) {
         Value value = expr_->eval(env);
         if (value.isUserType() && value.userType().name() == name_) {
             return Value::True;
@@ -447,7 +447,7 @@ StructName::StructName(CodeNode::SharedPtr expr)
 }
 
 Value StructName::exec(Environment::SharedPtr env) {
-    if (expr_.get()) {
+    if (expr_) {
         Value value = expr_->eval(env);
         if (value.isUserObject()) {
             return Value(value.userObject().type().name());
@@ -493,7 +493,7 @@ IsInstanceOf::IsInstanceOf(CodeNode::SharedPtr expr, const std::string &name)
 {}
 
 Value IsInstanceOf::exec(Environment::SharedPtr env) {
-    if (expr_.get()) {
+    if (expr_) {
         Value value = expr_->eval(env);
         if (value.isUserObject() && value.userObject().type().name() == name_) {
             return Value::True;
@@ -510,7 +510,7 @@ GetMember::GetMember(CodeNode::SharedPtr expr, const std::string &name)
 {}
 
 Value GetMember::exec(Environment::SharedPtr env) {
-    if (expr_.get()) {
+    if (expr_) {
         Value value = expr_->eval(env);
         if (value.isUserObject()) {
             return value.userObject().get(name_);
@@ -531,10 +531,10 @@ SetMember::SetMember(CodeNode::SharedPtr expr, const std::string &name, CodeNode
 {}
 
 Value SetMember::exec(Environment::SharedPtr env) {
-    if (expr_.get()) {
+    if (expr_) {
         Value instanceValue = expr_->eval(env);
         if (instanceValue.isUserObject()) {
-            if (newValExpr_.get()) {
+            if (newValExpr_) {
                 Value newValue = newValExpr_->eval(env);
                 instanceValue.userObject().set(name_, newValue);
                 return newValue;
@@ -554,7 +554,7 @@ StringLen::StringLen(CodeNode::SharedPtr expr)
 {}
 
 Value StringLen::exec(Environment::SharedPtr env) {
-    if (expr_.get()) {
+    if (expr_) {
         Value str = expr_->eval(env);
 
         if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
@@ -572,7 +572,7 @@ StringGet::StringGet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos)
 {}
 
 Value StringGet::exec(Environment::SharedPtr env) {
-    if (str_.get() && pos_.get()) {
+    if (str_ && pos_) {
         Value str = str_->eval(env);
         Value pos = pos_->eval(env);
 
@@ -599,7 +599,7 @@ StringSet::StringSet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode:
 {}
 
 Value StringSet::exec(Environment::SharedPtr env) {
-    if (str_.get() && pos_.get() && val_.get()) {
+    if (str_ && pos_ && val_) {
         Value str = str_->eval(env);
         Value pos = pos_->eval(env);
         Value val = val_->eval(env);
@@ -628,7 +628,7 @@ StringCat::StringCat(CodeNode::SharedPtr str, CodeNode::SharedPtr other)
 {}
 
 Value StringCat::exec(Environment::SharedPtr env) {
-    if (str_.get() && other_.get()) {
+    if (str_ && other_) {
         Value str = str_->eval(env);
         Value other = other_->eval(env);
 
@@ -667,7 +667,7 @@ SubString::SubString(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode:
 }
 
 Value SubString::exec(Environment::SharedPtr env) {
-    if (str_.get() && pos_.get()) {
+    if (str_ && pos_) {
         Value str = str_->eval(env);
         Value pos = pos_->eval(env);
         Value len = len_ ? len_->eval(env) : Value::Zero;
@@ -711,7 +711,7 @@ StringFind::StringFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr, CodeNod
 }
 
 Value StringFind::exec(Environment::SharedPtr env) {
-    if (str_.get() && chr_.get()) {
+    if (str_ && chr_) {
         Value str = str_->eval(env);
         Value chr = chr_->eval(env);
         Value pos = pos_ ? pos_->eval(env) : Value::Zero;
@@ -742,7 +742,7 @@ StringCount::StringCount(CodeNode::SharedPtr str, CodeNode::SharedPtr chr)
 }
 
 Value StringCount::exec(Environment::SharedPtr env) {
-    if (str_.get() && chr_.get()) {
+    if (str_ && chr_) {
         Value str = str_->eval(env);
         Value chr = chr_->eval(env);
 
@@ -765,7 +765,7 @@ StringCompare::StringCompare(CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
 }
 
 Value StringCompare::exec(Environment::SharedPtr env) {
-    if (lhs_.get() && rhs_.get()) {
+    if (lhs_ && rhs_) {
         Value lhs = lhs_->eval(env);
         Value rhs = rhs_->eval(env);
 
@@ -790,9 +790,9 @@ StringSort::StringSort(CodeNode::SharedPtr str, CodeNode::SharedPtr descending)
 }
 
 Value StringSort::exec(Environment::SharedPtr env) {
-    if (str_.get()) {
+    if (str_) {
         Value str = str_->eval(env);
-        Value desc = desc_.get() ? desc_->eval(env) : Value::False;
+        Value desc = desc_ ? desc_->eval(env) : Value::False;
 
         if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
         if (!desc.isBool()) { throw InvalidOperandType("Boolean", desc.typeToString()); }
@@ -818,7 +818,7 @@ StringReverse::StringReverse(CodeNode::SharedPtr str)
 }
 
 Value StringReverse::exec(Environment::SharedPtr env) {
-    if (str_.get()) {
+    if (str_) {
         Value str = str_->eval(env);
 
         if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
@@ -869,9 +869,9 @@ MakeArraySV::MakeArraySV(CodeNode::SharedPtr size, CodeNode::SharedPtr initValue
 {}
 
 Value MakeArraySV::exec(Environment::SharedPtr env) {
-    if (size_.get()) {
+    if (size_) {
         Value size = size_->eval(env);
-        Value initValue = initValue_.get() ? initValue_->eval(env) : Value::Null;
+        Value initValue = initValue_ ? initValue_->eval(env) : Value::Null;
 
         if (!size.isInt()) { throw InvalidOperandType("Integer", size.typeToString()); }
 
@@ -887,7 +887,7 @@ ArrayLen::ArrayLen(CodeNode::SharedPtr expr)
 {}
 
 Value ArrayLen::exec(Environment::SharedPtr env) {
-    if (expr_.get()) {
+    if (expr_) {
         Value arr = expr_->eval(env);
 
         if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
@@ -905,7 +905,7 @@ ArrayGet::ArrayGet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos)
 {}
 
 Value ArrayGet::exec(Environment::SharedPtr env) {
-    if (arr_.get() && pos_.get()) {
+    if (arr_ && pos_) {
         Value arr = arr_->eval(env);
         Value pos = pos_->eval(env);
 
@@ -932,7 +932,7 @@ ArraySet::ArraySet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeNode::S
 {}
 
 Value ArraySet::exec(Environment::SharedPtr env) {
-    if (arr_.get() && pos_.get() && val_.get()) {
+    if (arr_ && pos_ && val_) {
         Value arr = arr_->eval(env);
         Value pos = pos_->eval(env);
         Value val = val_->eval(env);
@@ -960,7 +960,7 @@ ArrayPush::ArrayPush(CodeNode::SharedPtr arr, CodeNode::SharedPtr val)
 {}
 
 Value ArrayPush::exec(Environment::SharedPtr env) {
-    if (arr_.get() && val_.get()) {
+    if (arr_ && val_) {
         Value arr = arr_->eval(env);
         Value val = val_->eval(env);
 
@@ -979,7 +979,7 @@ ArrayPop::ArrayPop(CodeNode::SharedPtr arr)
 {}
 
 Value ArrayPop::exec(Environment::SharedPtr env) {
-    if (arr_.get()) {
+    if (arr_) {
         Value arr = arr_->eval(env);
 
         if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
@@ -1014,7 +1014,7 @@ ArrayFind::ArrayFind(CodeNode::SharedPtr arr, CodeNode::SharedPtr chr, CodeNode:
 }
 
 Value ArrayFind::exec(Environment::SharedPtr env) {
-    if (arr_.get() && val_.get()) {
+    if (arr_ && val_) {
         Value arr = arr_->eval(env);
         Value val = val_->eval(env);
         Value pos = pos_ ? pos_->eval(env) : Value::Zero;
@@ -1044,7 +1044,7 @@ ArrayCount::ArrayCount(CodeNode::SharedPtr arr, CodeNode::SharedPtr val)
 }
 
 Value ArrayCount::exec(Environment::SharedPtr env) {
-    if (arr_.get() && val_.get()) {
+    if (arr_ && val_) {
         Value arr = arr_->eval(env);
         Value val = val_->eval(env);
 
@@ -1064,9 +1064,9 @@ ArraySort::ArraySort(CodeNode::SharedPtr arr, CodeNode::SharedPtr descending)
 }
 
 Value ArraySort::exec(Environment::SharedPtr env) {
-    if (arr_.get()) {
+    if (arr_) {
         Value arr = arr_->eval(env);
-        Value desc = desc_.get() ? desc_->eval(env) : Value::False;
+        Value desc = desc_ ? desc_->eval(env) : Value::False;
 
         if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
         if (!desc.isBool()) { throw InvalidOperandType("Boolean", desc.typeToString()); }
@@ -1087,7 +1087,7 @@ ArrayReverse::ArrayReverse(CodeNode::SharedPtr arr)
 }
 
 Value ArrayReverse::exec(Environment::SharedPtr env) {
-    if (arr_.get()) {
+    if (arr_) {
         Value arr = arr_->eval(env);
 
         if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
@@ -1111,7 +1111,7 @@ ArrayInsert::ArrayInsert(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeN
 
 Value ArrayInsert::exec(Environment::SharedPtr env)
 {
-    if (arr_.get() && pos_.get() && item_.get()) {
+    if (arr_ && pos_ && item_) {
         Value arr = arr_->eval(env);
         Value pos = pos_->eval(env);
         Value item = item_->eval(env);
@@ -1142,7 +1142,7 @@ ArrayRemove::ArrayRemove(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos)
 }
 
 Value ArrayRemove::exec(Environment::SharedPtr env) {
-    if (arr_.get() && pos_.get()) {
+    if (arr_ && pos_) {
         Value arr = arr_->eval(env);
         Value pos = pos_->eval(env);
 
@@ -1169,7 +1169,7 @@ ArrayClear::ArrayClear(CodeNode::SharedPtr arr)
 }
 
 Value ArrayClear::exec(Environment::SharedPtr env) {
-    if (arr_.get()) {
+    if (arr_) {
         Value arr = arr_->eval(env);
 
         if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
@@ -1188,7 +1188,7 @@ StrCharCheck::StrCharCheck(Type type, CodeNode::SharedPtr operand)
 }
 
 Value StrCharCheck::exec(Environment::SharedPtr env) {
-    if (operand_.get()) {
+    if (operand_) {
         const Value value = operand_->eval(env);
 
         if (!value.isChar() && !value.isString()) { throw InvalidOperandType("Character|String", value.typeToString()); }
@@ -1227,7 +1227,7 @@ StrCharTransform::StrCharTransform(Type type, CodeNode::SharedPtr operand)
 }
 
 Value StrCharTransform::exec(Environment::SharedPtr env) {
-    if (operand_.get()) {
+    if (operand_) {
         const Value value = operand_->eval(env);
 
         if (!value.isChar() && !value.isString()) { throw InvalidOperandType("Character|String", value.typeToString()); }
@@ -1379,7 +1379,7 @@ HashMapLen::HashMapLen(CodeNode::SharedPtr htExpr)
 {}
 
 Value HashMapLen::exec(Environment::SharedPtr env) {
-    if (htExpr_.get()) {
+    if (htExpr_) {
         Value hm = htExpr_->eval(env);
 
         if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
@@ -1397,7 +1397,7 @@ HashMapContains::HashMapContains(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr
 {}
 
 Value HashMapContains::exec(Environment::SharedPtr env) {
-    if (htExpr_.get() && keyExpr_.get()) {
+    if (htExpr_ && keyExpr_) {
         const Value hm = htExpr_->eval(env);
         const Value key = keyExpr_->eval(env);
 
@@ -1417,10 +1417,10 @@ HashMapGet::HashMapGet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, 
 {}
 
 Value HashMapGet::exec(Environment::SharedPtr env) {
-    if (htExpr_.get() && keyExpr_.get()) {
+    if (htExpr_ && keyExpr_) {
         const Value hm = htExpr_->eval(env);
         const Value key = keyExpr_->eval(env);
-        const Value defaultRet = defaultExpr_.get() ? defaultExpr_->eval(env) : Value::Null;
+        const Value defaultRet = defaultExpr_ ? defaultExpr_->eval(env) : Value::Null;
 
         if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
 
@@ -1438,7 +1438,7 @@ HashMapSet::HashMapSet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, 
 {}
 
 Value HashMapSet::exec(Environment::SharedPtr env) {
-    if (htExpr_.get() && keyExpr_.get() && valueExpr_.get()) {
+    if (htExpr_ && keyExpr_ && valueExpr_) {
         Value hm = htExpr_->eval(env);
         const Value key = keyExpr_->eval(env);
         const Value value = valueExpr_->eval(env);
@@ -1459,7 +1459,7 @@ HashMapRemove::HashMapRemove(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr key
 {}
 
 Value HashMapRemove::exec(Environment::SharedPtr env) {
-    if (htExpr_.get() && keyExpr_.get()) {
+    if (htExpr_ && keyExpr_) {
         Value hm = htExpr_->eval(env);
         const Value key = keyExpr_->eval(env);
 
@@ -1478,7 +1478,7 @@ HashMapClear::HashMapClear(CodeNode::SharedPtr htExpr)
 }
 
 Value HashMapClear::exec(Environment::SharedPtr env) {
-    if (htExpr_.get()) {
+    if (htExpr_) {
         Value hm = htExpr_->eval(env);
 
         if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
@@ -1496,7 +1496,7 @@ HashMapFind::HashMapFind(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueEx
 {}
 
 Value HashMapFind::exec(Environment::SharedPtr env) {
-    if (htExpr_.get() && valueExpr_.get()) {
+    if (htExpr_ && valueExpr_) {
         const Value hm = htExpr_->eval(env);
         const Value value = valueExpr_->eval(env);
 
@@ -1515,7 +1515,7 @@ HashMapCount::HashMapCount(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr value
 {}
 
 Value HashMapCount::exec(Environment::SharedPtr env) {
-    if (htExpr_.get() && valueExpr_.get()) {
+    if (htExpr_ && valueExpr_) {
         const Value hm = htExpr_->eval(env);
         const Value value = valueExpr_->eval(env);
 
@@ -1534,7 +1534,7 @@ HashMapKeys::HashMapKeys(CodeNode::SharedPtr htExpr)
 }
 
 Value HashMapKeys::exec(Environment::SharedPtr env) {
-    if (htExpr_.get()) {
+    if (htExpr_) {
         Value hm = htExpr_->eval(env);
 
         if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
@@ -1552,7 +1552,7 @@ HashMapValues::HashMapValues(CodeNode::SharedPtr htExpr)
 }
 
 Value HashMapValues::exec(Environment::SharedPtr env) {
-    if (htExpr_.get()) {
+    if (htExpr_) {
         Value hm = htExpr_->eval(env);
 
         if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
@@ -1569,7 +1569,7 @@ HashMapItems::HashMapItems(CodeNode::SharedPtr htExpr)
 {}
 
 Value HashMapItems::exec(Environment::SharedPtr env) {
-    if (htExpr_.get()) {
+    if (htExpr_) {
         Value hm = htExpr_->eval(env);
 
         if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
