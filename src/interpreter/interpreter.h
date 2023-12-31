@@ -22,6 +22,7 @@ namespace Ishlang {
     private:
         bool isREPLCommand(const std::string &expr) const;
         void handleREPLCommand(const std::string &expr);
+        void describe(const std::string &name) const;
 
     private:
         void initPath(const std::string &path);

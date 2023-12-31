@@ -1,6 +1,8 @@
 #include "instance.h"
 #include "exception.h"
 
+#include <iomanip>
+
 using namespace Ishlang;
 
 // -------------------------------------------------------------
@@ -29,4 +31,23 @@ void Instance::set(const std::string &name, const Value &value) {
         throw UnknownMember(type_.name(), name);
     }
     iter->second = value;
+}
+
+// -------------------------------------------------------------
+void Instance::describe() const {
+    const auto iter = std::max_element(
+        members_.begin(),
+        members_.end(),
+        [](const auto &lhs, const auto &rhs) {
+            return lhs.first.size() < rhs.first.size();
+        });
+    const std::size_t width = iter != members_.end()
+        ? iter->first.size()
+        : 0;
+
+    std::cout << "Instance of " << type_.name();
+    for (const auto & [mem, val] : members_) {
+        std::cout << "\n  " << std::setw(width) << mem << ": " << val;
+    }
+    std::cout << std::endl;
 }

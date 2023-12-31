@@ -46,3 +46,31 @@ Use * to access the result of the last evaulation.
   25
   >> 
 ```
+
+## Describe Struct or Instance
+
+The following command describes structs and instances:
+```
+:desc <name>
+```
+
+#### Example
+```
+  >> (struct User (id name loc))
+  struct:User
+  >> (var usr (makeinstance User (id 125) (name "Jon") (loc "USA")))
+  instance:User
+  >> 
+  >> :desc User
+  Struct User
+    id
+    name
+    loc
+  >> 
+  >> :desc usr
+  Instance of User
+     loc: "USA"
+    name: "Jon"
+      id: 125
+  >> 
+```

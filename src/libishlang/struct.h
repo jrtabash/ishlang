@@ -26,6 +26,8 @@ namespace Ishlang {
         inline const std::string &name() const;
         inline const MemberList &members() const;
 
+        void describe() const;
+
     public:
         friend std::ostream &operator<<(std::ostream &out, const Struct &s) {
             out << "struct:" << s.name();

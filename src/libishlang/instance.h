@@ -32,6 +32,8 @@ namespace Ishlang {
         const Value &get(const std::string &name) const;
         void set(const std::string &name, const Value &value);
 
+        void describe() const;
+
     public:
         friend std::ostream &operator<<(std::ostream &out, const Instance &inst) {
             out << "instance:" << inst.type().name();

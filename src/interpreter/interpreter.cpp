@@ -172,8 +172,31 @@ void Interpreter::handleREPLCommand(const std::string &expr) {
             throw InvalidCommand(cmd, "too many arguments");
         }
     }
+    else if (cmd == ":desc") {
+        if (size == 1) {
+            throw InvalidCommand(cmd, "missing instance");
+        }
+        else if (size > 2) {
+            throw InvalidCommand(cmd, "too many arguments");
+        }
+        describe(cmdTokens.front());
+    }
     else {
         throw InvalidCommand(cmd, "unknown command");
+    }
+}
+
+// -------------------------------------------------------------
+void Interpreter::describe(const std::string &name) const {
+    const Value &value = env_->get(name);
+    if (value.isUserType()) {
+        value.userType().describe();
+    }
+    else if (value.isUserObject()) {
+        value.userObject().describe();
+    }
+    else {
+        std::cout << "Name '" << name << "' is not a user type or object\n";
     }
 }
 
