@@ -4,6 +4,7 @@
 #include "util.h"
 #include "value.h"
 
+#include <algorithm>
 #include <optional>
 #include <ostream>
 #include <vector>
