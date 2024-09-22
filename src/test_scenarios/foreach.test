@@ -1,0 +1,48 @@
+__CODE__
+(var str "Hello")
+(var arr (array 1 2 3 4 5))
+(var ht (hashmap (pair 1 10) (pair 2 20) (pair 3 30)))
+
+(var cnt 0)
+(defun incrCnt ()
+  (= cnt (+ cnt 1)))
+(defun resetCnt ()
+  (= cnt 0))
+
+(println (foreach c str (incrCnt)))
+(println cnt)
+
+(resetCnt)
+(println (foreach c str (if (== c 'l') (incrCnt))))
+(println cnt)
+
+(var sum 0)
+(println (foreach i arr (= sum (+ sum i))))
+(println sum)
+
+(resetCnt)
+(var keySum 0)
+(var valSum 0)
+(println
+ (foreach
+  kv
+  ht
+  (progn
+    (incrCnt)
+    (= keySum (+ keySum (first kv)))
+    (= valSum (+ valSum (second kv))))))
+(println cnt)
+(println keySum)
+(println valSum)
+
+__EXPECT__
+5
+5
+null
+2
+15
+15
+60
+3
+6
+60

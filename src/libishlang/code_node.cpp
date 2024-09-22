@@ -327,6 +327,56 @@ Value Loop::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
+Foreach::Foreach(const std::string &name, CodeNode::SharedPtr container, CodeNode::SharedPtr body)
+    : CodeNode()
+    , name_(name)
+    , container_(container)
+    , body_(body)
+{}
+
+Value Foreach::exec(Environment::SharedPtr env) {
+    if (container_ && body_) {
+        auto loopEnv = Environment::make(env);
+        loopEnv->def(name_, Value::Null);
+
+        try {
+            auto contValue = container_->eval(loopEnv);
+            if (contValue.isString()) {
+                return impl(loopEnv, contValue.text());
+            }
+            else if (contValue.isArray()) {
+                return impl(loopEnv, contValue.array());
+            }
+            else if (contValue.isHashMap()) {
+                return impl(loopEnv, contValue.hashMap());
+            }
+            else {
+                throw InvalidExpressionType("String, array or hashmap", contValue.typeToString());
+            }
+        }
+        catch (const Break::Except &) { return Value::Null; }
+        catch (...) { throw; }
+    }
+    return Value::Null;
+}
+
+template <typename Container>
+Value Foreach::impl(Environment::SharedPtr loopEnv, const Container &container)
+{
+    Value result = Value::Null;
+    for (const auto &item : container) {
+        if constexpr (std::is_same_v<Container, Hashtable>) {
+            loopEnv->set(name_, Value(ValuePair(item.first, item.second)));
+        }
+        else {
+            loopEnv->set(name_, item);
+        }
+        result = body_->eval(loopEnv);
+    }
+    return result;
+}
+
+// -------------------------------------------------------------
 LambdaExpr::LambdaExpr(const ParamList &params, CodeNode::SharedPtr body)
   : CodeNode()
   , params_(params)

@@ -1,12 +1,26 @@
-(defun countSpaces (str)
+(defun countSpacesLoop (str)
   (var count 0)
   (loop (var i 0) (< i (strlen str)) (= i (+ i 1))
         (when (== (strget str i) ' ')
           (= count (+ count 1))))
   count)
 
+(defun countSpacesForeach (str)
+  (var count 0)
+  (foreach c str
+    (when (== c ' ')
+      (= count (+ count 1))))
+  count)
+
+(defun printCount (tag cnt)
+  (print tag)
+  (print " : ")
+  (println cnt))
+
 (var s "Test char at op on str")
 (print "Number of spaces in '")
 (print s)
-(print "' is ")
-(println (countSpaces s))
+(println "' is:")
+
+(printCount "   loop" (countSpacesLoop s))
+(printCount "foreach" (countSpacesForeach s))

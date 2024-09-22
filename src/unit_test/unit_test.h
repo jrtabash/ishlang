@@ -90,6 +90,7 @@ namespace Ishlang {
         void testCodeNodeSequence();
         void testCodeNodeCond();
         void testCodeNodeLoop();
+        void testCodeNodeForeach();
         void testCodeNodeLambdaExpr();
         void testCodeNodeLambdaApp();
         void testCodeNodeFunctionExpr();
@@ -158,6 +159,7 @@ namespace Ishlang {
         void testParserBlock();
         void testParserCond();
         void testParserLoop();
+        void testParserForeach();
         void testParserLambda();
         void testParserFtn();
         void testParserStruct();

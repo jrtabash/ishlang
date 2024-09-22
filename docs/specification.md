@@ -263,6 +263,30 @@ Conditional only form:
     (= count (+ count term))))
 ```
 
+## Foreach
+```
+(foreach <var> <container_expression>
+  <body_expression>)
+```
+
+Loop over each element in a container.
+Container can be a string, array or hashmap.
+The <var> variable is read-only and cannot directly modify the container.
+
+### Example - Sum array elements
+```
+(var sum 0)
+(foreach x (array 1 2 3 4 5)
+  (= sum (+ sum x)))
+```
+
+### Example - Sum hashmap values
+```
+(var sum 0)
+(foreach kv (hashmap (pair 1 10) (pair 2 20) (pair 3 30))
+  (= sum (+ sum (second kv))))
+```
+
 ## Functions
 User defined functions:
 ```

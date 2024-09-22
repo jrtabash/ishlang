@@ -1,7 +1,6 @@
 (defun array_map (ftn arr)
   (var ret (array))
-  (loop (var i 0) (< i (arrlen arr)) (= i (+ i 1))
-        (arrpush ret (ftn (arrget arr i))))
+  (foreach i arr (arrpush ret (ftn i)))
   ret)
 
 (defun triple (x)

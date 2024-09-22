@@ -542,6 +542,14 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "foreach",
+          [this]() {
+              const auto name(readName());
+              auto forms(readAndCheckExprList("foreach", 2));
+              return CodeNode::make<Foreach>(name, forms[0], forms[1]);
+          }
+        },
+
         { "lambda",
           [this]() {
                 auto params(readParams());

@@ -43,6 +43,9 @@ namespace Ishlang {
 
         inline std::size_t size() const;
 
+        inline Table::const_iterator begin() const noexcept;
+        inline Table::const_iterator end() const noexcept;
+
     public:
         friend std::ostream &operator<<(std::ostream &out, const Hashtable &ht) {
             return Util::printContainer(out,
@@ -112,6 +115,14 @@ namespace Ishlang {
 
     inline std::size_t Hashtable::size() const {
         return table_.size();
+    }
+
+    inline auto Hashtable::begin() const noexcept -> Table::const_iterator {
+        return table_.begin();
+    }
+
+    inline auto Hashtable::end() const noexcept -> Table::const_iterator {
+        return table_.end();
     }
 
     inline bool Hashtable::tableEqual(const Table &lhs, const Table &rhs) {

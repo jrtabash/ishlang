@@ -65,6 +65,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeSequence);
     ADD_TEST(testCodeNodeCond);
     ADD_TEST(testCodeNodeLoop);
+    ADD_TEST(testCodeNodeForeach);
     ADD_TEST(testCodeNodeLambdaExpr);
     ADD_TEST(testCodeNodeLambdaApp);
     ADD_TEST(testCodeNodeFunctionExpr);
@@ -134,6 +135,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserBlock);
     ADD_TEST(testParserCond);
     ADD_TEST(testParserLoop);
+    ADD_TEST(testParserForeach);
     ADD_TEST(testParserLambda);
     ADD_TEST(testParserFtn);
     ADD_TEST(testParserStruct);
@@ -2635,6 +2637,111 @@ void UnitTest::testCodeNodeLoop() {
         Value result = loop->eval(env);
         TEST_CASE_MSG(result.isNull(), "actual=" << result.typeToString());
         TEST_CASE_MSG(env->get("x") == Value(2ll), "actual=" << env->get("x"));
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeForeach() {
+    auto var = [](const char *name) {
+        return CodeNode::make<Variable>(name);
+    };
+    auto lit = [](auto val) {
+        return CodeNode::make<Literal>(Value(val));
+    };
+    auto add = [](auto lhs, auto rhs) {
+        return CodeNode::make<ArithOp>(ArithOp::Add, lhs, rhs);
+    };
+    auto assign = [](const char *name, auto expr) {
+        return CodeNode::make<Assign>(name, expr);
+    };
+    auto first = [](auto expr) {
+        return CodeNode::make<PairFirst>(expr);
+    };
+    auto second = [](auto expr) {
+        return CodeNode::make<PairSecond>(expr);
+    };
+    auto progn = [](auto e1, auto e2, auto e3) {
+        CodeNode::SharedPtrList exprs;
+        exprs.push_back(e1);
+        exprs.push_back(e2);
+        exprs.push_back(e3);
+        return CodeNode::make<ProgN>(exprs);
+    };
+
+    { // String
+        auto env = Environment::make();
+        env->def("str", Value("1234567890"));
+        env->def("cnt", Value(0ll));
+
+        auto foreach = CodeNode::make<Foreach>(
+            "c",
+            var("str"),
+            assign("cnt", add(var("cnt"), lit(1ll))));
+        Value result = foreach->eval(env);
+        TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+        TEST_CASE_MSG(result.integer() == 10ll, "actual=" << result);
+
+        auto const & cnt = env->get("cnt");
+        TEST_CASE_MSG(cnt.isInt(), "actual=" << cnt.typeToString());
+        TEST_CASE_MSG(cnt.integer() == 10ll, "actual=" << cnt);
+    }
+
+    { // Array
+        auto env = Environment::make();
+        env->def("arr", Value(Sequence::generate(10, [i = 1ll]() mutable { return Value(i++); })));
+        env->def("sum", Value(0ll));
+
+        auto foreach = CodeNode::make<Foreach>(
+            "i",
+            var("arr"),
+            assign("sum", add(var("sum"), var("i"))));
+        Value result = foreach->eval(env);
+        TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+        TEST_CASE_MSG(result.integer() == 55ll, "actual=" << result);
+
+        auto const & sum = env->get("sum");
+        TEST_CASE_MSG(sum.isInt(), "actual=" << sum.typeToString());
+        TEST_CASE_MSG(sum.integer() == 55ll, "actual=" << sum);
+    }
+
+    { // Hashtable
+        auto env = Environment::make();
+        Hashtable ht;
+        for (auto [k, v] : {
+                std::pair{ 1ll, 10ll },
+                std::pair{ 2ll, 20ll },
+                std::pair{ 3ll, 30ll },
+                std::pair{ 4ll, 40ll },
+                std::pair{ 5ll, 50ll } }) {
+            ht.set(Value(k), Value(v));
+        }
+        env->def("ht", Value(ht));
+        env->def("cnt", Value(0ll));
+        env->def("keySum", Value(0ll));
+        env->def("valSum", Value(0ll));
+
+        auto foreach = CodeNode::make<Foreach>(
+            "kv",
+            var("ht"),
+            progn(
+                assign("cnt", add(var("cnt"), lit(1ll))),
+                assign("keySum", add(var("keySum"), first(var("kv")))),
+                assign("valSum", add(var("valSum"), second(var("kv"))))));
+        Value result = foreach->eval(env);
+        TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+        TEST_CASE_MSG(result.integer() == 150ll, "actual=" << result);
+
+        auto const & cnt = env->get("cnt");
+        TEST_CASE_MSG(cnt.isInt(), "actual=" << cnt.typeToString());
+        TEST_CASE_MSG(cnt.integer() == 5ll, "actual=" << cnt);
+
+        auto const & keySum = env->get("keySum");
+        TEST_CASE_MSG(keySum.isInt(), "actual=" << keySum.typeToString());
+        TEST_CASE_MSG(keySum.integer() == 15ll, "actual=" << keySum);
+
+        auto const & valSum = env->get("valSum");
+        TEST_CASE_MSG(valSum.isInt(), "actual=" << valSum.typeToString());
+        TEST_CASE_MSG(valSum.integer() == 150ll, "actual=" << valSum);
     }
 }
 
@@ -5298,6 +5405,36 @@ void UnitTest::testParserLoop() {
     TEST_CASE(parserTest(parser, env, "(loop (var i 1) (< i 4) (= i (+ i 1)))",                                       Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(loop (var i 1))",                                                             Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(loop)",                                                                       Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserForeach() {
+    auto env = Environment::make();
+    Parser parser;
+
+    auto add_var = [&](const char *name, const char *val) {
+        const auto expr = std::string("(var ") + name + " " + val + ")";
+        parser.read(expr)->eval(env);
+    };
+    add_var("str", "\"abcdef\"");
+    add_var("arr", "(array 1 2 3 4 5)");
+    add_var("ht", "(hashmap (pair 1 10) (pair 2 20))");
+    add_var("strCnt", "0");
+    add_var("arrSum", "0");
+    add_var("htSum", "0");
+    add_var("keySum", "0");
+    add_var("valSum", "0");
+    add_var("dummy", "0");
+
+    TEST_CASE(parserTest(parser, env, "(foreach c str (= strCnt (+ strCnt 1)))",                        Value(6ll),  true));
+    TEST_CASE(parserTest(parser, env, "(foreach i arr (= arrSum (+ arrSum i)))",                        Value(15ll), true));
+    TEST_CASE(parserTest(parser, env, "(foreach kv ht (= htSum (+ htSum (* (first kv) (second kv)))))", Value(50ll), true));
+    TEST_CASE(parserTest(parser, env, "(foreach kv ht (progn (= keySum (+ keySum (first kv))) (= valSum (+ valSum (second kv)))))", Value(30ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(foreach)",                 Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(foreach x)",               Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(foreach x str)",           Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(foreach x 5 (+ dummy 1))", Value::Null, false));
 }
 
 // -------------------------------------------------------------

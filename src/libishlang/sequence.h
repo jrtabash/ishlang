@@ -43,6 +43,9 @@ namespace Ishlang {
 
         inline std::size_t size() const;
 
+        inline Vector::const_iterator begin() const noexcept;
+        inline Vector::const_iterator end() const noexcept;
+
     public:
         friend std::ostream &operator<<(std::ostream &out, const Sequence &sequence) {
             return Util::printContainer(out,
@@ -114,6 +117,14 @@ namespace Ishlang {
 
     inline std::size_t Sequence::size() const {
         return vector_.size();
+    }
+
+    inline auto Sequence::begin() const noexcept -> Vector::const_iterator {
+        return vector_.begin();
+    }
+
+    inline auto Sequence::end() const noexcept -> Vector::const_iterator {
+        return vector_.end();
     }
 
     inline Sequence Sequence::generate(std::size_t size, auto && ftn) {

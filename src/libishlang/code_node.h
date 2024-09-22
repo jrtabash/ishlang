@@ -354,6 +354,25 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class Foreach : public CodeNode {
+    public:
+        Foreach(const std::string &name, CodeNode::SharedPtr container, CodeNode::SharedPtr body);
+        virtual ~Foreach() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        template <typename Container>
+        Value impl(Environment::SharedPtr loopEnv, const Container &container);
+
+    private:
+        std::string         name_;
+        CodeNode::SharedPtr container_;
+        CodeNode::SharedPtr body_;
+    };
+
+    // -------------------------------------------------------------
     class LambdaExpr : public CodeNode {
     public:
         LambdaExpr(const ParamList &params, CodeNode::SharedPtr body);
