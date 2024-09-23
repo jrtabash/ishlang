@@ -90,7 +90,7 @@ The functions print and println evaluate to null value
 (read)
 ```
 
-#### Example:
+#### Example
 ```
 (var something (read))
 ```
@@ -146,7 +146,7 @@ The neg operator returns the negative of expression.
 (if <condition_expression> <true_expression> [<false_expression>])
 ```
 
-### Example:
+### Example
 ```
 (if (> x 0) 1 0)
 ```
@@ -161,7 +161,7 @@ The when form is syntactic sugar for the following if/true statement:
 (if <condition_expression> <true_expression>)
 ```
 
-## Example:
+## Example
 ```
 (when (> x 0) 1)
 ```
@@ -176,7 +176,7 @@ The unless form is syntactic sugar for the following if/not statement:
 (if (not <condition_expression>) <true_expression>)
 ```
 
-### Example:
+### Example
 ```
 (unless (<= x 0) 1)
 ```
@@ -191,7 +191,7 @@ The unless form is syntactic sugar for the following if/not statement:
 
 The (true ...) case acts as a default catch all case, and is optional
 
-### Example:
+### Example
 ```
 (var check1 false)
 (var check2 false)
@@ -218,7 +218,7 @@ Difference between progn and block is that block defines an new environment and 
 
 The value of executing a sequence is the result of evaluating the last expression.
 
-### Example:
+### Example
 ```
 (progn
   (var x 10)
@@ -248,14 +248,14 @@ Conditional only form:
   <body_expression>)
 ```
 
-### Example - general form:
+### Example - general form
 ```
 (var count 0)
 (loop (var i 1) (<= i 10) (= i (+ i 1))
   (= count (+ count i)))
 ```
 
-### Example - conditional form:
+### Example - conditional form
 ```
 (var count 0)
 (var term 0)
@@ -275,14 +275,14 @@ Loop over each element in a container.
 Container can be a string, array or hashmap.
 The <var> variable is read-only and cannot directly modify the container.
 
-### Example - Sum array elements
+### Example - sum array elements
 ```
 (var sum 0)
 (foreach x (array 1 2 3 4 5)
   (= sum (+ sum x)))
 ```
 
-### Example - Sum hashmap values
+### Example - sum hashmap values
 ```
 (var sum 0)
 (foreach kv (hashmap (pair 1 10) (pair 2 20) (pair 3 30))
@@ -300,7 +300,7 @@ Functions can be nested, i.e defined inside other functions.
 
 Language supports recursion.
 
-### Example:
+### Example
 ```
 (defun hello ()
   (println "Hello world"))
@@ -326,7 +326,7 @@ The closure environment is the enclosing environment where the lambda is defined
 
 When a lambda function is executed, the lambda execution environment will inherit the closure environment.
 
-### Examples:
+### Examples
 ```
 (lambda (x y)
   (+ x y))
@@ -358,7 +358,7 @@ Setting / Getting member fields:
 (memset <instance_expression> <member_name> <expression>)
 ```
 
-### Example:
+### Example
 ```
 (struct Person
   (name
@@ -378,7 +378,7 @@ Is type of?
 
 <type> is one of: none, int, real, char, bool, string, pair, array, hashmap, closure, usertype, userobject
 
-### Example:
+### Example
 ```
 (istypeof 10 int)
 (istypeof Person usertype)
@@ -389,7 +389,7 @@ Is struct name?
 (isstructname <expression> <struct>)
 ```
 
-### Example:
+### Example
 ```
 (var s Person)
 (isstructname s Person)
@@ -400,7 +400,7 @@ Is instance of?
 (isinstanceof <expression> <struct>)
 ```
 
-### Example:
+### Example
 ```
 (var p (makeinstance Person))
 (isinstanceof p Person)
@@ -414,7 +414,7 @@ Get type name of:
 
 Returns the name of the type of the expression.
 
-### Example:
+### Example
 ```
 (typename 10)
 (typename Person)
@@ -427,7 +427,7 @@ Get struct name:
 
 Returns struct name, expression must be an instance or a struct.
 
-### Example:
+### Example
 ```
 (struct Person (name))
 (var p (makeinstance Person))
@@ -464,7 +464,7 @@ Supports the following type conversions:
 | string | char | from[0] or '\0' if empty |
 | string | bool | from == "true" -> true, from == "false" -> false |
 
-### Example:
+### Example
 ```
 (astype true int)
 (astype 25.12 int)
@@ -483,7 +483,7 @@ Clone a value:
 
 will clone the value resulting from executing expression
 
-### Example:
+### Example
 ```
 (var p (makeinstance Person (name "John") (age 25)))
 (var q (clone p))
@@ -540,7 +540,7 @@ will clone the value resulting from executing expression
 (strrev <string>)
 ```
 
-### Examples:
+### Examples
 ```
 (var str "Hello!")
 (println (strlen str))
@@ -603,7 +603,7 @@ will clone the value resulting from executing expression
 The string check operations will return true if
 the check is true for every character in the string.
 
-### Examples:
+### Examples
 ```
 (var c 'U')
 (var s "UPPER")
@@ -637,7 +637,7 @@ the check is true for every character in the string.
 (second <pair>)
 ```
 
-### Examples:
+### Examples
 ```
 (var p (pair 1 2))
 (first p)
@@ -715,7 +715,7 @@ the check is true for every character in the string.
 (arrrem <array> <pos>)
 ```
 
-### Examples:
+### Examples
 ```
 (var a (array))
 (arrpush a 1)
@@ -801,7 +801,7 @@ the check is true for every character in the string.
 (hmitems <hashmap>)
 ```
 
-### Examples:
+### Examples
 ```
 (var ht (hashmap (array "one" 1) (array "two" 2) (array "four" 4)))
 (hmlen ht)
@@ -825,7 +825,7 @@ Comments can be occupy full or partial lines.
   ;; <comment text>
 ```
 
-### Examples:
+### Examples
 ```
 ;; This is a function
 (defun x2 (x) ;; Double x
@@ -849,7 +849,7 @@ Ishlang searches for a module source file according to the following rule:
 Paths specified in environment variable ISHLANG_PATH or command line -p option must
 be delimited using : character.
 
-### Examples:
+### Examples
 - Assuming the following module is defined:
   - name: arith.ish
   - code:
@@ -906,7 +906,7 @@ the call is equivalent to not specifying max.
 
 If max is 0, then function returns 0.
 
-### Examples:
+### Examples
 ```
 (rand)
 (rand 10)
