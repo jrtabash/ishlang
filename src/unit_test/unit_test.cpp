@@ -5431,6 +5431,10 @@ void UnitTest::testParserForeach() {
     TEST_CASE(parserTest(parser, env, "(foreach kv ht (= htSum (+ htSum (* (first kv) (second kv)))))", Value(50ll), true));
     TEST_CASE(parserTest(parser, env, "(foreach kv ht (progn (= keySum (+ keySum (first kv))) (= valSum (+ valSum (second kv)))))", Value(30ll), true));
 
+    add_var("arrCnt", "0");
+    TEST_CASE(parserTest(parser, env, "(foreach i arr (progn (when (> i 3) (break)) (= arrCnt (+ arrCnt 1))))", Value::Null, true));
+    TEST_CASE(env->get("arrCnt") == Value(3ll));
+
     TEST_CASE(parserTest(parser, env, "(foreach)",                 Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(foreach x)",               Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(foreach x str)",           Value::Null, false));

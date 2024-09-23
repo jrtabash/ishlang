@@ -21,6 +21,15 @@ __CODE__
 (println sum)
 
 (resetCnt)
+(println
+ (foreach i arr
+  (progn
+   (when (> i 3)
+     (break))
+   (incrCnt))))
+(println cnt)
+
+(resetCnt)
 (var keySum 0)
 (var valSum 0)
 (println
@@ -42,6 +51,8 @@ null
 2
 15
 15
+null
+3
 60
 3
 6
