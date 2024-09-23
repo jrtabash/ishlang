@@ -71,8 +71,8 @@ Reserved literal keywords: null, true, false
 ## Input / Output
 ### Printing
 ```
-(print <expression> [<expression> ...])
-(println <expression> [<expression> ...])
+(print <expression> ...)
+(println <expression> ...)
 ```
 
 #### Examples
