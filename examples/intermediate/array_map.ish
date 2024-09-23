@@ -7,9 +7,6 @@
   (* 3 x))
 
 (var ints (array 1 2 3 4 5))
-(print "numbers: ")
-(println ints)
-(print "doubles: ")
-(println (array_map (lambda (x) (* 2 x)) ints))
-(print "triples: ")
-(println (array_map triple ints))
+(println "numbers: " ints)
+(println "doubles: " (array_map (lambda (x) (* 2 x)) ints))
+(println "triples: " (array_map triple ints))

@@ -3,5 +3,4 @@
   (loop (var i start) (<= i end) (= i (+ i 1))
         (= count (+ count i))))
 
-(print "sumRange(1, 10): ")
-(println (sumRange 1 10))
+(println "sumRange(1, 10): " (sumRange 1 10))

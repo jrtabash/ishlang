@@ -31,8 +31,6 @@
             (= b m)))))
 
   (when (istypeof ret none)
-    (progn
-      (print "Bisection method failed to find root after ")
-      (println maxIter)))
+    (println "Bisection method failed to find root after " maxIter))
 
   ret)

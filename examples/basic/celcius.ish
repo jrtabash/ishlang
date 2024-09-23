@@ -5,5 +5,4 @@
 
 (print "Enter Fahrenheit: ")
 (var f (read))
-(print "Celcius: ")
-(println (cels f))
+(println "Celcius: " (cels f))

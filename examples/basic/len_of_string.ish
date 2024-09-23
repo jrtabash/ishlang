@@ -1,8 +1,5 @@
 (defun test (str)
-  (print "length of '")
-  (print str)
-  (print "': ")
-  (println (strlen str)))
+  (println "length of '" str "': " (strlen str)))
 
 (test "")
 (test "a")

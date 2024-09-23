@@ -71,14 +71,16 @@ Reserved literal keywords: null, true, false
 ## Input / Output
 ### Printing
 ```
-(print <expression>)
-(println <expression>)
+(print <expression> [<expression> ...])
+(println <expression> [<expression> ...])
 ```
 
-#### Examples:
+#### Examples
 ```
 (print "Hello ")
 (println "World")
+(println "Hello " "World")
+(println "Hello World")
 ```
 
 The functions print and println evaluate to null value

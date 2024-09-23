@@ -32,9 +32,7 @@
 
 (defun calcStats (arr)
   (defun printStat (name value)
-    (print name)
-    (print ": ")
-    (println value))
+    (println name ": " value))
 
   (var samm (calcSumAvgMinAndMax arr))
   (var mean (arrget samm 1))

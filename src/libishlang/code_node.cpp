@@ -436,14 +436,16 @@ Value FunctionApp::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-Print::Print(bool newline, CodeNode::SharedPtr expr)
+Print::Print(bool newline, CodeNode::SharedPtrList exprs)
     : CodeNode()
     , newline_(newline)
-    , expr_(expr)
+    , exprs_(exprs)
 {}
 
 Value Print::exec(Environment::SharedPtr env) {
-    Value::print(expr_->eval(env));
+    for (auto & expr : exprs_) {
+        Value::print(expr->eval(env));
+    }
     if (newline_) { std::cout << std::endl; }
     return Value::Null;
 }

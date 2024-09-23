@@ -33,7 +33,7 @@ namespace Ishlang {
         CodeNode::SharedPtr readApp(const std::string &expected="");
         CodeNode::SharedPtrList readExprList();
         CodeNode::SharedPtrList readAndCheckExprList(const char *name, std::size_t expectedSize);
-        CodeNode::SharedPtrList readAndCheckRangeExprList(const char *name, std::size_t minExpectedSize, std::size_t maxExpectedSize);
+        CodeNode::SharedPtrList readAndCheckRangeExprList(const char *name, std::size_t minExpectedSize, std::optional<std::size_t> maxExpectedSize);
         CodeNode::SharedPtrPairs readExprPairs();
         CodeNode::NameSharedPtrs readNameExprPairs();
         std::string readName();

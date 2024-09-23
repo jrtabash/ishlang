@@ -203,9 +203,9 @@ CodeNode::SharedPtrList Parser::readAndCheckExprList(const char *name, std::size
 }
 
 // -------------------------------------------------------------
-CodeNode::SharedPtrList Parser::readAndCheckRangeExprList(const char *name, std::size_t minExpectedSize, std::size_t maxExpectedSize) {
+CodeNode::SharedPtrList Parser::readAndCheckRangeExprList(const char *name, std::size_t minExpectedSize, std::optional<std::size_t> maxExpectedSize) {
     auto exprs(readExprList());
-    if (exprs.size() < minExpectedSize || exprs.size() > maxExpectedSize) {
+    if (exprs.size() < minExpectedSize || (maxExpectedSize && exprs.size() > *maxExpectedSize)) {
         throw TooManyOrFewForms(name);
     }
     return exprs;
@@ -608,15 +608,15 @@ void Parser::initAppFtns() {
 
         { "print",
           [this]() {
-                auto exprs(readAndCheckExprList("print", 1));
-                return CodeNode::make<Print>(false, exprs[0]);
+              auto exprs(readAndCheckRangeExprList("print", 1, std::nullopt));
+              return CodeNode::make<Print>(false, exprs);
           }
         },
 
         { "println",
           [this]() {
-                auto exprs(readAndCheckExprList("println", 1));
-                return CodeNode::make<Print>(true, exprs[0]);
+              auto exprs(readAndCheckRangeExprList("println", 1, std::nullopt));
+              return CodeNode::make<Print>(true, exprs);
           }
         },
 

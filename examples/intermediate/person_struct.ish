@@ -9,10 +9,9 @@
   (makeinstance Person (name newName) (age newAge)))
 
 (defun printPerson (p)
-  (print "[Person: name='")
-  (print (memget person name))
-  (print "' age=")
-  (print (memget person age))
+  (print "[Person:")
+  (print " name='" (memget person name) "'")
+  (print " age=" (memget person age))
   (println "]"))
 
 (var person (makePerson "Jon" 31))

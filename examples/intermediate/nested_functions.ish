@@ -18,8 +18,5 @@
 
   sum)
 
-(print "incrementN(10, 5): ")
-(println (incrementN 10 5))
-
-(print "incrementN2(10, 5): ")
-(println (incrementN2 10 5))
+(println "incrementN(10, 5): " (incrementN 10 5))
+(println "incrementN2(10, 5): " (incrementN2 10 5))

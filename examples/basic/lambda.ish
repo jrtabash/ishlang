@@ -1,6 +1,5 @@
 (defun test (name ftn arg)
-  (print (strcat (clone name) ": "))
-  (println (ftn arg)))
+  (println (strcat (clone name) ": ") (ftn arg)))
 
 (var mul2 (lambda (x) (* 2 x)))
 

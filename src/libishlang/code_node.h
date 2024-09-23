@@ -432,15 +432,15 @@ namespace Ishlang {
     // -------------------------------------------------------------
     class Print : public CodeNode {
     public:
-        Print(bool newline, CodeNode::SharedPtr expr);
+        Print(bool newline, CodeNode::SharedPtrList exprs);
         virtual ~Print() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) override;
 
     private:
-        bool                newline_;
-        CodeNode::SharedPtr expr_;
+        bool                    newline_;
+        CodeNode::SharedPtrList exprs_;
     };
 
     // -------------------------------------------------------------

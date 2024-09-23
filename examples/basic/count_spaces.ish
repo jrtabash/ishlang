@@ -18,9 +18,7 @@
   (println cnt))
 
 (var s "Test char at op on str")
-(print "Number of spaces in '")
-(print s)
-(println "' is:")
+(println "Number of spaces in '" s "' is:")
 
 (printCount "   loop" (countSpacesLoop s))
 (printCount "foreach" (countSpacesForeach s))
