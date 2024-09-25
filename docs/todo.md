@@ -56,30 +56,30 @@
 ### Add generic functions
 - Add generic get function with support for instances, strings, arrays and hashmaps
   ```
-  (get <instance|container> <item>)
+  (get <instance|container> <index|key>) -> <value>
   ```
 - Add generic set function with support for instances, strings, arrays and hashmaps
   ```
-  (set <instance|container> <item> <value>)
+  (set <instance|container> <index|key> <value>) -> <value>
   ```
 - Add generic len function with support for strings, arrays and hashmaps
   ```
-  (len <container>)
+  (len <container>) -> int
   ```
 - Add generic find function with support for strings, arrays and hashmaps
   ```
-  (find <container> <item>)
+  (find <container> <item>) -> <index|key>
   ```
 - Add generic count function with support for strings, arrays and hashmaps
   ```
-  (count <container> <item>)
+  (count <container> <item>) -> int
   ```
 - Add generic sort function with support for strings and arrays
   ```
-  (sort <sequence> key=null asc=true)
+  (sort <sequence> key=null asc=true) -> <container>
   ```
 - Add generic reverse function with support for strings and arrays
   ```
-  (reverse <sequence>)
+  (reverse <sequence>) -> <sequence>
   ```
 Note: Should work with future types; list and orderedmap.
