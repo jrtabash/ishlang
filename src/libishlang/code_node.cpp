@@ -351,7 +351,7 @@ Value Foreach::exec(Environment::SharedPtr env) {
                 return impl(loopEnv, contValue.hashMap());
             }
             else {
-                throw InvalidExpressionType("String, array or hashmap", contValue.typeToString());
+                throw InvalidExpressionType("String, Array or HashMap", contValue.typeToString());
             }
         }
         catch (const Break::Except &) { return Value::Null; }
