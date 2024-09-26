@@ -83,3 +83,42 @@
   (reverse <sequence>) -> <sequence>
   ```
 Note: Should work with future types; list and orderedmap.
+
+### Range
+- Value
+  ```
+  Struct: IntRange { begin, end, step }
+  Type: eRange = 'G'
+  Impl: Range = NumberRange
+  ```
+- Make
+  ```
+  (range <end>)
+  (range <begin> <end>)
+  (range <begin> <end> <step>)
+  ```
+- Functions
+  ```
+  (rngbegin <range>) -> int
+  (rngend <range>) -> int
+  (rngstep <range>) -> int
+  ```
+- Looping
+  ```
+  (foreach <var> <range> <body>)
+  ```
+- Expanding
+  ```
+  (array <range>)
+  ```
+- Example
+  ```
+  (var r (range 10))
+  (rngbegin r)
+  (rngend r)
+  (rngstep r)
+  (array r)
+  (progn
+     (var sum)
+     (foreach i r (= sum (+ sum i))))
+  ```
