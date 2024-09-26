@@ -1,3 +1,12 @@
+(struct Summary
+  (count
+   sum
+   mean
+   min
+   max
+   variance
+   stddev))
+
 (defun calcSumAvgMinAndMax (arr)
   (var size (arrlen arr))
   (var sum 0.0)
@@ -6,15 +15,13 @@
   (var max 0.0)
   (when (> size 0)
     (progn
-      (var ele null)
       (= min (arrget arr 0))
       (= max (arrget arr 0))
-      (loop (var i 0) (< i size) (= i (+ i 1))
-            (progn
-              (= ele (arrget arr i))
-              (= sum (+ sum ele))
-              (when (< ele min) (= min ele))
-              (when (> ele max) (= max ele))))
+      (foreach num arr
+        (progn
+          (= sum (+ sum num))
+          (when (< num min) (= min num))
+          (when (> num max) (= max num))))
       (= avg (/ sum size))))
   (array sum avg min max))
 
@@ -23,26 +30,38 @@
   (var variance 0.0)
   (when (> size 0)
     (progn
-      (loop (var i 0) (< i size) (= i (+ i 1))
-            (= variance (+ variance (^ (- (arrget arr i) average) 2))))
+      (foreach num arr
+        (= variance (+ variance (^ (- num average) 2))))
 
       (when (> size 1)
         (= variance (/ variance (- size 1))))))
   variance)
 
-(defun calcStats (arr)
-  (defun printStat (name value)
-    (println name ": " value))
-
+(defun makeSummary (arr)
   (var samm (calcSumAvgMinAndMax arr))
   (var mean (arrget samm 1))
   (var variance (calcVariance arr mean))
 
+  (makeinstance Summary
+    (count (arrlen arr))
+    (sum (arrget samm 0))
+    (mean mean)
+    (min (arrget samm 2))
+    (max (arrget samm 3))
+    (variance variance)
+    (stddev (^ variance 0.5))))
+
+(defun calcStats (arr)
+  (defun printStat (name value)
+    (println name ": " value))
+
+  (var summary (makeSummary arr))
+
   (printStat "arr" arr)
-  (printStat "cnt" (arrlen arr))
-  (printStat "sum" (arrget samm 0))
-  (printStat "avg" mean)
-  (printStat "min" (arrget samm 2))
-  (printStat "max" (arrget samm 3))
-  (printStat "var" variance)
-  (printStat "std" (^ variance 0.5)))
+  (printStat "cnt" (memget summary count))
+  (printStat "sum" (memget summary sum))
+  (printStat "avg" (memget summary mean))
+  (printStat "min" (memget summary min))
+  (printStat "max" (memget summary max))
+  (printStat "var" (memget summary variance))
+  (printStat "std" (memget summary stddev)))
