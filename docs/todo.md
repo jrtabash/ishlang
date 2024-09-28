@@ -102,6 +102,8 @@ Note: Should work with future types; list and orderedmap.
   (rngbegin <range>) -> int
   (rngend <range>) -> int
   (rngstep <range>) -> int
+  (rnglen <range>) -> int
+  (rngnext <range> <int>) -> int || null
   ```
 - Looping
   ```
@@ -109,7 +111,7 @@ Note: Should work with future types; list and orderedmap.
   ```
 - Expanding
   ```
-  (array <range>)
+  (array <range>) -> array
   ```
 - Example
   ```
