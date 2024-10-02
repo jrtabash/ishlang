@@ -1,6 +1,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <concepts>
 #include <filesystem>
 #include <forward_list>
 #include <optional>
@@ -34,6 +35,8 @@ namespace Ishlang {
     public:
         static bool isZero(double val);
         static bool isEqual(double lhs, double rhs);
+
+        static inline int sign(std::integral auto n);
 
     public:
         static std::string nextToken(const std::string &str, size_t &pos);
@@ -77,6 +80,10 @@ namespace Ishlang {
 
     // --------------------------------------------------------------------------------
     // INLINE
+
+    inline int Util::sign(std::integral auto n) {
+        return n >= 0 ? 1 : -1;
+    }
 
     inline std::ostream &Util::printContainer(std::ostream &out,
                                               Container auto const &container,

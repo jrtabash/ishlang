@@ -5,6 +5,7 @@
 #include "environment.h"
 #include "hashtable.h"
 #include "instance.h"
+#include "integer_range.h"
 #include "lambda.h"
 #include "lexer.h"
 #include "parser.h"
@@ -75,6 +76,10 @@ namespace Ishlang {
         void testHashtableFind();
         void testHashtableCount();
         void testHashtableKeysValues();
+        void testIntegerRange();
+        void testIntegerRangeComparison();
+        void testIntegerRangeStartNext();
+        void testIntegerRangeGenerator();
         void testModule();
         void testModuleStorage();
         void testCodeNodeBasic();

@@ -17,6 +17,7 @@ OBJS=\
 	instance.o \
 	sequence.o \
 	hashtable.o \
+	integer_range.o \
 	code_node.o \
 	lexer.o \
 	parser.o \
@@ -60,6 +61,9 @@ sequence.o: sequence.cpp sequence.h value.h exception.h
 
 hashtable.o: hashtable.cpp hashtable.h value.h
 	$(CPP) $(CFLAGS) -c hashtable.cpp -o $(BUILD)/hashtable.o
+
+integer_range.o: integer_range.cpp integer_range.h
+	$(CPP) $(CFLAGS) -c integer_range.cpp -o $(BUILD)/integer_range.o
 
 code_node.o: code_node.cpp code_node.h value.h parser.h environment.h lambda.h util.h exception.h
 	$(CPP) $(CFLAGS) -c code_node.cpp -o $(BUILD)/code_node.o

@@ -103,7 +103,6 @@ Note: Should work with future types; list and orderedmap.
   (rngend <range>) -> int
   (rngstep <range>) -> int
   (rnglen <range>) -> int
-  (rngnext <range> <int>) -> int || null
   ```
 - Looping
   ```
@@ -119,6 +118,7 @@ Note: Should work with future types; list and orderedmap.
   (rngbegin r)
   (rngend r)
   (rngstep r)
+  (rnglen r)
   (array r)
   (progn
      (var sum)
