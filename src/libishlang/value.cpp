@@ -3,6 +3,7 @@
 #include "exception.h"
 #include "hashtable.h"
 #include "instance.h"
+#include "integer_range.h"
 #include "lambda.h"
 #include "sequence.h"
 #include "struct.h"
@@ -17,13 +18,14 @@ const Value Value::Null;
 const Value Value::EmptyPair(Pair(Value::Null, Value::Null));
 
 // -------------------------------------------------------------
-ValuePair   Value::NullPair;
-std::string Value::NullText;
-Lambda      Value::NullFunc;
-Struct      Value::NullUserType;
-Instance    Value::NullObject;
-Sequence    Value::NullSequence;
-Hashtable   Value::NullHashtable;
+ValuePair    Value::NullPair;
+std::string  Value::NullText;
+Lambda       Value::NullFunc;
+Struct       Value::NullUserType;
+Instance     Value::NullObject;
+Sequence     Value::NullSequence;
+Hashtable    Value::NullHashtable;
+IntegerRange Value::NullIntegerRange;
 
 // -------------------------------------------------------------
 Value::Value(const Pair &p)
@@ -71,6 +73,12 @@ Value::Value(const Sequence &s)
 Value::Value(const Hashtable &h)
     : type_(eHashMap)
     , value_(std::make_shared<Hashtable>(h))
+{}
+
+// -------------------------------------------------------------
+Value::Value(const IntegerRange &r)
+    : type_(eRange)
+    , value_(std::make_shared<IntegerRange>(r))
 {}
 
 // -------------------------------------------------------------
@@ -183,6 +191,7 @@ bool Value::operator==(const Value &rhs) const {
         case eUserObject: return *std::get<InstancePtr>(value_) == *std::get<InstancePtr>(rhs.value_);
         case eArray:      return *std::get<SequencePtr>(value_) == *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) == *std::get<HashtablePtr>(rhs.value_);
+        case eRange:      return *std::get<IntegerRangePtr>(value_) == *std::get<IntegerRangePtr>(rhs.value_);
         case eNone:       return true;
         }
     }
@@ -207,6 +216,7 @@ bool Value::operator!=(const Value &rhs) const {
         case eUserObject: return *std::get<InstancePtr>(value_) != *std::get<InstancePtr>(rhs.value_);
         case eArray:      return *std::get<SequencePtr>(value_) != *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) != *std::get<HashtablePtr>(rhs.value_);
+        case eRange:      return *std::get<IntegerRangePtr>(value_) != *std::get<IntegerRangePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -231,6 +241,7 @@ bool Value::operator<(const Value &rhs) const {
         case eUserObject: return false;
         case eArray:      return *std::get<SequencePtr>(value_) < *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) < *std::get<HashtablePtr>(rhs.value_);
+        case eRange:      return *std::get<IntegerRangePtr>(value_) < *std::get<IntegerRangePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -255,6 +266,7 @@ bool Value::operator>(const Value &rhs) const {
         case eUserObject: return false;
         case eArray:      return *std::get<SequencePtr>(value_) > *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) > *std::get<HashtablePtr>(rhs.value_);
+        case eRange:      return *std::get<IntegerRangePtr>(value_) > *std::get<IntegerRangePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -279,6 +291,7 @@ bool Value::operator<=(const Value &rhs) const {
         case eUserObject: return false;
         case eArray:      return *std::get<SequencePtr>(value_) <= *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) <= *std::get<HashtablePtr>(rhs.value_);
+        case eRange:      return *std::get<IntegerRangePtr>(value_) <= *std::get<IntegerRangePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -303,6 +316,7 @@ bool Value::operator>=(const Value &rhs) const {
         case eUserObject: return false;
         case eArray:      return *std::get<SequencePtr>(value_) >= *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) >= *std::get<HashtablePtr>(rhs.value_);
+        case eRange:      return *std::get<IntegerRangePtr>(value_) >= *std::get<IntegerRangePtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -327,6 +341,7 @@ std::string Value::typeToString(Type type) {
         case eUserObject: return "userobject";
         case eArray:      return "array";
         case eHashMap:    return "hashmap";
+        case eRange:      return "range";
     }
     return "unknown";
 }
@@ -345,6 +360,7 @@ Value::Type Value::stringToType(const std::string &str) {
     else if (str == "userobject") { return Value::eUserObject; }
     else if (str == "array")      { return Value::eArray; }
     else if (str == "hashmap")    { return Value::eHashMap; }
+    else if (str == "range")      { return Value::eRange; }
     throw InvalidExpression("unknown value type", str);
     return Value::eNone;
 }
@@ -380,6 +396,9 @@ Value Value::clone() const {
 
     case eHashMap:
         return Value(*std::get<HashtablePtr>(value_));
+
+    case eRange:
+        return Value(*std::get<IntegerRangePtr>(value_));
     }
 
     return Value::Null;
@@ -405,6 +424,7 @@ Value Value::asType(Type otherType) const {
     case eUserObject:
     case eArray:
     case eHashMap:
+    case eRange:
         break;
     }
 
@@ -427,6 +447,7 @@ void Value::printC(std::ostream &out, const Value &value) {
     case Value::eUserObject: out << *std::get<InstancePtr>(value.value_);              break;
     case Value::eArray:      out << *std::get<SequencePtr>(value.value_);              break;
     case Value::eHashMap:    out << *std::get<HashtablePtr>(value.value_);             break;
+    case Value::eRange:      out << *std::get<IntegerRangePtr>(value.value_);          break;
     }
 }
 
@@ -445,6 +466,7 @@ void Value::print(const Value &value) {
     case Value::eUserObject: std::cout << *std::get<InstancePtr>(value.value_);              break;
     case Value::eArray:      std::cout << *std::get<SequencePtr>(value.value_);              break;
     case Value::eHashMap:    std::cout << *std::get<HashtablePtr>(value.value_);             break;
+    case Value::eRange:      std::cout << *std::get<IntegerRangePtr>(value.value_);          break;
     }
 }
 
@@ -462,6 +484,7 @@ std::size_t Value::Hash::operator()(const Value &value) const noexcept {
     case Value::eUserObject: return std::hash<const Value::UserObject *>{}(&value.userObject());
     case Value::eArray:      return std::hash<const Value::Array *>{}(&value.array());
     case Value::eHashMap:    return std::hash<const Value::HashMap *>{}(&value.hashMap());
+    case Value::eRange:      return operator()(value.range());
     case Value::eNone:       break;
     }
 
@@ -471,5 +494,12 @@ std::size_t Value::Hash::operator()(const Value &value) const noexcept {
 std::size_t Value::Hash::operator()(const ValuePair &value) const noexcept {
     const std::size_t hash1 = operator()(value.first());
     const std::size_t hash2 = operator()(value.second());
-    return hash1 ^ (hash2 << 1);
+    return combine(hash1, hash2);
+}
+
+std::size_t Value::Hash::operator()(const IntegerRange &rng) const noexcept {
+    auto hasher = std::hash<Value::Long>{};
+    const std::size_t hash1 = hasher(rng.begin());
+    const std::size_t hash2 = hasher(rng.end());
+    return combine(hash1, hash2);
 }

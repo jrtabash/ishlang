@@ -13,6 +13,7 @@ namespace Ishlang {
     class Instance;
     class Sequence;
     class Hashtable;
+    class IntegerRange;
 
     using PairPtr = std::shared_ptr<ValuePair>;
     using StringPtr = std::shared_ptr<std::string>;
@@ -21,6 +22,7 @@ namespace Ishlang {
     using InstancePtr = std::shared_ptr<Instance>;
     using SequencePtr = std::shared_ptr<Sequence>;
     using HashtablePtr = std::shared_ptr<Hashtable>;
+    using IntegerRangePtr = std::shared_ptr<IntegerRange>;
 
     struct Value {
     public:
@@ -31,13 +33,14 @@ namespace Ishlang {
         static const Value EmptyPair;
 
     private:
-        static ValuePair   NullPair;
-        static std::string NullText;
-        static Lambda      NullFunc;
-        static Struct      NullUserType;
-        static Instance    NullObject;
-        static Sequence    NullSequence;
-        static Hashtable   NullHashtable;
+        static ValuePair    NullPair;
+        static std::string  NullText;
+        static Lambda       NullFunc;
+        static Struct       NullUserType;
+        static Instance     NullObject;
+        static Sequence     NullSequence;
+        static Hashtable    NullHashtable;
+        static IntegerRange NullIntegerRange;
         
     public:
         enum Type {
@@ -53,6 +56,7 @@ namespace Ishlang {
             eUserObject = 'O',
             eArray      = 'A',
             eHashMap    = 'H',
+            eRange      = 'G',
         };
 
         using Long       = long long int;
@@ -66,6 +70,7 @@ namespace Ishlang {
         using UserObject = Instance;
         using Array      = Sequence;
         using HashMap    = Hashtable;
+        using Range      = IntegerRange;
         
     public:
         inline Value();
@@ -81,6 +86,7 @@ namespace Ishlang {
         Value(const Instance &o);
         Value(const Sequence &s);
         Value(const Hashtable &h);
+        Value(const IntegerRange &r);
 
         inline Type type() const;
         
@@ -96,6 +102,7 @@ namespace Ishlang {
         inline bool isUserObject() const;
         inline bool isArray() const;
         inline bool isHashMap() const;
+        inline bool isRange() const;
         
         inline bool isNumber() const;
         
@@ -114,6 +121,8 @@ namespace Ishlang {
         inline Array &array();
         inline const HashMap &hashMap() const;
         inline HashMap &hashMap();
+        inline const Range &range() const;
+        inline Range &range();
 
         Value asInt() const;
         Value asReal() const;
@@ -150,6 +159,9 @@ namespace Ishlang {
         struct Hash {
             std::size_t operator()(const Value &value) const noexcept;
             std::size_t operator()(const ValuePair &value) const noexcept;
+            std::size_t operator()(const IntegerRange &rng) const noexcept;
+
+            static inline std::size_t combine(std::size_t hash1, std::size_t hash2);
         };
 
     private:
@@ -163,7 +175,8 @@ namespace Ishlang {
                                           StructPtr,
                                           InstancePtr,
                                           SequencePtr,
-                                          HashtablePtr>;
+                                          HashtablePtr,
+                                          IntegerRangePtr>;
 
         Type type_;
         VariantValue value_;
@@ -248,6 +261,10 @@ namespace Ishlang {
         return type_ == eHashMap;
     }
 
+    inline bool Value::isRange() const {
+        return type_ == eRange;
+    }
+
     inline bool Value::isNumber() const {
         return type_ == eInteger || type_ == eReal;
     }
@@ -312,8 +329,20 @@ namespace Ishlang {
         return isHashMap() ? *std::get<HashtablePtr>(value_) : NullHashtable;
     }
 
+    inline auto Value::range() const -> const Range & {
+        return isRange() ? *std::get<IntegerRangePtr>(value_) : NullIntegerRange;
+    }
+
+    inline auto Value::range() -> Range & {
+        return isRange() ? *std::get<IntegerRangePtr>(value_) : NullIntegerRange;
+    }
+
     inline std::string Value::typeToString() const {
         return typeToString(type_);
+    }
+
+    inline std::size_t Value::Hash::combine(std::size_t hash1, std::size_t hash2) {
+        return hash1 ^ (hash2 << 1);
     }
 
 }

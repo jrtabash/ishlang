@@ -18,6 +18,7 @@ namespace Ishlang {
         using Predicate = std::function<bool (Long, Long)>;
 
     public:
+        IntegerRange() = default;
         IntegerRange(Long end);
         IntegerRange(Long begin, Long end, Long step = 1ll);
 

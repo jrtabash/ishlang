@@ -725,6 +725,23 @@ void UnitTest::testValue() {
     }
 
     {
+        Value r1(IntegerRange(10));
+        Value r2(IntegerRange(10));
+        Value r3(IntegerRange(100));
+
+        TEST_CASE(r1.isRange());
+        TEST_CASE(r2.isRange());
+        TEST_CASE(r3.isRange());
+
+        TEST_CASE(r1 == r2);
+        TEST_CASE(r1 != r3);
+        TEST_CASE(r1 < r3);
+        TEST_CASE(r2 <= r3);
+        TEST_CASE(r3 > r2);
+        TEST_CASE(r3 >= r1);
+    }
+
+    {
         TEST_CASE(Value::stringToType("none")       == Value::eNone);
         TEST_CASE(Value::stringToType("int")        == Value::eInteger);
         TEST_CASE(Value::stringToType("real")       == Value::eReal);
@@ -737,6 +754,7 @@ void UnitTest::testValue() {
         TEST_CASE(Value::stringToType("userobject") == Value::eUserObject);
         TEST_CASE(Value::stringToType("array")      == Value::eArray);
         TEST_CASE(Value::stringToType("hashmap")    == Value::eHashMap);
+        TEST_CASE(Value::stringToType("range")      == Value::eRange);
 
         try {
             Value::stringToType("foobar");
@@ -801,6 +819,7 @@ void UnitTest::testValueAsType() {
     Value const stringFalse = Value("false");
     Value const array1 = Value(Sequence(1, int1));
     Value const ht = Value(Hashtable());
+    Value const rng = Value(IntegerRange());
 
     { // asInt
         TEST_VALUE_ASTYPE(int1,        asInt(), int1);
@@ -814,6 +833,7 @@ void UnitTest::testValueAsType() {
         TEST_ASTYPE_EXCEPT(null,   asInt(), "int");
         TEST_ASTYPE_EXCEPT(array1, asInt(), "int");
         TEST_ASTYPE_EXCEPT(ht,     asInt(), "int");
+        TEST_ASTYPE_EXCEPT(rng,    asInt(), "int");
     }
 
     { // asReal
@@ -828,6 +848,7 @@ void UnitTest::testValueAsType() {
         TEST_ASTYPE_EXCEPT(null,   asReal(), "real");
         TEST_ASTYPE_EXCEPT(array1, asReal(), "real");
         TEST_ASTYPE_EXCEPT(ht,     asReal(), "real");
+        TEST_ASTYPE_EXCEPT(rng,    asReal(), "real");
     }
 
     { // asChar
@@ -842,6 +863,7 @@ void UnitTest::testValueAsType() {
         TEST_ASTYPE_EXCEPT(null,   asChar(), "char");
         TEST_ASTYPE_EXCEPT(array1, asChar(), "char");
         TEST_ASTYPE_EXCEPT(ht,     asChar(), "char");
+        TEST_ASTYPE_EXCEPT(rng,    asChar(), "char");
     }
 
     { // asBool
@@ -861,6 +883,7 @@ void UnitTest::testValueAsType() {
         TEST_ASTYPE_EXCEPT(string25, asBool(), "bool");
         TEST_ASTYPE_EXCEPT(array1,   asBool(), "bool");
         TEST_ASTYPE_EXCEPT(ht,       asBool(), "bool");
+        TEST_ASTYPE_EXCEPT(rng,      asBool(), "bool");
     }
 
     { // asString
@@ -874,6 +897,7 @@ void UnitTest::testValueAsType() {
         TEST_ASTYPE_EXCEPT(null,   asString(), "string");
         TEST_ASTYPE_EXCEPT(array1, asString(), "string");
         TEST_ASTYPE_EXCEPT(ht,     asString(), "string");
+        TEST_ASTYPE_EXCEPT(rng,    asString(), "string");
     }
 
     { // asType
@@ -4585,6 +4609,10 @@ void UnitTest::testCodeNodeHash() {
     TEST_CASE_MSG(test(Value::False), "hash(false");
     TEST_CASE_MSG(test(Value('a')), "hash('a')");
     TEST_CASE_MSG(test(Value("str")), "hash(\"str\")");
+    TEST_CASE_MSG(test(Value(Value::Pair(Value(1ll), Value(2ll)))), "hash(pair)");
+    TEST_CASE_MSG(test(Value(Sequence())), "hash(array");
+    TEST_CASE_MSG(test(Value(Hashtable())), "hash(hashmap)");
+    TEST_CASE_MSG(test(Value(IntegerRange())), "hash(range)");
 }
 
 // -------------------------------------------------------------
