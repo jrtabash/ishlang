@@ -121,6 +121,8 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeHashMapValues);
     ADD_TEST(testCodeNodeHashMapItems);
     ADD_TEST(testCodeNodePairOperations);
+    ADD_TEST(testCodeNodeMakeRange);
+    ADD_TEST(testCodeNodeRangeGetters);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -192,6 +194,8 @@ UnitTest::UnitTest()
     ADD_TEST(testParserHashMapVals);
     ADD_TEST(testParserHashMapItems);
     ADD_TEST(testParserPairOperations);
+    ADD_TEST(testParserMakeRange);
+    ADD_TEST(testParserRangeGetters);
 }
 #undef ADD_TEST
 
@@ -5208,6 +5212,129 @@ void UnitTest::testCodeNodePairOperations() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeMakeRange() {
+    auto env = Environment::make();
+
+    auto ilit = [](Value::Long value) { return CodeNode::make<Literal>(Value(value)); };
+    auto clit = [](Value::Char value) { return CodeNode::make<Literal>(Value(value)); };
+
+    Value value = CodeNode::make<MakeRange>(ilit(10))->eval(env);
+    TEST_CASE_MSG(value.isRange(), "actual=" << value.isRange());
+    TEST_CASE_MSG(value.range().begin() == 0ll, "actual=" << value.range().begin());
+    TEST_CASE_MSG(value.range().end() == 10ll, "actual=" << value.range().end());
+    TEST_CASE_MSG(value.range().step() == 1ll, "actual=" << value.range().step());
+
+    value = CodeNode::make<MakeRange>(ilit(5), ilit(10), CodeNode::SharedPtr())->eval(env);
+    TEST_CASE_MSG(value.isRange(), "actual=" << value.isRange());
+    TEST_CASE_MSG(value.range().begin() == 5ll, "actual=" << value.range().begin());
+    TEST_CASE_MSG(value.range().end() == 10ll, "actual=" << value.range().end());
+    TEST_CASE_MSG(value.range().step() == 1ll, "actual=" << value.range().step());
+
+    value = CodeNode::make<MakeRange>(ilit(0), ilit(10), ilit(2))->eval(env);
+    TEST_CASE_MSG(value.isRange(), "actual=" << value.isRange());
+    TEST_CASE_MSG(value.range().begin() == 0ll, "actual=" << value.range().begin());
+    TEST_CASE_MSG(value.range().end() == 10ll, "actual=" << value.range().end());
+    TEST_CASE_MSG(value.range().step() == 2ll, "actual=" << value.range().step());
+
+    try {
+        CodeNode::make<MakeRange>(CodeNode::SharedPtr())->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidExpression &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        CodeNode::make<MakeRange>(clit('a'))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        CodeNode::make<MakeRange>(ilit(0), clit('a'), CodeNode::SharedPtr())->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        CodeNode::make<MakeRange>(ilit(0), ilit(10), clit('a'))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeRangeGetters() {
+    auto env = Environment::make();
+    env->def("rng", Value(IntegerRange(10)));
+
+    auto ilit = [](Value::Long value) { return CodeNode::make<Literal>(Value(value)); };
+    auto rVar = []() { return CodeNode::make<Variable>("rng"); };
+
+    auto val = CodeNode::make<RangeBegin>(rVar())->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val == Value(0ll), "actual=" << val);
+
+    val = CodeNode::make<RangeEnd>(rVar())->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val == Value(10ll), "actual=" << val);
+
+    val = CodeNode::make<RangeStep>(rVar())->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val == Value(1ll), "actual=" << val);
+
+    val = CodeNode::make<RangeLen>(rVar())->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val == Value(10ll), "actual=" << val);
+
+    try {
+        CodeNode::make<RangeBegin>(ilit(5))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        CodeNode::make<RangeEnd>(ilit(5))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        CodeNode::make<RangeStep>(ilit(5))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        CodeNode::make<RangeLen>(ilit(5))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -6787,4 +6914,49 @@ void UnitTest::testParserPairOperations() {
     TEST_CASE(parserTest(parser, env, "(first p 'a')",   Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(second)",        Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(second p 'a')",  Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserMakeRange() {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(range 10)",        Value(IntegerRange(10)),          true));
+    TEST_CASE(parserTest(parser, env, "(range 1 10)",      Value(IntegerRange(1, 10)),       true));
+    TEST_CASE(parserTest(parser, env, "(range 0 12 3)",    Value(IntegerRange(0, 12, 3)),    true));
+    TEST_CASE(parserTest(parser, env, "(range -10 -1)",    Value(IntegerRange(-10, -1, 1)),  true));
+    TEST_CASE(parserTest(parser, env, "(range -10 0 2)",   Value(IntegerRange(-10, 0, 2)),   true));
+    TEST_CASE(parserTest(parser, env, "(range -1 -10 -1)", Value(IntegerRange(-1, -10, -1)), true));
+
+    TEST_CASE(parserTest(parser, env, "(range)",          Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(range -10)",      Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(range -1 -10)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(range 10 1)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(range -1 -10 2)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(range 10 1 2)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(range 'a')",      Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(range 1 'a')",    Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(range 1 10 'a')", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserRangeGetters() {
+    auto env = Environment::make();
+    Parser parser;
+
+    env->def("rng", Value(IntegerRange(1, 25, 2)));
+
+    TEST_CASE(parserTest(parser, env, "(rngbegin rng)", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(rngend rng)",   Value(25ll), true));
+    TEST_CASE(parserTest(parser, env, "(rngstep rng)",  Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(rnglen rng)",   Value(12ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(rngbegin)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(rngbegin 5)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(rngend)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(rngend 5)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(rngstep)",    Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(rngstep 5)",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(rnglen)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(rnglen 5)",   Value::Null, false));
 }

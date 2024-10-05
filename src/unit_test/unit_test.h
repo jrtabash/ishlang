@@ -150,6 +150,8 @@ namespace Ishlang {
         void testCodeNodeHashMapValues();
         void testCodeNodeHashMapItems();
         void testCodeNodePairOperations();
+        void testCodeNodeMakeRange();
+        void testCodeNodeRangeGetters();
         void testParserBasic();
         void testParserClone();
         void testParserIsType();
@@ -217,6 +219,8 @@ namespace Ishlang {
         void testParserHashMapVals();
         void testParserHashMapItems();
         void testParserPairOperations();
+        void testParserMakeRange();
+        void testParserRangeGetters();
         
     private:
         bool  success_;

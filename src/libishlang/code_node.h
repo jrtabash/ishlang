@@ -4,6 +4,7 @@
 #include "environment.h"
 #include "hashtable.h"
 #include "instance.h"
+#include "integer_range.h"
 #include "struct.h"
 #include "value.h"
 #include "value_pair.h"
@@ -1205,6 +1206,67 @@ namespace Ishlang {
 
     private:
         CodeNode::SharedPtr pairExpr_;
+    };
+
+    // -------------------------------------------------------------
+    class MakeRange : public CodeNode {
+    public:
+        MakeRange(CodeNode::SharedPtr end);
+        MakeRange(CodeNode::SharedPtr begin, CodeNode::SharedPtr end, CodeNode::SharedPtr step);
+        virtual ~MakeRange() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr begin_;
+        CodeNode::SharedPtr end_;
+        CodeNode::SharedPtr step_;
+    };
+
+    // -------------------------------------------------------------
+    class RangeGetter : public CodeNode {
+    public:
+        using Getter = std::function<Value::Long (const IntegerRange &)>;
+
+    public:
+        RangeGetter(CodeNode::SharedPtr rng, Getter && getter);
+        virtual ~RangeGetter() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtr rng_;
+        Getter getter_;
+    };
+
+    // -------------------------------------------------------------
+    class RangeBegin : public RangeGetter {
+    public:
+        RangeBegin(CodeNode::SharedPtr rng);
+        virtual ~RangeBegin() {}
+    };
+
+    // -------------------------------------------------------------
+    class RangeEnd : public RangeGetter {
+    public:
+        RangeEnd(CodeNode::SharedPtr rng);
+        virtual ~RangeEnd() {}
+    };
+
+    // -------------------------------------------------------------
+    class RangeStep : public RangeGetter {
+    public:
+        RangeStep(CodeNode::SharedPtr rng);
+        virtual ~RangeStep() {}
+    };
+
+    // -------------------------------------------------------------
+    class RangeLen : public RangeGetter {
+    public:
+        RangeLen(CodeNode::SharedPtr rng);
+        virtual ~RangeLen() {}
     };
 
 }

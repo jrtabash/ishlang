@@ -1681,3 +1681,79 @@ Value PairSecond::exec(Environment::SharedPtr env) {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+MakeRange::MakeRange(CodeNode::SharedPtr end)
+    : CodeNode()
+    , begin_(CodeNode::SharedPtr())
+    , end_(end)
+    , step_(CodeNode::SharedPtr())
+{}
+
+MakeRange::MakeRange(CodeNode::SharedPtr begin, CodeNode::SharedPtr end, CodeNode::SharedPtr step)
+    : CodeNode()
+    , begin_(begin)
+    , end_(end)
+    , step_(step)
+{}
+
+Value MakeRange::exec(Environment::SharedPtr env) {
+    const auto evalInt = [&env](CodeNode::SharedPtr expr) {
+        auto val = expr->eval(env);
+        if (!val.isInt()) {
+            throw InvalidOperandType("Integer", val.typeToString());
+        }
+        return val;
+    };
+
+    if (!end_) {
+        throw InvalidExpression("Missing required range end");
+    }
+
+    auto end = evalInt(end_).integer();
+    auto begin = begin_ ? evalInt(begin_).integer() : 0ll;
+    auto step = step_ ? evalInt(step_).integer() : 1ll;
+    return Value(IntegerRange(begin, end, step));
+}
+
+// -------------------------------------------------------------
+RangeGetter::RangeGetter(CodeNode::SharedPtr rng, Getter && getter)
+    : CodeNode()
+    , rng_(rng)
+    , getter_(std::move(getter))
+{}
+
+Value RangeGetter::exec(Environment::SharedPtr env) {
+    if (rng_) {
+        auto rng = rng_->eval(env);
+        if (!rng.isRange()) {
+            throw InvalidOperandType("Range", rng.typeToString());
+        }
+        return Value(getter_(rng.range()));
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+RangeBegin::RangeBegin(CodeNode::SharedPtr rng)
+    : RangeGetter(rng, &IntegerRange::begin)
+{}
+
+// -------------------------------------------------------------
+RangeEnd::RangeEnd(CodeNode::SharedPtr rng)
+    : RangeGetter(rng, &IntegerRange::end)
+{}
+
+// -------------------------------------------------------------
+RangeStep::RangeStep(CodeNode::SharedPtr rng)
+    : RangeGetter(rng, &IntegerRange::step)
+{}
+
+// -------------------------------------------------------------
+RangeLen::RangeLen(CodeNode::SharedPtr rng)
+    : RangeGetter(
+        rng,
+        [](const IntegerRange & r) {
+            return static_cast<Value::Long>(r.size());
+        })
+{}

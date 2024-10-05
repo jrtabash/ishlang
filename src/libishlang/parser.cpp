@@ -1023,6 +1023,46 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("second", 1));
               return CodeNode::make<PairSecond>(exprs[0]);
           }
+        },
+
+        { "range",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("range", 1, 3));
+              if (exprs.size() == 1) {
+                  return CodeNode::make<MakeRange>(exprs[0]);
+              }
+              else {
+                  return CodeNode::make<MakeRange>(exprs[0], exprs[1], exprs.size() == 3 ? exprs[2] : CodeNode::SharedPtr());
+              }
+          }
+        },
+
+        { "rngbegin",
+          [this]() {
+              auto rngExpr(readAndCheckExprList("rngbegin", 1));
+              return CodeNode::make<RangeBegin>(rngExpr[0]);
+          }
+        },
+
+        { "rngend",
+          [this]() {
+              auto rngExpr(readAndCheckExprList("rngend", 1));
+              return CodeNode::make<RangeEnd>(rngExpr[0]);
+          }
+        },
+
+        { "rngstep",
+          [this]() {
+              auto rngExpr(readAndCheckExprList("rngstep", 1));
+              return CodeNode::make<RangeStep>(rngExpr[0]);
+          }
+        },
+
+        { "rnglen",
+          [this]() {
+              auto rngExpr(readAndCheckExprList("rnglen", 1));
+              return CodeNode::make<RangeLen>(rngExpr[0]);
+          }
         }
     };
 }
