@@ -2902,6 +2902,24 @@ void UnitTest::testCodeNodeForeach() {
         TEST_CASE_MSG(valSum.isInt(), "actual=" << valSum.typeToString());
         TEST_CASE_MSG(valSum.integer() == 150ll, "actual=" << valSum);
     }
+
+    { // Range
+        auto env = Environment::make();
+        env->def("rng", Value(IntegerRange(0, 20, 2)));
+        env->def("sum", Value(0ll));
+
+        auto foreach = CodeNode::make<Foreach>(
+            "i",
+            var("rng"),
+            assign("sum", add(var("sum"), var("i"))));
+        Value result = foreach->eval(env);
+        TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+        TEST_CASE_MSG(result.integer() == 90ll, "actual=" << result);
+
+        auto const & sum = env->get("sum");
+        TEST_CASE_MSG(sum.isInt(), "actual=" << sum.typeToString());
+        TEST_CASE_MSG(sum.integer() == 90ll, "actual=" << sum);
+    }
 }
 
 // -------------------------------------------------------------
@@ -5705,17 +5723,20 @@ void UnitTest::testParserForeach() {
     add_var("str", "\"abcdef\"");
     add_var("arr", "(array 1 2 3 4 5)");
     add_var("ht", "(hashmap (pair 1 10) (pair 2 20))");
+    add_var("rng", "(range 10)");
     add_var("strCnt", "0");
     add_var("arrSum", "0");
     add_var("htSum", "0");
     add_var("keySum", "0");
     add_var("valSum", "0");
+    add_var("rngSum", "0");
     add_var("dummy", "0");
 
     TEST_CASE(parserTest(parser, env, "(foreach c str (= strCnt (+ strCnt 1)))",                        Value(6ll),  true));
     TEST_CASE(parserTest(parser, env, "(foreach i arr (= arrSum (+ arrSum i)))",                        Value(15ll), true));
     TEST_CASE(parserTest(parser, env, "(foreach kv ht (= htSum (+ htSum (* (first kv) (second kv)))))", Value(50ll), true));
     TEST_CASE(parserTest(parser, env, "(foreach kv ht (progn (= keySum (+ keySum (first kv))) (= valSum (+ valSum (second kv)))))", Value(30ll), true));
+    TEST_CASE(parserTest(parser, env, "(foreach i rng (= rngSum (+ rngSum i)))",                        Value(45ll), true));
 
     add_var("arrCnt", "0");
     TEST_CASE(parserTest(parser, env, "(foreach i arr (progn (when (> i 3) (break)) (= arrCnt (+ arrCnt 1))))", Value::Null, true));

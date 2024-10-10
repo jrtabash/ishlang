@@ -367,6 +367,8 @@ namespace Ishlang {
         template <typename Container>
         Value impl(Environment::SharedPtr loopEnv, const Container &container);
 
+        Value implRange(Environment::SharedPtr loopEnv, const IntegerRange &range);
+
     private:
         std::string         name_;
         CodeNode::SharedPtr container_;

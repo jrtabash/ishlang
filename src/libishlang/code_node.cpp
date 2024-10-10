@@ -341,17 +341,13 @@ Value Foreach::exec(Environment::SharedPtr env) {
 
         try {
             auto contValue = container_->eval(loopEnv);
-            if (contValue.isString()) {
-                return impl(loopEnv, contValue.text());
-            }
-            else if (contValue.isArray()) {
-                return impl(loopEnv, contValue.array());
-            }
-            else if (contValue.isHashMap()) {
-                return impl(loopEnv, contValue.hashMap());
-            }
-            else {
-                throw InvalidExpressionType("String, Array or HashMap", contValue.typeToString());
+            switch (contValue.type()) {
+            case Value::eString:  return impl(loopEnv, contValue.text());
+            case Value::eArray:   return impl(loopEnv, contValue.array());
+            case Value::eHashMap: return impl(loopEnv, contValue.hashMap());
+            case Value::eRange:   return implRange(loopEnv, contValue.range());
+            default:
+                throw InvalidExpressionType("String, Array, HashMap or Range", contValue.typeToString());
             }
         }
         catch (const Break::Except &) { return Value::Null; }
@@ -361,8 +357,7 @@ Value Foreach::exec(Environment::SharedPtr env) {
 }
 
 template <typename Container>
-Value Foreach::impl(Environment::SharedPtr loopEnv, const Container &container)
-{
+Value Foreach::impl(Environment::SharedPtr loopEnv, const Container &container) {
     Value result = Value::Null;
     for (const auto &item : container) {
         if constexpr (std::is_same_v<Container, Hashtable>) {
@@ -371,6 +366,16 @@ Value Foreach::impl(Environment::SharedPtr loopEnv, const Container &container)
         else {
             loopEnv->set(name_, item);
         }
+        result = body_->eval(loopEnv);
+    }
+    return result;
+}
+
+Value Foreach::implRange(Environment::SharedPtr loopEnv, const IntegerRange &range) {
+    Value result = Value::Null;
+    auto gen = range.generator();
+    while (auto i = gen.next()) {
+        loopEnv->set(name_, Value(*i));
         result = body_->eval(loopEnv);
     }
     return result;

@@ -11,6 +11,18 @@ __CODE__
 (println (rngstep rng))
 (println (rnglen rng))
 
+(var sum 0)
+(foreach i (range 10) (= sum (+ sum i)))
+(println sum)
+
+(= sum 0)
+(foreach i (range -10 0) (= sum (+ sum i)))
+(println sum)
+
+(= sum 0)
+(foreach i (range 1 1) (= sum (+ sum i)))
+(println sum)
+
 __EXPECT__
 0:1:100
 1:1:5
@@ -21,3 +33,6 @@ __EXPECT__
 25
 2
 12
+45
+-55
+0
