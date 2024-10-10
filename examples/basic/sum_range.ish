@@ -1,6 +1,6 @@
 (defun sumRange (start end)
-  (var count 0)
-  (loop (var i start) (<= i end) (= i (+ i 1))
-        (= count (+ count i))))
+  (var sum 0)
+  (foreach i (range start (+ end 1))
+    (= sum (+ sum i))))
 
 (println "sumRange(1, 10): " (sumRange 1 10))
