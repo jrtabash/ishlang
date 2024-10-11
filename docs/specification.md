@@ -745,6 +745,7 @@ the check is true for every character in the string.
 (hashmap [(pair key value) [(pair key value) ...]])
 (hashmap [(array key value) [(array key value) ...]])
 ```
+Note: Using pair and array can be mixed in same hashmap expression. See example below.
 
 **hmlen**: Return hashmap length
 ```
@@ -804,6 +805,8 @@ the check is true for every character in the string.
 ### Examples
 ```
 (var ht (hashmap (array "one" 1) (array "two" 2) (array "four" 4)))
+(var ht2 (hashmap (pair "one" 1) (pair "two" 2)))
+(var ht3 (hashmap (pair "one" 1) (array "two" 2) (pair "three" 3)))
 (hmlen ht)
 (hmhas ht "one")
 (hmget ht "two")
