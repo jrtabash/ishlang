@@ -272,9 +272,10 @@ Conditional only form:
   <body_expression>)
 ```
 
-Loop over each element in a container.
-Container can be a string, array, hashmap or range.
-The <var> variable is read-only and cannot directly modify the container.
+### Notes
+- Loop over each element in a container
+- Container can be a string, array, hashmap or range
+- The <var> variable is read-only and cannot directly modify the container
 
 ### Example - sum array elements
 ```
@@ -837,9 +838,10 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (range <begin> <end> [<step>])
 ```
 
-Range includes begin and excludes end.
-Use foreach to loop over ranges.
-Use expand to expand ranges to an array.
+### Notes
+- Range includes begin and excludes end
+- Use foreach to loop over ranges
+- Use expand to expand ranges to an array
 
 **rngbegin**: Get range begin
 ```
