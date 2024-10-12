@@ -3,9 +3,9 @@
   (when (> (arrlen arr) 0)
     (progn
       (= amax (arrget arr 0))
-      (loop (var i 1) (< i (arrlen arr)) (= i (+ i 1))
-            (when (> (arrget arr i) amax)
-              (= amax (arrget arr i))))))
+      (foreach x arr
+        (when (> x amax)
+          (= amax x)))))
   amax)
 
 (defun test (ints)
