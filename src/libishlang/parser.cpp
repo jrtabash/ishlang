@@ -1063,6 +1063,13 @@ void Parser::initAppFtns() {
               auto rngExpr(readAndCheckExprList("rnglen", 1));
               return CodeNode::make<RangeLen>(rngExpr[0]);
           }
+        },
+
+        { "expand",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("expand", 1, std::nullopt));
+              return CodeNode::make<Expand>(exprs);
+          }
         }
     };
 }

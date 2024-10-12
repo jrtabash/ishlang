@@ -1271,6 +1271,20 @@ namespace Ishlang {
         virtual ~RangeLen() {}
     };
 
+    // -------------------------------------------------------------
+    // Expand
+    class Expand : public CodeNode {
+    public:
+        Expand(CodeNode::SharedPtrList exprs);
+        virtual ~Expand() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        CodeNode::SharedPtrList exprs_;
+    };
+
 }
 
 #endif	// BYTE_CODE_H

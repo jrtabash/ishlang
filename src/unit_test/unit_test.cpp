@@ -123,6 +123,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodePairOperations);
     ADD_TEST(testCodeNodeMakeRange);
     ADD_TEST(testCodeNodeRangeGetters);
+    ADD_TEST(testCodeNodeExpand);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -196,6 +197,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserPairOperations);
     ADD_TEST(testParserMakeRange);
     ADD_TEST(testParserRangeGetters);
+    ADD_TEST(testParserExpand);
 }
 #undef ADD_TEST
 
@@ -5353,6 +5355,43 @@ void UnitTest::testCodeNodeRangeGetters() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeExpand() {
+    auto env = Environment::make();
+    env->def("rng1", Value(IntegerRange(4)));
+    env->def("rng2", Value(IntegerRange(4, 8, 2)));
+
+    auto ilit = [](Value::Long value) { return CodeNode::make<Literal>(Value(value)); };
+    auto rVar = [](const char * name) { return CodeNode::make<Variable>(name); };
+
+    auto val = CodeNode::make<Expand>(CodeNode::SharedPtrList{ rVar("rng1") })->eval(env);
+    TEST_CASE_MSG(val.isArray(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.array().size() == 4lu, "actual=" << val.array().size());
+    TEST_CASE_MSG(val.array().get(0lu) == Value(0ll), "actual=" << val.array().get(0lu));
+    TEST_CASE_MSG(val.array().get(1lu) == Value(1ll), "actual=" << val.array().get(1lu));
+    TEST_CASE_MSG(val.array().get(2lu) == Value(2ll), "actual=" << val.array().get(2lu));
+    TEST_CASE_MSG(val.array().get(3lu) == Value(3ll), "actual=" << val.array().get(3lu));
+
+    val = CodeNode::make<Expand>(CodeNode::SharedPtrList{ rVar("rng1"), rVar("rng2") })->eval(env);
+    TEST_CASE_MSG(val.isArray(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.array().size() == 6lu, "actual=" << val.array().size());
+    TEST_CASE_MSG(val.array().get(0lu) == Value(0ll), "actual=" << val.array().get(0lu));
+    TEST_CASE_MSG(val.array().get(1lu) == Value(1ll), "actual=" << val.array().get(1lu));
+    TEST_CASE_MSG(val.array().get(2lu) == Value(2ll), "actual=" << val.array().get(2lu));
+    TEST_CASE_MSG(val.array().get(3lu) == Value(3ll), "actual=" << val.array().get(3lu));
+    TEST_CASE_MSG(val.array().get(4lu) == Value(4ll), "actual=" << val.array().get(4lu));
+    TEST_CASE_MSG(val.array().get(5lu) == Value(6ll), "actual=" << val.array().get(5lu));
+
+    try {
+        CodeNode::make<Expand>(CodeNode::SharedPtrList{ ilit(5) })->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -6980,4 +7019,23 @@ void UnitTest::testParserRangeGetters() {
     TEST_CASE(parserTest(parser, env, "(rngstep 5)",  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(rnglen)",     Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(rnglen 5)",   Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserExpand() {
+    auto env = Environment::make();
+    Parser parser;
+
+    env->def("rng1", Value(IntegerRange(1, 6, 2)));
+    env->def("rng2", Value(IntegerRange(7, 9, 2)));
+
+    const auto val1 = Value(Sequence(std::vector{Value(1ll), Value(3ll), Value(5ll)}));
+    const auto val2 = Value(Sequence(std::vector{Value(1ll), Value(3ll), Value(5ll), Value(7ll)}));
+
+    TEST_CASE(parserTest(parser, env, "(expand rng1)",      val1, true));
+    TEST_CASE(parserTest(parser, env, "(expand rng1 rng2)", val2, true));
+
+    TEST_CASE(parserTest(parser, env, "(expand)",        Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(expand 1)",      Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(expand rng1 1)", Value::Null, false));
 }

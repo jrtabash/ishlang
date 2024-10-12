@@ -1762,3 +1762,25 @@ RangeLen::RangeLen(CodeNode::SharedPtr rng)
             return static_cast<Value::Long>(r.size());
         })
 {}
+
+// -------------------------------------------------------------
+Expand::Expand(CodeNode::SharedPtrList exprs)
+    : CodeNode()
+    , exprs_(exprs)
+{}
+
+Value Expand::exec(Environment::SharedPtr env) {
+    std::vector<Value> values;
+    for (auto expr : exprs_) {
+        auto val = expr->eval(env);
+        if (!val.isRange()) {
+            throw InvalidOperandType("Range", val.typeToString());
+        }
+
+        auto gen = val.range().generator();
+        while (auto i = gen.next()) {
+            values.push_back(Value(*i));
+        }
+    }
+    return Value(Sequence(std::move(values)));
+}
