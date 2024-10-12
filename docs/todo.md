@@ -62,9 +62,9 @@
   ```
   (set <instance|container> <index|key> <value>) -> <value>
   ```
-- Add generic len function with support for strings, arrays and hashmaps
+- Add generic len function with support for strings, arrays, hashmaps and ranges
   ```
-  (len <container>) -> int
+  (len <container|range>) -> int
   ```
 - Add generic find function with support for strings, arrays and hashmaps
   ```
@@ -81,5 +81,9 @@
 - Add generic reverse function with support for strings and arrays
   ```
   (reverse <sequence>) -> <sequence>
+  ```
+- Add generic sum function with support for arrays and ranges
+  ```
+  (sum <sequence|range> [<start> [<end>]]) -> int|real
   ```
 Note: Should work with future types; list and orderedmap.
