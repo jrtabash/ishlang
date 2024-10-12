@@ -23,6 +23,7 @@ Every expression in ishlang evaluates to a value. A value can hold any of the fo
 - closure
 - usertype
 - userobject
+- Range
 
 ## Literals
 Can be none, char, int, real, bool, and string.
@@ -272,7 +273,7 @@ Conditional only form:
 ```
 
 Loop over each element in a container.
-Container can be a string, array or hashmap.
+Container can be a string, array, hashmap or range.
 The <var> variable is read-only and cannot directly modify the container.
 
 ### Example - sum array elements
@@ -287,6 +288,13 @@ The <var> variable is read-only and cannot directly modify the container.
 (var sum 0)
 (foreach kv (hashmap (pair 1 10) (pair 2 20) (pair 3 30))
   (= sum (+ sum (second kv))))
+```
+
+### Example - sum range
+```
+(var sum 0)
+(foreach i (range 10)
+  (= sum (+ sum i)))
 ```
 
 ## Functions
@@ -742,8 +750,8 @@ the check is true for every character in the string.
 
 **hashmap**: Make a hashmap
 ```
-(hashmap [(pair key value) [(pair key value) ...]])
-(hashmap [(array key value) [(array key value) ...]])
+(hashmap [(pair <key> <value>) [(pair <key> <value>) ...]])
+(hashmap [(array <key> <value>) [(array <key> <value>) ...]])
 ```
 Note: Using pair and array can be mixed in same hashmap expression. See example below.
 
@@ -819,6 +827,61 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (hmvals ht)
 (hmitems ht)
 (hmclr ht)
+```
+
+## Range Operations
+
+**range**: Make a range
+```
+(range <end>)
+(range <begin> <end> [<step>])
+```
+
+Range includes begin and excludes end.
+Use foreach to loop over ranges.
+Use expand to expand ranges to an array.
+
+**rngbegin**: Get range begin
+```
+(rngbegin <range>)
+```
+
+**rngend**: Get range end
+```
+(rngend <range>)
+```
+
+**rngstep**: Get range step
+```
+(rngstep <range>)
+```
+
+**rnglen**: Get range length
+```
+(rnglen <range>)
+```
+
+### Examples
+```
+(var rng (range 10))
+(var rng2 (range 2 10 2))
+(rngbegin rng)
+(rngend rng)
+(rngstep rng)
+(rnglen rng)
+(foreach i rng (println i))
+(expand rng)
+```
+
+## Expand
+```
+(expand <range> [<range> [<range> ...]])
+```
+
+### Example
+```
+(expand (range 10))
+(expand (range 10) (range 10 100 10))
 ```
 
 ## Comments
