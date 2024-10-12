@@ -20,10 +20,10 @@ Every expression in ishlang evaluates to a value. A value can hold any of the fo
 - pair
 - array
 - hashmap
+- range
 - closure
 - usertype
 - userobject
-- Range
 
 ## Literals
 Can be none, char, int, real, bool, and string.
