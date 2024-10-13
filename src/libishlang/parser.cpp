@@ -1070,6 +1070,13 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckRangeExprList("expand", 1, std::nullopt));
               return CodeNode::make<Expand>(exprs);
           }
+        },
+
+        { "len",
+          [this]() {
+              auto exprs(readAndCheckExprList("len", 1));
+              return CodeNode::make<GenericLen>(exprs[0]);
+          }
         }
     };
 }

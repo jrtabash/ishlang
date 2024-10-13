@@ -886,6 +886,20 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (expand (range 10) (range 10 100 10))
 ```
 
+## Generic Functions
+**len**: Get string, array, hashmap or range length
+```
+(len <object>)
+```
+
+### Examples
+```
+(len "hello")
+(len (array 1 2 3))
+(len (hashmap (pair 1 10) (pair 2 20)))
+(len (range 10))
+```
+
 ## Comments
 Comments start with ;; and continue for the remainder of the line.
 Comments can be occupy full or partial lines.

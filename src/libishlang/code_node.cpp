@@ -1784,3 +1784,24 @@ Value Expand::exec(Environment::SharedPtr env) {
     }
     return Value(Sequence(std::move(values)));
 }
+
+// -------------------------------------------------------------
+GenericLen::GenericLen(CodeNode::SharedPtr object)
+    : CodeNode()
+    , object_(object)
+{}
+
+Value GenericLen::exec(Environment::SharedPtr env) {
+    if (object_) {
+        auto objVal = object_->eval(env);
+        switch (objVal.type()) {
+        case Value::eString:  return impl(objVal.text());
+        case Value::eArray:   return impl(objVal.array());
+        case Value::eHashMap: return impl(objVal.hashMap());
+        case Value::eRange:   return impl(objVal.range());
+        default:
+            throw InvalidOperandType("String, Array, HashMap or Range", objVal.typeToString());
+        }
+    }
+    return Value::Null;
+}

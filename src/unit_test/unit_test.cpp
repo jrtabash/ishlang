@@ -124,6 +124,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeMakeRange);
     ADD_TEST(testCodeNodeRangeGetters);
     ADD_TEST(testCodeNodeExpand);
+    ADD_TEST(testCodeNodeGenericLen);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -198,6 +199,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserMakeRange);
     ADD_TEST(testParserRangeGetters);
     ADD_TEST(testParserExpand);
+    ADD_TEST(testParserGenericLen);
 }
 #undef ADD_TEST
 
@@ -5392,6 +5394,40 @@ void UnitTest::testCodeNodeExpand() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeGenericLen() {
+    auto env = Environment::make();
+
+    auto len = [](auto rawVal) {
+        return CodeNode::make<GenericLen>(CodeNode::make<Literal>(Value(rawVal)));
+    };
+
+    auto val = len("hello")->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.integer() == 5, "actual=" << val);
+
+    val = len(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll)}))->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.integer() == 3, "actual=" << val);
+
+    val = len(Hashtable())->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.integer() == 0, "actual=" << val);
+
+    val = len(IntegerRange(10))->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.integer() == 10, "actual=" << val);
+
+    try {
+        len(5ll)->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -7038,4 +7074,22 @@ void UnitTest::testParserExpand() {
     TEST_CASE(parserTest(parser, env, "(expand)",        Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(expand 1)",      Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(expand rng1 1)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserGenericLen() {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(len \"\")",                 Value(0ll), true));
+    TEST_CASE(parserTest(parser, env, "(len \"text\")",             Value(4ll), true));
+    TEST_CASE(parserTest(parser, env, "(len (array))",              Value(0ll), true));
+    TEST_CASE(parserTest(parser, env, "(len (array 2 4 6))",        Value(3ll), true));
+    TEST_CASE(parserTest(parser, env, "(len (hashmap))",            Value(0ll), true));
+    TEST_CASE(parserTest(parser, env, "(len (hashmap (pair 2 4)))", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(len (range 1 1))",          Value(0ll), true));
+    TEST_CASE(parserTest(parser, env, "(len (range 5))",            Value(5ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(len)",   Value(3ll), false));
+    TEST_CASE(parserTest(parser, env, "(len 5)", Value(3ll), false));
 }

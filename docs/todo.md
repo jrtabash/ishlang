@@ -62,10 +62,6 @@
   ```
   (set <instance|container> <index|key> <value>) -> <value>
   ```
-- Add generic len function with support for strings, arrays, hashmaps and ranges
-  ```
-  (len <container|range>) -> int
-  ```
 - Add generic find function with support for strings, arrays and hashmaps
   ```
   (find <container> <item>) -> <index|key>

@@ -1,0 +1,11 @@
+__CODE__
+(println (len "Hello World!"))
+(println (len (array 1 3 5 7 9)))
+(println (len (hashmap (pair "one" 1) (pair "two" 2))))
+(println (len (range 0 100 2)))
+
+__EXPECT__
+12
+5
+2
+50

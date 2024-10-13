@@ -9,12 +9,19 @@
 #include "value.h"
 #include "value_pair.h"
 
+#include <concepts>
 #include <functional>
 #include <memory>
 #include <optional>
 #include <vector>
 
 namespace Ishlang {
+
+    // -------------------------------------------------------------
+    template <typename ObjectType>
+    concept Sizable = requires (ObjectType obj) {
+        { obj.size() } -> std::same_as<std::size_t>;
+    };
 
     // -------------------------------------------------------------
     class CodeNode {
@@ -1283,6 +1290,25 @@ namespace Ishlang {
 
     private:
         CodeNode::SharedPtrList exprs_;
+    };
+
+    // -------------------------------------------------------------
+    class GenericLen : public CodeNode {
+    public:
+        GenericLen(CodeNode::SharedPtr object);
+        virtual ~GenericLen() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override;
+
+    private:
+        template <Sizable ObjectType>
+        inline Value impl(const ObjectType &obj) {
+            return Value(Value::Long(obj.size()));
+        }
+
+    private:
+        CodeNode::SharedPtr object_;
     };
 
 }
