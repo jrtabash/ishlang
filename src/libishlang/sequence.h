@@ -1,5 +1,5 @@
-#ifndef SEQUENCE_H
-#define SEQUENCE_H
+#ifndef ISHLANG_SEQUENCE_H
+#define ISHLANG_SEQUENCE_H
 
 #include "util.h"
 #include "value.h"
@@ -139,4 +139,4 @@ namespace Ishlang {
 
 }
 
-#endif // VECTOR_H
+#endif // ISHLANG_SEQUENCE_H

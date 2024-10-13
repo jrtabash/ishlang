@@ -1,5 +1,5 @@
-#ifndef UNIT_TEST_H
-#define UNIT_TEST_H
+#ifndef ISHLANG_UNIT_TEST_H
+#define ISHLANG_UNIT_TEST_H
 
 #include "code_node.h"
 #include "environment.h"
@@ -234,4 +234,4 @@ namespace Ishlang {
 
 }
 
-#endif	// UNIT_TEST_H
+#endif	// ISHLANG_UNIT_TEST_H

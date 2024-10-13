@@ -1,5 +1,5 @@
-#ifndef EXCEPTION_H
-#define EXCEPTION_H
+#ifndef ISHLANG_EXCEPTION_H
+#define ISHLANG_EXCEPTION_H
 
 #include <cstdarg>
 #include <optional>
@@ -187,4 +187,4 @@ namespace Ishlang {
     };
 }
 
-#endif	// EXCEPTION_H
+#endif	// ISHLANG_EXCEPTION_H

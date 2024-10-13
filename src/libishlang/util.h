@@ -1,5 +1,5 @@
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef ISHLANG_UTIL_H
+#define ISHLANG_UTIL_H
 
 #include <concepts>
 #include <filesystem>
@@ -127,4 +127,4 @@ namespace Ishlang {
 
 }
 
-#endif	// UTIL_H
+#endif	// ISHLANG_UTIL_H

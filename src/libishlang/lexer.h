@@ -1,5 +1,5 @@
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef ISHLANG_LEXER_H
+#define ISHLANG_LEXER_H
 
 #include <deque>
 #include <functional>
@@ -85,4 +85,4 @@ namespace Ishlang {
 
 }
 
-#endif // LEXER_H
+#endif // ISHLANG_LEXER_H

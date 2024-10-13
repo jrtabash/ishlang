@@ -1,5 +1,5 @@
-#ifndef INTEGER_RANGE_H
-#define INTEGER_RANGE_H
+#ifndef ISHLANG_INTEGER_RANGE_H
+#define ISHLANG_INTEGER_RANGE_H
 
 #include "value.h"
 
@@ -136,4 +136,4 @@ namespace Ishlang {
 
 }
 
-#endif // INTEGER_RANGE_H
+#endif // ISHLANG_INTEGER_RANGE_H

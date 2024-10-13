@@ -1,5 +1,5 @@
-#ifndef VALUE_PAIR_H
-#define VALUE_PAIR_H
+#ifndef ISHLANG_VALUE_PAIR_H
+#define ISHLANG_VALUE_PAIR_H
 
 #include "value.h"
 
@@ -73,4 +73,4 @@ namespace Ishlang {
 
 }
 
-#endif // VALUE_PAIR_H
+#endif // ISHLANG_VALUE_PAIR_H

@@ -1,5 +1,5 @@
-#ifndef HASHTABLE_H
-#define HASHTABLE_H
+#ifndef ISHLANG_HASHTABLE_H
+#define ISHLANG_HASHTABLE_H
 
 #include "sequence.h"
 #include "util.h"
@@ -135,4 +135,4 @@ namespace Ishlang {
 
 }
 
-#endif // HASHTABLE_H
+#endif // ISHLANG_HASHTABLE_H

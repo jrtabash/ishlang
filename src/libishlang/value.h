@@ -1,5 +1,5 @@
-#ifndef VALUE_H
-#define VALUE_H
+#ifndef ISHLANG_VALUE_H
+#define ISHLANG_VALUE_H
 
 #include <iostream>
 #include <memory>
@@ -347,4 +347,4 @@ namespace Ishlang {
 
 }
 
-#endif	// VALUE_H
+#endif	// ISHLANG_VALUE_H

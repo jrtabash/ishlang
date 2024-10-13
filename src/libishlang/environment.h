@@ -1,5 +1,5 @@
-#ifndef ENVIRONMENT_H
-#define ENVIRONMENT_H
+#ifndef ISHLANG_ENVIRONMENT_H
+#define ISHLANG_ENVIRONMENT_H
 
 #include <concepts>
 #include <memory>
@@ -68,4 +68,4 @@ namespace Ishlang {
 
 }
 
-#endif	// ENVIRONMENT_H
+#endif	// ISHLANG_ENVIRONMENT_H

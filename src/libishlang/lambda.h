@@ -1,5 +1,5 @@
-#ifndef LAMBDA_H
-#define LAMBDA_H
+#ifndef ISHLANG_LAMBDA_H
+#define ISHLANG_LAMBDA_H
 
 #include "code_node.h"
 #include "environment.h"
@@ -72,4 +72,4 @@ namespace Ishlang {
 
 }
 
-#endif // LAMBDA_H
+#endif // ISHLANG_LAMBDA_H

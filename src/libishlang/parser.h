@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef ISHLANG_PARSER_H
+#define ISHLANG_PARSER_H
 
 #include "code_node.h"
 #include "lexer.h"
@@ -119,4 +119,4 @@ namespace Ishlang {
 
 } // Int
 
-#endif // PARSER_H
+#endif // ISHLANG_PARSER_H

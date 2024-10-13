@@ -1,5 +1,5 @@
-#ifndef BYTE_CODE_H
-#define BYTE_CODE_H
+#ifndef ISHLANG_CODE_NODE_H
+#define ISHLANG_CODE_NODE_H
 
 #include "environment.h"
 #include "hashtable.h"
@@ -1313,4 +1313,4 @@ namespace Ishlang {
 
 }
 
-#endif	// BYTE_CODE_H
+#endif	// ISHLANG_CODE_NODE_H

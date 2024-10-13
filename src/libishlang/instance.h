@@ -1,5 +1,5 @@
-#ifndef INSTANCE_H
-#define INSTANCE_H
+#ifndef ISHLANG_INSTANCE_H
+#define ISHLANG_INSTANCE_H
 
 #include "struct.h"
 #include "value.h"
@@ -91,4 +91,4 @@ namespace Ishlang {
 
 }
 
-#endif // STRUCT_H
+#endif // ISHLANG_INSTANCE_H

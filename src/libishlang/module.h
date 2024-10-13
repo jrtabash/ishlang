@@ -1,5 +1,5 @@
-#ifndef MODULE_H
-#define MODULE_H
+#ifndef ISHLANG_MODULE_H
+#define ISHLANG_MODULE_H
 
 #include <memory>
 #include <optional>
@@ -88,4 +88,4 @@ namespace Ishlang {
 
 }
 
-#endif // MODULE_H
+#endif // ISHLANG_MODULE_H

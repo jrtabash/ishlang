@@ -1,5 +1,5 @@
-#ifndef INTERPRETER_H
-#define INTERPRETER_H
+#ifndef ISHLANG_INTERPRETER_H
+#define ISHLANG_INTERPRETER_H
 
 #include "environment.h"
 #include "parser.h"
@@ -65,4 +65,4 @@ namespace Ishlang {
 
 } // Int
 
-#endif // INTERPRETER_H
+#endif // ISHLANG_INTERPRETER_H
