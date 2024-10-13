@@ -9,19 +9,12 @@
 #include "value.h"
 #include "value_pair.h"
 
-#include <concepts>
 #include <functional>
 #include <memory>
 #include <optional>
 #include <vector>
 
 namespace Ishlang {
-
-    // -------------------------------------------------------------
-    template <typename ObjectType>
-    concept Sizable = requires (ObjectType obj) {
-        { obj.size() } -> std::same_as<std::size_t>;
-    };
 
     // -------------------------------------------------------------
     class CodeNode {
@@ -1234,9 +1227,10 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    template <typename R>
     class RangeGetter : public CodeNode {
     public:
-        using Getter = std::function<Value::Long (const IntegerRange &)>;
+        using Getter = std::function<R (const IntegerRange &)>;
 
     public:
         RangeGetter(CodeNode::SharedPtr rng, Getter && getter);
@@ -1251,28 +1245,28 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
-    class RangeBegin : public RangeGetter {
+    class RangeBegin : public RangeGetter<Value::Long> {
     public:
         RangeBegin(CodeNode::SharedPtr rng);
         virtual ~RangeBegin() {}
     };
 
     // -------------------------------------------------------------
-    class RangeEnd : public RangeGetter {
+    class RangeEnd : public RangeGetter<Value::Long> {
     public:
         RangeEnd(CodeNode::SharedPtr rng);
         virtual ~RangeEnd() {}
     };
 
     // -------------------------------------------------------------
-    class RangeStep : public RangeGetter {
+    class RangeStep : public RangeGetter<Value::Long> {
     public:
         RangeStep(CodeNode::SharedPtr rng);
         virtual ~RangeStep() {}
     };
 
     // -------------------------------------------------------------
-    class RangeLen : public RangeGetter {
+    class RangeLen : public RangeGetter<Value> {
     public:
         RangeLen(CodeNode::SharedPtr rng);
         virtual ~RangeLen() {}
@@ -1300,12 +1294,6 @@ namespace Ishlang {
 
     protected:
         virtual Value exec(Environment::SharedPtr env) override;
-
-    private:
-        template <Sizable ObjectType>
-        inline Value impl(const ObjectType &obj) {
-            return Value(Value::Long(obj.size()));
-        }
 
     private:
         CodeNode::SharedPtr object_;

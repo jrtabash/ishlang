@@ -1,5 +1,6 @@
 #include "code_node.h"
 #include "exception.h"
+#include "generic_functions.h"
 #include "lambda.h"
 #include "module.h"
 #include "parser.h"
@@ -616,7 +617,7 @@ Value StringLen::exec(Environment::SharedPtr env) {
 
         if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
 
-        return Value(Value::Long(str.text().size()));
+        return Generic::length(str.text());
     }
     return Value::Zero;
 }
@@ -949,7 +950,7 @@ Value ArrayLen::exec(Environment::SharedPtr env) {
 
         if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
 
-        return Value(Value::Long(arr.array().size()));
+        return Generic::length(arr.array());
     }
     return Value::Zero;
 }
@@ -1441,7 +1442,7 @@ Value HashMapLen::exec(Environment::SharedPtr env) {
 
         if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
 
-        return Value(Value::Long(hm.hashMap().size()));
+        return Generic::length(hm.hashMap());
     }
     return Value::Zero;
 }
@@ -1722,44 +1723,52 @@ Value MakeRange::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-RangeGetter::RangeGetter(CodeNode::SharedPtr rng, Getter && getter)
+template <typename R>
+RangeGetter<R>::RangeGetter(CodeNode::SharedPtr rng, Getter && getter)
     : CodeNode()
     , rng_(rng)
     , getter_(std::move(getter))
 {}
 
-Value RangeGetter::exec(Environment::SharedPtr env) {
+template <typename R>
+Value RangeGetter<R>::exec(Environment::SharedPtr env) {
     if (rng_) {
         auto rng = rng_->eval(env);
         if (!rng.isRange()) {
             throw InvalidOperandType("Range", rng.typeToString());
         }
-        return Value(getter_(rng.range()));
+
+        if constexpr (std::is_same_v<R, Value>) {
+            return getter_(rng.range());
+        }
+        else {
+            return Value(getter_(rng.range()));
+        }
     }
     return Value::Null;
 }
 
 // -------------------------------------------------------------
 RangeBegin::RangeBegin(CodeNode::SharedPtr rng)
-    : RangeGetter(rng, &IntegerRange::begin)
+    : RangeGetter<Value::Long>(rng, &IntegerRange::begin)
 {}
 
 // -------------------------------------------------------------
 RangeEnd::RangeEnd(CodeNode::SharedPtr rng)
-    : RangeGetter(rng, &IntegerRange::end)
+    : RangeGetter<Value::Long>(rng, &IntegerRange::end)
 {}
 
 // -------------------------------------------------------------
 RangeStep::RangeStep(CodeNode::SharedPtr rng)
-    : RangeGetter(rng, &IntegerRange::step)
+    : RangeGetter<Value::Long>(rng, &IntegerRange::step)
 {}
 
 // -------------------------------------------------------------
 RangeLen::RangeLen(CodeNode::SharedPtr rng)
-    : RangeGetter(
+    : RangeGetter<Value>(
         rng,
         [](const IntegerRange & r) {
-            return static_cast<Value::Long>(r.size());
+            return Generic::length(r);
         })
 {}
 
@@ -1795,10 +1804,10 @@ Value GenericLen::exec(Environment::SharedPtr env) {
     if (object_) {
         auto objVal = object_->eval(env);
         switch (objVal.type()) {
-        case Value::eString:  return impl(objVal.text());
-        case Value::eArray:   return impl(objVal.array());
-        case Value::eHashMap: return impl(objVal.hashMap());
-        case Value::eRange:   return impl(objVal.range());
+        case Value::eString:  return Generic::length(objVal.text());
+        case Value::eArray:   return Generic::length(objVal.array());
+        case Value::eHashMap: return Generic::length(objVal.hashMap());
+        case Value::eRange:   return Generic::length(objVal.range());
         default:
             throw InvalidOperandType("String, Array, HashMap or Range", objVal.typeToString());
         }
