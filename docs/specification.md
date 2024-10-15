@@ -887,17 +887,38 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 ```
 
 ## Generic Functions
-**len**: Get string, array, hashmap or range length
+**len**: Length of string, array, hashmap or range
 ```
 (len <object>)
 ```
 
+**get**: Get value at index, key or member from string, array, hashmap or userobject
+```
+(get <object> <key> [<default_return>])
+```
+
+### Notes
+- For string and array, <key> must be an integer
+- For userobject, <key> must be a string
+- The parameter <default_return> applies to hashmap and is ignored otherwise
+
 ### Examples
 ```
-(len "hello")
-(len (array 1 2 3))
-(len (hashmap (pair 1 10) (pair 2 20)))
-(len (range 10))
+(struct Person (name age))
+(var txt "hello")
+(var seq (array 1 2 3))
+(var tab (hashmap (pair 1 10) (pair 2 20)))
+(var obj (makeinstance Person (name "Jon") (age 25)))
+(bar rng (range 10))
+
+(len txt)
+(len seq)
+(len tab)
+(len rng)
+(get txt 0)
+(get seq 1)
+(get tab 2 200)
+(get obj "name")
 ```
 
 ## Comments

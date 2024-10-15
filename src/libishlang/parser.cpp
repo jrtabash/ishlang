@@ -1077,6 +1077,13 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("len", 1));
               return CodeNode::make<GenericLen>(exprs[0]);
           }
+        },
+
+        { "get",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("get", 2, 3));
+              return CodeNode::make<GenericGet>(exprs[0], exprs[1], exprs.size() == 3 ? exprs[2] : CodeNode::SharedPtr());
+          }
         }
     };
 }

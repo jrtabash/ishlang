@@ -54,10 +54,6 @@
   - **omitems**: orderedmap items
 
 ### Add generic functions
-- Add generic get function with support for instances, strings, arrays and hashmaps
-  ```
-  (get <instance|container> <index|key>) -> <value>
-  ```
 - Add generic set function with support for instances, strings, arrays and hashmaps
   ```
   (set <instance|container> <index|key> <value>) -> <value>

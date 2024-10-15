@@ -1,11 +1,47 @@
 __CODE__
-(println (len "Hello World!"))
-(println (len (array 1 3 5 7 9)))
-(println (len (hashmap (pair "one" 1) (pair "two" 2))))
-(println (len (range 0 100 2)))
+(struct Person (name age))
+
+(var txt "Hello World!")
+(var seq (array 1 3 5 7 9))
+(var tab (hashmap (pair "one" 1) (pair "two" 2)))
+(var rng (range 0 100 2))
+(var obj (makeinstance Person (name "Jon") (age 25)))
+
+(println (len txt))
+(println (len seq))
+(println (len tab))
+(println (len rng))
+
+(println (get txt 0))
+(println (get txt 1))
+(println (get txt (- (len txt) 1)))
+
+(println (get seq 0))
+(println (get seq 1))
+(println (get seq (- (len seq) 1)))
+
+(println (get tab "one"))
+(println (get tab "two"))
+(println (get tab "three"))
+(println (get tab "three" 3))
+
+(println (get obj "name"))
+(println (get obj "age"))
 
 __EXPECT__
 12
 5
 2
 50
+H
+e
+!
+1
+3
+9
+1
+2
+null
+3
+Jon
+25

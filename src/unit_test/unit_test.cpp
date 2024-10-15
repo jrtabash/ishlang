@@ -125,6 +125,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeRangeGetters);
     ADD_TEST(testCodeNodeExpand);
     ADD_TEST(testCodeNodeGenericLen);
+    ADD_TEST(testCodeNodeGenericGet);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -200,6 +201,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserRangeGetters);
     ADD_TEST(testParserExpand);
     ADD_TEST(testParserGenericLen);
+    ADD_TEST(testParserGenericGet);
 }
 #undef ADD_TEST
 
@@ -5428,6 +5430,126 @@ void UnitTest::testCodeNodeGenericLen() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeGenericGet() {
+    auto env = Environment::make();
+
+    auto get = [](auto rawObj, auto rawKey, std::optional<Value> defaultVal = std::nullopt) {
+        return CodeNode::make<GenericGet>(
+            CodeNode::make<Literal>(Value(rawObj)),
+            CodeNode::make<Literal>(Value(rawKey)),
+            defaultVal ? CodeNode::make<Literal>(*defaultVal) : CodeNode::SharedPtr());
+    };
+
+    { // String
+        const char *rawStr = "hello";
+        for (Value::Long i : {0, 1, 2, 3, 4}) {
+            auto val = get(rawStr, i)->eval(env);
+            TEST_CASE_MSG(val.isChar(), "actual=" << Value::typeToString(val.type()) << " index=" << i);
+            TEST_CASE_MSG(val.character() == rawStr[i], "actual=" << val << " index=" << i);
+        }
+
+        try {
+            get(rawStr, "0")->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const InvalidOperandType &) {}
+        catch (...) {
+            TEST_CASE(false);
+        }
+
+        try {
+            get(rawStr, 5ll)->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const OutOfRange &) {}
+        catch (...) {
+            TEST_CASE(false);
+        }
+    }
+
+    { // Array
+        const auto rawSeq = Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll)});
+        for (Value::Long i : {0, 1, 2}) {
+            auto val = get(rawSeq, i)->eval(env);
+            TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " index=" << i);
+            TEST_CASE_MSG(val.integer() == rawSeq.get(i), "actual=" << val << " index=" << i);
+        }
+
+        try {
+            get(rawSeq, "0")->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const InvalidOperandType &) {}
+        catch (...) {
+            TEST_CASE(false);
+        }
+
+        try {
+            get(rawSeq, 5ll)->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const OutOfRange &) {}
+        catch (...) {
+            TEST_CASE(false);
+        }
+    }
+
+    { // HashMap
+        auto rawTab = Hashtable();
+        rawTab.set(Value(1ll), Value(100ll));
+        rawTab.set(Value(2ll), Value(200ll));
+        for (Value::Long i : {1, 2}) {
+            auto val = get(rawTab, i)->eval(env);
+            TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " key=" << i);
+            TEST_CASE_MSG(val.integer() == rawTab.get(Value(i)), "actual=" << val << " key=" << i);
+        }
+
+        auto val = get(rawTab, Value::Long(3))->eval(env);
+        TEST_CASE_MSG(val.isNull(), "actual=" << Value::typeToString(val.type()) << " key=3");
+
+        val = get(rawTab, Value::Long(3), Value(300ll))->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " key=3");
+        TEST_CASE_MSG(val.integer() == 300, "actual=" << val << " key=3");
+    }
+
+    { // UserObject
+        auto rawType = Struct("Person", Struct::MemberList{"name", "age"});
+        auto rawInst = Instance(rawType, Instance::InitArgs{{"name", Value("Jon")}, {"age", Value(25ll)}});
+        for (const char * mem : {"name", "age"}) {
+            auto val = get(rawInst, mem)->eval(env);
+            TEST_CASE_MSG(val == rawInst.get(mem), "actual=" << val << " mem=" << mem);
+        }
+
+        try {
+            get(rawInst, 0ll)->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const InvalidOperandType &) {}
+        catch (...) {
+            TEST_CASE(false);
+        }
+
+        try {
+            get(rawInst, "address")->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const UnknownMember &) {}
+        catch (...) {
+            TEST_CASE(false);
+        }
+    }
+
+    try {
+        get(5ll, 0ll)->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -7092,4 +7214,39 @@ void UnitTest::testParserGenericLen() {
 
     TEST_CASE(parserTest(parser, env, "(len)",   Value(3ll), false));
     TEST_CASE(parserTest(parser, env, "(len 5)", Value(3ll), false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserGenericGet() {
+    auto env = Environment::make();
+    Parser parser;
+
+    env->def("txt", Value("abc"));
+    env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll)})));
+
+    Hashtable ht;
+    ht.set(Value(1ll), Value(10ll));
+    ht.set(Value(2ll), Value(20ll));
+    env->def("ht", Value(ht));
+
+    auto rawStruct = Struct("Person", Struct::MemberList{"name", "age"});
+    env->def("inst", Value(Instance(rawStruct, Instance::InitArgs{{"name", Value("Jon")}, {"age", Value(25ll)}})));
+
+    TEST_CASE(parserTest(parser, env, "(get txt 0)",   Value('a'),  true));
+    TEST_CASE(parserTest(parser, env, "(get txt 1)",   Value('b'),  true));
+    TEST_CASE(parserTest(parser, env, "(get txt 2)",   Value('c'),  true));
+    TEST_CASE(parserTest(parser, env, "(get seq 0)",   Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(get seq 1)",   Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(get seq 2)",   Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(get ht 1)",    Value(10ll), true));
+    TEST_CASE(parserTest(parser, env, "(get ht 2)",    Value(20ll), true));
+    TEST_CASE(parserTest(parser, env, "(get ht 3)",    Value::Null, true));
+    TEST_CASE(parserTest(parser, env, "(get ht 3 30)", Value(30ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(get txt 'a')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get txt 5)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get seq 'a')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get seq 5)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get inst 5)",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get 5 0)",     Value::Null, false));
 }

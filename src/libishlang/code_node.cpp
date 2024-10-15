@@ -635,15 +635,8 @@ Value StringGet::exec(Environment::SharedPtr env) {
         Value pos = pos_->eval(env);
 
         if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
-        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
 
-        const auto &rawStr = str.text();
-        const auto rawPos = pos.integer();
-        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawStr.size()) {
-            throw OutOfRange("string strget access");
-        }
-
-        return Value(rawStr[rawPos]);
+        return Generic::get(str.text(), pos);
     }
     return Value::Null;
 }
@@ -968,15 +961,8 @@ Value ArrayGet::exec(Environment::SharedPtr env) {
         Value pos = pos_->eval(env);
 
         if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
-        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
 
-        const auto &rawArr = arr.array();
-        const auto rawPos = pos.integer();
-        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawArr.size()) {
-            throw OutOfRange("array get access");
-        }
-
-        return Value(rawArr.get(rawPos));
+        return Generic::get(arr.array(), pos);
     }
     return Value::Null;
 }
@@ -1482,7 +1468,7 @@ Value HashMapGet::exec(Environment::SharedPtr env) {
 
         if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
 
-        return Value(hm.hashMap().get(key, defaultRet));
+        return Generic::get(hm.hashMap(), key, defaultRet);
     }
     return Value::Null;
 }
@@ -1810,6 +1796,29 @@ Value GenericLen::exec(Environment::SharedPtr env) {
         case Value::eRange:   return Generic::length(objVal.range());
         default:
             throw InvalidOperandType("String, Array, HashMap or Range", objVal.typeToString());
+        }
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+GenericGet::GenericGet(CodeNode::SharedPtr object, CodeNode::SharedPtr key, CodeNode::SharedPtr defaultRet)
+    : CodeNode()
+    , object_(object)
+    , key_(key)
+    , defaultRet_(defaultRet)
+{}
+
+Value GenericGet::exec(Environment::SharedPtr env) {
+    if (object_ && key_) {
+        auto objVal = object_->eval(env);
+        switch (objVal.type()) {
+        case Value::eString:     return Generic::get(objVal.text(), key_->eval(env));
+        case Value::eArray:      return Generic::get(objVal.array(), key_->eval(env));
+        case Value::eHashMap:    return Generic::get(objVal.hashMap(), key_->eval(env), defaultRet_ ? defaultRet_->eval(env) : Value::Null);
+        case Value::eUserObject: return Generic::get(objVal.userObject(), key_->eval(env));
+        default:
+            throw InvalidOperandType("String, Array, HashMap or UserObject", objVal.typeToString());
         }
     }
     return Value::Null;
