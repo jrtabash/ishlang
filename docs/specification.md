@@ -898,9 +898,9 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 ```
 
 ### Notes
-- For string and array, <key> must be an integer
-- For userobject, <key> must be a string
-- The parameter <default_return> applies to hashmap and is ignored otherwise
+- For string and array, key must be an integer
+- For userobject, key must be a string
+- The parameter default_return applies to hashmap and is ignored otherwise
 
 ### Examples
 ```
