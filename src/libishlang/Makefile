@@ -65,7 +65,7 @@ hashtable.o: hashtable.cpp hashtable.h value.h
 integer_range.o: integer_range.cpp integer_range.h
 	$(CPP) $(CFLAGS) -c integer_range.cpp -o $(BUILD)/integer_range.o
 
-code_node.o: code_node.cpp code_node.h value.h parser.h environment.h lambda.h util.h exception.h
+code_node.o: code_node.cpp code_node.h code_node_bases.h value.h parser.h environment.h lambda.h util.h exception.h
 	$(CPP) $(CFLAGS) -c code_node.cpp -o $(BUILD)/code_node.o
 
 lexer.o: lexer.cpp lexer.h util.h exception.h
