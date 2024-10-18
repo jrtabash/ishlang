@@ -163,7 +163,7 @@ namespace Ishlang {
         void testParserVar();
         void testParserArith();
         void testParserComp();
-        void testParserLogic();
+        void testParserLogicOp();
         void testParserNot();
         void testParserNegativeOf();
         void testParserBlock();

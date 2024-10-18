@@ -445,8 +445,19 @@ void Parser::initAppFtns() {
         { "<=", MakeBinaryExpression<CompOp, CompOp::Type>("<=", *this, CompOp::LE) },
         { ">=", MakeBinaryExpression<CompOp, CompOp::Type>(">=", *this, CompOp::GE) },
 
-        { "and", MakeBinaryExpression<LogicOp, LogicOp::Type>("and", *this, LogicOp::Conjunction) },
-        { "or",  MakeBinaryExpression<LogicOp, LogicOp::Type>("or",  *this, LogicOp::Disjunction) },
+        { "and",
+          [this]() {
+              auto operands(readAndCheckRangeExprList("and", 2, std::nullopt));
+              return CodeNode::make<LogicOp>(LogicOp::Conjunction, operands);
+          }
+        },
+
+        { "or",
+          [this]() {
+              auto operands(readAndCheckRangeExprList("or", 2, std::nullopt));
+              return CodeNode::make<LogicOp>(LogicOp::Disjunction, operands);
+          }
+        },
 
         { "not",
           [this]() {

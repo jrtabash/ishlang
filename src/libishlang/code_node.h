@@ -191,7 +191,7 @@ namespace Ishlang {
     };
     
     // -------------------------------------------------------------
-    class LogicOp : public BinaryOp {
+    class LogicOp : public VariadicOp {
     public:
         enum Type {
             Conjunction = '&',
@@ -199,12 +199,12 @@ namespace Ishlang {
         };
         
     public:
-        LogicOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs);
+        LogicOp(Type type, CodeNode::SharedPtrList operands);
         virtual ~LogicOp() {}
         
     protected:
         virtual Value exec(Environment::SharedPtr env) override;
-        
+
     private:
         Type type_;
     };

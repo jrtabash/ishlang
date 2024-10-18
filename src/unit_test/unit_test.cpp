@@ -138,7 +138,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserVar);
     ADD_TEST(testParserArith);
     ADD_TEST(testParserComp);
-    ADD_TEST(testParserLogic);
+    ADD_TEST(testParserLogicOp);
     ADD_TEST(testParserNot);
     ADD_TEST(testParserNegativeOf);
     ADD_TEST(testParserBlock);
@@ -2447,7 +2447,7 @@ void UnitTest::testCodeNodeLogicOp() {
         { LogicOp::Disjunction, true,  false, true,  false, false },
         { LogicOp::Disjunction, false, true,  true,  false, false },
         { LogicOp::Disjunction, false, false, false, false, false },
-        { LogicOp::Disjunction, true,  true,  false, true,  true }
+        { LogicOp::Disjunction, true,  true,  true,  true,  false }
     };
     const size_t size = sizeof(cases)/sizeof(cases[0]);
     for (size_t i = 0; i < size; ++i) {
@@ -2456,7 +2456,7 @@ void UnitTest::testCodeNodeLogicOp() {
         try {
             CodeNode::SharedPtr lhsLit(new Literal(Value(c.lhs)));
             CodeNode::SharedPtr rhsLit(new Literal(!c.other ? Value(c.rhs) : Value('a')));
-            CodeNode::SharedPtr logic(new LogicOp(c.type, lhsLit, rhsLit));
+            CodeNode::SharedPtr logic(new LogicOp(c.type, CodeNode::SharedPtrList{lhsLit, rhsLit}));
             Value result = logic->eval(env);
             if (!c.error) {
                 TEST_CASE_MSG(result.isBool(), "actual=" << result.typeToString() << " (" << c.toString() << ')');
@@ -2469,6 +2469,24 @@ void UnitTest::testCodeNodeLogicOp() {
         catch (const InvalidOperandType &ex) { if (!c.error) { TEST_CASE_MSG(false, c.toString()); } }
         catch (...) { TEST_CASE_MSG(false, c.toString()); }
     }
+
+    auto value = CodeNode::make<LogicOp>(
+        LogicOp::Conjunction,
+        CodeNode::SharedPtrList{
+            CodeNode::make<Literal>(Value::True),
+            CodeNode::make<Literal>(Value::True),
+            CodeNode::make<Literal>(Value::False)})->eval(env);
+    TEST_CASE_MSG(value.isBool(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value == Value::False, "actual=" << value);
+
+    value = CodeNode::make<LogicOp>(
+        LogicOp::Disjunction,
+        CodeNode::SharedPtrList{
+            CodeNode::make<Literal>(Value::False),
+            CodeNode::make<Literal>(Value::False),
+            CodeNode::make<Literal>(Value::True)})->eval(env);
+    TEST_CASE_MSG(value.isBool(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value == Value::True, "actual=" << value);
 }
 
 // -------------------------------------------------------------
@@ -5810,7 +5828,7 @@ void UnitTest::testParserComp() {
 }
 
 // -------------------------------------------------------------
-void UnitTest::testParserLogic() {
+void UnitTest::testParserLogicOp() {
     auto env = Environment::make();
     Parser parser;
 
@@ -5822,6 +5840,18 @@ void UnitTest::testParserLogic() {
     TEST_CASE(parserTest(parser, env, "(or true false)",    Value::True,  true));
     TEST_CASE(parserTest(parser, env, "(or false true)",    Value::True,  true));
     TEST_CASE(parserTest(parser, env, "(or false false)",   Value::False, true));
+
+    TEST_CASE(parserTest(parser, env, "(and true true true)",    Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(and false true true)",   Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(and true false true)",   Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(and true true false)",   Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(and false false false)", Value::False, true));
+
+    TEST_CASE(parserTest(parser, env, "(or true true true)",    Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(or false true true)",   Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(or true false true)",   Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(or true true false)",   Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(or false false false)", Value::False, true));
 }
 
 // -------------------------------------------------------------

@@ -146,22 +146,37 @@ Value CompOp::exec(Environment::SharedPtr env) {
 }
 
 // -------------------------------------------------------------
-LogicOp::LogicOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
-    : BinaryOp(lhs, rhs)
+LogicOp::LogicOp(Type type, CodeNode::SharedPtrList operands)
+    : VariadicOp(operands)
     , type_(type)
 {}
 
 Value LogicOp::exec(Environment::SharedPtr env) {
-    if (lhs_ && rhs_) {
-        const Value lhsVal = lhs_->eval(env);
-        const Value rhsVal = rhs_->eval(env);
-        
-        if (!lhsVal.isBool()) { throw InvalidOperandType("Boolean", lhsVal.typeToString()); }
-        if (!rhsVal.isBool()) { throw InvalidOperandType("Boolean", rhsVal.typeToString()); }
+    if (!operands_.empty()) {
+        auto operandToBool = [&env](CodeNode::SharedPtr operand) {
+            const Value val = operand->eval(env);
+            if (!val.isBool()) {
+                throw InvalidOperandType("Boolean", val.typeToString());
+            }
+            return val.boolean();
+        };
 
         switch (type_) {
-            case Conjunction: return Value(lhsVal.boolean() && rhsVal.boolean());
-            case Disjunction: return Value(lhsVal.boolean() || rhsVal.boolean());
+        case Conjunction:
+            for (auto operand : operands_) {
+                if (!operandToBool(operand)) {
+                    return Value::False;
+                }
+            }
+            return Value::True;
+
+        case Disjunction:
+            for (auto operand : operands_) {
+                if (operandToBool(operand)) {
+                    return Value::True;
+                }
+            }
+            return Value::False;
         }
     }
     return Value::False;

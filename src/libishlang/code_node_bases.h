@@ -69,6 +69,23 @@ namespace Ishlang {
         CodeNode::SharedPtr rhs_;
     };
 
+    // -------------------------------------------------------------
+    class VariadicOp : public CodeNode {
+    public:
+        VariadicOp(CodeNode::SharedPtrList operands)
+            : CodeNode()
+            , operands_(operands)
+        {}
+
+        virtual ~VariadicOp() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) override = 0;
+
+    protected:
+        CodeNode::SharedPtrList operands_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_BASES_H

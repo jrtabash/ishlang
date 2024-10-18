@@ -121,15 +121,21 @@ The neg operator returns the negative of expression.
 ```
 
 ## Logical
-### Binary operations: == != < > <= >= and or
+### Binary operations: == != < > <= >=
 ```
 (op <expression> <expression>)
+```
+
+### Variadic operations: and or
+```
+(op <expression> <expression> [<expression> ...])
 ```
 
 #### Examples
 ```
 (== x y)
 (or (== x y) (> y 10))
+(and (== (% x 2) 0) (> x y) (> y 10))
 ```
 
 ### Unary operation

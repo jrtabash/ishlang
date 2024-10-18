@@ -9,10 +9,30 @@ __CODE__
 (println (or false true))
 (println (or false false))
 
+(println (and true true true true))
+(println (and false true true true))
+(println (and true true false true))
+(println (and false false false false))
+
+(println (or true true true true))
+(println (or false true true true))
+(println (or true true false true))
+(println (or false false false false))
+
 (println (not true))
 (println (not false))
 
 __EXPECT__
+true
+false
+false
+false
+
+true
+true
+true
+false
+
 true
 false
 false
