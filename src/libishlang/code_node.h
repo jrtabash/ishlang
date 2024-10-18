@@ -42,6 +42,16 @@ namespace Ishlang {
             return std::make_shared<CodeType>(std::forward<Args>(args)...);
         }
 
+    public:
+        virtual bool isIdentifier() const {
+            return false;
+        }
+
+        virtual const std::string &identifierName() const {
+            static const std::string Empty;
+            return Empty;
+        }
+
     protected:
         virtual Value exec(Environment::SharedPtr env) = 0;
     };
@@ -106,9 +116,18 @@ namespace Ishlang {
         Variable(const std::string &name) : CodeNode(), name_(name) {}
         virtual ~Variable() {}
 
+    public:
+        virtual bool isIdentifier() const override {
+            return true;
+        }
+
+        virtual const std::string &identifierName() const override {
+            return name_;
+        }
+
     protected:
         virtual Value exec(Environment::SharedPtr env) override { return env->get(name_); }
-        
+
     private:
         std::string name_;
     };

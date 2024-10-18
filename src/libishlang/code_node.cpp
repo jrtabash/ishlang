@@ -571,7 +571,7 @@ Value GetMember::exec(Environment::SharedPtr env) {
     if (expr_) {
         Value value = expr_->eval(env);
         if (value.isUserObject()) {
-            return value.userObject().get(name_);
+            return Generic::get(value.userObject(), name_);
         }
         else {
             throw InvalidExpressionType("UserObject", value.typeToString());
@@ -1813,10 +1813,20 @@ Value GenericGet::exec(Environment::SharedPtr env) {
     if (object_ && key_) {
         auto objVal = object_->eval(env);
         switch (objVal.type()) {
-        case Value::eString:     return Generic::get(objVal.text(), key_->eval(env));
-        case Value::eArray:      return Generic::get(objVal.array(), key_->eval(env));
-        case Value::eHashMap:    return Generic::get(objVal.hashMap(), key_->eval(env), defaultRet_ ? defaultRet_->eval(env) : Value::Null);
-        case Value::eUserObject: return Generic::get(objVal.userObject(), key_->eval(env));
+        case Value::eString:
+            return Generic::get(objVal.text(), key_->eval(env));
+
+        case Value::eArray:
+            return Generic::get(objVal.array(), key_->eval(env));
+
+        case Value::eHashMap:
+            return Generic::get(objVal.hashMap(), key_->eval(env), defaultRet_ ? defaultRet_->eval(env) : Value::Null);
+
+        case Value::eUserObject:
+            return key_->isIdentifier()
+                ? Generic::get(objVal.userObject(), key_->identifierName())
+                : Generic::get(objVal.userObject(), key_->eval(env));
+
         default:
             throw InvalidOperandType("String, Array, HashMap or UserObject", objVal.typeToString());
         }

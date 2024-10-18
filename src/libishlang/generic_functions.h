@@ -52,6 +52,10 @@ namespace Ishlang {
                 }
             }
         }
+
+        static inline Value get(const Value::UserObject &obj, const std::string &memberName) {
+            return Value(obj.get(memberName));
+        }
     };
 
 }

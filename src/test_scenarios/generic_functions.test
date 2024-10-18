@@ -25,6 +25,8 @@ __CODE__
 (println (get tab "three"))
 (println (get tab "three" 3))
 
+(println (get obj name))
+(println (get obj age))
 (println (get obj "name"))
 (println (get obj "age"))
 
@@ -43,5 +45,7 @@ e
 2
 null
 3
+Jon
+25
 Jon
 25

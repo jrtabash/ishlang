@@ -899,7 +899,7 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 
 ### Notes
 - For string and array, key must be an integer
-- For userobject, key must be a string
+- For userobject, key must be a member name/symbol or a string
 - The parameter default_return applies to hashmap and is ignored otherwise
 
 ### Examples
@@ -918,6 +918,7 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (get txt 0)
 (get seq 1)
 (get tab 2 200)
+(get obj name)
 (get obj "name")
 ```
 

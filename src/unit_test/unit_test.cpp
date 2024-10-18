@@ -5520,6 +5520,13 @@ void UnitTest::testCodeNodeGenericGet() {
             TEST_CASE_MSG(val == rawInst.get(mem), "actual=" << val << " mem=" << mem);
         }
 
+        for (const char * mem : {"name", "age"}) {
+            auto val = CodeNode::make<GenericGet>(
+                CodeNode::make<Literal>(Value(rawInst)),
+                CodeNode::make<Variable>(mem))->eval(env);
+            TEST_CASE_MSG(val == rawInst.get(mem), "actual=" << val << " mem=" << mem);
+        }
+
         try {
             get(rawInst, 0ll)->eval(env);
             TEST_CASE(false);
@@ -7235,18 +7242,26 @@ void UnitTest::testParserGenericGet() {
     TEST_CASE(parserTest(parser, env, "(get txt 0)",   Value('a'),  true));
     TEST_CASE(parserTest(parser, env, "(get txt 1)",   Value('b'),  true));
     TEST_CASE(parserTest(parser, env, "(get txt 2)",   Value('c'),  true));
+
     TEST_CASE(parserTest(parser, env, "(get seq 0)",   Value(1ll),  true));
     TEST_CASE(parserTest(parser, env, "(get seq 1)",   Value(2ll),  true));
     TEST_CASE(parserTest(parser, env, "(get seq 2)",   Value(3ll),  true));
+
     TEST_CASE(parserTest(parser, env, "(get ht 1)",    Value(10ll), true));
     TEST_CASE(parserTest(parser, env, "(get ht 2)",    Value(20ll), true));
     TEST_CASE(parserTest(parser, env, "(get ht 3)",    Value::Null, true));
     TEST_CASE(parserTest(parser, env, "(get ht 3 30)", Value(30ll), true));
 
-    TEST_CASE(parserTest(parser, env, "(get txt 'a')", Value::Null, false));
-    TEST_CASE(parserTest(parser, env, "(get txt 5)",   Value::Null, false));
-    TEST_CASE(parserTest(parser, env, "(get seq 'a')", Value::Null, false));
-    TEST_CASE(parserTest(parser, env, "(get seq 5)",   Value::Null, false));
-    TEST_CASE(parserTest(parser, env, "(get inst 5)",  Value::Null, false));
-    TEST_CASE(parserTest(parser, env, "(get 5 0)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get inst \"name\")", Value("Jon"), true));
+    TEST_CASE(parserTest(parser, env, "(get inst \"age\")",  Value(25ll), true));
+    TEST_CASE(parserTest(parser, env, "(get inst name)",     Value("Jon"), true));
+    TEST_CASE(parserTest(parser, env, "(get inst age)",      Value(25ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(get txt 'a')",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get txt 5)",    Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get seq 'a')",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get seq 5)",    Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get inst 5)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get inst mem)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get 5 0)",      Value::Null, false));
 }
