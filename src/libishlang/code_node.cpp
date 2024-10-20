@@ -24,7 +24,7 @@ IsType::IsType(CodeNode::SharedPtr expr, Value::Type type)
   , type_(type)
 {}
 
-Value IsType::exec(Environment::SharedPtr env) {
+Value IsType::exec(Environment::SharedPtr env) const {
     if (expr_) {
         Value exprValue = expr_->eval(env);
         return exprValue.type() == type_ ? Value::True : Value::False;
@@ -38,7 +38,7 @@ TypeName::TypeName(CodeNode::SharedPtr expr)
   , expr_(expr)
 {}
 
-Value TypeName::exec(Environment::SharedPtr env) {
+Value TypeName::exec(Environment::SharedPtr env) const {
     if (expr_) {
         Value exprValue = expr_->eval(env);
         return Value(Value::typeToString(exprValue.type()));
@@ -53,7 +53,7 @@ AsType::AsType(CodeNode::SharedPtr expr, Value::Type type)
   , type_(type)
 {}
 
-Value AsType::exec(Environment::SharedPtr env) {
+Value AsType::exec(Environment::SharedPtr env) const {
     if (expr_) {
         Value exprValue = expr_->eval(env);
         return exprValue.asType(type_);
@@ -67,7 +67,7 @@ ArithOp::ArithOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
     , type_(type)
 {}
 
-Value ArithOp::exec(Environment::SharedPtr env) {
+Value ArithOp::exec(Environment::SharedPtr env) const {
     if (lhs_ && rhs_) {
         const Value lhsVal = lhs_->eval(env);
         const Value rhsVal = rhs_->eval(env);
@@ -122,7 +122,7 @@ CompOp::CompOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
     , type_(type)
 {}
 
-Value CompOp::exec(Environment::SharedPtr env) {
+Value CompOp::exec(Environment::SharedPtr env) const {
     if (lhs_ && rhs_) {
         const Value lhsVal = lhs_->eval(env);
         const Value rhsVal = rhs_->eval(env);
@@ -151,7 +151,7 @@ LogicOp::LogicOp(Type type, CodeNode::SharedPtrList operands)
     , type_(type)
 {}
 
-Value LogicOp::exec(Environment::SharedPtr env) {
+Value LogicOp::exec(Environment::SharedPtr env) const {
     if (!operands_.empty()) {
         auto operandToBool = [&env](CodeNode::SharedPtr operand) {
             const Value val = operand->eval(env);
@@ -188,7 +188,7 @@ Not::Not(CodeNode::SharedPtr operand)
     , operand_(operand)
 {}
 
-Value Not::exec(Environment::SharedPtr env) {
+Value Not::exec(Environment::SharedPtr env) const {
     if (operand_) {
         Value operand = operand_->eval(env);
 
@@ -205,7 +205,7 @@ NegativeOf::NegativeOf(CodeNode::SharedPtr operand)
     , operand_(operand)
 {}
 
-Value NegativeOf::exec(Environment::SharedPtr env) {
+Value NegativeOf::exec(Environment::SharedPtr env) const {
     if (operand_) {
         Value operand = operand_->eval(env);
 
@@ -222,10 +222,10 @@ ProgN::ProgN(CodeNode::SharedPtrList exprs)
     , exprs_(exprs)
 {}
 
-Value ProgN::exec(Environment::SharedPtr env) {
+Value ProgN::exec(Environment::SharedPtr env) const {
     if (!exprs_.empty()) {
         Value result;
-        for (CodeNode::SharedPtrList::iterator iter = exprs_.begin(); iter != exprs_.end(); ++iter) {
+        for (CodeNode::SharedPtrList::const_iterator iter = exprs_.begin(); iter != exprs_.end(); ++iter) {
             result = (*iter)->eval(env);
         }
         return result;
@@ -238,7 +238,7 @@ Block::Block(CodeNode::SharedPtrList exprs)
     : ProgN(exprs)
 {}
 
-Value Block::exec(Environment::SharedPtr env) {
+Value Block::exec(Environment::SharedPtr env) const {
     auto blockEnv = Environment::make(env);
     return ProgN::exec(blockEnv);
 }
@@ -258,7 +258,7 @@ If::If(CodeNode::SharedPtr pred, CodeNode::SharedPtr tCode, CodeNode::SharedPtr 
     , fCode_(fCode)
 {}
 
-Value If::exec(Environment::SharedPtr env) {
+Value If::exec(Environment::SharedPtr env) const {
     if (pred_) {
         auto ifEnv = Environment::make(env);
 
@@ -281,10 +281,10 @@ Cond::Cond(CodeNode::SharedPtrPairs cases)
     , cases_(cases)
 {}
 
-Value Cond::exec(Environment::SharedPtr env) {
+Value Cond::exec(Environment::SharedPtr env) const {
     const size_t numCases = cases_.size();
     if (numCases > 0) {
-        for (CodeNode::SharedPtrPairs::iterator iter = cases_.begin(); iter != cases_.end(); ++iter) {
+        for (CodeNode::SharedPtrPairs::const_iterator iter = cases_.begin(); iter != cases_.end(); ++iter) {
             if (!iter->first) { throw InvalidExpressionType("Boolean", "Null"); }
 
             const Value pred = iter->first->eval(env);
@@ -314,7 +314,7 @@ Loop::Loop(CodeNode::SharedPtr cond, CodeNode::SharedPtr body)
     , body_(body)
 {}
 
-Value Loop::exec(Environment::SharedPtr env) {
+Value Loop::exec(Environment::SharedPtr env) const {
     if (cond_ && body_) {
         auto loopEnv = Environment::make(env);
         
@@ -348,7 +348,7 @@ Foreach::Foreach(const std::string &name, CodeNode::SharedPtr container, CodeNod
     , body_(body)
 {}
 
-Value Foreach::exec(Environment::SharedPtr env) {
+Value Foreach::exec(Environment::SharedPtr env) const {
     if (container_ && body_) {
         auto loopEnv = Environment::make(env);
         loopEnv->def(name_, Value::Null);
@@ -371,7 +371,7 @@ Value Foreach::exec(Environment::SharedPtr env) {
 }
 
 template <typename Container>
-Value Foreach::impl(Environment::SharedPtr loopEnv, const Container &container) {
+Value Foreach::impl(Environment::SharedPtr loopEnv, const Container &container) const {
     Value result = Value::Null;
     for (const auto &item : container) {
         if constexpr (std::is_same_v<Container, Hashtable>) {
@@ -385,7 +385,7 @@ Value Foreach::impl(Environment::SharedPtr loopEnv, const Container &container) 
     return result;
 }
 
-Value Foreach::implRange(Environment::SharedPtr loopEnv, const IntegerRange &range) {
+Value Foreach::implRange(Environment::SharedPtr loopEnv, const IntegerRange &range) const {
     Value result = Value::Null;
     auto gen = range.generator();
     while (auto i = gen.next()) {
@@ -402,7 +402,7 @@ LambdaExpr::LambdaExpr(const ParamList &params, CodeNode::SharedPtr body)
   , body_(body)
 {}
 
-Value LambdaExpr::exec(Environment::SharedPtr env) {
+Value LambdaExpr::exec(Environment::SharedPtr env) const {
     return Value(Lambda(params_, body_, env));
 }
 
@@ -414,7 +414,7 @@ LambdaApp::LambdaApp(CodeNode::SharedPtr closure, SharedPtrList args)
     , closureVar_(Value::Null)
 {}
 
-Value LambdaApp::exec(Environment::SharedPtr env) {
+Value LambdaApp::exec(Environment::SharedPtr env) const {
     if (!closureVar_.isClosure() && closure_) {
         closureVar_ = closure_->eval(env);
     }
@@ -435,7 +435,7 @@ FunctionExpr::FunctionExpr(const std::string &name, const ParamList &params, Cod
     , name_(name)
 {}
 
-Value FunctionExpr::exec(Environment::SharedPtr env) {
+Value FunctionExpr::exec(Environment::SharedPtr env) const {
     Value lambdaVal = LambdaExpr::exec(env);
     if (!lambdaVal.isClosure()) {
         throw InvalidExpressionType("Closure", lambdaVal.typeToString());
@@ -449,7 +449,7 @@ FunctionApp::FunctionApp(const std::string &name, SharedPtrList args)
     , name_(name)
 {}
 
-Value FunctionApp::exec(Environment::SharedPtr env) {
+Value FunctionApp::exec(Environment::SharedPtr env) const {
     closureVar_ = env->get(name_);
     return LambdaApp::exec(env);
 }
@@ -461,7 +461,7 @@ Print::Print(bool newline, CodeNode::SharedPtrList exprs)
     , exprs_(exprs)
 {}
 
-Value Print::exec(Environment::SharedPtr env) {
+Value Print::exec(Environment::SharedPtr env) const {
     for (auto & expr : exprs_) {
         Value::print(expr->eval(env));
     }
@@ -474,7 +474,7 @@ Read::Read()
     : CodeNode()
 {}
 
-Value Read::exec(Environment::SharedPtr env) {
+Value Read::exec(Environment::SharedPtr env) const {
     std::string input;
     std::getline(std::cin, input);
     return Parser().readLiteral(input)->eval(env);
@@ -486,7 +486,7 @@ StructExpr::StructExpr(const std::string &name, const Struct::MemberList &member
     , struct_(name, members)
 {}
 
-Value StructExpr::exec(Environment::SharedPtr env) {
+Value StructExpr::exec(Environment::SharedPtr env) const {
     Value structValue(struct_);
     return env->def(struct_.name(), structValue);
 }
@@ -498,7 +498,7 @@ IsStructName::IsStructName(CodeNode::SharedPtr expr, const std::string &name)
     , name_(name)
 {}
 
-Value IsStructName::exec(Environment::SharedPtr env) {
+Value IsStructName::exec(Environment::SharedPtr env) const {
     if (expr_) {
         Value value = expr_->eval(env);
         if (value.isUserType() && value.userType().name() == name_) {
@@ -514,7 +514,7 @@ StructName::StructName(CodeNode::SharedPtr expr)
     , expr_(expr)
 {}
 
-Value StructName::exec(Environment::SharedPtr env) {
+Value StructName::exec(Environment::SharedPtr env) const {
     if (expr_) {
         Value value = expr_->eval(env);
         if (value.isUserObject()) {
@@ -537,7 +537,7 @@ MakeInstance::MakeInstance(const std::string &name, const NameSharedPtrs &initLi
     , initList_(initList)
 {}
 
-Value MakeInstance::exec(Environment::SharedPtr env) {
+Value MakeInstance::exec(Environment::SharedPtr env) const {
     const Value structValue = env->get(name_);
     if (!structValue.isUserType()) {
         throw InvalidExpressionType("UserType", structValue.typeToString());
@@ -560,7 +560,7 @@ IsInstanceOf::IsInstanceOf(CodeNode::SharedPtr expr, const std::string &name)
     , name_(name)
 {}
 
-Value IsInstanceOf::exec(Environment::SharedPtr env) {
+Value IsInstanceOf::exec(Environment::SharedPtr env) const {
     if (expr_) {
         Value value = expr_->eval(env);
         if (value.isUserObject() && value.userObject().type().name() == name_) {
@@ -577,7 +577,7 @@ GetMember::GetMember(CodeNode::SharedPtr expr, const std::string &name)
     , name_(name)
 {}
 
-Value GetMember::exec(Environment::SharedPtr env) {
+Value GetMember::exec(Environment::SharedPtr env) const {
     if (expr_) {
         Value value = expr_->eval(env);
         if (value.isUserObject()) {
@@ -598,7 +598,7 @@ SetMember::SetMember(CodeNode::SharedPtr expr, const std::string &name, CodeNode
     , newValExpr_(newValExpr)
 {}
 
-Value SetMember::exec(Environment::SharedPtr env) {
+Value SetMember::exec(Environment::SharedPtr env) const {
     if (expr_) {
         Value instanceValue = expr_->eval(env);
         if (instanceValue.isUserObject()) {
@@ -621,7 +621,7 @@ StringLen::StringLen(CodeNode::SharedPtr expr)
     , expr_(expr)
 {}
 
-Value StringLen::exec(Environment::SharedPtr env) {
+Value StringLen::exec(Environment::SharedPtr env) const {
     if (expr_) {
         Value str = expr_->eval(env);
 
@@ -639,7 +639,7 @@ StringGet::StringGet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos)
     , pos_(pos)
 {}
 
-Value StringGet::exec(Environment::SharedPtr env) {
+Value StringGet::exec(Environment::SharedPtr env) const {
     if (str_ && pos_) {
         Value str = str_->eval(env);
         Value pos = pos_->eval(env);
@@ -659,7 +659,7 @@ StringSet::StringSet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode:
     , val_(val)
 {}
 
-Value StringSet::exec(Environment::SharedPtr env) {
+Value StringSet::exec(Environment::SharedPtr env) const {
     if (str_ && pos_ && val_) {
         Value str = str_->eval(env);
         Value pos = pos_->eval(env);
@@ -688,7 +688,7 @@ StringCat::StringCat(CodeNode::SharedPtr str, CodeNode::SharedPtr other)
     , other_(other)
 {}
 
-Value StringCat::exec(Environment::SharedPtr env) {
+Value StringCat::exec(Environment::SharedPtr env) const {
     if (str_ && other_) {
         Value str = str_->eval(env);
         Value other = other_->eval(env);
@@ -725,7 +725,7 @@ SubString::SubString(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode:
     , len_(len)
 {}
 
-Value SubString::exec(Environment::SharedPtr env) {
+Value SubString::exec(Environment::SharedPtr env) const {
     if (str_ && pos_) {
         Value str = str_->eval(env);
         Value pos = pos_->eval(env);
@@ -767,7 +767,7 @@ StringFind::StringFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr, CodeNod
     , pos_(pos)
 {}
 
-Value StringFind::exec(Environment::SharedPtr env) {
+Value StringFind::exec(Environment::SharedPtr env) const {
     if (str_ && chr_) {
         Value str = str_->eval(env);
         Value chr = chr_->eval(env);
@@ -797,7 +797,7 @@ StringCount::StringCount(CodeNode::SharedPtr str, CodeNode::SharedPtr chr)
     , chr_(chr)
 {}
 
-Value StringCount::exec(Environment::SharedPtr env) {
+Value StringCount::exec(Environment::SharedPtr env) const {
     if (str_ && chr_) {
         Value str = str_->eval(env);
         Value chr = chr_->eval(env);
@@ -819,7 +819,7 @@ StringCompare::StringCompare(CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
     , rhs_(rhs)
 {}
 
-Value StringCompare::exec(Environment::SharedPtr env) {
+Value StringCompare::exec(Environment::SharedPtr env) const {
     if (lhs_ && rhs_) {
         Value lhs = lhs_->eval(env);
         Value rhs = rhs_->eval(env);
@@ -843,7 +843,7 @@ StringSort::StringSort(CodeNode::SharedPtr str, CodeNode::SharedPtr descending)
     , desc_(descending)
 {}
 
-Value StringSort::exec(Environment::SharedPtr env) {
+Value StringSort::exec(Environment::SharedPtr env) const {
     if (str_) {
         Value str = str_->eval(env);
         Value desc = desc_ ? desc_->eval(env) : Value::False;
@@ -870,7 +870,7 @@ StringReverse::StringReverse(CodeNode::SharedPtr str)
     , str_(str)
 {}
 
-Value StringReverse::exec(Environment::SharedPtr env) {
+Value StringReverse::exec(Environment::SharedPtr env) const {
     if (str_) {
         Value str = str_->eval(env);
 
@@ -895,7 +895,7 @@ MakeArray::MakeArray(CodeNode::SharedPtrList values)
     , values_(values)
 {}
 
-Value MakeArray::exec(Environment::SharedPtr env) {
+Value MakeArray::exec(Environment::SharedPtr env) const {
     if (values_.empty()) {
         return Value(Sequence());
     }
@@ -921,7 +921,7 @@ MakeArraySV::MakeArraySV(CodeNode::SharedPtr size, CodeNode::SharedPtr initValue
     , initValue_(initValue)
 {}
 
-Value MakeArraySV::exec(Environment::SharedPtr env) {
+Value MakeArraySV::exec(Environment::SharedPtr env) const {
     if (size_) {
         Value size = size_->eval(env);
         Value initValue = initValue_ ? initValue_->eval(env) : Value::Null;
@@ -939,7 +939,7 @@ ArrayLen::ArrayLen(CodeNode::SharedPtr expr)
     , expr_(expr)
 {}
 
-Value ArrayLen::exec(Environment::SharedPtr env) {
+Value ArrayLen::exec(Environment::SharedPtr env) const {
     if (expr_) {
         Value arr = expr_->eval(env);
 
@@ -957,7 +957,7 @@ ArrayGet::ArrayGet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos)
     , pos_(pos)
 {}
 
-Value ArrayGet::exec(Environment::SharedPtr env) {
+Value ArrayGet::exec(Environment::SharedPtr env) const {
     if (arr_ && pos_) {
         Value arr = arr_->eval(env);
         Value pos = pos_->eval(env);
@@ -977,7 +977,7 @@ ArraySet::ArraySet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeNode::S
     , val_(val)
 {}
 
-Value ArraySet::exec(Environment::SharedPtr env) {
+Value ArraySet::exec(Environment::SharedPtr env) const {
     if (arr_ && pos_ && val_) {
         Value arr = arr_->eval(env);
         Value pos = pos_->eval(env);
@@ -1005,7 +1005,7 @@ ArrayPush::ArrayPush(CodeNode::SharedPtr arr, CodeNode::SharedPtr val)
     , val_(val)
 {}
 
-Value ArrayPush::exec(Environment::SharedPtr env) {
+Value ArrayPush::exec(Environment::SharedPtr env) const {
     if (arr_ && val_) {
         Value arr = arr_->eval(env);
         Value val = val_->eval(env);
@@ -1024,7 +1024,7 @@ ArrayPop::ArrayPop(CodeNode::SharedPtr arr)
     , arr_(arr)
 {}
 
-Value ArrayPop::exec(Environment::SharedPtr env) {
+Value ArrayPop::exec(Environment::SharedPtr env) const {
     if (arr_) {
         Value arr = arr_->eval(env);
 
@@ -1057,7 +1057,7 @@ ArrayFind::ArrayFind(CodeNode::SharedPtr arr, CodeNode::SharedPtr chr, CodeNode:
     , pos_(pos)
 {}
 
-Value ArrayFind::exec(Environment::SharedPtr env) {
+Value ArrayFind::exec(Environment::SharedPtr env) const {
     if (arr_ && val_) {
         Value arr = arr_->eval(env);
         Value val = val_->eval(env);
@@ -1086,7 +1086,7 @@ ArrayCount::ArrayCount(CodeNode::SharedPtr arr, CodeNode::SharedPtr val)
     , val_(val)
 {}
 
-Value ArrayCount::exec(Environment::SharedPtr env) {
+Value ArrayCount::exec(Environment::SharedPtr env) const {
     if (arr_ && val_) {
         Value arr = arr_->eval(env);
         Value val = val_->eval(env);
@@ -1105,7 +1105,7 @@ ArraySort::ArraySort(CodeNode::SharedPtr arr, CodeNode::SharedPtr descending)
     , desc_(descending)
 {}
 
-Value ArraySort::exec(Environment::SharedPtr env) {
+Value ArraySort::exec(Environment::SharedPtr env) const {
     if (arr_) {
         Value arr = arr_->eval(env);
         Value desc = desc_ ? desc_->eval(env) : Value::False;
@@ -1127,7 +1127,7 @@ ArrayReverse::ArrayReverse(CodeNode::SharedPtr arr)
     , arr_(arr)
 {}
 
-Value ArrayReverse::exec(Environment::SharedPtr env) {
+Value ArrayReverse::exec(Environment::SharedPtr env) const {
     if (arr_) {
         Value arr = arr_->eval(env);
 
@@ -1149,7 +1149,7 @@ ArrayInsert::ArrayInsert(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeN
     , item_(item)
 {}
 
-Value ArrayInsert::exec(Environment::SharedPtr env) {
+Value ArrayInsert::exec(Environment::SharedPtr env) const {
     if (arr_ && pos_ && item_) {
         Value arr = arr_->eval(env);
         Value pos = pos_->eval(env);
@@ -1179,7 +1179,7 @@ ArrayRemove::ArrayRemove(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos)
     , pos_(pos)
 {}
 
-Value ArrayRemove::exec(Environment::SharedPtr env) {
+Value ArrayRemove::exec(Environment::SharedPtr env) const {
     if (arr_ && pos_) {
         Value arr = arr_->eval(env);
         Value pos = pos_->eval(env);
@@ -1205,7 +1205,7 @@ ArrayClear::ArrayClear(CodeNode::SharedPtr arr)
     , arr_(arr)
 {}
 
-Value ArrayClear::exec(Environment::SharedPtr env) {
+Value ArrayClear::exec(Environment::SharedPtr env) const {
     if (arr_) {
         Value arr = arr_->eval(env);
 
@@ -1223,7 +1223,7 @@ StrCharCheck::StrCharCheck(Type type, CodeNode::SharedPtr operand)
     , ftn_(typeToCheckFtn(type))
 {}
 
-Value StrCharCheck::exec(Environment::SharedPtr env) {
+Value StrCharCheck::exec(Environment::SharedPtr env) const {
     if (operand_) {
         const Value value = operand_->eval(env);
 
@@ -1261,7 +1261,7 @@ StrCharTransform::StrCharTransform(Type type, CodeNode::SharedPtr operand)
     , ftn_(typeToTransformFtn(type))
 {}
 
-Value StrCharTransform::exec(Environment::SharedPtr env) {
+Value StrCharTransform::exec(Environment::SharedPtr env) const {
     if (operand_) {
         const Value value = operand_->eval(env);
 
@@ -1296,7 +1296,7 @@ ImportModule::ImportModule(const std::string &name, const std::string &asName)
     , asName_(asName)
 {}
 
-Value ImportModule::exec(Environment::SharedPtr env) {
+Value ImportModule::exec(Environment::SharedPtr env) const {
     auto modulePtr = ModuleStorage::getOrCreate(name_);
     if (modulePtr) {
         return modulePtr->import(env, asName_.empty() ? Module::OptionalName() : Module::OptionalName(asName_));
@@ -1319,7 +1319,7 @@ FromModuleImport::FromModuleImport(const std::string &name, const NameAndAsList 
     , aliasList_(aliasList)
 {}
 
-Value FromModuleImport::exec(Environment::SharedPtr env) {
+Value FromModuleImport::exec(Environment::SharedPtr env) const {
     auto modulePtr = ModuleStorage::getOrCreate(name_);
     if (modulePtr) {
         return modulePtr->aliases(env, aliasList_);
@@ -1333,7 +1333,7 @@ Random::Random(CodeNode::SharedPtr max)
     , max_(max)
 {}
 
-Value Random::exec(Environment::SharedPtr env) {
+Value Random::exec(Environment::SharedPtr env) const {
     static auto randFtn = std::mt19937(std::random_device()());
     static const auto maxRand = static_cast<Value::Long>(randFtn.max());
 
@@ -1358,7 +1358,7 @@ Hash::Hash(CodeNode::SharedPtr operand)
     , operand_(operand)
 {}
 
-Value Hash::exec(Environment::SharedPtr env) {
+Value Hash::exec(Environment::SharedPtr env) const {
     static const Value::Hash hashFtn;
     static const std::size_t maxLongPlus1 =
         std::size_t(std::numeric_limits<Value::Long>::max()) + 1;
@@ -1374,7 +1374,7 @@ MakeHashMap::MakeHashMap(CodeNode::SharedPtrList pairs)
     , pairs_(pairs)
 {}
 
-Value MakeHashMap::exec(Environment::SharedPtr env) {
+Value MakeHashMap::exec(Environment::SharedPtr env) const {
     if (pairs_.empty()) {
         return Value(Hashtable());
     }
@@ -1411,7 +1411,7 @@ HashMapLen::HashMapLen(CodeNode::SharedPtr htExpr)
     , htExpr_(htExpr)
 {}
 
-Value HashMapLen::exec(Environment::SharedPtr env) {
+Value HashMapLen::exec(Environment::SharedPtr env) const {
     if (htExpr_) {
         Value hm = htExpr_->eval(env);
 
@@ -1429,7 +1429,7 @@ HashMapContains::HashMapContains(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr
     , keyExpr_(keyExpr)
 {}
 
-Value HashMapContains::exec(Environment::SharedPtr env) {
+Value HashMapContains::exec(Environment::SharedPtr env) const {
     if (htExpr_ && keyExpr_) {
         const Value hm = htExpr_->eval(env);
         const Value key = keyExpr_->eval(env);
@@ -1449,7 +1449,7 @@ HashMapGet::HashMapGet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, 
     , defaultExpr_(defaultExpr)
 {}
 
-Value HashMapGet::exec(Environment::SharedPtr env) {
+Value HashMapGet::exec(Environment::SharedPtr env) const {
     if (htExpr_ && keyExpr_) {
         const Value hm = htExpr_->eval(env);
         const Value key = keyExpr_->eval(env);
@@ -1470,7 +1470,7 @@ HashMapSet::HashMapSet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, 
     , valueExpr_(valueExpr)
 {}
 
-Value HashMapSet::exec(Environment::SharedPtr env) {
+Value HashMapSet::exec(Environment::SharedPtr env) const {
     if (htExpr_ && keyExpr_ && valueExpr_) {
         Value hm = htExpr_->eval(env);
         const Value key = keyExpr_->eval(env);
@@ -1491,7 +1491,7 @@ HashMapRemove::HashMapRemove(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr key
     , keyExpr_(keyExpr)
 {}
 
-Value HashMapRemove::exec(Environment::SharedPtr env) {
+Value HashMapRemove::exec(Environment::SharedPtr env) const {
     if (htExpr_ && keyExpr_) {
         Value hm = htExpr_->eval(env);
         const Value key = keyExpr_->eval(env);
@@ -1509,7 +1509,7 @@ HashMapClear::HashMapClear(CodeNode::SharedPtr htExpr)
     , htExpr_(htExpr)
 {}
 
-Value HashMapClear::exec(Environment::SharedPtr env) {
+Value HashMapClear::exec(Environment::SharedPtr env) const {
     if (htExpr_) {
         Value hm = htExpr_->eval(env);
 
@@ -1527,7 +1527,7 @@ HashMapFind::HashMapFind(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueEx
     , valueExpr_(valueExpr)
 {}
 
-Value HashMapFind::exec(Environment::SharedPtr env) {
+Value HashMapFind::exec(Environment::SharedPtr env) const {
     if (htExpr_ && valueExpr_) {
         const Value hm = htExpr_->eval(env);
         const Value value = valueExpr_->eval(env);
@@ -1546,7 +1546,7 @@ HashMapCount::HashMapCount(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr value
     , valueExpr_(valueExpr)
 {}
 
-Value HashMapCount::exec(Environment::SharedPtr env) {
+Value HashMapCount::exec(Environment::SharedPtr env) const {
     if (htExpr_ && valueExpr_) {
         const Value hm = htExpr_->eval(env);
         const Value value = valueExpr_->eval(env);
@@ -1564,7 +1564,7 @@ HashMapKeys::HashMapKeys(CodeNode::SharedPtr htExpr)
     , htExpr_(htExpr)
 {}
 
-Value HashMapKeys::exec(Environment::SharedPtr env) {
+Value HashMapKeys::exec(Environment::SharedPtr env) const {
     if (htExpr_) {
         Value hm = htExpr_->eval(env);
 
@@ -1581,7 +1581,7 @@ HashMapValues::HashMapValues(CodeNode::SharedPtr htExpr)
     , htExpr_(htExpr)
 {}
 
-Value HashMapValues::exec(Environment::SharedPtr env) {
+Value HashMapValues::exec(Environment::SharedPtr env) const {
     if (htExpr_) {
         Value hm = htExpr_->eval(env);
 
@@ -1598,7 +1598,7 @@ HashMapItems::HashMapItems(CodeNode::SharedPtr htExpr)
     , htExpr_(htExpr)
 {}
 
-Value HashMapItems::exec(Environment::SharedPtr env) {
+Value HashMapItems::exec(Environment::SharedPtr env) const {
     if (htExpr_) {
         Value hm = htExpr_->eval(env);
 
@@ -1616,7 +1616,7 @@ MakePair::MakePair(CodeNode::SharedPtr firstExpr, CodeNode::SharedPtr secondExpr
     , secondExpr_(secondExpr)
 {}
 
-Value MakePair::exec(Environment::SharedPtr env) {
+Value MakePair::exec(Environment::SharedPtr env) const {
     if (firstExpr_ && secondExpr_) {
         const auto first = firstExpr_->eval(env);
         const auto second = secondExpr_->eval(env);
@@ -1632,7 +1632,7 @@ PairFirst::PairFirst(CodeNode::SharedPtr pairExpr)
     , pairExpr_(pairExpr)
 {}
 
-Value PairFirst::exec(Environment::SharedPtr env) {
+Value PairFirst::exec(Environment::SharedPtr env) const {
     if (pairExpr_) {
         auto pairValue = pairExpr_->eval(env);
 
@@ -1649,7 +1649,7 @@ PairSecond::PairSecond(CodeNode::SharedPtr pairExpr)
     , pairExpr_(pairExpr)
 {}
 
-Value PairSecond::exec(Environment::SharedPtr env) {
+Value PairSecond::exec(Environment::SharedPtr env) const {
     if (pairExpr_) {
         auto pairValue = pairExpr_->eval(env);
 
@@ -1675,7 +1675,7 @@ MakeRange::MakeRange(CodeNode::SharedPtr begin, CodeNode::SharedPtr end, CodeNod
     , step_(step)
 {}
 
-Value MakeRange::exec(Environment::SharedPtr env) {
+Value MakeRange::exec(Environment::SharedPtr env) const {
     const auto evalInt = [&env](CodeNode::SharedPtr expr) {
         auto val = expr->eval(env);
         if (!val.isInt()) {
@@ -1703,7 +1703,7 @@ RangeGetter<R>::RangeGetter(CodeNode::SharedPtr rng, Getter && getter)
 {}
 
 template <typename R>
-Value RangeGetter<R>::exec(Environment::SharedPtr env) {
+Value RangeGetter<R>::exec(Environment::SharedPtr env) const {
     if (rng_) {
         auto rng = rng_->eval(env);
         if (!rng.isRange()) {
@@ -1750,7 +1750,7 @@ Expand::Expand(CodeNode::SharedPtrList exprs)
     , exprs_(exprs)
 {}
 
-Value Expand::exec(Environment::SharedPtr env) {
+Value Expand::exec(Environment::SharedPtr env) const {
     std::vector<Value> values;
     for (auto expr : exprs_) {
         auto val = expr->eval(env);
@@ -1772,7 +1772,7 @@ GenericLen::GenericLen(CodeNode::SharedPtr object)
     , object_(object)
 {}
 
-Value GenericLen::exec(Environment::SharedPtr env) {
+Value GenericLen::exec(Environment::SharedPtr env) const {
     if (object_) {
         auto objVal = object_->eval(env);
         switch (objVal.type()) {
@@ -1795,7 +1795,7 @@ GenericGet::GenericGet(CodeNode::SharedPtr object, CodeNode::SharedPtr key, Code
     , defaultRet_(defaultRet)
 {}
 
-Value GenericGet::exec(Environment::SharedPtr env) {
+Value GenericGet::exec(Environment::SharedPtr env) const {
     if (object_ && key_) {
         auto objVal = object_->eval(env);
         switch (objVal.type()) {

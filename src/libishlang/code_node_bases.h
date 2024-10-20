@@ -25,7 +25,7 @@ namespace Ishlang {
         CodeNode() {}
         virtual ~CodeNode() {}
 
-        Value eval(Environment::SharedPtr env) {
+        Value eval(Environment::SharedPtr env) const {
             if (!env) { throw NullEnvironment(); }
             return this->exec(env);
         }
@@ -47,7 +47,7 @@ namespace Ishlang {
         }
 
     protected:
-        virtual Value exec(Environment::SharedPtr env) = 0;
+        virtual Value exec(Environment::SharedPtr env) const = 0;
     };
 
     // -------------------------------------------------------------
@@ -62,7 +62,7 @@ namespace Ishlang {
         virtual ~BinaryOp() {}
 
     protected:
-        virtual Value exec(Environment::SharedPtr env) override = 0;
+        virtual Value exec(Environment::SharedPtr env) const override = 0;
 
     protected:
         CodeNode::SharedPtr lhs_;
@@ -80,7 +80,7 @@ namespace Ishlang {
         virtual ~VariadicOp() {}
 
     protected:
-        virtual Value exec(Environment::SharedPtr env) override = 0;
+        virtual Value exec(Environment::SharedPtr env) const override = 0;
 
     protected:
         CodeNode::SharedPtrList operands_;
