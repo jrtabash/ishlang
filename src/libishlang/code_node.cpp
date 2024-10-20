@@ -186,8 +186,7 @@ Value LogicOp::exec(Environment::SharedPtr env) {
 Not::Not(CodeNode::SharedPtr operand)
     : CodeNode()
     , operand_(operand)
-{
-}
+{}
 
 Value Not::exec(Environment::SharedPtr env) {
     if (operand_) {
@@ -204,8 +203,7 @@ Value Not::exec(Environment::SharedPtr env) {
 NegativeOf::NegativeOf(CodeNode::SharedPtr operand)
     : CodeNode()
     , operand_(operand)
-{
-}
+{}
 
 Value NegativeOf::exec(Environment::SharedPtr env) {
     if (operand_) {
@@ -474,11 +472,9 @@ Value Print::exec(Environment::SharedPtr env) {
 // -------------------------------------------------------------
 Read::Read()
     : CodeNode()
-{
-}
+{}
 
-Value Read::exec(Environment::SharedPtr env)
-{
+Value Read::exec(Environment::SharedPtr env) {
     std::string input;
     std::getline(std::cin, input);
     return Parser().readLiteral(input)->eval(env);
@@ -516,8 +512,7 @@ Value IsStructName::exec(Environment::SharedPtr env) {
 StructName::StructName(CodeNode::SharedPtr expr)
     : CodeNode()
     , expr_(expr)
-{
-}
+{}
 
 Value StructName::exec(Environment::SharedPtr env) {
     if (expr_) {
@@ -721,16 +716,14 @@ SubString::SubString(CodeNode::SharedPtr str, CodeNode::SharedPtr pos)
     , str_(str)
     , pos_(pos)
     , len_()
-{
-}
+{}
 
 SubString::SubString(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode::SharedPtr len)
     : CodeNode()
     , str_(str)
     , pos_(pos)
     , len_(len)
-{
-}
+{}
 
 Value SubString::exec(Environment::SharedPtr env) {
     if (str_ && pos_) {
@@ -765,16 +758,14 @@ StringFind::StringFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr)
     , str_(str)
     , chr_(chr)
     , pos_()
-{
-}
+{}
 
 StringFind::StringFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr, CodeNode::SharedPtr pos)
     : CodeNode()
     , str_(str)
     , chr_(chr)
     , pos_(pos)
-{
-}
+{}
 
 Value StringFind::exec(Environment::SharedPtr env) {
     if (str_ && chr_) {
@@ -804,8 +795,7 @@ StringCount::StringCount(CodeNode::SharedPtr str, CodeNode::SharedPtr chr)
     : CodeNode()
     , str_(str)
     , chr_(chr)
-{
-}
+{}
 
 Value StringCount::exec(Environment::SharedPtr env) {
     if (str_ && chr_) {
@@ -827,8 +817,7 @@ StringCompare::StringCompare(CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
     : CodeNode()
     , lhs_(lhs)
     , rhs_(rhs)
-{
-}
+{}
 
 Value StringCompare::exec(Environment::SharedPtr env) {
     if (lhs_ && rhs_) {
@@ -852,8 +841,7 @@ StringSort::StringSort(CodeNode::SharedPtr str, CodeNode::SharedPtr descending)
     : CodeNode()
     , str_(str)
     , desc_(descending)
-{
-}
+{}
 
 Value StringSort::exec(Environment::SharedPtr env) {
     if (str_) {
@@ -880,8 +868,7 @@ Value StringSort::exec(Environment::SharedPtr env) {
 StringReverse::StringReverse(CodeNode::SharedPtr str)
     : CodeNode()
     , str_(str)
-{
-}
+{}
 
 Value StringReverse::exec(Environment::SharedPtr env) {
     if (str_) {
@@ -1061,16 +1048,14 @@ ArrayFind::ArrayFind(CodeNode::SharedPtr arr, CodeNode::SharedPtr chr)
     , arr_(arr)
     , val_(chr)
     , pos_()
-{
-}
+{}
 
 ArrayFind::ArrayFind(CodeNode::SharedPtr arr, CodeNode::SharedPtr chr, CodeNode::SharedPtr pos)
     : CodeNode()
     , arr_(arr)
     , val_(chr)
     , pos_(pos)
-{
-}
+{}
 
 Value ArrayFind::exec(Environment::SharedPtr env) {
     if (arr_ && val_) {
@@ -1099,8 +1084,7 @@ ArrayCount::ArrayCount(CodeNode::SharedPtr arr, CodeNode::SharedPtr val)
     : CodeNode()
     , arr_(arr)
     , val_(val)
-{
-}
+{}
 
 Value ArrayCount::exec(Environment::SharedPtr env) {
     if (arr_ && val_) {
@@ -1119,8 +1103,7 @@ ArraySort::ArraySort(CodeNode::SharedPtr arr, CodeNode::SharedPtr descending)
     : CodeNode()
     , arr_(arr)
     , desc_(descending)
-{
-}
+{}
 
 Value ArraySort::exec(Environment::SharedPtr env) {
     if (arr_) {
@@ -1142,8 +1125,7 @@ Value ArraySort::exec(Environment::SharedPtr env) {
 ArrayReverse::ArrayReverse(CodeNode::SharedPtr arr)
     : CodeNode()
     , arr_(arr)
-{
-}
+{}
 
 Value ArrayReverse::exec(Environment::SharedPtr env) {
     if (arr_) {
@@ -1165,11 +1147,9 @@ ArrayInsert::ArrayInsert(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeN
     , arr_(arr)
     , pos_(pos)
     , item_(item)
-{
-}
+{}
 
-Value ArrayInsert::exec(Environment::SharedPtr env)
-{
+Value ArrayInsert::exec(Environment::SharedPtr env) {
     if (arr_ && pos_ && item_) {
         Value arr = arr_->eval(env);
         Value pos = pos_->eval(env);
@@ -1197,8 +1177,7 @@ ArrayRemove::ArrayRemove(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos)
     : CodeNode()
     , arr_(arr)
     , pos_(pos)
-{
-}
+{}
 
 Value ArrayRemove::exec(Environment::SharedPtr env) {
     if (arr_ && pos_) {
@@ -1224,8 +1203,7 @@ Value ArrayRemove::exec(Environment::SharedPtr env) {
 ArrayClear::ArrayClear(CodeNode::SharedPtr arr)
     : CodeNode()
     , arr_(arr)
-{
-}
+{}
 
 Value ArrayClear::exec(Environment::SharedPtr env) {
     if (arr_) {
@@ -1243,8 +1221,7 @@ StrCharCheck::StrCharCheck(Type type, CodeNode::SharedPtr operand)
     : CodeNode()
     , operand_(operand)
     , ftn_(typeToCheckFtn(type))
-{
-}
+{}
 
 Value StrCharCheck::exec(Environment::SharedPtr env) {
     if (operand_) {
@@ -1282,8 +1259,7 @@ StrCharTransform::StrCharTransform(Type type, CodeNode::SharedPtr operand)
     : CodeNode()
     , operand_(operand)
     , ftn_(typeToTransformFtn(type))
-{
-}
+{}
 
 Value StrCharTransform::exec(Environment::SharedPtr env) {
     if (operand_) {
@@ -1318,8 +1294,7 @@ ImportModule::ImportModule(const std::string &name, const std::string &asName)
     : CodeNode()
     , name_(name)
     , asName_(asName)
-{
-}
+{}
 
 Value ImportModule::exec(Environment::SharedPtr env) {
     auto modulePtr = ModuleStorage::getOrCreate(name_);
@@ -1342,8 +1317,7 @@ FromModuleImport::FromModuleImport(const std::string &name, const NameAndAsList 
     : CodeNode()
     , name_(name)
     , aliasList_(aliasList)
-{
-}
+{}
 
 Value FromModuleImport::exec(Environment::SharedPtr env) {
     auto modulePtr = ModuleStorage::getOrCreate(name_);
@@ -1533,8 +1507,7 @@ Value HashMapRemove::exec(Environment::SharedPtr env) {
 HashMapClear::HashMapClear(CodeNode::SharedPtr htExpr)
     : CodeNode()
     , htExpr_(htExpr)
-{
-}
+{}
 
 Value HashMapClear::exec(Environment::SharedPtr env) {
     if (htExpr_) {
@@ -1589,8 +1562,7 @@ Value HashMapCount::exec(Environment::SharedPtr env) {
 HashMapKeys::HashMapKeys(CodeNode::SharedPtr htExpr)
     : CodeNode()
     , htExpr_(htExpr)
-{
-}
+{}
 
 Value HashMapKeys::exec(Environment::SharedPtr env) {
     if (htExpr_) {
@@ -1607,8 +1579,7 @@ Value HashMapKeys::exec(Environment::SharedPtr env) {
 HashMapValues::HashMapValues(CodeNode::SharedPtr htExpr)
     : CodeNode()
     , htExpr_(htExpr)
-{
-}
+{}
 
 Value HashMapValues::exec(Environment::SharedPtr env) {
     if (htExpr_) {
