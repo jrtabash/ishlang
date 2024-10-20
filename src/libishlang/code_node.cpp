@@ -153,7 +153,7 @@ LogicOp::LogicOp(Type type, CodeNode::SharedPtrList operands)
 
 Value LogicOp::exec(Environment::SharedPtr env) const {
     if (!operands_.empty()) {
-        auto operandToBool = [&env](CodeNode::SharedPtr operand) {
+        const auto operandToBool = [&env](const CodeNode::SharedPtr &operand) {
             const Value val = operand->eval(env);
             if (!val.isBool()) {
                 throw InvalidOperandType("Boolean", val.typeToString());
@@ -163,7 +163,7 @@ Value LogicOp::exec(Environment::SharedPtr env) const {
 
         switch (type_) {
         case Conjunction:
-            for (auto operand : operands_) {
+            for (const auto &operand : operands_) {
                 if (!operandToBool(operand)) {
                     return Value::False;
                 }
@@ -171,7 +171,7 @@ Value LogicOp::exec(Environment::SharedPtr env) const {
             return Value::True;
 
         case Disjunction:
-            for (auto operand : operands_) {
+            for (const auto &operand : operands_) {
                 if (operandToBool(operand)) {
                     return Value::True;
                 }
@@ -462,7 +462,7 @@ Print::Print(bool newline, CodeNode::SharedPtrList exprs)
 {}
 
 Value Print::exec(Environment::SharedPtr env) const {
-    for (auto & expr : exprs_) {
+    for (const auto &expr : exprs_) {
         Value::print(expr->eval(env));
     }
     if (newline_) { std::cout << std::endl; }
@@ -547,7 +547,7 @@ Value MakeInstance::exec(Environment::SharedPtr env) const {
 
 Instance::InitArgs MakeInstance::makeInitArgs(Environment::SharedPtr &env) const {
     Instance::InitArgs initArgs;
-    for (auto & nameSharedPtr : initList_) {
+    for (const auto &nameSharedPtr : initList_) {
         initArgs.emplace(nameSharedPtr.first, nameSharedPtr.second->eval(env));
     }
     return initArgs;
@@ -901,7 +901,7 @@ Value MakeArray::exec(Environment::SharedPtr env) const {
     }
     else {
         std::vector<Value> values;
-        for (auto & valueCode : values_) {
+        for (const auto &valueCode : values_) {
             values.push_back(valueCode->eval(env));
         }
         return Value(Sequence(std::move(values)));
@@ -1380,7 +1380,7 @@ Value MakeHashMap::exec(Environment::SharedPtr env) const {
     }
     else {
         Hashtable::Table table;
-        for (auto & pairCode : pairs_) {
+        for (const auto &pairCode : pairs_) {
             auto pairValue = pairCode->eval(env);
             if (pairValue.isPair()) {
                 append(table, pairValue.pair());
@@ -1752,7 +1752,7 @@ Expand::Expand(CodeNode::SharedPtrList exprs)
 
 Value Expand::exec(Environment::SharedPtr env) const {
     std::vector<Value> values;
-    for (auto expr : exprs_) {
+    for (const auto &expr : exprs_) {
         auto val = expr->eval(env);
         if (!val.isRange()) {
             throw InvalidOperandType("Range", val.typeToString());
