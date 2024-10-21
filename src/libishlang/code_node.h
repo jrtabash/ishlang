@@ -1277,6 +1277,21 @@ namespace Ishlang {
         CodeNode::SharedPtr defaultRet_;
     };
 
+    // -------------------------------------------------------------
+    class GenericSet : public CodeNode {
+    public:
+        GenericSet(CodeNode::SharedPtr object, CodeNode::SharedPtr key, CodeNode::SharedPtr value);
+        virtual ~GenericSet() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr object_;
+        CodeNode::SharedPtr key_;
+        CodeNode::SharedPtr value_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_H

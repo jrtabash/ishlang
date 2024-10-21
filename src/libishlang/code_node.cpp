@@ -604,7 +604,7 @@ Value SetMember::exec(Environment::SharedPtr env) const {
         if (instanceValue.isUserObject()) {
             if (newValExpr_) {
                 Value newValue = newValExpr_->eval(env);
-                instanceValue.userObject().set(name_, newValue);
+                Generic::set(instanceValue.userObject(), name_, newValue);
                 return newValue;
             }
         }
@@ -662,20 +662,11 @@ StringSet::StringSet(CodeNode::SharedPtr str, CodeNode::SharedPtr pos, CodeNode:
 Value StringSet::exec(Environment::SharedPtr env) const {
     if (str_ && pos_ && val_) {
         Value str = str_->eval(env);
-        Value pos = pos_->eval(env);
-        Value val = val_->eval(env);
 
         if (!str.isString()) { throw InvalidOperandType("String", str.typeToString()); }
-        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
-        if (!val.isChar()) { throw InvalidOperandType("Character", val.typeToString()); }
 
-        auto &rawStr = str.text();
-        const auto rawPos = pos.integer();
-        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawStr.size()) {
-            throw OutOfRange("string strset access");
-        }
-
-        rawStr[rawPos] = val.character();
+        Value val = val_->eval(env);
+        Generic::set(str.text(), pos_->eval(env), val);
         return val;
     }
     return Value::Null;
@@ -980,19 +971,11 @@ ArraySet::ArraySet(CodeNode::SharedPtr arr, CodeNode::SharedPtr pos, CodeNode::S
 Value ArraySet::exec(Environment::SharedPtr env) const {
     if (arr_ && pos_ && val_) {
         Value arr = arr_->eval(env);
-        Value pos = pos_->eval(env);
-        Value val = val_->eval(env);
 
         if (!arr.isArray()) { throw InvalidOperandType("Array", arr.typeToString()); }
-        if (!pos.isInt()) { throw InvalidOperandType("Integer", pos.typeToString()); }
 
-        auto &rawArr = arr.array();
-        const auto rawPos = pos.integer();
-        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawArr.size()) {
-            throw OutOfRange("array set access");
-        }
-
-        rawArr.set(rawPos, val);
+        Value val = val_->eval(env);
+        Generic::set(arr.array(), pos_->eval(env), val);
         return val;
     }
     return Value::Null;
@@ -1473,12 +1456,11 @@ HashMapSet::HashMapSet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, 
 Value HashMapSet::exec(Environment::SharedPtr env) const {
     if (htExpr_ && keyExpr_ && valueExpr_) {
         Value hm = htExpr_->eval(env);
-        const Value key = keyExpr_->eval(env);
-        const Value value = valueExpr_->eval(env);
 
         if (!hm.isHashMap()) { throw InvalidOperandType("HashMap", hm.typeToString()); }
 
-        hm.hashMap().set(key, value);
+        Value value = valueExpr_->eval(env);
+        Generic::set(hm.hashMap(), keyExpr_->eval(env), value);
         return value;
     }
     return Value::Null;
@@ -1816,6 +1798,50 @@ Value GenericGet::exec(Environment::SharedPtr env) const {
         default:
             throw InvalidOperandType("String, Array, HashMap or UserObject", objVal.typeToString());
         }
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+GenericSet::GenericSet(CodeNode::SharedPtr object, CodeNode::SharedPtr key, CodeNode::SharedPtr value)
+    : CodeNode()
+    , object_(object)
+    , key_(key)
+    , value_(value)
+{}
+
+Value GenericSet::exec(Environment::SharedPtr env) const {
+    if (object_ && key_ && value_) {
+        auto objVal = object_->eval(env);
+        auto value = value_->eval(env);
+
+        switch (objVal.type()) {
+        case Value::eString:
+            Generic::set(objVal.text(), key_->eval(env), value);
+            break;
+
+        case Value::eArray:
+            Generic::set(objVal.array(), key_->eval(env), value);
+            break;
+
+        case Value::eHashMap:
+            Generic::set(objVal.hashMap(), key_->eval(env), value);
+            break;
+
+        case Value::eUserObject:
+            if (key_->isIdentifier()) {
+                Generic::set(objVal.userObject(), key_->identifierName(), value);
+            }
+            else {
+                Generic::set(objVal.userObject(), key_->eval(env), value);
+            }
+            break;
+
+        default:
+            throw InvalidOperandType("String, Array, HashMap or UserObject", objVal.typeToString());
+        }
+
+        return value;
     }
     return Value::Null;
 }

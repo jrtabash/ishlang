@@ -908,6 +908,15 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 - For userobject, key must be a member name/symbol or a string
 - The parameter default_return applies to hashmap and is ignored otherwise
 
+**set**: Set value at index, key or member for string, array, hashmap or userobject
+```
+(set <object> <key> <value>)
+```
+
+### Notes
+- For string and array, key must be an integer
+- For userobject, key must be a member name/symbol or a string
+
 ### Examples
 ```
 (struct Person (name age))
@@ -926,6 +935,11 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (get tab 2 200)
 (get obj name)
 (get obj "name")
+(set txt 0 'H')
+(set seq 1 20)
+(set tab 3 30)
+(set obj age 26)
+(set obj "age" 27)
 ```
 
 ## Comments

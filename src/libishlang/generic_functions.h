@@ -56,6 +56,45 @@ namespace Ishlang {
         static inline Value get(const Value::UserObject &obj, const std::string &memberName) {
             return Value(obj.get(memberName));
         }
+
+        template <typename ObjectType>
+        static inline void set(ObjectType &obj, const Value &key, const Value &value) {
+            if constexpr (std::is_same_v<ObjectType, Value::HashMap>) {
+                obj.set(key, value);
+            }
+            else if constexpr (std::is_same_v<ObjectType, Value::UserObject>) {
+                if (!key.isString()) {
+                    throw InvalidOperandType("String", key.typeToString());
+                }
+                obj.set(key.text(), value);
+            }
+            else {
+                static_assert(std::is_same_v<ObjectType, Value::Text> || std::is_same_v<ObjectType, Value::Array>);
+
+                if (!key.isInt()) {
+                    throw InvalidOperandType("Integer", key.typeToString());
+                }
+
+                const auto pos = key.integer();
+                if (pos < 0 || static_cast<std::size_t>(pos) >= obj.size()) {
+                    throw OutOfRange(Exception::format("%s get access", Value::typeToString(key.type()).c_str()));
+                }
+
+                if constexpr (std::is_same_v<ObjectType, Value::Text>) {
+                    if (!value.isChar()) {
+                        throw InvalidOperandType("Character", value.typeToString());
+                    }
+                    obj[pos] = value.character();
+                }
+                else {
+                    obj.set(pos, value);
+                }
+            }
+        }
+
+        static inline void set(Value::UserObject &obj, const std::string &memberName, const Value &value) {
+            obj.set(memberName, value);
+        }
     };
 
 }

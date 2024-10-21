@@ -30,6 +30,18 @@ __CODE__
 (println (get obj "name"))
 (println (get obj "age"))
 
+(println (set txt 6 'w'))
+(println (set seq 2 50))
+(println (set tab "two" 20))
+(println (set obj "name" "John"))
+(println (set obj age 24))
+
+(println (get txt 6))
+(println (get seq 2))
+(println (get tab "two"))
+(println (get obj name))
+(println (get obj age))
+
 __EXPECT__
 12
 5
@@ -49,3 +61,13 @@ Jon
 25
 Jon
 25
+w
+50
+20
+John
+24
+w
+50
+20
+John
+24

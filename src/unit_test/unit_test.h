@@ -155,6 +155,7 @@ namespace Ishlang {
         void testCodeNodeExpand();
         void testCodeNodeGenericLen();
         void testCodeNodeGenericGet();
+        void testCodeNodeGenericSet();
         void testParserBasic();
         void testParserClone();
         void testParserIsType();
@@ -227,6 +228,7 @@ namespace Ishlang {
         void testParserExpand();
         void testParserGenericLen();
         void testParserGenericGet();
+        void testParserGenericSet();
         
     private:
         bool  success_;
