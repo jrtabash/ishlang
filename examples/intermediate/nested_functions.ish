@@ -3,8 +3,8 @@
     (+ x 1))
 
   (var sum x)
-  (loop (var i 0) (< i n) (= i (+ i 1))
-        (= sum (add1 sum)))
+  (foreach i (range n) (= sum (add1 sum)))
+
   sum)
 
 (defun incrementN2 (x n)
@@ -13,8 +13,7 @@
   (defun inc ()
     (= sum (+ sum 1)))
 
-  (loop (var i 0) (< i n) (= i (+ i 1))
-        (inc))
+  (foreach i (range n) (inc))
 
   sum)
 

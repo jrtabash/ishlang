@@ -1,8 +1,8 @@
 (defun replaceSpaces (str c)
   (var count 0)
-  (loop (var i 0) (< i (strlen str)) (= i (+ i 1))
-        (when (== (strget str i) ' ')
-          (strset str i c))))
+  (foreach i (range (len str))
+    (when (== (get str i) ' ')
+      (set str i c))))
 
 (var s "Test set char at op")
 (replaceSpaces s '-')

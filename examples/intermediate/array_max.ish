@@ -1,8 +1,8 @@
 (defun array_max (arr)
   (var amax 0)
-  (when (> (arrlen arr) 0)
+  (when (> (len arr) 0)
     (progn
-      (= amax (arrget arr 0))
+      (= amax (get arr 0))
       (foreach x arr
         (when (> x amax)
           (= amax x)))))

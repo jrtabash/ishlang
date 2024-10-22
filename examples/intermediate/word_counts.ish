@@ -1,19 +1,12 @@
 (defun word_counts (words)
   (var counts (hashmap))
-  (var word null)
-  (loop (var i 0) (< i (arrlen words)) (= i (+ i 1))
-        (progn
-          (= word (arrget words i))
-          (hmset counts word (+ 1 (hmget counts word 0)))))
+  (foreach word words
+    (set counts word (+ 1 (get counts word 0))))
   counts)
 
 (defun print_counts (counts)
-  (var items (hmitems counts))
-  (loop (var i 0) (< i (arrlen items)) (= i (+ i 1))
-        (progn
-          (print (second (arrget items i)))
-          (print "  ")
-          (println (first (arrget items i))))))
+  (foreach wc counts
+    (println (second wc) "  " (first wc))))
 
 (print_counts
  (word_counts

@@ -10,11 +10,11 @@
 
 (defun printPerson (p)
   (print "[Person:")
-  (print " name='" (memget person name) "'")
-  (print " age=" (memget person age))
+  (print " name='" (get person name) "'")
+  (print " age=" (get person age))
   (println "]"))
 
 (var person (makePerson "Jon" 31))
 (printPerson person)
-(memset person age 32)
+(set person age 32)
 (printPerson person)
