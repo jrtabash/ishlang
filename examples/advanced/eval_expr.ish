@@ -27,27 +27,27 @@
 ;; Tokenizer
 
 (defun tokenize (sexpr)
-  (var size (strlen sexpr))
+  (var size (len sexpr))
   (var tokens (array))
   (var token "")
   (var char ' ')
 
   (defun add_token ()
-    (when (> (strlen token) 0)
+    (when (> (len token) 0)
       (progn
         (arrpush tokens token)
         (= token ""))))
 
-  (loop (var i 0) (< i size) (= i (+ i 1))
-        (progn
-          (= char (strget sexpr i))
-          (cond
-           ((isspace char)
-            (add_token))
-           ((!= (strfind "()" char) -1)
-            (add_token))
-           (true
-            (strcat token char)))))
+  (foreach i (range size)
+    (progn
+      (= char (get sexpr i))
+      (cond
+       ((isspace char)
+        (add_token))
+       ((!= (strfind "()" char) -1)
+        (add_token))
+       (true
+        (strcat token char)))))
 
   tokens)
 
@@ -72,7 +72,7 @@
 
 (defun make_expr (sexpr)
   (defun make_expr_recur (tokens index)
-    (var token (arrget tokens index))
+    (var token (get tokens index))
     (cond
      ((!= (arrfind ops token) -1)
       (progn
@@ -85,7 +85,7 @@
   (first (make_expr_recur (tokenize sexpr) 0)))
 
 (defun op2ftn (expr)
-  (var op (memget expr op))
+  (var op (get expr op))
   (cond
    ((== op add) (lambda (x y) (+ x y)))
    ((== op sub) (lambda (x y) (- x y)))
@@ -101,8 +101,8 @@
 (defun eval (expr)
   (if (isinstanceof expr Expr)
       (progn
-        (var lhs_val (eval (memget expr lhs)))
-        (var rhs_val (eval (memget expr rhs)))
+        (var lhs_val (eval (get expr lhs)))
+        (var rhs_val (eval (get expr rhs)))
         (var ftn (op2ftn expr))
         (ftn lhs_val rhs_val))
     expr))
@@ -110,12 +110,10 @@
 (defun show (expr newline)
   (if (isinstanceof expr Expr)
       (progn
-        (print "(")
-        (print (memget expr op))
+        (print "(" (get expr op) " ")
+        (show (get expr lhs) false)
         (print " ")
-        (show (memget expr lhs) false)
-        (print " ")
-        (show (memget expr rhs) false)
+        (show (get expr rhs) false)
         (print ")"))
     (print expr))
   (when newline
@@ -124,8 +122,8 @@
 ;; --------------------------------------------------------------------------------
 ;; Main
 
-(when (> (arrlen argv) 0)
+(when (> (len argv) 0)
   (progn
-    (var e (make_expr (arrget argv 0)))
+    (var e (make_expr (get argv 0)))
     (show e true)
     (println (eval e))))
