@@ -1,6 +1,7 @@
 #include "unit_test.h"
 
 #include <array>
+#include "code_node_util.h"
 #include <functional>
 #include <iostream>
 #include <map>
@@ -56,6 +57,7 @@ UnitTest::UnitTest()
     ADD_TEST(testIntegerRangeGenerator);
     ADD_TEST(testModule);
     ADD_TEST(testModuleStorage);
+    ADD_TEST(testCodeNodeUtil);
     ADD_TEST(testCodeNodeBasic);
     ADD_TEST(testCodeNodeClone);
     ADD_TEST(testCodeNodeIsType);
@@ -1946,6 +1948,21 @@ void UnitTest::testModuleStorage() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeUtil() {
+    TEST_CASE(anyOfType(Value::eInteger, Value::eInteger));
+    TEST_CASE(anyOfType(Value::eInteger, Value::eReal, Value::eInteger));
+    TEST_CASE(anyOfType(Value::eInteger, Value::eReal, Value::eInteger, Value::eBoolean));
+
+    TEST_CASE(!anyOfType(Value::eInteger, Value::eReal));
+    TEST_CASE(!anyOfType(Value::eInteger, Value::eReal, Value::eBoolean));
+    TEST_CASE(!anyOfType(Value::eInteger, Value::eReal, Value::eBoolean, Value::eString));
+
+    TEST_CASE(typesToString(Value::eInteger) == "int");
+    TEST_CASE(typesToString(Value::eInteger, Value::eReal) == "int|real");
+    TEST_CASE(typesToString(Value::eInteger, Value::eReal, Value::eBoolean) == "int|real|bool");
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeBasic() {
     auto env = Environment::make();
 
@@ -3640,7 +3657,7 @@ void UnitTest::testCodeNodeStringCompare() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=String actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=string actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -3651,7 +3668,7 @@ void UnitTest::testCodeNodeStringCompare() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=String actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=string actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -3714,7 +3731,7 @@ void UnitTest::testCodeNodeStringSort() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=String actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=string actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -3725,7 +3742,7 @@ void UnitTest::testCodeNodeStringSort() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=Boolean actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=bool actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -3781,7 +3798,7 @@ void UnitTest::testCodeNodeStringReverse() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=String actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=string actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -4154,7 +4171,7 @@ void UnitTest::testCodeNodeArraySort() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=Array actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=array actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -4165,7 +4182,7 @@ void UnitTest::testCodeNodeArraySort() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=Boolean actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=bool actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -4217,7 +4234,7 @@ void UnitTest::testCodeNodeArrayReverse() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=Array actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=array actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -4251,7 +4268,7 @@ void UnitTest::testCodeNodeArrayClear() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=Array actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=array actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -4299,7 +4316,7 @@ void UnitTest::testCodeNodeArrayInsert() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=Array actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=array actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -4310,7 +4327,7 @@ void UnitTest::testCodeNodeArrayInsert() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=Integer actual=char") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=int actual=char") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -4367,7 +4384,7 @@ void UnitTest::testCodeNodeArrayRemove() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=Array actual=int") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=array actual=int") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -4378,7 +4395,7 @@ void UnitTest::testCodeNodeArrayRemove() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=Integer actual=char") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=int actual=char") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -4628,7 +4645,7 @@ void UnitTest::testCodeNodeRandom() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE(std::string("Invalid operand type, expected=Integer actual=char") == ex.what());
+        TEST_CASE(std::string("Invalid operand type, expected=int actual=char") == ex.what());
     }
     catch (...) {
         TEST_CASE(false);
@@ -4707,7 +4724,7 @@ void UnitTest::testCodeNodeMakeHashMap() {
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE_MSG(std::string("Invalid operand type, expected=Pair or Array actual=int") == ex.what(), ex.what());
+        TEST_CASE_MSG(std::string("Invalid operand type, expected=pair|array actual=int") == ex.what(), ex.what());
     }
     catch (...) {
         TEST_CASE(false);

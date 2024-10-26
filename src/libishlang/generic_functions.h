@@ -1,6 +1,7 @@
 #ifndef ISHLANG_GENERIC_FUNCTIONS_H
 #define ISHLANG_GENERIC_FUNCTIONS_H
 
+#include "code_node_util.h"
 #include "value.h"
 
 #include <concepts>
@@ -28,7 +29,7 @@ namespace Ishlang {
             }
             else if constexpr (std::is_same_v<ObjectType, Value::UserObject>) {
                 if (!key.isString()) {
-                    throw InvalidOperandType("String", key.typeToString());
+                    throw InvalidOperandType(Value::typeToString(Value::eString), key.typeToString());
                 }
                 return obj.get(key.text());
             }
@@ -36,7 +37,7 @@ namespace Ishlang {
                 static_assert(std::is_same_v<ObjectType, Value::Text> || std::is_same_v<ObjectType, Value::Array>);
 
                 if (!key.isInt()) {
-                    throw InvalidOperandType("Integer", key.typeToString());
+                    throw InvalidOperandType(Value::typeToString(Value::eInteger), key.typeToString());
                 }
 
                 const auto pos = key.integer();
@@ -64,7 +65,7 @@ namespace Ishlang {
             }
             else if constexpr (std::is_same_v<ObjectType, Value::UserObject>) {
                 if (!key.isString()) {
-                    throw InvalidOperandType("String", key.typeToString());
+                    throw InvalidOperandType(Value::typeToString(Value::eString), key.typeToString());
                 }
                 obj.set(key.text(), value);
             }
@@ -72,7 +73,7 @@ namespace Ishlang {
                 static_assert(std::is_same_v<ObjectType, Value::Text> || std::is_same_v<ObjectType, Value::Array>);
 
                 if (!key.isInt()) {
-                    throw InvalidOperandType("Integer", key.typeToString());
+                    throw InvalidOperandType(Value::typeToString(Value::eInteger), key.typeToString());
                 }
 
                 const auto pos = key.integer();
@@ -82,7 +83,7 @@ namespace Ishlang {
 
                 if constexpr (std::is_same_v<ObjectType, Value::Text>) {
                     if (!value.isChar()) {
-                        throw InvalidOperandType("Character", value.typeToString());
+                        throw InvalidOperandType(Value::typeToString(Value::eCharacter), value.typeToString());
                     }
                     obj[pos] = value.character();
                 }

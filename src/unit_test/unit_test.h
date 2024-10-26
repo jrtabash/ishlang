@@ -82,6 +82,7 @@ namespace Ishlang {
         void testIntegerRangeGenerator();
         void testModule();
         void testModuleStorage();
+        void testCodeNodeUtil();
         void testCodeNodeBasic();
         void testCodeNodeClone();
         void testCodeNodeIsType();
