@@ -94,7 +94,17 @@ int main(int argc, char** argv) {
     interpreter.setArguments(args.argv, args.argsBegin, args.argc);
 
     if (!args.filename.empty()) {
-        interpreter.loadFile(args.filename);
+        try {
+            interpreter.loadFile(args.filename);
+        }
+        catch (const Ishlang::Exception &ex) {
+            ex.printError();
+            return 1;
+        }
+        catch (const std::exception &ex) {
+            std::cerr << "System error: " << ex.what() << std::endl;
+            return 1;
+        }
     }
 
     if (!args.expression.empty()) {
