@@ -38,6 +38,17 @@ namespace Ishlang {
         return val;
     }
 
+    template <typename ... Type>
+    inline Value evalExpression(Environment::SharedPtr env,
+                                const CodeNode::SharedPtr &expr,
+                                Type ... expectTypes) {
+        Value val = expr->eval(env);
+        if (!anyOfType(val.type(), expectTypes...)) {
+            throw InvalidExpressionType(typesToString(expectTypes...), val.typeToString());
+        }
+        return val;
+    }
+
 }
 
 #endif	// ISHLANG_CODE_NODE_UTILS_H

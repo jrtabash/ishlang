@@ -2738,7 +2738,7 @@ void UnitTest::testCodeNodeCond() {
                 cond->eval(env);
                 TEST_CASE(false);
             }
-            catch (const InvalidExpressionType &ex) {}
+            catch (const InvalidExpression &ex) {}
             catch (...) { TEST_CASE(false); }
         }
         

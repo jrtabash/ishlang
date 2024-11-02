@@ -250,9 +250,7 @@ Value If::exec(Environment::SharedPtr env) const {
     if (pred_) {
         auto ifEnv = Environment::make(env);
 
-        const Value pVal = pred_->eval(ifEnv);
-        if (!pVal.isBool()) { throw InvalidExpressionType("Boolean", pVal.typeToString()); }
-
+        const Value pVal = evalExpression(ifEnv, pred_, Value::eBoolean);
         if (pVal.boolean()) {
             if (tCode_) { return tCode_->eval(ifEnv); }
         }
@@ -273,10 +271,9 @@ Value Cond::exec(Environment::SharedPtr env) const {
     const size_t numCases = cases_.size();
     if (numCases > 0) {
         for (CodeNode::SharedPtrPairs::const_iterator iter = cases_.begin(); iter != cases_.end(); ++iter) {
-            if (!iter->first) { throw InvalidExpressionType("Boolean", "Null"); }
+            if (!iter->first) { throw InvalidExpression("Null condition"); }
 
-            const Value pred = iter->first->eval(env);
-            if (!pred.isBool()) { throw InvalidExpressionType("Boolean", pred.typeToString()); }
+            const Value pred = evalExpression(env, iter->first, Value::eBoolean);
             if (pred.boolean()) {
                 return iter->second ? iter->second->eval(env) : Value::Null;
             }
@@ -312,8 +309,7 @@ Value Loop::exec(Environment::SharedPtr env) const {
         try {
             if (decl_) { decl_->eval(loopEnv); }
             while (true) {
-                condVal = cond_->eval(loopEnv);
-                if (!condVal.isBool()) { throw InvalidExpressionType("Boolean", condVal.typeToString()); }
+                condVal = evalExpression(loopEnv, cond_, Value::eBoolean);
                 if (!condVal.boolean()) { break; }
 
                 result = body_->eval(loopEnv);
@@ -349,7 +345,9 @@ Value Foreach::exec(Environment::SharedPtr env) const {
             case Value::eHashMap: return impl(loopEnv, contValue.hashMap());
             case Value::eRange:   return implRange(loopEnv, contValue.range());
             default:
-                throw InvalidExpressionType("String, Array, HashMap or Range", contValue.typeToString());
+                throw InvalidExpressionType(
+                    typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange),
+                    contValue.typeToString());
             }
         }
         catch (const Break::Except &) { return Value::Null; }
@@ -404,11 +402,7 @@ LambdaApp::LambdaApp(CodeNode::SharedPtr closure, SharedPtrList args)
 
 Value LambdaApp::exec(Environment::SharedPtr env) const {
     if (!closureVar_.isClosure() && closure_) {
-        closureVar_ = closure_->eval(env);
-    }
-
-    if (!closureVar_.isClosure()) {
-        throw InvalidExpressionType("Closure", closureVar_.typeToString());
+        closureVar_ = evalExpression(env, closure_, Value::eClosure);
     }
 
     Lambda::ArgList args(argExprs_.size());
@@ -426,7 +420,7 @@ FunctionExpr::FunctionExpr(const std::string &name, const ParamList &params, Cod
 Value FunctionExpr::exec(Environment::SharedPtr env) const {
     Value lambdaVal = LambdaExpr::exec(env);
     if (!lambdaVal.isClosure()) {
-        throw InvalidExpressionType("Closure", lambdaVal.typeToString());
+        throw InvalidExpressionType(Value::typeToString(Value::eClosure), lambdaVal.typeToString());
     }
     return env->def(name_, lambdaVal);
 }
@@ -512,7 +506,9 @@ Value StructName::exec(Environment::SharedPtr env) const {
             return Value(value.userType().name());
         }
         else {
-            throw InvalidExpressionType("(UserObject or UserType)", value.typeToString());
+            throw InvalidExpressionType(
+                typesToString(Value::eUserObject, Value::eUserType),
+                value.typeToString());
         }
     }
     return Value::Null;
@@ -528,7 +524,7 @@ MakeInstance::MakeInstance(const std::string &name, const NameSharedPtrs &initLi
 Value MakeInstance::exec(Environment::SharedPtr env) const {
     const Value structValue = env->get(name_);
     if (!structValue.isUserType()) {
-        throw InvalidExpressionType("UserType", structValue.typeToString());
+        throw InvalidExpressionType(Value::typeToString(Value::eUserType), structValue.typeToString());
     }
     return Value(Instance(structValue.userType(), makeInitArgs(env)));
 }
@@ -567,13 +563,8 @@ GetMember::GetMember(CodeNode::SharedPtr expr, const std::string &name)
 
 Value GetMember::exec(Environment::SharedPtr env) const {
     if (expr_) {
-        Value value = expr_->eval(env);
-        if (value.isUserObject()) {
-            return Generic::get(value.userObject(), name_);
-        }
-        else {
-            throw InvalidExpressionType("UserObject", value.typeToString());
-        }
+        const Value value = evalOperand(env, expr_, Value::eUserObject);
+        return Generic::get(value.userObject(), name_);
     }
     return Value::Null;
 }
@@ -587,18 +578,11 @@ SetMember::SetMember(CodeNode::SharedPtr expr, const std::string &name, CodeNode
 {}
 
 Value SetMember::exec(Environment::SharedPtr env) const {
-    if (expr_) {
-        Value instanceValue = expr_->eval(env);
-        if (instanceValue.isUserObject()) {
-            if (newValExpr_) {
-                Value newValue = newValExpr_->eval(env);
-                Generic::set(instanceValue.userObject(), name_, newValue);
-                return newValue;
-            }
-        }
-        else {
-            throw InvalidExpressionType("UserObject", instanceValue.typeToString());
-        }
+    if (expr_ && newValExpr_) {
+        Value instanceValue = evalOperand(env, expr_, Value::eUserObject);
+        Value newValue = newValExpr_->eval(env);
+        Generic::set(instanceValue.userObject(), name_, newValue);
+        return newValue;
     }
     return Value::Null;
 }
