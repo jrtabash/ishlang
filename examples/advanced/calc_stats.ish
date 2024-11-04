@@ -22,7 +22,7 @@
           (= sum (+ sum num))
           (when (< num min) (= min num))
           (when (> num max) (= max num))))
-      (= avg (/ sum size))))
+      (= avg (/ sum (astype size real)))))
   (array sum avg min max))
 
 (defun calcVariance (arr average)
@@ -34,7 +34,7 @@
         (= variance (+ variance (^ (- num average) 2))))
 
       (when (> size 1)
-        (= variance (/ variance (- size 1))))))
+        (= variance (/ variance (astype (- size 1) real))))))
   variance)
 
 (defun makeSummary (arr)
