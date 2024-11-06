@@ -63,6 +63,30 @@ Value AsType::exec(Environment::SharedPtr env) const {
 }
 
 // -------------------------------------------------------------
+Assert::Assert(const std::string &tag, CodeNode::SharedPtr expr)
+    : CodeNode()
+    , tag_(tag)
+    , expr_(expr)
+{}
+
+Value Assert::exec(Environment::SharedPtr env) const {
+    if (expr_) {
+        Value val = expr_->eval(env);
+
+        if (!val.isBool()) {
+            throw AssertFailed(tag_, "unable to check non-boolean expression");
+        }
+
+        if (!val.boolean()) {
+            throw AssertFailed(tag_);
+        }
+
+        return Value::True;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 ArithOp::ArithOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
     : BinaryOp(lhs, rhs)
     , type_(type)

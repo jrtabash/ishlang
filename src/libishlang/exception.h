@@ -185,6 +185,18 @@ namespace Ishlang {
             : Exception(format("Module '%s' - %s", name.c_str(), msg.c_str()))
         {}
     };
+
+    class AssertFailed : public Exception {
+    public:
+        AssertFailed(const std::string &tag)
+            : Exception(format("Assert %s failed", tag.c_str()))
+        {}
+
+        AssertFailed(const std::string &tag, const std::string &reason)
+            : Exception(format("Assert %s failed (%s)", tag.c_str(), reason.c_str()))
+        {}
+    };
+
 }
 
 #endif	// ISHLANG_EXCEPTION_H

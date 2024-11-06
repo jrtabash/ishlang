@@ -490,6 +490,20 @@ Supports the following type conversions:
 (astype 12.34 string)
 ```
 
+## Asserting
+Assert expression is true
+```
+(assert <tag> <expression>)
+```
+
+### Example
+```
+(assert Check1 (== 1 1)) ;; Success
+(assert Check2 (>= 3 2)) ;; Success
+(assert Check3 (<= 3 2)) ;; Error: Assert Check3 failed
+(assert Check4 (+ 1 2))  ;; Error: Assert Check4 failed (unable to check non-boolean expression)
+```
+
 ## Cloning
 Clone a value:
 ```

@@ -69,6 +69,20 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class Assert : public CodeNode {
+    public:
+        Assert(const std::string &tag, CodeNode::SharedPtr expr);
+        virtual ~Assert() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        std::string tag_;
+        CodeNode::SharedPtr expr_;
+    };
+
+    // -------------------------------------------------------------
     class Variable : public CodeNode {
     public:
         Variable(const std::string &name) : CodeNode(), name_(name) {}

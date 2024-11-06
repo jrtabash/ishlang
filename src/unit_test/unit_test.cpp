@@ -63,6 +63,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeIsType);
     ADD_TEST(testCodeNodeTypeName);
     ADD_TEST(testCodeNodeAsType);
+    ADD_TEST(testCodeNodeAssert);
     ADD_TEST(testCodeNodeArithOp);
     ADD_TEST(testCodeNodeCompOp);
     ADD_TEST(testCodeNodeLogicOp);
@@ -138,6 +139,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserIsType);
     ADD_TEST(testParserTypeName);
     ADD_TEST(testParserAsType);
+    ADD_TEST(testParserAssert);
     ADD_TEST(testParserVar);
     ADD_TEST(testParserArith);
     ADD_TEST(testParserComp);
@@ -2157,6 +2159,49 @@ void UnitTest::testCodeNodeAsType() {
                 CodeNode::make<Literal>(fromAndTo.first), fromAndTo.second.type());
         Value value = asType->eval(env);
         TEST_CASE_MSG(value == fromAndTo.second, "actual=" << value << " expected=" << fromAndTo.second);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeAssert() {
+    auto env = Environment::make();
+
+    auto const aeval = [env](const std::string &tag, Value value) {
+        return CodeNode::make<Assert>(
+            tag,
+            CodeNode::make<Literal>(value))->eval(env);
+    };
+
+    try {
+        aeval("A1", Value::True);
+    }
+    catch (const AssertFailed &) {
+        TEST_CASE(false);
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        aeval("A2", Value::False);
+        TEST_CASE(false);
+    }
+    catch (const AssertFailed &ex) {
+        TEST_CASE_MSG(std::string("Assert A2 failed") == ex.what(), "actual='" << ex.what() << "'");
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        aeval("A3", Value::Zero);
+        TEST_CASE(false);
+    }
+    catch (const AssertFailed &ex) {
+        TEST_CASE_MSG(std::string("Assert A3 failed (unable to check non-boolean expression)") == ex.what(), "actual='" << ex.what() << "'");
+    }
+    catch (...) {
+        TEST_CASE(false);
     }
 }
 
@@ -5948,6 +5993,20 @@ void UnitTest::testParserAsType() {
 
     TEST_CASE(parserTest(parser, env, "(astype null int)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(astype 'b' bool)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserAssert() {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(assert C1 true)",     Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(assert C2 (== 1 1))", Value::True, true));
+
+    TEST_CASE(parserTest(parser, env, "(assert C3 false)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(assert C4 3)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(assert C5)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(assert)",          Value::Null, false));
 }
 
 // -------------------------------------------------------------

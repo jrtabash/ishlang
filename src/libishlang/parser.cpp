@@ -617,6 +617,14 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "assert",
+          [this]() {
+              const auto tag(readName());
+              const auto exprs(readAndCheckExprList("assert", 1));
+              return CodeNode::make<Assert>(tag, exprs[0]);
+          }
+        },
+
         { "print",
           [this]() {
               auto exprs(readAndCheckRangeExprList("print", 1, std::nullopt));
