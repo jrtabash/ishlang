@@ -1,5 +1,27 @@
 ## Ideas
 
+### Struct combine support
+```
+(scombine <name>
+  (<struct> [<struct> ...])
+  [(<member> [<member> ...])])
+```
+Example
+```
+(struct Aggregate
+  (count
+   sum
+   mean))
+
+(struct MinMax
+  (min
+   max))
+
+(scombine Summary (Aggregate MinMax)
+  (median
+   stddev))
+```
+
 ### Add support for a standard library / set of standard modules
 1. Add stdlib folder under src folder in ishlang repo
 2. New ISHLANG_LIB_PATH vs use ISHLANG_PATH? With ISHLANG_LIB_PATH can enforce module search order
