@@ -192,13 +192,16 @@ namespace Ishlang {
             LE = 'l',
             GE = 'g',
         };
-        
+
     public:
         CompOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs);
         virtual ~CompOp() {}
         
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        static const char * op2str(Type type);
         
     private:
         Type type_;

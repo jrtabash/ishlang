@@ -88,8 +88,8 @@ namespace Ishlang {
 
     class IncompatibleTypes : public Exception {
     public:
-        IncompatibleTypes(const std::string &type1, const std::string &type2)
-            : Exception(std::string(std::string("Incompatible types, type1=") + type1 + " type2=" + type2))
+        IncompatibleTypes(const std::string &op, const std::string &type1, const std::string &type2)
+            : Exception(format("Incompatible %s op types, type1=%s type2=%s", op.c_str(), type1.c_str(), type2.c_str()))
         {}
     };
     

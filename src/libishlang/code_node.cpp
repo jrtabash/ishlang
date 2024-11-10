@@ -9,6 +9,7 @@
 #include "util.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cctype>
 #include <cmath>
 #include <cstring>
@@ -155,7 +156,7 @@ Value CompOp::exec(Environment::SharedPtr env) const {
         
         if (lhsVal.type() != rhsVal.type()) {
             if (!lhsVal.isNumber() || !rhsVal.isNumber()) {
-                throw IncompatibleTypes(lhsVal.typeToString(), rhsVal.typeToString());
+                throw IncompatibleTypes(op2str(type_), lhsVal.typeToString(), rhsVal.typeToString());
             }
         }
 
@@ -169,6 +170,20 @@ Value CompOp::exec(Environment::SharedPtr env) const {
         }
     }
     return Value::False;
+}
+
+const char * CompOp::op2str(Type type) {
+    switch (type) {
+    case EQ: return "==";
+    case NE: return "!=";
+    case LT: return "<";
+    case GT: return ">";
+    case LE: return "<=";
+    case GE: return ">=";
+    }
+
+    assert(!"unknown operation");
+    return "unknown";
 }
 
 // -------------------------------------------------------------
