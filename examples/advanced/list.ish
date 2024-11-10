@@ -5,16 +5,16 @@
   (makeinstance Node (value value) (next next)))
 
 (defun node_value (node)
-  (memget node value))
+  (get node value))
 
 (defun node_next (node)
-  (memget node next))
+  (get node next))
 
 (defun node_setValue (node value)
-  (memset node value value))
+  (set node value value))
 
 (defun node_setNext (node next)
-  (memset node next next))
+  (set node next next))
 
 ;; --------------------------------------------------------------------------------
 (struct List (head))
@@ -23,10 +23,10 @@
   (makeinstance List (head null)))
 
 (defun list_head (list)
-  (memget list head))
+  (get list head))
 
 (defun list_setHead (list node)
-  (memset list head node))
+  (set list head node))
 
 (defun list_empty (list)
   (istypeof (list_head list) none))

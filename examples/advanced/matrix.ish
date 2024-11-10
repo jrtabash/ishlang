@@ -4,20 +4,20 @@
 (defun matrix (n m)
   (var mat (makeinstance Matrix (data (array))))
   (loop (var r 0) (< r n) (= r (+ r 1))
-        (arrpush (memget mat data) (arraysv m 0)))
+        (arrpush (get mat data) (arraysv m 0)))
   mat)
 
 (defun matrix_n (mat)
-  (arrlen (memget mat data)))
+  (len (get mat data)))
 
 (defun matrix_m (mat)
-  (arrlen (arrget (memget mat data) 0)))
+  (len (get (get mat data) 0)))
 
 (defun matrix_get (mat i j)
-  (arrget (arrget (memget mat data) i) j))
+  (get (get (get mat data) i) j))
 
 (defun matrix_set (mat i j val)
-  (arrset (arrget (memget mat data) i) j val))
+  (set (get (get mat data) i) j val))
 
 (defun matrix_id (n)
   (var mat (matrix n n))
@@ -40,11 +40,11 @@
   (defun col (i)
     (% i m))
 
-  (if (== (* n m) (arrlen arr))
+  (if (== (* n m) (len arr))
       (progn
         (var mat (matrix n m))
-        (loop (var i 0) (< i (arrlen arr)) (= i (+ i 1))
-              (matrix_set mat (row i) (col i) (arrget arr i)))
+        (loop (var i 0) (< i (len arr)) (= i (+ i 1))
+              (matrix_set mat (row i) (col i) (get arr i)))
         mat)
     (progn
       (println "matrix_array: Incompatible array size")
@@ -88,6 +88,6 @@
       (loop (var i 0) (< i (matrix_n mat)) (= i (+ i 1))
             (progn
               (if (== i 0) (print "[") (print " "))
-              (print (arrget (memget mat data) i))
+              (print (get (get mat data) i))
               (if (== i lastRowIndex) (println "]") (println ""))))
       (println ""))))

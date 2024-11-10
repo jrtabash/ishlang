@@ -15,8 +15,8 @@
   (var max 0.0)
   (when (> size 0)
     (progn
-      (= min (arrget arr 0))
-      (= max (arrget arr 0))
+      (= min (get arr 0))
+      (= max (get arr 0))
       (foreach num arr
         (progn
           (= sum (+ sum num))
@@ -39,15 +39,15 @@
 
 (defun makeSummary (arr)
   (var samm (calcSumAvgMinAndMax arr))
-  (var mean (arrget samm 1))
+  (var mean (get samm 1))
   (var variance (calcVariance arr mean))
 
   (makeinstance Summary
     (count (arrlen arr))
-    (sum (arrget samm 0))
+    (sum (get samm 0))
     (mean mean)
-    (min (arrget samm 2))
-    (max (arrget samm 3))
+    (min (get samm 2))
+    (max (get samm 3))
     (variance variance)
     (stddev (^ variance 0.5))))
 
@@ -58,10 +58,10 @@
   (var summary (makeSummary arr))
 
   (printStat "arr" arr)
-  (printStat "cnt" (memget summary count))
-  (printStat "sum" (memget summary sum))
-  (printStat "avg" (memget summary mean))
-  (printStat "min" (memget summary min))
-  (printStat "max" (memget summary max))
-  (printStat "var" (memget summary variance))
-  (printStat "std" (memget summary stddev)))
+  (printStat "cnt" (get summary count))
+  (printStat "sum" (get summary sum))
+  (printStat "avg" (get summary mean))
+  (printStat "min" (get summary min))
+  (printStat "max" (get summary max))
+  (printStat "var" (get summary variance))
+  (printStat "std" (get summary stddev)))

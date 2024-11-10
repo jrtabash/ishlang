@@ -1,29 +1,29 @@
 (defun strcmp (str1 str2)
-  (var str1Len (strlen str1))
-  (var str2Len (strlen str2))
+  (var str1Len (len str1))
+  (var str2Len (len str2))
   (var minLen (if (< str1Len str2Len) str1Len str2Len))
 
   (var ret null)
   (var diff 0)
 
-  (loop (var i 0) (< i minLen) (= i (+ i 1))
+  (foreach i (range min)
+    (progn
+      (= diff
+         (- (astype (get str1 i) int)
+            (astype (get str2 i) int)))
+      (unless (== diff 0)
         (progn
-          (= diff
-             (- (astype (strget str1 i) int)
-                (astype (strget str2 i) int)))
-          (unless (== diff 0)
-            (progn
-              (= ret diff)
-              (break)))))
+          (= ret diff)
+          (break)))))
 
   (when (istypeof ret none)
     (cond
      ((== str1Len str2Len)
       (= ret 0))
      ((< str1Len str2Len)
-      (= ret (- 0 (astype (strget str2 str1Len) int))))
+      (= ret (- 0 (astype (get str2 str1Len) int))))
      (true
-      (= ret (astype (strget str1 str2Len) int)))))
+      (= ret (astype (get str1 str2Len) int)))))
 
   ret)
 

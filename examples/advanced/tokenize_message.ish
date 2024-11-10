@@ -7,11 +7,11 @@
   (makeinstance TokenizerState (string str) (length (strlen str)) (position 0)))
 
 (defun nextToken (tokState)
-  (var str (memget tokState string))
-  (var pos (memget tokState position))
+  (var str (get tokState string))
+  (var pos (get tokState position))
   (var nextPos (strfind str ' ' pos))
   (when (== nextPos -1)
-    (= nextPos (memget tokState length)))
+    (= nextPos (get tokState length)))
   (var token (substr str pos (- nextPos pos)))
   (memset tokState position (+ nextPos 1))
   token)
@@ -22,5 +22,5 @@
 (println "'")
 
 (var tokState (makeTokenizerState message))
-(loop (< (memget tokState position) (memget tokState length))
+(loop (< (get tokState position) (get tokState length))
       (println (nextToken tokState))))
