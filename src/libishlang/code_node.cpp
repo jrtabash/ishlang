@@ -132,6 +132,7 @@ Value ArithOp::exec(Environment::SharedPtr env) const {
                     Value::typeToString(Value::eReal),
                     Value::typeToString(Value::eInteger));
             }
+            if (rhsVal.integer() == 0) { throw DivByZero(); }
             return Value(lhsVal.integer() % rhsVal.integer());
             break;
 

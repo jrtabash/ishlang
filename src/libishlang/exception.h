@@ -83,7 +83,7 @@ namespace Ishlang {
 
     class DivByZero : public Exception {
     public:
-        DivByZero() : Exception("Division by zero") {}
+        DivByZero() : Exception("Division or modulo by zero") {}
     };
 
     class IncompatibleTypes : public Exception {

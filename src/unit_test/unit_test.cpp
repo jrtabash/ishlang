@@ -2297,6 +2297,14 @@ void UnitTest::testCodeNodeArithOp() {
     }
     catch (const DivByZero &ex) {}
     catch (...) { TEST_CASE(false); }
+
+    try {
+        arith.reset(new ArithOp(ArithOp::Mod, iLit1, iLit3));
+        arith->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const DivByZero &ex) {}
+    catch (...) { TEST_CASE(false); }
     
     try {
         arith.reset(new ArithOp(ArithOp::Add, iLit1, cLit));
