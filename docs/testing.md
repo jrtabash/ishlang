@@ -21,7 +21,7 @@ The option -v can be added to all above commands for verbose mode.
 
 ### Run all scenarios in a given folder:
 ```bash
-ishlang_run_tests.sh <ishlang_binary> <ishlang_test_files_binary> <scenarios_folder>
+ishlang_run_tests.sh [-v] <ishlang_binary> <ishlang_test_files_binary> <scenarios_folder>
 ```
 
 ### Scenario files
