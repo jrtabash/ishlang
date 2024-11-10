@@ -227,29 +227,23 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
-    class Not : public CodeNode {
+    class Not : public UnaryOp {
     public:
         Not(CodeNode::SharedPtr operand);
         virtual ~Not() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
-
-    private:
-        CodeNode::SharedPtr operand_;
     };
 
     // -------------------------------------------------------------
-    class NegativeOf : public CodeNode {
+    class NegativeOf : public UnaryOp {
     public:
         NegativeOf(CodeNode::SharedPtr operand);
         virtual ~NegativeOf() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
-
-    private:
-        CodeNode::SharedPtr operand_;
     };
 
     // -------------------------------------------------------------
@@ -972,15 +966,12 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
-    class Hash : public CodeNode {
+    class Hash : public UnaryOp {
     public:
         Hash(CodeNode::SharedPtr operand);
         virtual ~Hash() {}
 
         virtual Value exec(Environment::SharedPtr env) const override;
-
-    private:
-        CodeNode::SharedPtr operand_;
     };
 
     // -------------------------------------------------------------

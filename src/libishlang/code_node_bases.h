@@ -51,6 +51,23 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class UnaryOp : public CodeNode {
+    public:
+        UnaryOp(CodeNode::SharedPtr operand)
+            : CodeNode()
+            , operand_(operand)
+        {}
+
+        virtual ~UnaryOp() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override = 0;
+
+    protected:
+        CodeNode::SharedPtr operand_;
+    };
+
+    // -------------------------------------------------------------
     class BinaryOp : public CodeNode {
     public:
         BinaryOp(CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)

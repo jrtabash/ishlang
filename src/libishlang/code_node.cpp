@@ -218,8 +218,7 @@ Value LogicOp::exec(Environment::SharedPtr env) const {
 
 // -------------------------------------------------------------
 Not::Not(CodeNode::SharedPtr operand)
-    : CodeNode()
-    , operand_(operand)
+    : UnaryOp(operand)
 {}
 
 Value Not::exec(Environment::SharedPtr env) const {
@@ -232,8 +231,7 @@ Value Not::exec(Environment::SharedPtr env) const {
 
 // -------------------------------------------------------------
 NegativeOf::NegativeOf(CodeNode::SharedPtr operand)
-    : CodeNode()
-    , operand_(operand)
+    : UnaryOp(operand)
 {}
 
 Value NegativeOf::exec(Environment::SharedPtr env) const {
@@ -1270,8 +1268,7 @@ Value Random::exec(Environment::SharedPtr env) const {
 
 // -------------------------------------------------------------
 Hash::Hash(CodeNode::SharedPtr operand)
-    : CodeNode()
-    , operand_(operand)
+    : UnaryOp(operand)
 {}
 
 Value Hash::exec(Environment::SharedPtr env) const {
