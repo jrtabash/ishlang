@@ -1,9 +1,27 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]; then
+verbose=0
+ishlang=""
+ishlang_test_files=""
+tests=""
+
+for arg in $@;
+do
+    if [ "${arg}" == "-v" ] || [ "${arg}" == "--verbose" ]; then
+        verbose=1
+    elif [ "${ishlang}" == "" ]; then
+        ishlang=${arg}
+    elif [ "${ishlang_test_files}" == "" ]; then
+        ishlang_test_files=${arg}
+    elif [ "${tests}" == "" ]; then
+        tests=${arg}
+    fi
+done
+
+if [ "${ishlang}" == "" ] || [ "${ishlang_test_files}" == "" ] || [ "${tests}" == "" ]; then
     echo "Usage"
     echo ""
-    echo "    $0 <ishlang> <ishlang_test_files> <tests>"
+    echo "    $0 [-v|--verbose] <ishlang> <ishlang_test_files> <tests>"
     echo ""
     echo "            ishlang := ishlang binary"
     echo " ishlang_test_files := ishlang_test_files binary"
@@ -12,10 +30,6 @@ if [ $# -ne 3 ]; then
     echo "Error: Invalid arguments"
     exit 1
 fi
-
-ishlang=${1}
-ishlang_test_files=${2}
-tests=${3}
 
 if [ ! -f ${ishlang} ]; then
     echo "Terminating tests ... cannot find ishlang binary ${ishlang}"
@@ -61,7 +75,9 @@ do
 
     diff_result=$(diff ${out_file} ${expect_file})
     if [ "${diff_result}" == "" ]; then
-        echo "${scenario}: OK"
+        if [ ${verbose} -eq 1 ]; then
+            echo "${scenario}: OK"
+        fi
     else
         echo "${scenario}: Failed"
         echo ""
@@ -73,6 +89,8 @@ do
 done
 
 count=$(ls ${tests}/*.test | wc -l)
-echo ""
+if [ ${verbose} -eq 1 ]; then
+    echo ""
+fi
 echo "***** Ran ${count} test scenarios"
 echo "***** Success"
