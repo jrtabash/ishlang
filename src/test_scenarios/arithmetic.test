@@ -1,19 +1,31 @@
 __CODE__
 (println (+ 1 2))
+(println (+ 1 2 3 4))
 (println (- 5 3))
+(println (- 10 2 3))
 (println (* 2 3))
+(println (* 2 3 5))
 (println (/ 8 2))
+(println (/ 100 10 5))
 (println (% 5 2))
+(println (% 30 11 3))
 (println (^ 2 3))
+(println (^ 2 3 2))
 (println (neg 5))
 (println (neg -5))
 
 __EXPECT__
 3
+10
 2
+5
 6
+30
 4
+2
 1
+2
 8
+64
 -5
 5

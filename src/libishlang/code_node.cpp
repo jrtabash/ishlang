@@ -9,7 +9,6 @@
 #include "util.h"
 
 #include <algorithm>
-#include <cassert>
 #include <cctype>
 #include <cmath>
 #include <cstring>
@@ -88,43 +87,40 @@ Value Assert::exec(Environment::SharedPtr env) const {
 }
 
 // -------------------------------------------------------------
-ArithOp::ArithOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs)
-    : BinaryOp(lhs, rhs)
+ArithOp::ArithOp(Type type, CodeNode::SharedPtrList operands)
+    : VariadicOp(operands)
     , type_(type)
-{}
+{
+    assert(operands_.size() >= 2);
+}
 
 Value ArithOp::exec(Environment::SharedPtr env) const {
-    if (lhs_ && rhs_) {
-        const Value lhsVal = evalOperand(env, lhs_, Value::eInteger, Value::eReal);
-        const Value rhsVal = evalOperand(env, rhs_, Value::eInteger, Value::eReal);
-        
-        const bool real = lhsVal.isReal() || rhsVal.isReal();
+    if (!operands_.empty()) {
+        const auto values = evalOperands(env, operands_, Value::eInteger, Value::eReal);
+
+        const bool real = std::any_of(values.begin(), values.end(), [](const Value & v) { return v.isReal(); });
         switch (type_) {
         case Add:
-            if (real) { return Value(lhsVal.real() + rhsVal.real()); }
-            else      { return Value(lhsVal.integer() + rhsVal.integer()); }
-            break;
+            if (real) { return accum<Value::Double>(values, std::plus<Value::Double>()); }
+            else      { return accum<Value::Long>(values, std::plus<Value::Long>()); }
                 
         case Sub:
-            if (real) { return Value(lhsVal.real() - rhsVal.real()); }
-            else      { return Value(lhsVal.integer() - rhsVal.integer()); }
-            break;
+            if (real) { return accum<Value::Double>(values, std::minus<Value::Double>()); }
+            else      { return accum<Value::Long>(values, std::minus<Value::Long>()); }
                 
         case Mul:
-            if (real) { return Value(lhsVal.real() * rhsVal.real()); }
-            else      { return Value(lhsVal.integer() * rhsVal.integer()); }
-            break;
+            if (real) { return accum<Value::Double>(values, std::multiplies<Value::Double>()); }
+            else      { return accum<Value::Long>(values, std::multiplies<Value::Long>()); }
                 
         case Div:
             if (real) {
-                if (Util::isZero(rhsVal.real())) { throw DivByZero(); }
-                return Value(lhsVal.real() / rhsVal.real());
+                if (isDivByZero<Value::Double>(values)) { throw DivByZero(); }
+                return accum<Value::Double>(values, std::divides<Value::Double>());
             }
             else {
-                if (rhsVal.integer() == 0) { throw DivByZero(); }
-                return Value(lhsVal.integer() / rhsVal.integer());
+                if (isDivByZero<Value::Long>(values)) { throw DivByZero(); }
+                return accum<Value::Long>(values, std::divides<Value::Long>());
             }
-            break;
 
         case Mod:
             if (real) {
@@ -132,13 +128,11 @@ Value ArithOp::exec(Environment::SharedPtr env) const {
                     Value::typeToString(Value::eReal),
                     Value::typeToString(Value::eInteger));
             }
-            if (rhsVal.integer() == 0) { throw DivByZero(); }
-            return Value(lhsVal.integer() % rhsVal.integer());
-            break;
+            if (isDivByZero<Value::Long>(values)) { throw DivByZero(); }
+            return accum<Value::Long>(values, std::modulus<Value::Long>());
 
         case Pow:
-            return std::pow(lhsVal.real(), rhsVal.isReal() ? rhsVal.real() : rhsVal.integer());
-            break;
+            return accum<Value::Double>(values, power);
         }
     }
     return Value::Zero;

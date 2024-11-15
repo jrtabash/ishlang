@@ -90,6 +90,7 @@ namespace Ishlang {
         void testCodeNodeAsType();
         void testCodeNodeAssert();
         void testCodeNodeArithOp();
+        void testCodeNodeArithOpVariadic();
         void testCodeNodeCompOp();
         void testCodeNodeLogicOp();
         void testCodeNodeNot();

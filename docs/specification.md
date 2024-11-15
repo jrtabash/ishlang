@@ -97,15 +97,24 @@ The functions print and println evaluate to null value
 ```
 
 ## Arithmetic
-### Binary operations: + - * / %
+### Variadic operations: + - * / % ^
 ```
-(<op> <expression> <expression>)
+(<op> <expression> <expression> [<expression> ...])
+```
+
+When more than 2 operands are given to op, the expression is equivalent to a binary left to right aggregation:
+```
+(<op> <1> <2> <3> <4>)
+<=>
+(<op> (<op> (<op> <1> <2>) <3>) <4>)
 ```
 
 #### Examples
 ```
 (+ 10 12)
 (* 2 5)
+(+ 1 2 3 4 5)
+(* 2 4 6)
 ```
 
 ### Unary operation:

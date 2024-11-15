@@ -7,6 +7,7 @@
 #include "value.h"
 
 #include <string>
+#include <vector>
 
 namespace Ishlang {
 
@@ -36,6 +37,21 @@ namespace Ishlang {
             throw InvalidOperandType(typesToString(expectTypes...), val.typeToString());
         }
         return val;
+    }
+
+    template <typename ... Type>
+    inline std::vector<Value> evalOperands(Environment::SharedPtr env,
+                                           const CodeNode::SharedPtrList &exprs,
+                                           Type ... expectTypes) {
+        std::vector<Value> values;
+        values.reserve(exprs.size());
+        for (const auto &expr : exprs) {
+            values.push_back(expr->eval(env));
+            if (!anyOfType(values.back().type(), expectTypes...)) {
+                throw InvalidOperandType(typesToString(expectTypes...), values.back().typeToString());
+            }
+        }
+        return values;
     }
 
     template <typename ... Type>

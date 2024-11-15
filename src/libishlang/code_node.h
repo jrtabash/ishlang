@@ -10,7 +10,9 @@
 #include "value.h"
 #include "value_pair.h"
 
+#include <cassert>
 #include <functional>
+#include <numeric>
 
 namespace Ishlang {
 
@@ -159,7 +161,7 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
-    class ArithOp : public BinaryOp {
+    class ArithOp : public VariadicOp {
     public:
         enum Type {
             Add = '+',
@@ -171,12 +173,47 @@ namespace Ishlang {
         };
         
     public:
-        ArithOp(Type type, CodeNode::SharedPtr lhs, CodeNode::SharedPtr rhs);
+        ArithOp(Type type, CodeNode::SharedPtrList operands);
         virtual ~ArithOp() {}
-        
+
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
-        
+
+    private:
+        template <typename NumType, typename AccumOp>
+        static inline Value accum(const std::vector<Value> &vals, AccumOp op) {
+            if constexpr (std::is_same_v<NumType, Value::Double>) {
+                return Value(std::accumulate(
+                                 vals.begin() + 1,
+                                 vals.end(),
+                                 vals.front().real(),
+                                 [op](NumType a, const Value &v) { return op(a, v.real()); }));
+            }
+            else {
+                static_assert(std::is_same_v<NumType, Value::Long>);
+                return Value(std::accumulate(
+                                 vals.begin() + 1,
+                                 vals.end(),
+                                 vals.front().integer(),
+                                 [op](NumType a, const Value &v) { return op(a, v.integer()); }));
+            }
+        }
+
+        template <typename NumType>
+        static inline bool isDivByZero(const std::vector<Value> &vals) {
+            if constexpr (std::is_same_v<NumType, Value::Double>) {
+                return std::any_of(vals.begin() + 1, vals.end(), [](const Value &v) { return Util::isZero(v.real()); });
+            }
+            else {
+                static_assert(std::is_same_v<NumType, Value::Long>);
+                return std::any_of(vals.begin() + 1, vals.end(), [](const Value &v) { return v.integer() == 0; });
+            }
+        }
+
+        static inline Value::Double power(Value::Double a, Value::Double v) {
+            return std::pow(a, v);
+        }
+
     private:
         Type type_;
     };

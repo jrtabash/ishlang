@@ -65,6 +65,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeAsType);
     ADD_TEST(testCodeNodeAssert);
     ADD_TEST(testCodeNodeArithOp);
+    ADD_TEST(testCodeNodeArithOpVariadic);
     ADD_TEST(testCodeNodeCompOp);
     ADD_TEST(testCodeNodeLogicOp);
     ADD_TEST(testCodeNodeNot);
@@ -1173,8 +1174,8 @@ void UnitTest::testLambda() {
     const Lambda::ParamList params({"x", "y"});    
     CodeNode::SharedPtr body(
         new ArithOp(ArithOp::Add,
-                    CodeNode::SharedPtr(new Variable("x")),
-                    CodeNode::SharedPtr(new Variable("y"))));
+                    { CodeNode::SharedPtr(new Variable("x")),
+                      CodeNode::SharedPtr(new Variable("y")) }));
 
     Lambda lambda(params, body, env);
 
@@ -2222,68 +2223,68 @@ void UnitTest::testCodeNodeArithOp() {
     CodeNode::SharedPtr cLit(new Literal(Value('c')));
     CodeNode::SharedPtr bLit(new Literal(Value(true)));
     
-    CodeNode::SharedPtr arith(new ArithOp(ArithOp::Add, iLit1, iLit2));
+    CodeNode::SharedPtr arith(new ArithOp(ArithOp::Add, {iLit1, iLit2}));
     Value result = arith->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
     TEST_CASE_MSG(result.integer() == 3ll, "actual=" << result);
 
-    arith.reset(new ArithOp(ArithOp::Add, iLit1, rLit1));
+    arith.reset(new ArithOp(ArithOp::Add, {iLit1, rLit1}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
     TEST_CASE_MSG(Util::isEqual(result.real(), 2.2), "actual=" << result);
     
-    arith.reset(new ArithOp(ArithOp::Sub, rLit2, rLit1));
+    arith.reset(new ArithOp(ArithOp::Sub, {rLit2, rLit1}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
     TEST_CASE_MSG(Util::isEqual(result.real(), 0.1), "actual=" << result);
     
-    arith.reset(new ArithOp(ArithOp::Mul, rLit1, iLit2));
+    arith.reset(new ArithOp(ArithOp::Mul, {rLit1, iLit2}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
     TEST_CASE_MSG(Util::isEqual(result.real(), 2.4), "actual=" << result);
     
-    arith.reset(new ArithOp(ArithOp::Div, iLit1, iLit2));
+    arith.reset(new ArithOp(ArithOp::Div, {iLit1, iLit2}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
     TEST_CASE_MSG(result.integer() == 0, "actual=" << result);
     
-    arith.reset(new ArithOp(ArithOp::Div, rLit1, iLit2));
+    arith.reset(new ArithOp(ArithOp::Div, {rLit1, iLit2}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
     TEST_CASE_MSG(Util::isEqual(result.real(), 0.6), "actual=" << result);
 
-    arith.reset(new ArithOp(ArithOp::Mod, iLit4, iLit2));
+    arith.reset(new ArithOp(ArithOp::Mod, {iLit4, iLit2}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
     TEST_CASE_MSG(Util::isEqual(result.integer(), 0), "actual=" << result);
 
-    arith.reset(new ArithOp(ArithOp::Mod, iLit5, iLit2));
+    arith.reset(new ArithOp(ArithOp::Mod, {iLit5, iLit2}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
     TEST_CASE_MSG(Util::isEqual(result.integer(), 1), "actual=" << result);
 
-    arith.reset(new ArithOp(ArithOp::Pow, iLit4, iLit2));
+    arith.reset(new ArithOp(ArithOp::Pow, {iLit4, iLit2}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
     TEST_CASE_MSG(Util::isEqual(result.real(), 16.0), "actual=" << result);
     
-    arith.reset(new ArithOp(ArithOp::Pow, iLit4, iLit3));
+    arith.reset(new ArithOp(ArithOp::Pow, {iLit4, iLit3}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
     TEST_CASE_MSG(Util::isEqual(result.real(), 1.0), "actual=" << result);
 
-    arith.reset(new ArithOp(ArithOp::Pow, iLit4, iLit1));
+    arith.reset(new ArithOp(ArithOp::Pow, {iLit4, iLit1}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
     TEST_CASE_MSG(Util::isEqual(result.real(), 4.0), "actual=" << result);
 
-    arith.reset(new ArithOp(ArithOp::Pow, rLit4, rLit5));
+    arith.reset(new ArithOp(ArithOp::Pow, {rLit4, rLit5}));
     result = arith->eval(env);
     TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
     TEST_CASE_MSG(Util::isEqual(result.real(), 3.0), "actual=" << result);
 
     try {
-        arith.reset(new ArithOp(ArithOp::Div, iLit1, iLit3));
+        arith.reset(new ArithOp(ArithOp::Div, {iLit1, iLit3}));
         arith->eval(env);
         TEST_CASE(false);
     }
@@ -2291,7 +2292,7 @@ void UnitTest::testCodeNodeArithOp() {
     catch (...) { TEST_CASE(false); }
     
     try {
-        arith.reset(new ArithOp(ArithOp::Div, rLit1, rLit3));
+        arith.reset(new ArithOp(ArithOp::Div, {rLit1, rLit3}));
         arith->eval(env);
         TEST_CASE(false);
     }
@@ -2299,7 +2300,7 @@ void UnitTest::testCodeNodeArithOp() {
     catch (...) { TEST_CASE(false); }
 
     try {
-        arith.reset(new ArithOp(ArithOp::Mod, iLit1, iLit3));
+        arith.reset(new ArithOp(ArithOp::Mod, {iLit1, iLit3}));
         arith->eval(env);
         TEST_CASE(false);
     }
@@ -2307,7 +2308,7 @@ void UnitTest::testCodeNodeArithOp() {
     catch (...) { TEST_CASE(false); }
     
     try {
-        arith.reset(new ArithOp(ArithOp::Add, iLit1, cLit));
+        arith.reset(new ArithOp(ArithOp::Add, {iLit1, cLit}));
         arith->eval(env);
         TEST_CASE(false);
     }
@@ -2315,7 +2316,7 @@ void UnitTest::testCodeNodeArithOp() {
     catch (...) { TEST_CASE(false); }
 
     try {
-        arith.reset(new ArithOp(ArithOp::Add, bLit, rLit2));
+        arith.reset(new ArithOp(ArithOp::Add, {bLit, rLit2}));
         arith->eval(env);
         TEST_CASE(false);
     }
@@ -2323,7 +2324,7 @@ void UnitTest::testCodeNodeArithOp() {
     catch (...) { TEST_CASE(false); }
 
     try {
-        arith.reset(new ArithOp(ArithOp::Add, bLit, cLit));
+        arith.reset(new ArithOp(ArithOp::Add, {bLit, cLit}));
         arith->eval(env);
         TEST_CASE(false);
     }
@@ -2331,7 +2332,7 @@ void UnitTest::testCodeNodeArithOp() {
     catch (...) { TEST_CASE(false); }
 
     try {
-        arith.reset(new ArithOp(ArithOp::Mod, rLit2, iLit1));
+        arith.reset(new ArithOp(ArithOp::Mod, {rLit2, iLit1}));
         arith->eval(env);
         TEST_CASE(false);
     }
@@ -2339,7 +2340,7 @@ void UnitTest::testCodeNodeArithOp() {
     catch (...) { TEST_CASE(false); }
 
     try {
-        arith.reset(new ArithOp(ArithOp::Mod, iLit1, rLit2));
+        arith.reset(new ArithOp(ArithOp::Mod, {iLit1, rLit2}));
         arith->eval(env);
         TEST_CASE(false);
     }
@@ -2347,12 +2348,71 @@ void UnitTest::testCodeNodeArithOp() {
     catch (...) { TEST_CASE(false); }
 
     try {
-        arith.reset(new ArithOp(ArithOp::Mod, rLit1, rLit2));
+        arith.reset(new ArithOp(ArithOp::Mod, {rLit1, rLit2}));
         arith->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {}
     catch (...) { TEST_CASE(false); }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeArithOpVariadic() {
+    auto env = Environment::make();
+
+    const auto i0 = CodeNode::make<Literal>(Value(0ll));
+    const auto i1 = CodeNode::make<Literal>(Value(1ll));
+    const auto i2 = CodeNode::make<Literal>(Value(2ll));
+    const auto i3 = CodeNode::make<Literal>(Value(3ll));
+    const auto i4 = CodeNode::make<Literal>(Value(4ll));
+    const auto i5 = CodeNode::make<Literal>(Value(5ll));
+    const auto i11 = CodeNode::make<Literal>(Value(11ll));
+    const auto r0 = CodeNode::make<Literal>(Value(0.0));
+    const auto r1 = CodeNode::make<Literal>(Value(1.0));
+    const auto r2 = CodeNode::make<Literal>(Value(2.0));
+    const auto r3 = CodeNode::make<Literal>(Value(3.0));
+    const auto r4 = CodeNode::make<Literal>(Value(4.0));
+    const auto r5 = CodeNode::make<Literal>(Value(5.0));
+
+    const auto arith = [](ArithOp::Type op, CodeNode::SharedPtrList operands) {
+        return CodeNode::make<ArithOp>(op, operands);
+    };
+
+    Value result = arith(ArithOp::Add, {i1, i2, i3, i4, i5})->eval(env);
+    TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(result.integer() == 15ll, "actual=" << result);
+
+    result = arith(ArithOp::Add, {r1, r2, r3, r4, r5})->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(result.real() == 15.0, "actual=" << result);
+
+    result = arith(ArithOp::Add, {i1, i2, r3, r4, r5})->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(result.real() == 15.0, "actual=" << result);
+
+    result = arith(ArithOp::Sub, {i5, i2, i1})->eval(env);
+    TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(result.integer() == 2ll, "actual=" << result);
+
+    result = arith(ArithOp::Mul, {r5, r2, r3})->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(result.real() == 30.0, "actual=" << result);
+
+    result = arith(ArithOp::Div, {r4, r2, r4})->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(result.real() == 0.5, "actual=" << result);
+
+    result = arith(ArithOp::Mod, {i11, i4, i2})->eval(env);
+    TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(result.integer() == 1ll, "actual=" << result);
+
+    result = arith(ArithOp::Pow, {i2, i3, i2})->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(result.real() == 64.0, "actual=" << result);
+
+    result = arith(ArithOp::Pow, {r2, r3, r2})->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(result.real() == 64.0, "actual=" << result);
 }
 
 // -------------------------------------------------------------
@@ -2827,13 +2887,13 @@ void UnitTest::testCodeNodeLoop() {
                 CodeNode::SharedPtr(
                     new Assign("i", CodeNode::SharedPtr(
                                         new ArithOp(ArithOp::Add,
-                                                    CodeNode::SharedPtr(new Variable("i")),
-                                                    CodeNode::SharedPtr(new Literal(Value(1ll))))))),
+                                                    { CodeNode::SharedPtr(new Variable("i")),
+                                                      CodeNode::SharedPtr(new Literal(Value(1ll))) })))),
                 CodeNode::SharedPtr(
                     new Assign("sum", CodeNode::SharedPtr(
                                         new ArithOp(ArithOp::Add,
-                                                    CodeNode::SharedPtr(new Variable("sum")),
-                                                    CodeNode::SharedPtr(new Variable("i"))))))));
+                                                    { CodeNode::SharedPtr(new Variable("sum")),
+                                                      CodeNode::SharedPtr(new Variable("i")) }))))));
         Value result = loop->eval(env);
         TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.integer() == 55ll, "actual=" << result);
@@ -2858,8 +2918,8 @@ void UnitTest::testCodeNodeLoop() {
                     CodeNode::SharedPtr(
                         new Assign("count", CodeNode::SharedPtr(
                                                 new ArithOp(ArithOp::Mul,
-                                                            CodeNode::SharedPtr(new Variable("count")),
-                                                            CodeNode::SharedPtr(new Literal(Value(2ll)))))))));
+                                                            { CodeNode::SharedPtr(new Variable("count")),
+                                                              CodeNode::SharedPtr(new Literal(Value(2ll))) }))))));
         Value result = loop->eval(env);
         TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.integer() == 32ll, "actual=" << result);
@@ -2873,8 +2933,8 @@ void UnitTest::testCodeNodeLoop() {
             CodeNode::SharedPtr(
                 new Assign("x", CodeNode::SharedPtr(
                                     new ArithOp(ArithOp::Add,
-                                                CodeNode::SharedPtr(new Variable("x")),
-                                                CodeNode::SharedPtr(new Literal(Value(1ll))))))));
+                                                { CodeNode::SharedPtr(new Variable("x")),
+                                                  CodeNode::SharedPtr(new Literal(Value(1ll))) })))));
         exprs.push_back(
             CodeNode::SharedPtr(
                 new If(CodeNode::SharedPtr(
@@ -2904,7 +2964,7 @@ void UnitTest::testCodeNodeForeach() {
         return CodeNode::make<Literal>(Value(val));
     };
     auto add = [](auto lhs, auto rhs) {
-        return CodeNode::make<ArithOp>(ArithOp::Add, lhs, rhs);
+        return CodeNode::make<ArithOp>(ArithOp::Add, CodeNode::SharedPtrList{lhs, rhs});
     };
     auto assign = [](const char *name, auto expr) {
         return CodeNode::make<Assign>(name, expr);
@@ -3027,11 +3087,11 @@ void UnitTest::testCodeNodeLambdaExpr() {
 
     CodeNode::SharedPtr body(
         new ArithOp(ArithOp::Add,
-                    CodeNode::SharedPtr(
-                        new ArithOp(ArithOp::Add,
-                                    CodeNode::SharedPtr(new Variable("x")),
-                                    CodeNode::SharedPtr(new Variable("y")))),
-                    CodeNode::SharedPtr(new Variable("foo"))));
+                    { CodeNode::SharedPtr(
+                            new ArithOp(ArithOp::Add,
+                                        { CodeNode::SharedPtr(new Variable("x")),
+                                          CodeNode::SharedPtr(new Variable("y")) })),
+                      CodeNode::SharedPtr(new Variable("foo")) }));
 
     CodeNode::SharedPtr lambdaExpr(new LambdaExpr(params, body));
     Value lambdaVal = lambdaExpr->eval(env);
@@ -3055,8 +3115,8 @@ void UnitTest::testCodeNodeLambdaApp() {
 
     CodeNode::SharedPtr body(
         new ArithOp(ArithOp::Add,
-                    CodeNode::SharedPtr(new Variable("x")),
-                    CodeNode::SharedPtr(new Variable("y"))));
+                    { CodeNode::SharedPtr(new Variable("x")),
+                      CodeNode::SharedPtr(new Variable("y")) }));
 
     CodeNode::SharedPtr lambdaExpr(new LambdaExpr(params, body));
 
@@ -3078,8 +3138,8 @@ void UnitTest::testCodeNodeFunctionExpr() {
 
     CodeNode::SharedPtr body(
         new ArithOp(ArithOp::Add,
-                    CodeNode::SharedPtr(new Variable("x")),
-                    CodeNode::SharedPtr(new Variable("y"))));
+                    { CodeNode::SharedPtr(new Variable("x")),
+                      CodeNode::SharedPtr(new Variable("y")) }));
 
     CodeNode::SharedPtr ftnExpr(new FunctionExpr("myfunc", params, body));
     Value ftnVal = ftnExpr->eval(env);
@@ -3107,8 +3167,9 @@ void UnitTest::testCodeNodeFunctionApp() {
             Lambda::ParamList({"x", "y"}),
             CodeNode::make<ArithOp>(
                 ArithOp::Add,
-                CodeNode::make<Variable>("x"),
-                CodeNode::make<Variable>("y"))));
+                CodeNode::SharedPtrList{
+                    CodeNode::make<Variable>("x"),
+                    CodeNode::make<Variable>("y") })));
     Value ftnVal = ftnExpr->eval(env);
     TEST_CASE_MSG(ftnVal.isClosure(), "actual=" << ftnVal.typeToString());
 
@@ -6051,6 +6112,15 @@ void UnitTest::testParserArith() {
     TEST_CASE(parserTest(parser, env, "(% 2.4 2)",   Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(^ 3.0 2)",   Value(9.0),  true));
     TEST_CASE(parserTest(parser, env, "(^ 9.0 0.5)", Value(3.0),  true));
+
+    TEST_CASE(parserTest(parser, env, "(+ 1 2 3 4 5)", Value(15ll),  true));
+    TEST_CASE(parserTest(parser, env, "(- 15 2 4 6)",  Value(3ll),   true));
+    TEST_CASE(parserTest(parser, env, "(* 2 3 4 5)",   Value(120ll), true));
+    TEST_CASE(parserTest(parser, env, "(/ 100 10 5)",  Value(2ll),   true));
+    TEST_CASE(parserTest(parser, env, "(% 100 30 4)",  Value(2ll),   true));
+    TEST_CASE(parserTest(parser, env, "(^ 2 3 2)",     Value(64.0),  true));
+    TEST_CASE(parserTest(parser, env, "(+)",           Value::Null,  false));
+    TEST_CASE(parserTest(parser, env, "(+ 1)",         Value::Null,  false));
 }
 
 // -------------------------------------------------------------
