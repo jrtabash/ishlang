@@ -402,32 +402,32 @@ void Parser::initAppFtns() {
 
         { "var",
           [this]() {
-                const auto name(readName());
-                auto expr(readAndCheckExprList("var", 1));
-                return CodeNode::make<Define>(name, expr[0]);
+              const auto name(readName());
+              auto expr(readAndCheckExprList("var", 1));
+              return CodeNode::make<Define>(name, expr[0]);
           }
         },
 
         { "=",
           [this]() {
-                const auto name(readName());
-                auto expr(readAndCheckExprList("=", 1));
-                return CodeNode::make<Assign>(name, expr[0]);
+              const auto name(readName());
+              auto expr(readAndCheckExprList("=", 1));
+              return CodeNode::make<Assign>(name, expr[0]);
           }
         },
 
         { "?",
           [this]() {
-                const auto name(readName());
-                ignoreRightP();
-                return CodeNode::make<Exists>(name);
+              const auto name(readName());
+              ignoreRightP();
+              return CodeNode::make<Exists>(name);
           }
         },
 
         { "clone",
           [this]() {
-                auto expr(readAndCheckExprList("clone", 1));
-                return CodeNode::make<Clone>(expr[0]);
+              auto expr(readAndCheckExprList("clone", 1));
+              return CodeNode::make<Clone>(expr[0]);
           }
         },
 
@@ -450,8 +450,8 @@ void Parser::initAppFtns() {
 
         { "not",
           [this]() {
-                auto expr(readAndCheckExprList("not", 1));
-                return CodeNode::make<Not>(expr[0]);
+              auto expr(readAndCheckExprList("not", 1));
+              return CodeNode::make<Not>(expr[0]);
           }
         },
 
@@ -464,81 +464,81 @@ void Parser::initAppFtns() {
 
         { "progn",
           [this]() {
-                auto exprs(readExprList());
-                return CodeNode::make<ProgN>(exprs);
+              auto exprs(readExprList());
+              return CodeNode::make<ProgN>(exprs);
           }
         },
 
         { "block",
           [this]() {
-                auto exprs(readExprList());
-                return CodeNode::make<Block>(exprs);
+              auto exprs(readExprList());
+              return CodeNode::make<Block>(exprs);
           }
         },
 
         { "if",
           [this]() {
-                auto exprs(readExprList());
-                if (exprs.size() == 2) {
-                    return CodeNode::make<If>(exprs[0], exprs[1]);
-                }
-                else if (exprs.size() == 3) {
-                    return CodeNode::make<If>(exprs[0], exprs[1], exprs[2]);
-                }
-                else {
-                    throw TooManyOrFewForms("if");
-                }
+              auto exprs(readExprList());
+              if (exprs.size() == 2) {
+                  return CodeNode::make<If>(exprs[0], exprs[1]);
+              }
+              else if (exprs.size() == 3) {
+                  return CodeNode::make<If>(exprs[0], exprs[1], exprs[2]);
+              }
+              else {
+                  throw TooManyOrFewForms("if");
+              }
           }
         },
 
         { "when",
           [this]() {
-                auto exprs(readAndCheckExprList("when", 2));
-                return CodeNode::make<If>(exprs[0], exprs[1]);
+              auto exprs(readAndCheckExprList("when", 2));
+              return CodeNode::make<If>(exprs[0], exprs[1]);
           }
         },
 
         { "unless",
           [this]() {
-                auto exprs(readAndCheckExprList("unless", 2));
-                return CodeNode::make<If>(CodeNode::make<Not>(exprs[0]), exprs[1]);
+              auto exprs(readAndCheckExprList("unless", 2));
+              return CodeNode::make<If>(CodeNode::make<Not>(exprs[0]), exprs[1]);
           }
         },
 
         { "cond",
           [this]() {
-                auto pairs(readExprPairs());
-                return CodeNode::make<Cond>(pairs);
+              auto pairs(readExprPairs());
+              return CodeNode::make<Cond>(pairs);
           }
         },
 
         { "break",
           [this]() {
-                ignoreRightP();
-                return CodeNode::make<Break>();
+              ignoreRightP();
+              return CodeNode::make<Break>();
           }
         },
 
         { "loop",
           [this]() {
-                auto forms(readExprList());
-                if (forms.size() == 4) {
-                    auto iter = forms.begin();
-                    auto decl(*iter++);
-                    auto cond(*iter++);
-                    auto next(*iter++);
-                    auto body(*iter++);
-                    return CodeNode::make<Loop>(decl, cond, next, body);
-                }
-                else if (forms.size() == 2) {
-                    auto iter = forms.begin();
-                    auto cond(*iter++);
-                    auto body(*iter++);
-                    return CodeNode::make<Loop>(cond, body);
-                }
-                else {
-                    throw TooManyOrFewForms("loop");
-                }
+              auto forms(readExprList());
+              if (forms.size() == 4) {
+                  auto iter = forms.begin();
+                  auto decl(*iter++);
+                  auto cond(*iter++);
+                  auto next(*iter++);
+                  auto body(*iter++);
+                  return CodeNode::make<Loop>(decl, cond, next, body);
+              }
+              else if (forms.size() == 2) {
+                  auto iter = forms.begin();
+                  auto cond(*iter++);
+                  auto body(*iter++);
+                  return CodeNode::make<Loop>(cond, body);
+              }
+              else {
+                  throw TooManyOrFewForms("loop");
+              }
           }
         },
 
@@ -552,57 +552,57 @@ void Parser::initAppFtns() {
 
         { "lambda",
           [this]() {
-                auto params(readParams());
-                auto exprs(readExprList());
-                auto body(exprs.size() == 1
-                          ? exprs[0]
-                          : CodeNode::make<ProgN>(exprs));
-                return CodeNode::make<LambdaExpr>(params, body);
+              auto params(readParams());
+              auto exprs(readExprList());
+              auto body(exprs.size() == 1
+                        ? exprs[0]
+                        : CodeNode::make<ProgN>(exprs));
+              return CodeNode::make<LambdaExpr>(params, body);
           }
         },
 
         { "defun",
           [this]() {
-                const auto name(readName());
-                auto params(readParams());
-                auto exprs(readExprList());
-                auto body(exprs.size() == 1
-                          ? exprs[0]
-                          : CodeNode::make<ProgN>(exprs));
-                return CodeNode::make<FunctionExpr>(name, params, body);
+              const auto name(readName());
+              auto params(readParams());
+              auto exprs(readExprList());
+              auto body(exprs.size() == 1
+                        ? exprs[0]
+                        : CodeNode::make<ProgN>(exprs));
+              return CodeNode::make<FunctionExpr>(name, params, body);
           }
         },
 
         { "(",
           [this]() {
-                auto lambda(readApp("lambda"));
-                auto args(readExprList());
-                return CodeNode::make<LambdaApp>(lambda, args);
+              auto lambda(readApp("lambda"));
+              auto args(readExprList());
+              return CodeNode::make<LambdaApp>(lambda, args);
           }
         },
 
         { "istypeof",
           [this]() {
-                auto form(readExpr());
-                auto type(Value::stringToType(readName()));
-                ignoreRightP();
-                return CodeNode::make<IsType>(form, type);
+              auto form(readExpr());
+              auto type(Value::stringToType(readName()));
+              ignoreRightP();
+              return CodeNode::make<IsType>(form, type);
           }
         },
 
         { "typename",
           [this]() {
-                auto exprs(readAndCheckExprList("typename", 1));
-                return CodeNode::make<TypeName>(exprs[0]);
+              auto exprs(readAndCheckExprList("typename", 1));
+              return CodeNode::make<TypeName>(exprs[0]);
           }
         },
 
         { "astype",
           [this]() {
-                auto form(readExpr());
-                auto type(Value::stringToType(readName()));
-                ignoreRightP();
-                return CodeNode::make<AsType>(form, type);
+              auto form(readExpr());
+              auto type(Value::stringToType(readName()));
+              ignoreRightP();
+              return CodeNode::make<AsType>(form, type);
           }
         },
 
@@ -630,134 +630,134 @@ void Parser::initAppFtns() {
 
         { "read",
           [this]() {
-                ignoreRightP();
-                return CodeNode::make<Read>();
+              ignoreRightP();
+              return CodeNode::make<Read>();
           }
         },
 
         { "struct",
           [this]() {
-                const auto name(readName());
-                const auto members(readParams());
-                ignoreRightP();
-                return CodeNode::make<StructExpr>(name, members);
+              const auto name(readName());
+              const auto members(readParams());
+              ignoreRightP();
+              return CodeNode::make<StructExpr>(name, members);
           }
         },
 
         { "isstructname",
           [this]() {
-                auto snExpr(readExpr());
-                const auto name(readName());
-                ignoreRightP();
-                return CodeNode::make<IsStructName>(snExpr, name);
+              auto snExpr(readExpr());
+              const auto name(readName());
+              ignoreRightP();
+              return CodeNode::make<IsStructName>(snExpr, name);
           }
         },
 
         { "structname",
           [this]() {
-                auto exprs(readAndCheckExprList("structname", 1));
-                return CodeNode::make<StructName>(exprs[0]);
+              auto exprs(readAndCheckExprList("structname", 1));
+              return CodeNode::make<StructName>(exprs[0]);
           }
         },
 
         { "makeinstance",
           [this]() {
-                const auto name(readName());
-                const auto initArgs = readNameExprPairs();
-                return CodeNode::make<MakeInstance>(name, initArgs);
+              const auto name(readName());
+              const auto initArgs = readNameExprPairs();
+              return CodeNode::make<MakeInstance>(name, initArgs);
           }
         },
 
         { "isinstanceof",
           [this]() {
-                auto ioExpr(readExpr());
-                const auto name(readName());
-                ignoreRightP();
-                return CodeNode::make<IsInstanceOf>(ioExpr, name);
+              auto ioExpr(readExpr());
+              const auto name(readName());
+              ignoreRightP();
+              return CodeNode::make<IsInstanceOf>(ioExpr, name);
           }
         },
 
         { "memget",
           [this]() {
-                auto instExpr(readExpr());
-                const auto name(readName());
-                ignoreRightP();
-                return CodeNode::make<GetMember>(instExpr, name);
+              auto instExpr(readExpr());
+              const auto name(readName());
+              ignoreRightP();
+              return CodeNode::make<GetMember>(instExpr, name);
           }
         },
 
         { "memset",
           [this]() {
-                auto instExpr(readExpr());
-                const auto name(readName());
-                auto valueExpr(readExpr());
-                ignoreRightP();
-                return CodeNode::make<SetMember>(instExpr, name, valueExpr);
+              auto instExpr(readExpr());
+              const auto name(readName());
+              auto valueExpr(readExpr());
+              ignoreRightP();
+              return CodeNode::make<SetMember>(instExpr, name, valueExpr);
           }
         },
 
         { "strlen",
           [this]() {
-                auto exprs(readAndCheckExprList("strlen", 1));
-                return CodeNode::make<StringLen>(exprs[0]);
+              auto exprs(readAndCheckExprList("strlen", 1));
+              return CodeNode::make<StringLen>(exprs[0]);
           }
         },
 
         { "strget",
           [this]() {
-                auto exprs(readAndCheckExprList("strget", 2));
-                return CodeNode::make<StringGet>(exprs[0], exprs[1]);
+              auto exprs(readAndCheckExprList("strget", 2));
+              return CodeNode::make<StringGet>(exprs[0], exprs[1]);
           }
         },
 
         { "strset",
           [this]() {
-                auto exprs(readAndCheckExprList("strset", 3));
-                return CodeNode::make<StringSet>(exprs[0], exprs[1], exprs[2]);
+              auto exprs(readAndCheckExprList("strset", 3));
+              return CodeNode::make<StringSet>(exprs[0], exprs[1], exprs[2]);
           }
         },
 
         { "strcat",
           [this]() {
-                auto exprs(readAndCheckExprList("strcat", 2));
-                return CodeNode::make<StringCat>(exprs[0], exprs[1]);
+              auto exprs(readAndCheckExprList("strcat", 2));
+              return CodeNode::make<StringCat>(exprs[0], exprs[1]);
           }
         },
 
         { "substr",
           [this]() {
-                auto exprs(readExprList());
-                if (exprs.size() == 2) {
-                    return CodeNode::make<SubString>(exprs[0], exprs[1]);
-                }
-                else if (exprs.size() == 3) {
-                    return CodeNode::make<SubString>(exprs[0], exprs[1], exprs[2]);
-                }
-                else {
-                    throw TooManyOrFewForms("substr");
-                }
+              auto exprs(readExprList());
+              if (exprs.size() == 2) {
+                  return CodeNode::make<SubString>(exprs[0], exprs[1]);
+              }
+              else if (exprs.size() == 3) {
+                  return CodeNode::make<SubString>(exprs[0], exprs[1], exprs[2]);
+              }
+              else {
+                  throw TooManyOrFewForms("substr");
+              }
           }
         },
 
         { "strfind",
           [this]() {
-                auto exprs(readExprList());
-                if (exprs.size() == 2) {
-                    return CodeNode::make<StringFind>(exprs[0], exprs[1]);
-                }
-                else if (exprs.size() == 3) {
-                    return CodeNode::make<StringFind>(exprs[0], exprs[1], exprs[2]);
-                }
-                else {
-                    throw TooManyOrFewForms("strfind");
-                }
+              auto exprs(readExprList());
+              if (exprs.size() == 2) {
+                  return CodeNode::make<StringFind>(exprs[0], exprs[1]);
+              }
+              else if (exprs.size() == 3) {
+                  return CodeNode::make<StringFind>(exprs[0], exprs[1], exprs[2]);
+              }
+              else {
+                  throw TooManyOrFewForms("strfind");
+              }
           }
         },
 
         { "strcount",
           [this]() {
-                auto exprs(readAndCheckExprList("strcount", 2));
-                return CodeNode::make<StringCount>(exprs[0], exprs[1]);
+              auto exprs(readAndCheckExprList("strcount", 2));
+              return CodeNode::make<StringCount>(exprs[0], exprs[1]);
           }
         },
 
@@ -784,56 +784,56 @@ void Parser::initAppFtns() {
 
         { "array",
           [this]() {
-                auto valueExprs(readExprList());
-                if (valueExprs.size() == 0) {
-                    return CodeNode::make<MakeArray>();
-                }
-                else {
-                    return CodeNode::make<MakeArray>(valueExprs);
-                }
+              auto valueExprs(readExprList());
+              if (valueExprs.size() == 0) {
+                  return CodeNode::make<MakeArray>();
+              }
+              else {
+                  return CodeNode::make<MakeArray>(valueExprs);
+              }
           }
         },
 
         { "arraysv",
           [this]() {
-                auto exprs(readExprList());
-                if (exprs.size() == 1) {
-                    return CodeNode::make<MakeArraySV>(exprs[0]);
-                }
-                else if (exprs.size() == 2) {
-                    return CodeNode::make<MakeArraySV>(exprs[0], exprs[1]);
-                }
-                else {
-                    throw TooManyOrFewForms("arraysv");
-                }
+              auto exprs(readExprList());
+              if (exprs.size() == 1) {
+                  return CodeNode::make<MakeArraySV>(exprs[0]);
+              }
+              else if (exprs.size() == 2) {
+                  return CodeNode::make<MakeArraySV>(exprs[0], exprs[1]);
+              }
+              else {
+                  throw TooManyOrFewForms("arraysv");
+              }
           }
         },
 
         { "arrlen",
           [this]() {
-                auto exprs(readAndCheckExprList("arrlen", 1));
-                return CodeNode::make<ArrayLen>(exprs[0]);
+              auto exprs(readAndCheckExprList("arrlen", 1));
+              return CodeNode::make<ArrayLen>(exprs[0]);
           }
         },
 
         { "arrget",
           [this]() {
-                auto exprs(readAndCheckExprList("arrget", 2));
-                return CodeNode::make<ArrayGet>(exprs[0], exprs[1]);
+              auto exprs(readAndCheckExprList("arrget", 2));
+              return CodeNode::make<ArrayGet>(exprs[0], exprs[1]);
           }
         },
 
         { "arrset",
           [this]() {
-                auto exprs(readAndCheckExprList("arrset", 3));
-                return CodeNode::make<ArraySet>(exprs[0], exprs[1], exprs[2]);
+              auto exprs(readAndCheckExprList("arrset", 3));
+              return CodeNode::make<ArraySet>(exprs[0], exprs[1], exprs[2]);
           }
         },
 
         { "arrpush",
           [this]() {
-                auto exprs(readAndCheckExprList("arrpush", 2));
-                return CodeNode::make<ArrayPush>(exprs[0], exprs[1]);
+              auto exprs(readAndCheckExprList("arrpush", 2));
+              return CodeNode::make<ArrayPush>(exprs[0], exprs[1]);
           }
         },
 
@@ -846,23 +846,23 @@ void Parser::initAppFtns() {
 
         { "arrfind",
           [this]() {
-                auto exprs(readExprList());
-                if (exprs.size() == 2) {
-                    return CodeNode::make<ArrayFind>(exprs[0], exprs[1]);
-                }
-                else if (exprs.size() == 3) {
-                    return CodeNode::make<ArrayFind>(exprs[0], exprs[1], exprs[2]);
-                }
-                else {
-                    throw TooManyOrFewForms("arrfind");
-                }
+              auto exprs(readExprList());
+              if (exprs.size() == 2) {
+                  return CodeNode::make<ArrayFind>(exprs[0], exprs[1]);
+              }
+              else if (exprs.size() == 3) {
+                  return CodeNode::make<ArrayFind>(exprs[0], exprs[1], exprs[2]);
+              }
+              else {
+                  throw TooManyOrFewForms("arrfind");
+              }
           }
         },
 
         { "arrcount",
           [this]() {
-                auto exprs(readAndCheckExprList("arrcount", 2));
-                return CodeNode::make<ArrayCount>(exprs[0], exprs[1]);
+              auto exprs(readAndCheckExprList("arrcount", 2));
+              return CodeNode::make<ArrayCount>(exprs[0], exprs[1]);
           }
         },
 
