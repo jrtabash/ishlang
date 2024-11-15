@@ -48,8 +48,10 @@ namespace Ishlang {
         void initAppFtns();
 
     private:
-        template <typename ExprType, typename ExprOp>
+        template <typename ExprType>
         struct MakeBinaryExpression {
+            using ExprOp = typename ExprType::Type;
+
             inline MakeBinaryExpression(const std::string &name, Parser &parser, ExprOp exprOp);
 
             inline CodeNode::SharedPtr operator()();
@@ -61,8 +63,10 @@ namespace Ishlang {
         };
 
     private:
-        template <typename ExprType, typename ExprOp>
+        template <typename ExprType>
         struct MakeVariadicExpression {
+            using ExprOp = typename ExprType::Type;
+
             inline MakeVariadicExpression(const std::string &name, Parser &parser, ExprOp exprOp);
 
             inline CodeNode::SharedPtr operator()();
@@ -104,28 +108,28 @@ namespace Ishlang {
         lexer_.clear();
     }
 
-    template <typename ExprType, typename ExprOp>
-    inline Parser::MakeBinaryExpression<ExprType, ExprOp>::MakeBinaryExpression(const std::string &name, Parser &parser, ExprOp exprOp)
+    template <typename ExprType>
+    inline Parser::MakeBinaryExpression<ExprType>::MakeBinaryExpression(const std::string &name, Parser &parser, ExprOp exprOp)
         : name_(name)
         , parser_(parser)
         , exprOp_(exprOp)
     {}
 
-    template <typename ExprType, typename ExprOp>
-    inline CodeNode::SharedPtr Parser::MakeBinaryExpression<ExprType, ExprOp>::operator()() {
+    template <typename ExprType>
+    inline CodeNode::SharedPtr Parser::MakeBinaryExpression<ExprType>::operator()() {
         auto exprs(parser_.readAndCheckExprList(name_.c_str(), 2));
         return CodeNode::make<ExprType>(exprOp_, exprs[0], exprs[1]);
     }
 
-    template <typename ExprType, typename ExprOp>
-    inline Parser::MakeVariadicExpression<ExprType, ExprOp>::MakeVariadicExpression(const std::string &name, Parser &parser, ExprOp exprOp)
+    template <typename ExprType>
+    inline Parser::MakeVariadicExpression<ExprType>::MakeVariadicExpression(const std::string &name, Parser &parser, ExprOp exprOp)
         : name_(name)
         , parser_(parser)
         , exprOp_(exprOp)
     {}
 
-    template <typename ExprType, typename ExprOp>
-    inline CodeNode::SharedPtr Parser::MakeVariadicExpression<ExprType, ExprOp>::operator()() {
+    template <typename ExprType>
+    inline CodeNode::SharedPtr Parser::MakeVariadicExpression<ExprType>::operator()() {
         auto operands(parser_.readAndCheckRangeExprList(name_.c_str(), 2, std::nullopt));
         return CodeNode::make<ExprType>(exprOp_, operands);
     }

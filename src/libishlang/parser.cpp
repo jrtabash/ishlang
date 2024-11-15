@@ -431,22 +431,22 @@ void Parser::initAppFtns() {
           }
         },
 
-        { "+", MakeVariadicExpression<ArithOp, ArithOp::Type>("+", *this, ArithOp::Add) },
-        { "-", MakeVariadicExpression<ArithOp, ArithOp::Type>("-", *this, ArithOp::Sub) },
-        { "*", MakeVariadicExpression<ArithOp, ArithOp::Type>("*", *this, ArithOp::Mul) },
-        { "/", MakeVariadicExpression<ArithOp, ArithOp::Type>("/", *this, ArithOp::Div) },
-        { "%", MakeVariadicExpression<ArithOp, ArithOp::Type>("%", *this, ArithOp::Mod) },
-        { "^", MakeVariadicExpression<ArithOp, ArithOp::Type>("^", *this, ArithOp::Pow) },
+        { "+", MakeVariadicExpression<ArithOp>("+", *this, ArithOp::Add) },
+        { "-", MakeVariadicExpression<ArithOp>("-", *this, ArithOp::Sub) },
+        { "*", MakeVariadicExpression<ArithOp>("*", *this, ArithOp::Mul) },
+        { "/", MakeVariadicExpression<ArithOp>("/", *this, ArithOp::Div) },
+        { "%", MakeVariadicExpression<ArithOp>("%", *this, ArithOp::Mod) },
+        { "^", MakeVariadicExpression<ArithOp>("^", *this, ArithOp::Pow) },
 
-        { "==", MakeBinaryExpression<CompOp, CompOp::Type>("==", *this, CompOp::EQ) },
-        { "!=", MakeBinaryExpression<CompOp, CompOp::Type>("!=", *this, CompOp::NE) },
-        { "<",  MakeBinaryExpression<CompOp, CompOp::Type>("<",  *this, CompOp::LT) },
-        { ">",  MakeBinaryExpression<CompOp, CompOp::Type>("<",  *this, CompOp::GT) },
-        { "<=", MakeBinaryExpression<CompOp, CompOp::Type>("<=", *this, CompOp::LE) },
-        { ">=", MakeBinaryExpression<CompOp, CompOp::Type>(">=", *this, CompOp::GE) },
+        { "==", MakeBinaryExpression<CompOp>("==", *this, CompOp::EQ) },
+        { "!=", MakeBinaryExpression<CompOp>("!=", *this, CompOp::NE) },
+        { "<",  MakeBinaryExpression<CompOp>("<",  *this, CompOp::LT) },
+        { ">",  MakeBinaryExpression<CompOp>("<",  *this, CompOp::GT) },
+        { "<=", MakeBinaryExpression<CompOp>("<=", *this, CompOp::LE) },
+        { ">=", MakeBinaryExpression<CompOp>(">=", *this, CompOp::GE) },
 
-        { "and", MakeVariadicExpression<LogicOp, LogicOp::Type>("and", *this, LogicOp::Conjunction) },
-        { "or", MakeVariadicExpression<LogicOp, LogicOp::Type>("or", *this, LogicOp::Disjunction) },
+        { "and", MakeVariadicExpression<LogicOp>("and", *this, LogicOp::Conjunction) },
+        { "or",  MakeVariadicExpression<LogicOp>("or", *this, LogicOp::Disjunction) },
 
         { "not",
           [this]() {
