@@ -400,7 +400,7 @@ Is type of?
 (istypeof <expression> <type>)
 ```
 
-<type> is one of: none, int, real, char, bool, string, pair, array, hashmap, closure, usertype, userobject
+<type> is one of: none, int, real, char, bool, string, pair, array, hashmap, range, closure, usertype, userobject
 
 ### Example
 ```
