@@ -1,22 +1,48 @@
 ## TODO
 
+### Make istypeof variadic
+```
+(istypeof <expression> <type> [<type> ...])
+```
+Example:
+```
+(defun isnumber (obj)
+  (istypeof obj int real))
+
+(defun isiterable (obj)
+  (istypeof obj array range string hashmap))
+```
+
+### Add strsplit function
+```
+(strsplit <str> <delim>) -> array
+```
+Example:
+```
+(strsplit "1 2 3" ' ') -> ["1" "2" "3"]
+```
+
 ### Add support for file IO
 - Add file type
 - File functions
-  - fopen
+  - fopen (modes: r, w, a)
   - fclose
   - fflush
   - fread
+  - freadln
   - fwrite
-  - fget
-  - fput
-  - fgetline
-  - ftell
-  - fseek
-- File variables
-  - stdin
-  - stdout
-  - stderr
+  - fwriteln
+  - withfile (fopen, do work, fclose)
+  - Add foreach support to iterate over lines
+  - Examples
+    ```
+    (withfile f (fopen "some/path.txt" 'w')
+      (fwriteln f "some text"))
+
+    (withfile f (fopen "some/path.txt" 'r')
+      (foreach line f
+        (println line)))
+    ```
 
 ### Implement built-in data structures:
 - List
