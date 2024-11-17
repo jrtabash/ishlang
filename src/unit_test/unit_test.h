@@ -157,6 +157,7 @@ namespace Ishlang {
         void testCodeNodeRangeGetters();
         void testCodeNodeExpand();
         void testCodeNodeGenericLen();
+        void testCodeNodeGenericEmpty();
         void testCodeNodeGenericGet();
         void testCodeNodeGenericSet();
         void testParserBasic();
@@ -231,6 +232,7 @@ namespace Ishlang {
         void testParserRangeGetters();
         void testParserExpand();
         void testParserGenericLen();
+        void testParserGenericEmpty();
         void testParserGenericGet();
         void testParserGenericSet();
         

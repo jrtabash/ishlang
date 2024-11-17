@@ -87,8 +87,8 @@ Example:
   ```
   (sum <sequence> [<start> [<end>]]) -> int|real
   ```
-- Add generic is_empty function with support for strings, arrays, hashmaps and ranges
+- Add generic clear function with support for strings, arrays and hashmaps
   ```
-  (is_empty <iterable>) -> bool
+  (clear <container>)
   ```
 Note: Should work with future types; list and orderedmap.

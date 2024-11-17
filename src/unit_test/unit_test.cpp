@@ -129,6 +129,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeRangeGetters);
     ADD_TEST(testCodeNodeExpand);
     ADD_TEST(testCodeNodeGenericLen);
+    ADD_TEST(testCodeNodeGenericEmpty);
     ADD_TEST(testCodeNodeGenericGet);
     ADD_TEST(testCodeNodeGenericSet);
     ADD_TEST(testTokenType);
@@ -207,6 +208,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserRangeGetters);
     ADD_TEST(testParserExpand);
     ADD_TEST(testParserGenericLen);
+    ADD_TEST(testParserGenericEmpty);
     ADD_TEST(testParserGenericGet);
     ADD_TEST(testParserGenericSet);
 }
@@ -5604,6 +5606,40 @@ void UnitTest::testCodeNodeGenericLen() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeGenericEmpty() {
+    auto env = Environment::make();
+
+    auto isEmpty = [](auto rawVal) {
+        return CodeNode::make<GenericEmpty>(CodeNode::make<Literal>(Value(rawVal)));
+    };
+
+    auto val = isEmpty("")->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.boolean(), "actual=" << val);
+
+    val = isEmpty(Sequence())->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.boolean(), "actual=" << val);
+
+    val = isEmpty(Hashtable())->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.boolean(), "actual=" << val);
+
+    val = isEmpty(IntegerRange(0, 0, 1))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.boolean(), "actual=" << val);
+
+    try {
+        isEmpty(5ll)->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeGenericGet() {
     auto env = Environment::make();
 
@@ -7604,8 +7640,26 @@ void UnitTest::testParserGenericLen() {
     TEST_CASE(parserTest(parser, env, "(len (range 1 1))",          Value(0ll), true));
     TEST_CASE(parserTest(parser, env, "(len (range 5))",            Value(5ll), true));
 
-    TEST_CASE(parserTest(parser, env, "(len)",   Value(3ll), false));
-    TEST_CASE(parserTest(parser, env, "(len 5)", Value(3ll), false));
+    TEST_CASE(parserTest(parser, env, "(len)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(len 5)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserGenericEmpty() {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(empty \"\")",                 Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(empty \"text\")",             Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(empty (array))",              Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(empty (array 1))",            Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(empty (hashmap))",            Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(empty (hashmap (pair 2 4)))", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(empty (range 1 1))",          Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(empty (range 5))",            Value::False, true));
+
+    TEST_CASE(parserTest(parser, env, "(empty)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(empty 5)", Value::Null, false));
 }
 
 // -------------------------------------------------------------

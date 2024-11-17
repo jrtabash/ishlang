@@ -12,6 +12,11 @@ __CODE__
 (println (len tab))
 (println (len rng))
 
+(println (empty txt))
+(println (empty seq))
+(println (empty tab))
+(println (empty rng))
+
 (println (get txt 0))
 (println (get txt 1))
 (println (get txt (- (len txt) 1)))
@@ -47,6 +52,10 @@ __EXPECT__
 5
 2
 50
+false
+false
+false
+false
 H
 e
 !

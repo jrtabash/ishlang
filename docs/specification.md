@@ -924,6 +924,11 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (len <object>)
 ```
 
+**empty**: Is string, array, hashmap or range empty?
+```
+(empty <object>)
+```
+
 **get**: Get value at index, key or member from string, array, hashmap or userobject
 ```
 (get <object> <key> [<default_return>])
@@ -956,6 +961,10 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (len seq)
 (len tab)
 (len rng)
+(empty txt)
+(empty seq)
+(empty tab)
+(empty rng)
 (get txt 0)
 (get seq 1)
 (get tab 2 200)

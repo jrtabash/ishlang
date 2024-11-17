@@ -22,6 +22,11 @@ namespace Ishlang {
             return Value(Value::Long(obj.size()));
         }
 
+        template <Sizable ObjectType>
+        static inline Value empty(const ObjectType &obj) {
+            return Value(obj.size() == 0);
+        }
+
         template <typename ObjectType>
         static inline Value get(const ObjectType &obj, const Value &key, const Value &defaultRet = Value::Null) {
             if constexpr (std::is_same_v<ObjectType, Value::HashMap>) {

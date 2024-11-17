@@ -1108,6 +1108,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "empty",
+          [this]() {
+              auto exprs(readAndCheckExprList("empty", 1));
+              return CodeNode::make<GenericEmpty>(exprs[0]);
+          }
+        },
+
         { "get",
           [this]() {
               auto exprs(readAndCheckRangeExprList("get", 2, 3));

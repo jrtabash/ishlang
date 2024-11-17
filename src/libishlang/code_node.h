@@ -1308,6 +1308,19 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class GenericEmpty : public CodeNode {
+    public:
+        GenericEmpty(CodeNode::SharedPtr object);
+        virtual ~GenericEmpty() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr object_;
+    };
+
+    // -------------------------------------------------------------
     class GenericGet : public CodeNode {
     public:
         GenericGet(CodeNode::SharedPtr object, CodeNode::SharedPtr key, CodeNode::SharedPtr defaultRet = CodeNode::SharedPtr());

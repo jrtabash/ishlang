@@ -1648,6 +1648,29 @@ Value GenericLen::exec(Environment::SharedPtr env) const {
 }
 
 // -------------------------------------------------------------
+GenericEmpty::GenericEmpty(CodeNode::SharedPtr object)
+    : CodeNode()
+    , object_(object)
+{}
+
+Value GenericEmpty::exec(Environment::SharedPtr env) const {
+    if (object_) {
+        auto objVal = object_->eval(env);
+        switch (objVal.type()) {
+        case Value::eString:  return Generic::empty(objVal.text());
+        case Value::eArray:   return Generic::empty(objVal.array());
+        case Value::eHashMap: return Generic::empty(objVal.hashMap());
+        case Value::eRange:   return Generic::empty(objVal.range());
+        default:
+            throw InvalidOperandType(
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange),
+                objVal.typeToString());
+        }
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 GenericGet::GenericGet(CodeNode::SharedPtr object, CodeNode::SharedPtr key, CodeNode::SharedPtr defaultRet)
     : CodeNode()
     , object_(object)
