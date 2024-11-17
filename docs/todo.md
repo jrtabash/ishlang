@@ -85,6 +85,10 @@ Example:
   ```
 - Add generic sum function with support for arrays and ranges
   ```
-  (sum <sequence|range> [<start> [<end>]]) -> int|real
+  (sum <sequence> [<start> [<end>]]) -> int|real
+  ```
+- Add generic is_empty function with support for strings, arrays, hashmaps and ranges
+  ```
+  (is_empty <iterable>) -> bool
   ```
 Note: Should work with future types; list and orderedmap.
