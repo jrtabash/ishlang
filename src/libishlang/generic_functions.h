@@ -17,7 +17,7 @@ namespace Ishlang {
     // -------------------------------------------------------------
     class Generic {
     public:
-        template <typename ObjectType>
+        template <Sizable ObjectType>
         static inline Value length(const ObjectType &obj) {
             return Value(Value::Long(obj.size()));
         }
