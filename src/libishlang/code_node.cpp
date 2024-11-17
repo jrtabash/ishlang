@@ -15,20 +15,27 @@
 #include <functional>
 #include <limits>
 #include <random>
+#include <ranges>
 
 using namespace Ishlang;
 
 // -------------------------------------------------------------
-IsType::IsType(CodeNode::SharedPtr expr, Value::Type type)
+IsType::IsType(CodeNode::SharedPtr expr, Value::TypeList types)
   : CodeNode()
   , expr_(expr)
-  , type_(type)
-{}
+  , types_(types)
+{
+    assert(types_.size() > 0);
+}
 
 Value IsType::exec(Environment::SharedPtr env) const {
     if (expr_) {
-        Value exprValue = expr_->eval(env);
-        return exprValue.type() == type_ ? Value::True : Value::False;
+        const Value exprValue = expr_->eval(env);
+        return Value(std::ranges::any_of(
+                         types_,
+                         [exprType = exprValue.type()](Value::Type type) {
+                             return exprType == type;
+                         }));
     }
     return Value::False;
 }
@@ -98,7 +105,7 @@ Value ArithOp::exec(Environment::SharedPtr env) const {
     if (!operands_.empty()) {
         const auto values = evalOperands(env, operands_, Value::eInteger, Value::eReal);
 
-        const bool real = std::any_of(values.begin(), values.end(), [](const Value & v) { return v.isReal(); });
+        const bool real = std::ranges::any_of(values, [](const Value & v) { return v.isReal(); });
         switch (type_) {
         case Add:
             if (real) { return accum<Value::Double>(values, std::plus<Value::Double>()); }
@@ -1142,7 +1149,7 @@ Value StrCharCheck::exec(Environment::SharedPtr env) const {
 
         if (value.isString()) {
             auto const & str = value.text();
-            return Value(std::all_of(str.begin(), str.end(), ftn_));
+            return Value(std::ranges::all_of(str, ftn_));
         }
         else {
             return Value(ftn_(value.character()));

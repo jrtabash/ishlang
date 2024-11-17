@@ -7,7 +7,10 @@ __CODE__
 (var b true)
 (var c 'a')
 (var s "foobar")
+(var p (pair 1 2))
 (var a (array 1 2 3))
+(var h (hashmap (pair 1 10)))
+(var g (range 10))
 (var f (lambda (x y) (+ x y)))
 (var t MyStruct)
 (var o (makeinstance MyStruct))
@@ -18,16 +21,40 @@ __CODE__
 (println (istypeof b bool))
 (println (istypeof c char))
 (println (istypeof s string))
+(println (istypeof p pair))
 (println (istypeof a array))
+(println (istypeof h hashmap))
+(println (istypeof g range))
 (println (istypeof f closure))
 (println (istypeof t usertype))
 (println (istypeof o userobject))
+
+(println (istypeof i real int))
+(println (istypeof r bool real int))
+(println (istypeof b bool int))
+(println (istypeof c string char))
+(println (istypeof s string char))
+(println (istypeof a range array string))
+(println (istypeof t userobject usertype))
+(println (istypeof o userobject usertype))
+
 (println (isstructname t MyStruct))
 (println (isinstanceof o MyStruct))
 (println (structname t))
 (println (structname o))
 
 __EXPECT__
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
 true
 true
 true

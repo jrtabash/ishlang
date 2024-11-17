@@ -7,6 +7,8 @@
 #include <cctype>
 #include <cstdlib>
 #include <fstream>
+#include <iterator>
+#include <ranges>
 
 using namespace Ishlang;
 
@@ -263,6 +265,25 @@ std::string Parser::readName() {
         throw UnexpectedExpression("name", nameToken.text);
     }
     return nameToken.text;
+}
+
+// -------------------------------------------------------------
+std::vector<std::string> Parser::readNames(const char *listName, std::size_t minExpectedSize) {
+    std::vector<std::string> names;
+    auto nameToken = lexer_.next();
+    while (nameToken.type != Lexer::RightP) {
+        if (nameToken.type != Lexer::Symbol) {
+            throw UnexpectedExpression("name", nameToken.text);
+        }
+        names.push_back(std::move(nameToken.text));
+        nameToken = lexer_.next();
+    }
+
+    if (names.size() < minExpectedSize) {
+        throw TooManyOrFewForms(listName);
+    }
+
+    return names;
 }
 
 // -------------------------------------------------------------
@@ -584,9 +605,9 @@ void Parser::initAppFtns() {
         { "istypeof",
           [this]() {
               auto form(readExpr());
-              auto type(Value::stringToType(readName()));
-              ignoreRightP();
-              return CodeNode::make<IsType>(form, type);
+              Value::TypeList types;
+              std::ranges::transform(readNames("istypeof", 1), std::back_inserter(types), Value::stringToType);
+              return CodeNode::make<IsType>(form, types);
           }
         },
 

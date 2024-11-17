@@ -1,18 +1,5 @@
 ## TODO
 
-### Make istypeof variadic
-```
-(istypeof <expression> <type> [<type> ...])
-```
-Example:
-```
-(defun isnumber (obj)
-  (istypeof obj int real))
-
-(defun isiterable (obj)
-  (istypeof obj array range string hashmap))
-```
-
 ### Add strsplit function
 ```
 (strsplit <str> <delim>) -> array

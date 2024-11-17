@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <variant>
+#include <vector>
 
 namespace Ishlang {
     class ValuePair;
@@ -58,6 +59,7 @@ namespace Ishlang {
             eHashMap    = 'H',
             eRange      = 'G',
         };
+        using TypeList = std::vector<Type>;
 
         using Long       = long long int;
         using Double     = double;

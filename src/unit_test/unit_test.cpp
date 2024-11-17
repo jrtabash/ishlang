@@ -2067,11 +2067,34 @@ void UnitTest::testCodeNodeIsType() {
         Value::Type exprType = valueType.second;
 
         for (auto type : types) {
-            CodeNode::SharedPtr isType(new IsType(expr, type));
+            CodeNode::SharedPtr isType(new IsType(expr, { type }));
             Value result = isType->eval(env);
             bool expected = exprType == type ? true : false;
             TEST_CASE_MSG(result.isBool() && result.boolean() == expected,
                           "actual=" << Value::typeToString(exprType) << " check=" << Value::typeToString(type));
+
+            if (exprType != Value::eUserType && exprType != Value::eUserObject) {
+                CodeNode::SharedPtr isTypeMulti(new IsType(expr, { Value::eUserType, type, Value::eUserObject }));
+                Value result = isTypeMulti->eval(env);
+                bool expected = exprType == type ? true : false;
+                TEST_CASE_MSG(result.isBool() && result.boolean() == expected,
+                              "actual=" << Value::typeToString(exprType) << " check=usertype|" << Value::typeToString(type) << "|userobject");
+            }
+
+            if (exprType == Value::eInteger) {
+                CodeNode::SharedPtr isTypeMulti(new IsType(expr, { Value::eReal, type }));
+                Value result = isTypeMulti->eval(env);
+                bool expected = exprType == type ? true : false;
+                TEST_CASE_MSG(result.isBool() && result.boolean() == expected,
+                              "actual=" << Value::typeToString(exprType) << " check=" << typesToString(Value::eReal, type));
+            }
+            else if (exprType == Value::eReal) {
+                CodeNode::SharedPtr isTypeMulti(new IsType(expr, { Value::eInteger, type }));
+                Value result = isTypeMulti->eval(env);
+                bool expected = exprType == type ? true : false;
+                TEST_CASE_MSG(result.isBool() && result.boolean() == expected,
+                              "actual=" << Value::typeToString(exprType) << " check=" << typesToString(Value::eInteger, type));
+            }
         }
     }
 }
@@ -6011,7 +6034,22 @@ void UnitTest::testParserIsType() {
     TEST_CASE(parserTest(parser, env, "(istypeof (lambda () 1) none)",         Value::False, true));
     TEST_CASE(parserTest(parser, env, "(istypeof (struct Bar (y z)) closure)", Value::False, true));
 
-    TEST_CASE(parserTest(parser, env, "(istypeof 3 three)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(istypeof 3 real int)",          Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof 1.5 int real)",        Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof true int bool real)",  Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof 'c' char string)",     Value::True, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof \"txt\" char string)", Value::True, true));
+
+    TEST_CASE(parserTest(parser, env, "(istypeof 3 real bool)",         Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof 1.5 bool int)",        Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof true int real char)",  Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof 'c' int string)",      Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(istypeof \"txt\" char bool)",   Value::False, true));
+
+    TEST_CASE(parserTest(parser, env, "(istypeof 3)",           Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(istypeof 3 3)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(istypeof 3 three)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(istypeof 3 int three)", Value::Null, false));
 }
 
 // -------------------------------------------------------------

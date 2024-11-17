@@ -32,7 +32,7 @@ namespace Ishlang {
     // -------------------------------------------------------------
     class IsType : public CodeNode {
     public:
-        IsType(CodeNode::SharedPtr expr, Value::Type type);
+        IsType(CodeNode::SharedPtr expr, Value::TypeList types);
         virtual ~IsType() {}
 
     protected:
@@ -40,7 +40,7 @@ namespace Ishlang {
 
     private:
         CodeNode::SharedPtr expr_;
-        Value::Type         type_;
+        Value::TypeList     types_;
     };
 
     // -------------------------------------------------------------

@@ -397,14 +397,17 @@ Setting / Getting member fields:
 ## Type Checking
 Is type of?
 ```
-(istypeof <expression> <type>)
+(istypeof <expression> <type> [<type> ...])
 ```
+
+Check expression type matches any of provided types.
 
 <type> is one of: none, int, real, char, bool, string, pair, array, hashmap, range, closure, usertype, userobject
 
 ### Example
 ```
 (istypeof 10 int)
+(istypeof 10 int real)
 (istypeof Person usertype)
 ```
 
