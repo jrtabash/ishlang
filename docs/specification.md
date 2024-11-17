@@ -283,14 +283,14 @@ Conditional only form:
 
 ## Foreach
 ```
-(foreach <var> <container_expression>
+(foreach <var> <iterable_expression>
   <body_expression>)
 ```
 
 ### Notes
-- Loop over each element in a container
-- Container can be a string, array, hashmap or range
-- The <var> variable is read-only and cannot directly modify the container
+- Loop over each element in `<iterable_expression>`
+- Iterable expression can be a string, array, hashmap or range
+- The `<var>` variable is read-only and cannot directly modify iterable elemets
 
 ### Example - sum array elements
 ```
@@ -402,7 +402,7 @@ Is type of?
 
 Check expression type matches any of provided types.
 
-Type must be one of: none, int, real, char, bool, string, pair, array, hashmap, range, closure, usertype, userobject
+`<type>` must be one of: none, int, real, char, bool, string, pair, array, hashmap, range, closure, usertype, userobject
 
 ### Example
 ```
@@ -989,7 +989,7 @@ Import full ishlang files with import command, or import select components using
 (from <module> import name [as <asName] [name [as <asName>]]*)
 ```
 
-A module name must have a corresponding source file <module>.ish.
+A module name must have a corresponding source file `<module>.ish`.
 
 Ishlang searches for a module source file according to the following rule:
 1. Look in current working directory
