@@ -402,7 +402,7 @@ Is type of?
 
 Check expression type matches any of provided types.
 
-<type> is one of: none, int, real, char, bool, string, pair, array, hashmap, range, closure, usertype, userobject
+Type must be one of: none, int, real, char, bool, string, pair, array, hashmap, range, closure, usertype, userobject
 
 ### Example
 ```
