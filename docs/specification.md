@@ -980,6 +980,9 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (set tab 3 30)
 (set obj age 26)
 (set obj "age" 27)
+(empty txt)
+(empty seq)
+(empty tab)
 ```
 
 ## Comments
