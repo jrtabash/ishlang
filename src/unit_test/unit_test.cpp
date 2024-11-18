@@ -132,6 +132,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeGenericEmpty);
     ADD_TEST(testCodeNodeGenericGet);
     ADD_TEST(testCodeNodeGenericSet);
+    ADD_TEST(testCodeNodeGenericClear);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -211,6 +212,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserGenericEmpty);
     ADD_TEST(testParserGenericGet);
     ADD_TEST(testParserGenericSet);
+    ADD_TEST(testParserGenericClear);
 }
 #undef ADD_TEST
 
@@ -5928,6 +5930,46 @@ void UnitTest::testCodeNodeGenericSet() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeGenericClear() {
+    auto env = Environment::make();
+    env->def("a", Value(Sequence(std::vector{Value::Zero, Value::Null})));
+    env->def("s", Value("1234"));
+    env->def("i", Value(5ll));
+
+    auto rawTab = Hashtable();
+    rawTab.set(Value(1ll), Value(100ll));
+    env->def("h", rawTab);
+
+    auto clr = [](char const * name) {
+        return CodeNode::make<GenericClear>(CodeNode::make<Variable>(name));
+    };
+
+    auto val = clr("a")->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.integer() == 2, "actual=" << val);
+    TEST_CASE_MSG(env->get("a") == Value(Sequence()), "actual=" << env->get("a"));
+
+    val = clr("s")->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.integer() == 4, "actual=" << val);
+    TEST_CASE_MSG(env->get("s") == Value(""), "actual=" << env->get("s"));
+
+    val = clr("h")->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.integer() == 1, "actual=" << val);
+    TEST_CASE_MSG(env->get("h") == Value(Hashtable()), "actual=" << env->get("h"));
+
+    try {
+        clr("i")->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testTokenType() {
     TEST_CASE(Lexer::tokenType("") == Lexer::Unknown);
     TEST_CASE(Lexer::tokenType("'") == Lexer::Unknown);
@@ -7764,4 +7806,28 @@ void UnitTest::testParserGenericSet() {
     TEST_CASE(parserTest(parser, env, "(set inst 5 10)",   Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(set inst mem 10)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(set 5 0 10)",      Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserGenericClear() {
+    auto env = Environment::make();
+    Parser parser;
+
+    env->def("a", Value(Sequence(std::vector{Value::Zero, Value::Null})));
+    env->def("s", Value("1234"));
+
+    auto rawTab = Hashtable();
+    rawTab.set(Value(1ll), Value(100ll));
+    env->def("h", rawTab);
+
+    TEST_CASE(parserTest(parser, env, "(clear a)", Value(2ll), true));
+    TEST_CASE(parserTest(parser, env, "(clear s)", Value(4ll), true));
+    TEST_CASE(parserTest(parser, env, "(clear h)", Value(1ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(len a)", Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(len s)", Value::Zero, true));
+    TEST_CASE(parserTest(parser, env, "(len h)", Value::Zero, true));
+
+    TEST_CASE(parserTest(parser, env, "(clear)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(clear 5)", Value::Null, false));
 }

@@ -1127,6 +1127,13 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("get", 3));
               return CodeNode::make<GenericSet>(exprs[0], exprs[1], exprs[2]);
           }
+        },
+
+        { "clear",
+          [this]() {
+              auto exprs(readAndCheckExprList("clear", 1));
+              return CodeNode::make<GenericClear>(exprs[0]);
+          }
         }
     };
 }

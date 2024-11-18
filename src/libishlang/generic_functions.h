@@ -14,6 +14,12 @@ namespace Ishlang {
         { obj.size() } -> std::same_as<std::size_t>;
     };
 
+    template <typename ObjectType>
+    concept Clearable = requires (ObjectType obj) {
+        Sizable<ObjectType>;
+        obj.clear();
+    };
+
     // -------------------------------------------------------------
     class Generic {
     public:
@@ -25,6 +31,13 @@ namespace Ishlang {
         template <Sizable ObjectType>
         static inline Value empty(const ObjectType &obj) {
             return Value(obj.size() == 0);
+        }
+
+        template <Clearable ObjectType>
+        static inline Value clear(ObjectType &obj) {
+            Value cnt = length(obj);
+            obj.clear();
+            return cnt;
         }
 
         template <typename ObjectType>

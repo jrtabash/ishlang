@@ -948,6 +948,11 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 - For string and array, key must be an integer
 - For userobject, key must be a member name/symbol or a string
 
+**clear**: Clear string, array or hashmap
+```
+(clear <object>)
+```
+
 ### Examples
 ```
 (struct Person (name age))

@@ -87,8 +87,4 @@ Example:
   ```
   (sum <sequence> [<start> [<end>]]) -> int|real
   ```
-- Add generic clear function with support for strings, arrays and hashmaps
-  ```
-  (clear <container>)
-  ```
 Note: Should work with future types; list and orderedmap.

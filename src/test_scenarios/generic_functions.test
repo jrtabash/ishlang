@@ -47,6 +47,14 @@ __CODE__
 (println (get obj name))
 (println (get obj age))
 
+(println (clear txt))
+(println (clear seq))
+(println (clear tab))
+
+(println (len txt))
+(println (len seq))
+(println (len tab))
+
 __EXPECT__
 12
 5
@@ -80,3 +88,9 @@ w
 20
 John
 24
+12
+5
+2
+0
+0
+0

@@ -1350,6 +1350,19 @@ namespace Ishlang {
         CodeNode::SharedPtr value_;
     };
 
+    // -------------------------------------------------------------
+    class GenericClear : public CodeNode {
+    public:
+        GenericClear(CodeNode::SharedPtr object);
+        virtual ~GenericClear() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr object_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_H

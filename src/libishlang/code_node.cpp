@@ -1750,3 +1750,25 @@ Value GenericSet::exec(Environment::SharedPtr env) const {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+GenericClear::GenericClear(CodeNode::SharedPtr object)
+    : CodeNode()
+    , object_(object)
+{}
+
+Value GenericClear::exec(Environment::SharedPtr env) const {
+    if (object_) {
+        auto objVal = object_->eval(env);
+        switch (objVal.type()) {
+        case Value::eString:  return Generic::clear(objVal.text());
+        case Value::eArray:   return Generic::clear(objVal.array());
+        case Value::eHashMap: return Generic::clear(objVal.hashMap());
+        default:
+            throw InvalidOperandType(
+                typesToString(Value::eString, Value::eArray, Value::eHashMap),
+                objVal.typeToString());
+        }
+    }
+    return Value::Null;
+}
