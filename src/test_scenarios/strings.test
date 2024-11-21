@@ -49,6 +49,10 @@ __CODE__
 (println (strrev s2))
 (println s2)
 
+;; strsplit
+(println (strsplit "12,24,36,48,60" ','))
+(println (strsplit ",123,4,,56,7," ','))
+
 __EXPECT__
 I am text! Read me...
 21
@@ -80,3 +84,5 @@ gat
 gat
 tag
 tag
+["12" "24" "36" "48" "60"]
+["" "123" "4" "" "56" "7" ""]

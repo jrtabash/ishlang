@@ -854,6 +854,30 @@ Value StringReverse::exec(Environment::SharedPtr env) const {
 }
 
 // -------------------------------------------------------------
+StringSplit::StringSplit(CodeNode::SharedPtr str, CodeNode::SharedPtr delim)
+    : CodeNode()
+    , str_(str)
+    , delim_(delim)
+{}
+
+Value StringSplit::exec(Environment::SharedPtr env) const {
+    if (str_ && delim_) {
+        const Value str = evalOperand(env, str_, Value::eString);
+        const Value delim = evalOperand(env, delim_, Value::eCharacter);
+
+        auto ret = Value(Sequence());
+        auto & arr = ret.array();
+
+        for (auto && token : Util::split(str.text(), delim.character())) {
+            arr.push(Value(std::move(token)));
+        }
+
+        return ret;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 MakeArray::MakeArray()
     : CodeNode()
     , values_()

@@ -711,6 +711,20 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class StringSplit : public CodeNode {
+    public:
+        StringSplit(CodeNode::SharedPtr str, CodeNode::SharedPtr delim);
+        virtual ~StringSplit() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr str_;
+        CodeNode::SharedPtr delim_;
+    };
+
+    // -------------------------------------------------------------
     class MakeArray : public CodeNode {
     public:
         MakeArray();

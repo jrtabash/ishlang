@@ -83,6 +83,7 @@ namespace Ishlang {
         Value(const Pair &p);
         Value(const char *t);
         Value(const std::string &t);
+        Value(std::string &&t);
         Value(const Lambda &f);
         Value(const Struct &s);
         Value(const Instance &o);

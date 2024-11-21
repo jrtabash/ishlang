@@ -92,6 +92,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeStringCompare);
     ADD_TEST(testCodeNodeStringSort);
     ADD_TEST(testCodeNodeStringReverse);
+    ADD_TEST(testCodeNodeStringSplit);
     ADD_TEST(testCodeNodeMakeArray);
     ADD_TEST(testCodeNodeMakeArraySV);
     ADD_TEST(testCodeNodeArrayLen);
@@ -171,6 +172,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserStringCompare);
     ADD_TEST(testParserStringSort);
     ADD_TEST(testParserStringReverse);
+    ADD_TEST(testParserStringSplit);
     ADD_TEST(testParserStringCount);
     ADD_TEST(testParserMakeArray);
     ADD_TEST(testParserMakeArraySV);
@@ -3947,6 +3949,61 @@ void UnitTest::testCodeNodeStringReverse() {
 }
 
 // -------------------------------------------------------------
+void UnitTest::testCodeNodeStringSplit() {
+    auto env = Environment::make();
+
+    auto splitv = [](const Value &str, const Value &delim) {
+        return CodeNode::make<StringSplit>(CodeNode::make<Literal>(str), CodeNode::make<Literal>(delim));
+    };
+
+    auto split = [splitv](const char * str, char delim) {
+        return splitv(Value(str), Value(delim));
+    };
+
+    auto testCase = [&](const char *str, char delim, const std::vector<const char *> &expect) {
+        auto value = split(str, delim)->eval(env);
+        TEST_CASE_MSG(value.isArray(), "type actual=" << value.typeToString());
+
+        const auto &actual = value.array();
+        TEST_CASE_MSG(actual.size() == expect.size(), "size actual=" << actual.size());
+        for (std::size_t i = 0; i < expect.size(); ++i) {
+            TEST_CASE_MSG(actual.get(i) == expect[i], "token " << i << " actual=" << actual.get(i));
+        }
+    };
+
+    testCase("",          ' ', {});
+    testCase(" ",         ' ', {"", ""});
+    testCase("abc",       ' ', {"abc"});
+    testCase("ab cd",     ' ', {"ab", "cd"});
+    testCase("ab cd ef",  ' ', {"ab", "cd", "ef"});
+    testCase("a,b,c",     ',', {"a", "b", "c"});
+    testCase(" a,b , c",  ',', {" a", "b ", " c"});
+    testCase(" a,,b , c", ',', {" a", "", "b ", " c"});
+
+    try {
+        splitv(Value(5ll), Value(' '))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=string actual=int") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        splitv(Value("test"), Value(5ll))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE(std::string("Invalid operand type, expected=char actual=int") == ex.what());
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
 void UnitTest::testCodeNodeMakeArray() {
     auto env = Environment::make();
 
@@ -6746,6 +6803,31 @@ void UnitTest::testParserStringReverse() {
     TEST_CASE(parserTest(parser, env, "(strrev \"54321\")", Value("12345"), true));
 
     TEST_CASE(parserTest(parser, env, "(strsort 34251)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserStringSplit() {
+    auto env = Environment::make();
+    Parser parser;
+
+    const auto vals = [](const std::vector<const char *> &vs) {
+        auto seq = Value(Sequence());
+        auto & arr = seq.array();
+        for (const char * t : vs) { arr.push(Value(t)); }
+        return seq;
+    };
+
+    TEST_CASE(parserTest(parser, env, "(strsplit \"\" ' ')",          vals({}),             true));
+    TEST_CASE(parserTest(parser, env, "(strsplit \",\" ',')",         vals({"", ""}),       true));
+    TEST_CASE(parserTest(parser, env, "(strsplit \"a\" ' ')",         vals({"a"}),          true));
+    TEST_CASE(parserTest(parser, env, "(strsplit \"a b\" ' ')",       vals({"a", "b"}),     true));
+    TEST_CASE(parserTest(parser, env, "(strsplit \"a,b,\" ',')",      vals({"a", "b", ""}), true));
+    TEST_CASE(parserTest(parser, env, "(strsplit \",a,,b,,c,\" ',')", vals({"", "a", "", "b", "", "c", ""}), true));
+
+    TEST_CASE(parserTest(parser, env, "(strsplit)",        Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strsplit \"\")",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strsplit 5 ' ')",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(strsplit \"\" 5)", Value::Null, false));
 }
 
 // -------------------------------------------------------------

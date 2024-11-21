@@ -1,14 +1,5 @@
 ## TODO
 
-### Add strsplit function
-```
-(strsplit <str> <delim>) -> array
-```
-Example:
-```
-(strsplit "1 2 3" ' ') -> ["1" "2" "3"]
-```
-
 ### Add support for file IO
 - Add file type
 - File functions

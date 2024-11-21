@@ -803,6 +803,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "strsplit",
+          [this]() {
+              auto exprs(readAndCheckExprList("strsplit", 2));
+              return CodeNode::make<StringSplit>(exprs[0], exprs[1]);
+          }
+        },
+
         { "array",
           [this]() {
               auto valueExprs(readExprList());

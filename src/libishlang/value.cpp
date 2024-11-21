@@ -46,6 +46,12 @@ Value::Value(const std::string &t)
 {}
 
 // -------------------------------------------------------------
+Value::Value(std::string &&t)
+    : type_(eString)
+    , value_(std::make_shared<std::string>(std::move(t)))
+{}
+
+// -------------------------------------------------------------
 Value::Value(const Lambda &f)
     : type_(eClosure)
     , value_(std::make_shared<Lambda>(f))

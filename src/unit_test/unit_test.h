@@ -120,6 +120,7 @@ namespace Ishlang {
         void testCodeNodeStringCompare();
         void testCodeNodeStringSort();
         void testCodeNodeStringReverse();
+        void testCodeNodeStringSplit();
         void testCodeNodeMakeArray();
         void testCodeNodeMakeArraySV();
         void testCodeNodeArrayLen();
@@ -196,6 +197,7 @@ namespace Ishlang {
         void testParserStringCompare();
         void testParserStringSort();
         void testParserStringReverse();
+        void testParserStringSplit();
         void testParserMakeArray();
         void testParserMakeArraySV();
         void testParserArrayLen();

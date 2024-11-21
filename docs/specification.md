@@ -581,6 +581,11 @@ will clone the value resulting from executing expression
 (strrev <string>)
 ```
 
+**strsplit**: Split string
+```
+(strsplit <string> <delimiter>)
+```
+
 ### Examples
 ```
 (var str "Hello!")
@@ -596,6 +601,7 @@ will clone the value resulting from executing expression
 (println (strsort str true))
 (println (strsort str false))
 (println (strrev str))
+(println (strsplit "1 2 3 4 5" ' '))
 ```
 
 ## String / Character Operations
