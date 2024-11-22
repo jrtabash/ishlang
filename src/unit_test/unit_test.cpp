@@ -134,6 +134,7 @@ UnitTest::UnitTest()
     ADD_TEST(testCodeNodeGenericGet);
     ADD_TEST(testCodeNodeGenericSet);
     ADD_TEST(testCodeNodeGenericClear);
+    ADD_TEST(testCodeNodeGenericFind);
     ADD_TEST(testTokenType);
     ADD_TEST(testCodeNodeStringLen);
     ADD_TEST(testCodeNodeStringGet);
@@ -215,6 +216,7 @@ UnitTest::UnitTest()
     ADD_TEST(testParserGenericGet);
     ADD_TEST(testParserGenericSet);
     ADD_TEST(testParserGenericClear);
+    ADD_TEST(testParserGenericFind);
 }
 #undef ADD_TEST
 
@@ -3710,7 +3712,10 @@ void UnitTest::testCodeNodeStringFind() {
         CodeNode::make<StringFind>(var, clit('0'), ilit(10))->eval(env);
         TEST_CASE(false);
     }
-    catch (const OutOfRange &) {}
+    catch (const OutOfRange &ex) {
+        TEST_CASE_MSG(std::string("Out of range: string find position access") == ex.what(),
+                      "actual='" << ex.what() << "'");
+    }
     catch (...) {
         TEST_CASE(false);
     }
@@ -3719,7 +3724,10 @@ void UnitTest::testCodeNodeStringFind() {
         CodeNode::make<StringFind>(var, clit('0'), ilit(-1))->eval(env);
         TEST_CASE(false);
     }
-    catch (const OutOfRange &) {}
+    catch (const OutOfRange &ex) {
+        TEST_CASE_MSG(std::string("Out of range: string find position access") == ex.what(),
+                      "actual='" << ex.what() << "'");
+    }
     catch (...) {
         TEST_CASE(false);
     }
@@ -4275,7 +4283,7 @@ void UnitTest::testCodeNodeArrayFind() {
         TEST_CASE(false);
     }
     catch (OutOfRange const & ex) {
-        TEST_CASE_MSG(std::string("Out of range: arrfind position access") == ex.what(),
+        TEST_CASE_MSG(std::string("Out of range: array find position access") == ex.what(),
                       "actual='" << ex.what() << "'");
     }
 }
@@ -6018,6 +6026,115 @@ void UnitTest::testCodeNodeGenericClear() {
 
     try {
         clr("i")->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+void UnitTest::testCodeNodeGenericFind() {
+    auto env = Environment::make();
+
+    auto find = [](auto rawObj, auto rawItem, std::optional<Value> rawPos = std::nullopt) {
+        return CodeNode::make<GenericFind>(
+            CodeNode::make<Literal>(Value(rawObj)),
+            CodeNode::make<Literal>(Value(rawItem)),
+            rawPos ? CodeNode::make<Literal>(*rawPos) : CodeNode::SharedPtr());
+    };
+
+    { // String
+        const char *rawStr = "hello";
+        auto val = find(rawStr, 'l')->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 2ll, "actual=" << val);
+
+        val = find(rawStr, 'o', 2ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 4ll, "actual=" << val);
+
+        val = find(rawStr, 'w')->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == -1ll, "actual=" << val);
+
+        try {
+            find(rawStr, "h")->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const InvalidOperandType &ex) {
+            TEST_CASE_MSG(std::string("Invalid operand type, expected=char actual=string") == ex.what(), "actual='" << ex.what() << "'");
+        }
+        catch (...) {
+            TEST_CASE(false);
+        }
+
+        try {
+            find(rawStr, 'o', 5ll)->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const OutOfRange &ex) {
+            TEST_CASE_MSG(std::string("Out of range: string find position access") == ex.what(), "actual='" << ex.what() << "'");
+        }
+        catch (...) {
+            TEST_CASE(false);
+        }
+    }
+
+    { // Array
+        const auto rawSeq = Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll), Value(4ll)});
+        auto val = find(rawSeq, 3ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 2ll, "actual=" << val);
+
+        val = find(rawSeq, 3ll, 1ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 2ll, "actual=" << val);
+
+        val = find(rawSeq, 5ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == -1ll, "actual=" << val);
+
+        try {
+            find(rawSeq, 3ll, 5ll)->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const OutOfRange &ex) {
+            TEST_CASE_MSG(std::string("Out of range: array find position access") == ex.what(), "actual='" << ex.what() << "'");
+        }
+        catch (...) {
+            TEST_CASE(false);
+        }
+
+        try {
+            find(rawSeq, 3ll, -1ll)->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const OutOfRange &ex) {
+            TEST_CASE_MSG(std::string("Out of range: array find position access") == ex.what(), "actual='" << ex.what() << "'");
+        }
+        catch (...) {
+            TEST_CASE(false);
+        }
+    }
+
+    { // HashMap
+        auto rawTab = Hashtable();
+        rawTab.set(Value(1ll), Value(100ll));
+        rawTab.set(Value(2ll), Value(200ll));
+        rawTab.set(Value(3ll), Value(300ll));
+
+        auto val = find(rawTab, 200ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 2ll, "actual=" << val);
+
+        val = find(rawTab, 400ll)->eval(env);
+        TEST_CASE_MSG(val.isNull(), "actual=" << val.typeToString());
+    }
+
+    try {
+        find(5ll, 0ll)->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
@@ -7912,4 +8029,50 @@ void UnitTest::testParserGenericClear() {
 
     TEST_CASE(parserTest(parser, env, "(clear)",   Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(clear 5)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+void UnitTest::testParserGenericFind() {
+    auto env = Environment::make();
+    Parser parser;
+    env->def("txt", Value("abcdef"));
+    env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll), Value(4ll), Value(5ll)})));
+
+    Hashtable ht;
+    ht.set(Value(1ll), Value(10ll));
+    ht.set(Value(2ll), Value(20ll));
+    ht.set(Value(3ll), Value(30ll));
+    env->def("ht", Value(ht));
+
+    TEST_CASE(parserTest(parser, env, "(find txt 'a')", Value(0ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find txt 'd')", Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find txt 'f')", Value(5ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find txt 'g')", Value(-1ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(find txt 'a' 1)", Value(-1ll), true));
+    TEST_CASE(parserTest(parser, env, "(find txt 'd' 2)", Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find txt 'f' 4)", Value(5ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find txt 'g' 3)", Value(-1ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(find seq 1)", Value(0ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find seq 3)", Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find seq 5)", Value(4ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find seq 6)", Value(-1ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(find seq 1 1)", Value(-1ll), true));
+    TEST_CASE(parserTest(parser, env, "(find seq 3 1)", Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find seq 5 3)", Value(4ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find seq 6 3)", Value(-1ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(find ht 10)", Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find ht 20)", Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find ht 30)", Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find ht 40)", Value::Null, true));
+
+    TEST_CASE(parserTest(parser, env, "(find txt 1)",      Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(find txt 'a' 7)",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(find txt 'a' -1)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(find seq 3 6)",    Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(find seq 3 -1)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(find 5 0)",        Value::Null, false));
 }

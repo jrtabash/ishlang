@@ -959,6 +959,16 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (clear <object>)
 ```
 
+**find**: Get position or key of value in string, array or hashmap
+```
+(find <object> <item> [<position>])
+```
+
+### Notes
+- For string, item must be a character
+- The parameter position applies to string and array and is ignored otherwise
+- When provided, position must be an integer, and is used as the search start index
+
 ### Examples
 ```
 (struct Person (name age))
@@ -981,6 +991,10 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (get tab 2 200)
 (get obj name)
 (get obj "name")
+(find txt 'l')
+(find txt 'l' 3)
+(find seq 3)
+(find tab 20)
 (set txt 0 'H')
 (set seq 1 20)
 (set tab 3 30)

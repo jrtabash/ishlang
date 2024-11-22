@@ -753,19 +753,9 @@ StringFind::StringFind(CodeNode::SharedPtr str, CodeNode::SharedPtr chr, CodeNod
 
 Value StringFind::exec(Environment::SharedPtr env) const {
     if (str_ && chr_) {
-        const Value str = evalOperand(env, str_, Value::eString);
-        const Value chr = evalOperand(env, chr_, Value::eCharacter);
-        const Value pos = pos_ ? evalOperand(env, pos_, Value::eInteger) : Value::Zero;
-
-        const auto &rawStr = str.text();
-
-        const auto rawPos = pos.integer();
-        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawStr.size()) {
-            throw OutOfRange("strfind position access");
-        }
-
-        auto result = rawStr.find(chr.character(), rawPos);
-        return result != std::string::npos ? Value(Value::Long(result)) : Value(-1ll);
+        return Generic::find(evalOperand(env, str_, Value::eString).text(),
+                             chr_->eval(env),
+                             pos_ ? pos_->eval(env) : Value::Zero);
     }
     return Value::Null;
 }
@@ -1025,19 +1015,9 @@ ArrayFind::ArrayFind(CodeNode::SharedPtr arr, CodeNode::SharedPtr chr, CodeNode:
 
 Value ArrayFind::exec(Environment::SharedPtr env) const {
     if (arr_ && val_) {
-        const Value arr = evalOperand(env, arr_, Value::eArray);
-        const Value val = val_->eval(env);
-        const Value pos = pos_ ? evalOperand(env, pos_, Value::eInteger) : Value::Zero;
-
-        const auto &rawArray = arr.array();
-
-        const auto rawPos = pos.integer();
-        if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= rawArray.size()) {
-            throw OutOfRange("arrfind position access");
-        }
-
-        auto result = rawArray.find(val, rawPos);
-        return result ? Value(Value::Long(*result)) : Value(-1ll);
+        return Generic::find(evalOperand(env, arr_, Value::eArray).array(),
+                             val_->eval(env),
+                             pos_ ? pos_->eval(env) : Value::Zero);
     }
     return Value::Null;
 }
@@ -1448,8 +1428,8 @@ HashMapFind::HashMapFind(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueEx
 
 Value HashMapFind::exec(Environment::SharedPtr env) const {
     if (htExpr_ && valueExpr_) {
-        const Value hm = evalOperand(env, htExpr_, Value::eHashMap);
-        return hm.hashMap().find(valueExpr_->eval(env));
+        return Generic::find(evalOperand(env, htExpr_, Value::eHashMap).hashMap(),
+                             valueExpr_->eval(env));
     }
     return Value::Null;
 }
@@ -1788,6 +1768,32 @@ Value GenericClear::exec(Environment::SharedPtr env) const {
         case Value::eString:  return Generic::clear(objVal.text());
         case Value::eArray:   return Generic::clear(objVal.array());
         case Value::eHashMap: return Generic::clear(objVal.hashMap());
+        default:
+            throw InvalidOperandType(
+                typesToString(Value::eString, Value::eArray, Value::eHashMap),
+                objVal.typeToString());
+        }
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+GenericFind::GenericFind(CodeNode::SharedPtr object, CodeNode::SharedPtr item, CodeNode::SharedPtr pos)
+    : CodeNode()
+    , object_(object)
+    , item_(item)
+    , pos_(pos)
+{}
+
+Value GenericFind::exec(Environment::SharedPtr env) const {
+    if (object_ && item_) {
+        auto objVal = object_->eval(env);
+        auto itemVal = item_->eval(env);
+
+        switch (objVal.type()) {
+        case Value::eString:  return Generic::find(objVal.text(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
+        case Value::eArray:   return Generic::find(objVal.array(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
+        case Value::eHashMap: return Generic::find(objVal.hashMap(), itemVal);
         default:
             throw InvalidOperandType(
                 typesToString(Value::eString, Value::eArray, Value::eHashMap),

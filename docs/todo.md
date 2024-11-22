@@ -58,10 +58,6 @@
   - **omitems**: orderedmap items
 
 ### Add generic functions
-- Add generic find function with support for strings, arrays and hashmaps
-  ```
-  (find <container> <item>) -> <index|key>
-  ```
 - Add generic count function with support for strings, arrays and hashmaps
   ```
   (count <container> <item>) -> int

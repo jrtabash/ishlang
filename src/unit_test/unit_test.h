@@ -162,6 +162,7 @@ namespace Ishlang {
         void testCodeNodeGenericGet();
         void testCodeNodeGenericSet();
         void testCodeNodeGenericClear();
+        void testCodeNodeGenericFind();
         void testParserBasic();
         void testParserClone();
         void testParserIsType();
@@ -239,6 +240,7 @@ namespace Ishlang {
         void testParserGenericGet();
         void testParserGenericSet();
         void testParserGenericClear();
+        void testParserGenericFind();
         
     private:
         bool  success_;

@@ -35,6 +35,12 @@ __CODE__
 (println (get obj "name"))
 (println (get obj "age"))
 
+(println (find txt 'W'))
+(println (find txt 'W' 4))
+(println (find seq 7))
+(println (find seq 7 2))
+(println (find tab 2))
+
 (println (set txt 6 'w'))
 (println (set seq 2 50))
 (println (set tab "two" 20))
@@ -78,6 +84,11 @@ Jon
 25
 Jon
 25
+6
+6
+3
+3
+two
 w
 50
 20

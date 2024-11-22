@@ -1377,6 +1377,21 @@ namespace Ishlang {
         CodeNode::SharedPtr object_;
     };
 
+    // -------------------------------------------------------------
+    class GenericFind : public CodeNode {
+    public:
+        GenericFind(CodeNode::SharedPtr object, CodeNode::SharedPtr item, CodeNode::SharedPtr pos = CodeNode::SharedPtr());
+        virtual ~GenericFind() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr object_;
+        CodeNode::SharedPtr item_;
+        CodeNode::SharedPtr pos_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_H

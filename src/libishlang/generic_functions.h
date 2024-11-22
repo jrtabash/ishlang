@@ -114,6 +114,38 @@ namespace Ishlang {
         static inline void set(Value::UserObject &obj, const std::string &memberName, const Value &value) {
             obj.set(memberName, value);
         }
+
+        template <typename ObjectType>
+        static inline Value find(ObjectType &obj, const Value &item, const Value &pos = Value::Zero) {
+            if constexpr (std::is_same_v<ObjectType, Value::HashMap>) {
+                return obj.find(item);
+            }
+            else {
+                static_assert(std::is_same_v<ObjectType, Value::Text> || std::is_same_v<ObjectType, Value::Array>);
+
+                if (!pos.isInt()) {
+                    throw InvalidOperandType(Value::typeToString(Value::eInteger), pos.typeToString());
+                }
+
+                const auto rawPos = pos.integer();
+                if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= obj.size()) {
+                    throw OutOfRange(Exception::format("%s find position access", std::is_same_v<ObjectType, Value::Text> ? "string" : "array"));
+                }
+
+                if constexpr (std::is_same_v<ObjectType, Value::Text>) {
+                    if (!item.isChar()) {
+                        throw InvalidOperandType(Value::typeToString(Value::eCharacter), item.typeToString());
+                    }
+
+                    auto result = obj.find(item.character(), rawPos);
+                    return result != std::string::npos ? Value(Value::Long(result)) : Value(-1ll);
+                }
+                else {
+                    auto result = obj.find(item, rawPos);
+                    return result ? Value(Value::Long(*result)) : Value(-1ll);
+                }
+            }
+        }
     };
 
 }
