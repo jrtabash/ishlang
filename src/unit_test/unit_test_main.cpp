@@ -73,7 +73,7 @@ public:
 int main(int argc, char** argv) {
     Arguments args(argc, argv);
 
-    Ishlang::UnitTest unitTest;
+    UnitTest unitTest;
     unitTest.setVerbose(args.verbose);
     if (args.listTests) {
         unitTest.list();

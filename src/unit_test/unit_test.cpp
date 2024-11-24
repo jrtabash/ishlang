@@ -1,7 +1,18 @@
 #include "unit_test.h"
+#include "code_node.h"
+#include "code_node_util.h"
+#include "environment.h"
+#include "hashtable.h"
+#include "instance.h"
+#include "integer_range.h"
+#include "lambda.h"
+#include "lexer.h"
+#include "parser.h"
+#include "struct.h"
+#include "value_pair.h"
+#include "module.h"
 
 #include <array>
-#include "code_node_util.h"
 #include <functional>
 #include <iostream>
 #include <map>
