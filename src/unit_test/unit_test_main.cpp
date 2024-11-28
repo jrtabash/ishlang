@@ -1,8 +1,10 @@
-#include "unit_test.h"
+#include "unit_test_function.h"
 
 #include <cstdlib>
 #include <iostream>
 #include <string>
+
+#include "tests/tests.inc"
 
 class Arguments {
 public:
@@ -73,7 +75,7 @@ public:
 int main(int argc, char** argv) {
     Arguments args(argc, argv);
 
-    UnitTest unitTest;
+    auto & unitTest = UnitTestFtn::unitTest;
     unitTest.setVerbose(args.verbose);
     if (args.listTests) {
         unitTest.list();
