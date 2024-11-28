@@ -116,7 +116,7 @@ namespace Ishlang {
         }
 
         template <typename ObjectType>
-        static inline Value find(ObjectType &obj, const Value &item, const Value &pos = Value::Zero) {
+        static inline Value find(const ObjectType &obj, const Value &item, const Value &pos = Value::Zero) {
             if constexpr (std::is_same_v<ObjectType, Value::HashMap>) {
                 return obj.find(item);
             }
