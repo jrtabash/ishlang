@@ -969,6 +969,14 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 - The parameter position applies to string and array and is ignored otherwise
 - When provided, position must be an integer, and is used as the search start index
 
+**count**: Count number of times value occurs in string, array or hashmap
+```
+(count <object> <item>)
+```
+
+### Notes
+- For string, item must be a character
+
 ### Examples
 ```
 (struct Person (name age))
@@ -995,6 +1003,9 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (find txt 'l' 3)
 (find seq 3)
 (find tab 20)
+(count txt 'l')
+(count seq 2)
+(count tab 20)
 (set txt 0 'H')
 (set seq 1 20)
 (set tab 3 30)

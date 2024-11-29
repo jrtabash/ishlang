@@ -1392,6 +1392,20 @@ namespace Ishlang {
         CodeNode::SharedPtr pos_;
     };
 
+    // -------------------------------------------------------------
+    class GenericCount : public CodeNode {
+    public:
+        GenericCount(CodeNode::SharedPtr object, CodeNode::SharedPtr item);
+        virtual ~GenericCount() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr object_;
+        CodeNode::SharedPtr item_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_H

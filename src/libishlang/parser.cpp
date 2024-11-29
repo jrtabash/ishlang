@@ -1148,6 +1148,13 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckRangeExprList("find", 2, 3));
               return CodeNode::make<GenericFind>(exprs[0], exprs[1], exprs.size() == 3 ? exprs[2] : CodeNode::SharedPtr());
           }
+        },
+
+        { "count",
+          [this]() {
+              auto exprs(readAndCheckExprList("count", 2));
+              return CodeNode::make<GenericCount>(exprs[0], exprs[1]);
+          }
         }
     };
 }

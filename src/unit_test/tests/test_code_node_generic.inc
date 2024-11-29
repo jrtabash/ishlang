@@ -518,3 +518,84 @@ DEFINE_TEST(testCodeNodeGenericFind) {
         TEST_CASE(false);
     }
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeGenericCount) {
+    auto env = Environment::make();
+
+    auto count = [](auto rawObj, auto rawItem) {
+        return CodeNode::make<GenericCount>(
+            CodeNode::make<Literal>(Value(rawObj)),
+            CodeNode::make<Literal>(Value(rawItem)));
+    };
+
+    { // String
+        const char *rawStr = "hello";
+        auto val = count(rawStr, 'l')->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 2ll, "actual=" << val);
+
+        val = count(rawStr, 'o')->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 1ll, "actual=" << val);
+
+        val = count(rawStr, 'w')->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
+
+        try {
+            count(rawStr, "h")->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const InvalidOperandType &ex) {
+            TEST_CASE_MSG(std::string("Invalid operand type, expected=char actual=string") == ex.what(), "actual='" << ex.what() << "'");
+        }
+        catch (...) {
+            TEST_CASE(false);
+        }
+    }
+
+    { // Array
+        const auto rawSeq = Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll), Value(3ll), Value(4ll)});
+        auto val = count(rawSeq, 3ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 2ll, "actual=" << val);
+
+        val = count(rawSeq, 2ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 1ll, "actual=" << val);
+
+        val = count(rawSeq, 5ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
+    }
+
+    { // HashMap
+        auto rawTab = Hashtable();
+        rawTab.set(Value(1ll), Value(100ll));
+        rawTab.set(Value(2ll), Value(200ll));
+        rawTab.set(Value(20ll), Value(200ll));
+        rawTab.set(Value(3ll), Value(300ll));
+
+        auto val = count(rawTab, 200ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 2ll, "actual=" << val);
+
+        val = count(rawTab, 100ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 1ll, "actual=" << val);
+
+        val = count(rawTab, 400ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
+    }
+
+    try {
+        count(5ll, 0ll)->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}

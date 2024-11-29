@@ -769,12 +769,8 @@ StringCount::StringCount(CodeNode::SharedPtr str, CodeNode::SharedPtr chr)
 
 Value StringCount::exec(Environment::SharedPtr env) const {
     if (str_ && chr_) {
-        const Value str = evalOperand(env, str_, Value::eString);
-        const Value chr = evalOperand(env, chr_, Value::eCharacter);
-
-        const auto &rawStr = str.text();
-
-        return Value(Value::Long(std::count(rawStr.begin(), rawStr.end(), chr.character())));
+        return Generic::count(evalOperand(env, str_, Value::eString).text(),
+                              chr_->eval(env));
     }
     return Value::Null;
 }
@@ -1031,8 +1027,8 @@ ArrayCount::ArrayCount(CodeNode::SharedPtr arr, CodeNode::SharedPtr val)
 
 Value ArrayCount::exec(Environment::SharedPtr env) const {
     if (arr_ && val_) {
-        const Value arr = evalOperand(env, arr_, Value::eArray);
-        return Value(Value::Long(arr.array().count(val_->eval(env))));
+        return Generic::count(evalOperand(env, arr_, Value::eArray).array(),
+                              val_->eval(env));
     }
     return Value::Null;
 }
@@ -1443,8 +1439,8 @@ HashMapCount::HashMapCount(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr value
 
 Value HashMapCount::exec(Environment::SharedPtr env) const {
     if (htExpr_ && valueExpr_) {
-        const Value hm = evalOperand(env, htExpr_, Value::eHashMap);
-        return Value(Value::Long(hm.hashMap().count(valueExpr_->eval(env))));
+        return Generic::count(evalOperand(env, htExpr_, Value::eHashMap).hashMap(),
+                              valueExpr_->eval(env));
     }
     return Value::Zero;
 }
@@ -1794,6 +1790,32 @@ Value GenericFind::exec(Environment::SharedPtr env) const {
         case Value::eString:  return Generic::find(objVal.text(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
         case Value::eArray:   return Generic::find(objVal.array(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
         case Value::eHashMap: return Generic::find(objVal.hashMap(), itemVal);
+        default:
+            throw InvalidOperandType(
+                typesToString(Value::eString, Value::eArray, Value::eHashMap),
+                objVal.typeToString());
+        }
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+GenericCount::GenericCount(CodeNode::SharedPtr object, CodeNode::SharedPtr item)
+    : CodeNode()
+    , object_(object)
+    , item_(item)
+{}
+
+// -------------------------------------------------------------
+Value GenericCount::exec(Environment::SharedPtr env) const {
+    if (object_ && item_) {
+        auto objVal = object_->eval(env);
+        auto itemVal = item_->eval(env);
+
+        switch (objVal.type()) {
+        case Value::eString:  return Generic::count(objVal.text(), itemVal);
+        case Value::eArray:   return Generic::count(objVal.array(), itemVal);
+        case Value::eHashMap: return Generic::count(objVal.hashMap(), itemVal);
         default:
             throw InvalidOperandType(
                 typesToString(Value::eString, Value::eArray, Value::eHashMap),

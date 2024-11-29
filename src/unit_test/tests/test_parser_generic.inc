@@ -219,3 +219,38 @@ DEFINE_TEST(testParserGenericFind) {
     TEST_CASE(parserTest(parser, env, "(find seq 3 -1)",   Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(find 5 0)",        Value::Null, false));
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserGenericCount) {
+    auto env = Environment::make();
+    Parser parser;
+    env->def("txt", Value("abacbadef"));
+    env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(1ll), Value(2ll), Value(3ll), Value(1ll), Value(4ll), Value(5ll)})));
+
+    Hashtable ht;
+    ht.set(Value(1ll), Value(10ll));
+    ht.set(Value(2ll), Value(20ll));
+    ht.set(Value(3ll), Value(30ll));
+    ht.set(Value(4ll), Value(20ll));
+    env->def("ht", Value(ht));
+
+    TEST_CASE(parserTest(parser, env, "(count txt 'a')", Value(3ll), true));
+    TEST_CASE(parserTest(parser, env, "(count txt 'b')", Value(2ll), true));
+    TEST_CASE(parserTest(parser, env, "(count txt 'c')", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(count txt 'f')", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(count txt 'g')", Value(0ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(count seq 1)", Value(3ll), true));
+    TEST_CASE(parserTest(parser, env, "(count seq 2)", Value(2ll), true));
+    TEST_CASE(parserTest(parser, env, "(count seq 3)", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(count seq 5)", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(count seq 6)", Value(0ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(count ht 10)", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(count ht 20)", Value(2ll), true));
+    TEST_CASE(parserTest(parser, env, "(count ht 30)", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(count ht 40)", Value(0ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(count txt 1)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(count 5 0)",   Value::Null, false));
+}

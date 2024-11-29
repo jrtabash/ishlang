@@ -146,6 +146,21 @@ namespace Ishlang {
                 }
             }
         }
+
+        template <typename ObjectType>
+        static inline Value count(const ObjectType &obj, const Value &item) {
+            if constexpr (std::is_same_v<ObjectType, Value::Text>) {
+                if (!item.isChar()) {
+                    throw InvalidOperandType(Value::typeToString(Value::eCharacter), item.typeToString());
+                }
+
+                return Value(Value::Long(std::count(obj.begin(), obj.end(), item.character())));
+            }
+            else {
+                static_assert(std::is_same_v<ObjectType, Value::Array> || std::is_same_v<ObjectType, Value::HashMap>);
+                return Value(Value::Long(obj.count(item)));
+            }
+        }
     };
 
 }

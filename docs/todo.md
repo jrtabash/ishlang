@@ -58,10 +58,6 @@
   - **omitems**: orderedmap items
 
 ### Add generic functions
-- Add generic count function with support for strings, arrays and hashmaps
-  ```
-  (count <container> <item>) -> int
-  ```
 - Add generic sort function with support for strings and arrays
   ```
   (sort <sequence> key=null asc=true) -> <container>

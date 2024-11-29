@@ -7,16 +7,19 @@ __CODE__
 (var rng (range 0 100 2))
 (var obj (makeinstance Person (name "Jon") (age 25)))
 
+(println "== len ==")
 (println (len txt))
 (println (len seq))
 (println (len tab))
 (println (len rng))
 
+(println "== empty ==")
 (println (empty txt))
 (println (empty seq))
 (println (empty tab))
 (println (empty rng))
 
+(println "== get ==")
 (println (get txt 0))
 (println (get txt 1))
 (println (get txt (- (len txt) 1)))
@@ -35,12 +38,20 @@ __CODE__
 (println (get obj "name"))
 (println (get obj "age"))
 
+(println "== find ==")
 (println (find txt 'W'))
 (println (find txt 'W' 4))
 (println (find seq 7))
 (println (find seq 7 2))
 (println (find tab 2))
 
+(println "== count ==")
+(println (count txt 'l'))
+(println (count txt 'o'))
+(println (count seq 3))
+(println (count tab 2))
+
+(println "== set ==")
 (println (set txt 6 'w'))
 (println (set seq 2 50))
 (println (set tab "two" 20))
@@ -53,23 +64,28 @@ __CODE__
 (println (get obj name))
 (println (get obj age))
 
+(println "== clear ==")
 (println (clear txt))
 (println (clear seq))
 (println (clear tab))
 
+(println "== len ==")
 (println (len txt))
 (println (len seq))
 (println (len tab))
 
 __EXPECT__
+== len ==
 12
 5
 2
 50
+== empty ==
 false
 false
 false
 false
+== get ==
 H
 e
 !
@@ -84,11 +100,18 @@ Jon
 25
 Jon
 25
+== find ==
 6
 6
 3
 3
 two
+== count ==
+3
+2
+1
+1
+== set ==
 w
 50
 20
@@ -99,9 +122,11 @@ w
 20
 John
 24
+== clear ==
 12
 5
 2
+== len ==
 0
 0
 0
