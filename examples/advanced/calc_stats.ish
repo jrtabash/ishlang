@@ -8,7 +8,7 @@
    stddev))
 
 (defun calcSumAvgMinAndMax (arr)
-  (var size (arrlen arr))
+  (var size (len arr))
   (var sum 0.0)
   (var avg 0.0)
   (var min 0.0)
@@ -26,7 +26,7 @@
   (array sum avg min max))
 
 (defun calcVariance (arr average)
-  (var size (arrlen arr))
+  (var size (len arr))
   (var variance 0.0)
   (when (> size 0)
     (progn
@@ -43,7 +43,7 @@
   (var variance (calcVariance arr mean))
 
   (makeinstance Summary
-    (count (arrlen arr))
+    (count (len arr))
     (sum (get samm 0))
     (mean mean)
     (min (get samm 2))

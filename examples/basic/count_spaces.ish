@@ -1,6 +1,6 @@
 (defun countSpacesLoop (str)
   (var count 0)
-  (loop (var i 0) (< i (strlen str)) (= i (+ i 1))
+  (loop (var i 0) (< i (len str)) (= i (+ i 1))
         (when (== (get str i) ' ')
           (= count (+ count 1))))
   count)

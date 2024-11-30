@@ -4,7 +4,7 @@
    position))
 
 (defun makeTokenizerState (str)
-  (makeinstance TokenizerState (string str) (length (strlen str)) (position 0)))
+  (makeinstance TokenizerState (string str) (length (len str)) (position 0)))
 
 (defun nextToken (tokState)
   (var str (get tokState string))

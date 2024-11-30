@@ -37,9 +37,9 @@
           (ftn cur))))
 
 (defun list_len (list)
-  (var len 0)
-  (list_foreach list (lambda (node) (= len (+ len 1))))
-  len)
+  (var size 0)
+  (list_foreach list (lambda (node) (= size (+ size 1))))
+  size)
 
 (defun list_last (list)
   (var last null)
