@@ -58,10 +58,6 @@
   - **omitems**: orderedmap items
 
 ### Add generic functions
-- Add generic sort function with support for strings and arrays
-  ```
-  (sort <sequence> key=null asc=true) -> <container>
-  ```
 - Add generic reverse function with support for strings and arrays
   ```
   (reverse <sequence>) -> <sequence>

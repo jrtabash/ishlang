@@ -254,3 +254,41 @@ DEFINE_TEST(testParserGenericCount) {
     TEST_CASE(parserTest(parser, env, "(count txt 1)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(count 5 0)",   Value::Null, false));
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserGenericSort) {
+    auto env = Environment::make();
+    Parser parser;
+
+    const auto v1 = Value(1ll);
+    const auto v2 = Value(2ll);
+    const auto v3 = Value(3ll);
+    const auto v4 = Value(4ll);
+    const auto v5 = Value(5ll);
+    const auto v6 = Value(6ll);
+    const auto v7 = Value(7ll);
+
+    env->def("txt", Value("3216574"));
+    env->def("seq", arrval(v3, v2, v1, v6, v5, v7, v4));
+
+    TEST_CASE(parserTest(parser, env, "(sort txt)",       Value("1234567"), true));
+    TEST_CASE(parserTest(parser, env, "(sort txt true)",  Value("7654321"), true));
+    TEST_CASE(parserTest(parser, env, "(sort txt false)", Value("1234567"), true));
+
+    TEST_CASE(parserTest(parser, env, "(sort \"\")",     Value(""),     true));
+    TEST_CASE(parserTest(parser, env, "(sort \"1\")",    Value("1"),    true));
+    TEST_CASE(parserTest(parser, env, "(sort \"21\")",   Value("12"),   true));
+    TEST_CASE(parserTest(parser, env, "(sort \"2121\")", Value("1122"), true));
+
+    TEST_CASE(parserTest(parser, env, "(sort seq)",       arrval(v1, v2, v3, v4, v5, v6, v7), true));
+    TEST_CASE(parserTest(parser, env, "(sort seq true)",  arrval(v7, v6, v5, v4, v3, v2, v1), true));
+    TEST_CASE(parserTest(parser, env, "(sort seq false)", arrval(v1, v2, v3, v4, v5, v6, v7), true));
+
+    TEST_CASE(parserTest(parser, env, "(sort (array))",         arrval(),               true));
+    TEST_CASE(parserTest(parser, env, "(sort (array 1))",       arrval(v1),             true));
+    TEST_CASE(parserTest(parser, env, "(sort (array 2 1))",     arrval(v1, v2),         true));
+    TEST_CASE(parserTest(parser, env, "(sort (array 2 1 2 1))", arrval(v1, v1, v2, v2), true));
+
+    TEST_CASE(parserTest(parser, env, "(sort txt 1)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(sort 5)",     Value::Null, false));
+}

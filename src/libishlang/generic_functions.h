@@ -161,6 +161,26 @@ namespace Ishlang {
                 return Value(Value::Long(obj.count(item)));
             }
         }
+
+        template <typename ObjectType>
+        static inline void sort(ObjectType &obj, const Value &desc) {
+            if (!desc.isBool()) {
+                throw InvalidOperandType(Value::typeToString(Value::eBoolean), desc.typeToString());
+            }
+
+            if constexpr (std::is_same_v<ObjectType, Value::Text>) {
+                if (desc.boolean()) {
+                    std::sort(obj.begin(), obj.end(), std::greater<char>());
+                }
+                else {
+                    std::sort(obj.begin(), obj.end());
+                }
+            }
+            else {
+                static_assert(std::is_same_v<ObjectType, Value::Array>);
+                obj.sort(desc.boolean());
+            }
+        }
     };
 
 }

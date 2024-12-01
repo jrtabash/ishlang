@@ -74,6 +74,14 @@ __CODE__
 (println (len seq))
 (println (len tab))
 
+(println "== sort ==")
+(println (sort (array 2 1 5 4 3)))
+(println (sort (array 2 1 5 4 3) false))
+(println (sort (array 2 1 5 4 3) true))
+(println (sort "21543"))
+(println (sort "21543" false))
+(println (sort "21543" true))
+
 __EXPECT__
 == len ==
 12
@@ -130,3 +138,10 @@ John
 0
 0
 0
+== sort ==
+[1 2 3 4 5]
+[1 2 3 4 5]
+[5 4 3 2 1]
+12345
+12345
+54321

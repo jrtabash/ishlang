@@ -1406,6 +1406,20 @@ namespace Ishlang {
         CodeNode::SharedPtr item_;
     };
 
+    // -------------------------------------------------------------
+    class GenericSort : public CodeNode {
+    public:
+        GenericSort(CodeNode::SharedPtr obj, CodeNode::SharedPtr descending);
+        virtual ~GenericSort() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr obj_;
+        CodeNode::SharedPtr desc_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_H

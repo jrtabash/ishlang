@@ -806,16 +806,7 @@ StringSort::StringSort(CodeNode::SharedPtr str, CodeNode::SharedPtr descending)
 Value StringSort::exec(Environment::SharedPtr env) const {
     if (str_) {
         Value str = evalOperand(env, str_, Value::eString);
-        const Value desc = desc_ ? evalOperand(env, desc_, Value::eBoolean) : Value::False;
-
-        auto & rawStr = str.text();
-
-        if (desc.boolean()) {
-            std::sort(rawStr.begin(), rawStr.end(), std::greater<char>());
-        }
-        else {
-            std::sort(rawStr.begin(), rawStr.end());
-        }
+        Generic::sort(str.text(), desc_ ? desc_->eval(env) : Value::False);
         return str;
     }
     return Value::Null;
@@ -1043,11 +1034,7 @@ ArraySort::ArraySort(CodeNode::SharedPtr arr, CodeNode::SharedPtr descending)
 Value ArraySort::exec(Environment::SharedPtr env) const {
     if (arr_) {
         Value arr = evalOperand(env, arr_, Value::eArray);
-        const Value desc = desc_ ? evalOperand(env, desc_, Value::eBoolean) : Value::False;
-
-        auto & rawArr = arr.array();
-
-        rawArr.sort(desc.boolean());
+        Generic::sort(arr.array(), desc_ ? desc_->eval(env) : Value::False);
         return arr;
     }
     return Value::Null;
@@ -1821,6 +1808,30 @@ Value GenericCount::exec(Environment::SharedPtr env) const {
                 typesToString(Value::eString, Value::eArray, Value::eHashMap),
                 objVal.typeToString());
         }
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+GenericSort::GenericSort(CodeNode::SharedPtr obj, CodeNode::SharedPtr descending)
+    : CodeNode()
+    , obj_(obj)
+    , desc_(descending)
+{}
+
+Value GenericSort::exec(Environment::SharedPtr env) const {
+    if (obj_) {
+        Value obj = obj_->eval(env);
+        const Value desc = desc_ ? desc_->eval(env) : Value::False;
+        switch (obj.type()) {
+        case Value::eString: Generic::sort(obj.text(), desc);  break;
+        case Value::eArray:  Generic::sort(obj.array(), desc); break;
+        default:
+            throw InvalidOperandType(
+                typesToString(Value::eString, Value::eArray),
+                obj.typeToString());
+        }
+        return obj;
     }
     return Value::Null;
 }

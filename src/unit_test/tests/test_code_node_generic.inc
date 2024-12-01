@@ -599,3 +599,96 @@ DEFINE_TEST(testCodeNodeGenericCount) {
         TEST_CASE(false);
     }
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeGenericSort) {
+    auto env = Environment::make();
+
+    const auto v1 = Value(1ll);
+    const auto v2 = Value(2ll);
+    const auto v3 = Value(3ll);
+    const auto v4 = Value(4ll);
+    const auto v5 = Value(5ll);
+    const auto v6 = Value(6ll);
+    const auto v7 = Value(7ll);
+
+    env->def("num", Value(5ll));
+    env->def("str", Value("3215674"));
+    env->def("arr", arrval(v3, v2, v1, v5, v6, v7, v4));
+
+    const auto sort = [](const char *obj, const Value &desc = Value::Null) {
+        return CodeNode::make<GenericSort>(
+            CodeNode::make<Variable>(obj),
+            desc != Value::Null ? CodeNode::make<Literal>(desc) : CodeNode::SharedPtr());
+    };
+
+    const auto str = [&env]() { return env->get("str"); };
+    const auto arr = [&env]() { return env->get("arr"); };
+
+    { // String
+        auto val = sort("str")->eval(env);
+        TEST_CASE_MSG(val.isString(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.text() == "1234567", "actual=" << val);
+        TEST_CASE_MSG(val == str(), "actual=" << val);
+
+        val = sort("str", Value::True)->eval(env);
+        TEST_CASE_MSG(val.isString(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.text() == "7654321", "actual=" << val);
+        TEST_CASE_MSG(val == str(), "actual=" << val);
+
+        val = sort("str", Value::False)->eval(env);
+        TEST_CASE_MSG(val.isString(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.text() == "1234567", "actual=" << val);
+        TEST_CASE_MSG(val == str(), "actual=" << val);
+
+        try {
+            sort("str", Value("h"))->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const InvalidOperandType &ex) {
+            TEST_CASE_MSG(std::string("Invalid operand type, expected=bool actual=string") == ex.what(), "actual='" << ex.what() << "'");
+        }
+        catch (...) {
+            TEST_CASE(false);
+        }
+    }
+
+    { // Array
+        auto val = sort("arr")->eval(env);
+        TEST_CASE_MSG(val.isArray(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.array() == arrval(v1, v2, v3, v4, v5, v6, v7), "actual=" << val);
+        TEST_CASE_MSG(val == arr(), "actual=" << val);
+
+        val = sort("arr", Value::True)->eval(env);
+        TEST_CASE_MSG(val.isArray(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.array() == arrval(v7, v6, v5, v4, v3, v2, v1), "actual=" << val);
+        TEST_CASE_MSG(val == arr(), "actual=" << val);
+
+        val = sort("arr", Value::False)->eval(env);
+        TEST_CASE_MSG(val.isArray(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.array() == arrval(v1, v2, v3, v4, v5, v6, v7), "actual=" << val);
+        TEST_CASE_MSG(val == arr(), "actual=" << val);
+
+        try {
+            sort("arr", Value("h"))->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const InvalidOperandType &ex) {
+            TEST_CASE_MSG(std::string("Invalid operand type, expected=bool actual=string") == ex.what(), "actual='" << ex.what() << "'");
+        }
+        catch (...) {
+            TEST_CASE(false);
+        }
+    }
+
+    try {
+        sort("num")->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE_MSG(std::string("Invalid operand type, expected=string|array actual=int") == ex.what(), "actual='" << ex.what() << "'");
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}

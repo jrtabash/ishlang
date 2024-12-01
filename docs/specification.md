@@ -977,6 +977,14 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 ### Notes
 - For string, item must be a character
 
+**sort**: Sort string or array
+```
+(sort <obj> [<descending>])
+```
+
+### Notes
+- When provided, descending must be a boolean
+
 ### Examples
 ```
 (struct Person (name age))
