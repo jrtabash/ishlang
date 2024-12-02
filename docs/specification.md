@@ -287,7 +287,6 @@ Conditional only form:
   <body_expression>)
 ```
 
-### Notes
 - Loop over each element in `<iterable_expression>`
 - Iterable expression can be a string, array, hashmap or range
 - The `<var>` variable is read-only and cannot directly modify iterable elemets
@@ -876,7 +875,6 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (range <begin> <end> [<step>])
 ```
 
-### Notes
 - Range includes begin and excludes end
 - Use foreach to loop over ranges
 - Use expand to expand ranges to an array
@@ -940,7 +938,6 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (get <object> <key> [<default_return>])
 ```
 
-### Notes
 - For string and array, key must be an integer
 - For userobject, key must be a member name/symbol or a string
 - The parameter default_return applies to hashmap and is ignored otherwise
@@ -950,7 +947,6 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (set <object> <key> <value>)
 ```
 
-### Notes
 - For string and array, key must be an integer
 - For userobject, key must be a member name/symbol or a string
 
@@ -964,7 +960,6 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (find <object> <item> [<position>])
 ```
 
-### Notes
 - For string, item must be a character
 - The parameter position applies to string and array and is ignored otherwise
 - When provided, position must be an integer, and is used as the search start index
@@ -974,7 +969,6 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (count <object> <item>)
 ```
 
-### Notes
 - For string, item must be a character
 
 **sort**: Sort string or array
@@ -982,7 +976,6 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (sort <obj> [<descending>])
 ```
 
-### Notes
 - When provided, descending must be a boolean
 
 **reverse**: Reverse string or array
