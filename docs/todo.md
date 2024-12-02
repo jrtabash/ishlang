@@ -58,10 +58,6 @@
   - **omitems**: orderedmap items
 
 ### Add generic functions
-- Add generic reverse function with support for strings and arrays
-  ```
-  (reverse <sequence>) -> <sequence>
-  ```
 - Add generic sum function with support for arrays and ranges
   ```
   (sum <sequence> [<start> [<end>]]) -> int|real

@@ -985,6 +985,11 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 ### Notes
 - When provided, descending must be a boolean
 
+**reverse**: Reverse string or array
+```
+(reverse <obj>)
+```
+
 ### Examples
 ```
 (struct Person (name age))
@@ -1022,6 +1027,8 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (sort txt true)
 (sort txt)
 (sort seq true)
+(reverse txt)
+(reverse seq)
 (clear txt)
 (clear seq)
 (clear tab)

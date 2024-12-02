@@ -1162,6 +1162,13 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckRangeExprList("sort", 1, 2));
               return CodeNode::make<GenericSort>(exprs[0], exprs.size() == 2 ? exprs[1] : CodeNode::SharedPtr());
           }
+        },
+
+        { "reverse",
+          [this]() {
+              auto exprs(readAndCheckExprList("reverse", 1));
+              return CodeNode::make<GenericReverse>(exprs[0]);
+          }
         }
     };
 }

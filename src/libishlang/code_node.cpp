@@ -821,10 +821,7 @@ StringReverse::StringReverse(CodeNode::SharedPtr str)
 Value StringReverse::exec(Environment::SharedPtr env) const {
     if (str_) {
         Value str = evalOperand(env, str_, Value::eString);
-
-        auto & rawStr = str.text();
-
-        std::reverse(rawStr.begin(), rawStr.end());
+        Generic::reverse(str.text());
         return str;
     }
     return Value::Null;
@@ -1049,10 +1046,7 @@ ArrayReverse::ArrayReverse(CodeNode::SharedPtr arr)
 Value ArrayReverse::exec(Environment::SharedPtr env) const {
     if (arr_) {
         Value arr = evalOperand(env, arr_, Value::eArray);
-
-        auto & rawArr = arr.array();
-
-        rawArr.reverse();
+        Generic::reverse(arr.array());
         return arr;
     }
     return Value::Null;
@@ -1826,6 +1820,28 @@ Value GenericSort::exec(Environment::SharedPtr env) const {
         switch (obj.type()) {
         case Value::eString: Generic::sort(obj.text(), desc);  break;
         case Value::eArray:  Generic::sort(obj.array(), desc); break;
+        default:
+            throw InvalidOperandType(
+                typesToString(Value::eString, Value::eArray),
+                obj.typeToString());
+        }
+        return obj;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+GenericReverse::GenericReverse(CodeNode::SharedPtr obj)
+    : CodeNode()
+    , obj_(obj)
+{}
+
+Value GenericReverse::exec(Environment::SharedPtr env) const {
+    if (obj_) {
+        Value obj = obj_->eval(env);
+        switch (obj.type()) {
+        case Value::eString: Generic::reverse(obj.text());  break;
+        case Value::eArray:  Generic::reverse(obj.array()); break;
         default:
             throw InvalidOperandType(
                 typesToString(Value::eString, Value::eArray),

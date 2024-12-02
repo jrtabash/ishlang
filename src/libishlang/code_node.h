@@ -1420,6 +1420,19 @@ namespace Ishlang {
         CodeNode::SharedPtr desc_;
     };
 
+    // -------------------------------------------------------------
+    class GenericReverse : public CodeNode {
+    public:
+        GenericReverse(CodeNode::SharedPtr obj);
+        virtual ~GenericReverse() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr obj_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_H

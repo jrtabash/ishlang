@@ -82,6 +82,12 @@ __CODE__
 (println (sort "21543" false))
 (println (sort "21543" true))
 
+(println "== reverse ==")
+(println (reverse "12345"))
+(println (reverse "1"))
+(println (reverse (array 1 2 3 4 5)))
+(println (reverse (array 1)))
+
 __EXPECT__
 == len ==
 12
@@ -145,3 +151,8 @@ John
 12345
 12345
 54321
+== reverse ==
+54321
+1
+[5 4 3 2 1]
+[1]

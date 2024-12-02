@@ -692,3 +692,60 @@ DEFINE_TEST(testCodeNodeGenericSort) {
         TEST_CASE(false);
     }
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeGenericReverse) {
+    auto env = Environment::make();
+
+    const auto v1 = Value(1ll);
+    const auto v2 = Value(2ll);
+    const auto v3 = Value(3ll);
+    const auto v4 = Value(4ll);
+    const auto v5 = Value(5ll);
+
+    env->def("num", Value(5ll));
+    env->def("str", Value("12345"));
+    env->def("arr", arrval(v1, v2, v3, v4, v5));
+
+    const auto reverse = [](const char *obj) {
+        return CodeNode::make<GenericReverse>(CodeNode::make<Variable>(obj));
+    };
+
+    const auto str = [&env]() { return env->get("str"); };
+    const auto arr = [&env]() { return env->get("arr"); };
+
+    { // String
+        auto val = reverse("str")->eval(env);
+        TEST_CASE_MSG(val.isString(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.text() == "54321", "actual=" << val);
+        TEST_CASE_MSG(val == str(), "actual=" << val);
+
+        val = reverse("str")->eval(env);
+        TEST_CASE_MSG(val.isString(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.text() == "12345", "actual=" << val);
+        TEST_CASE_MSG(val == str(), "actual=" << val);
+    }
+
+    { // Array
+        auto val = reverse("arr")->eval(env);
+        TEST_CASE_MSG(val.isArray(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.array() == arrval(v5, v4, v3, v2, v1), "actual=" << val);
+        TEST_CASE_MSG(val == arr(), "actual=" << val);
+
+        val = reverse("arr")->eval(env);
+        TEST_CASE_MSG(val.isArray(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.array() == arrval(v1, v2, v3, v4, v5), "actual=" << val);
+        TEST_CASE_MSG(val == arr(), "actual=" << val);
+    }
+
+    try {
+        reverse("num")->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE_MSG(std::string("Invalid operand type, expected=string|array actual=int") == ex.what(), "actual='" << ex.what() << "'");
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}

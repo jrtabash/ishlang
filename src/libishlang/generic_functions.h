@@ -181,6 +181,17 @@ namespace Ishlang {
                 obj.sort(desc.boolean());
             }
         }
+
+        template <typename ObjectType>
+        static inline void reverse(ObjectType &obj) {
+            if constexpr (std::is_same_v<ObjectType, Value::Text>) {
+                std::reverse(obj.begin(), obj.end());
+            }
+            else {
+                static_assert(std::is_same_v<ObjectType, Value::Array>);
+                obj.reverse();
+            }
+        }
     };
 
 }

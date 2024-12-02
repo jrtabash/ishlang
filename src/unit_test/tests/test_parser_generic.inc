@@ -292,3 +292,36 @@ DEFINE_TEST(testParserGenericSort) {
     TEST_CASE(parserTest(parser, env, "(sort txt 1)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(sort 5)",     Value::Null, false));
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserGenericReverse) {
+    auto env = Environment::make();
+    Parser parser;
+
+    const auto v1 = Value(1ll);
+    const auto v2 = Value(2ll);
+    const auto v3 = Value(3ll);
+    const auto v4 = Value(4ll);
+    const auto v5 = Value(5ll);
+
+    env->def("txt", Value("12345"));
+    env->def("seq", arrval(v1, v2, v3, v4, v5));
+
+    TEST_CASE(parserTest(parser, env, "(reverse txt)", Value("54321"), true));
+    TEST_CASE(parserTest(parser, env, "(reverse txt)", Value("12345"), true));
+
+    TEST_CASE(parserTest(parser, env, "(reverse \"\")",     Value(""),     true));
+    TEST_CASE(parserTest(parser, env, "(reverse \"1\")",    Value("1"),    true));
+    TEST_CASE(parserTest(parser, env, "(reverse \"21\")",   Value("12"),   true));
+    TEST_CASE(parserTest(parser, env, "(reverse \"2121\")", Value("1212"), true));
+
+    TEST_CASE(parserTest(parser, env, "(reverse seq)", arrval(v5, v4, v3, v2, v1), true));
+    TEST_CASE(parserTest(parser, env, "(reverse seq)", arrval(v1, v2, v3, v4, v5), true));
+
+    TEST_CASE(parserTest(parser, env, "(reverse (array))",         arrval(),               true));
+    TEST_CASE(parserTest(parser, env, "(reverse (array 1))",       arrval(v1),             true));
+    TEST_CASE(parserTest(parser, env, "(reverse (array 2 1))",     arrval(v1, v2),         true));
+    TEST_CASE(parserTest(parser, env, "(reverse (array 2 1 2 1))", arrval(v1, v2, v1, v2), true));
+
+    TEST_CASE(parserTest(parser, env, "(sort 5)", Value::Null, false));
+}
