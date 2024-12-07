@@ -1433,6 +1433,19 @@ namespace Ishlang {
         CodeNode::SharedPtr obj_;
     };
 
+    // -------------------------------------------------------------
+    class GenericSum : public CodeNode {
+    public:
+        GenericSum(CodeNode::SharedPtr obj);
+        virtual ~GenericSum() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr obj_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_H

@@ -749,3 +749,83 @@ DEFINE_TEST(testCodeNodeGenericReverse) {
         TEST_CASE(false);
     }
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeGenericSum) {
+    auto env = Environment::make();
+
+    const auto v1 = Value(1ll);
+    const auto v2 = Value(2ll);
+    const auto v3 = Value(3ll);
+    const auto v4 = Value(4ll);
+    const auto v5 = Value(5ll);
+
+    const auto f1 = Value(1.1);
+    const auto f2 = Value(2.2);
+    const auto f3 = Value(3.3);
+
+    const auto c1 = Value('c');
+
+    env->def("num", Value(5ll));
+    env->def("rng0", Value(IntegerRange(0)));
+    env->def("rng1", Value(IntegerRange(10)));
+    env->def("arr0", arrval());
+    env->def("arr1", arrval(v1, v2, v3, v4, v5));
+    env->def("arr2", arrval(f1, f2, f3));
+    env->def("arr3", arrval(v1, f2, v3));
+    env->def("mix", arrval(v1, c1, f1));
+
+    const auto sum = [](const char *obj) {
+        return CodeNode::make<GenericSum>(CodeNode::make<Variable>(obj));
+    };
+
+    { // range
+        auto val = sum("rng0")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
+
+        val = sum("rng1")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 45ll, "actual=" << val);
+    }
+
+    { // array
+        auto val = sum("arr0")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val.typeToString());
+
+        val = sum("arr1")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 15ll, "actual=" << val.typeToString());
+
+        val = sum("arr2")->eval(env);
+        TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.real() == 6.6, "actual=" << val);
+
+        val = sum("arr3")->eval(env);
+        TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.real() == 6.2, "actual=" << val);
+    }
+
+    try {
+        sum("mix")->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidExpression &ex) {
+        TEST_CASE_MSG(std::string("Invalid expression - Unexpected non-numeric sum argument") == ex.what(), "actual='" << ex.what() << "'");
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        sum("num")->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE_MSG(std::string("Invalid operand type, expected=array|range actual=int") == ex.what(), "actual='" << ex.what() << "'");
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}

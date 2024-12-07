@@ -1169,6 +1169,13 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("reverse", 1));
               return CodeNode::make<GenericReverse>(exprs[0]);
           }
+        },
+
+        { "sum",
+          [this]() {
+              auto exprs(readAndCheckExprList("sum", 1));
+              return CodeNode::make<GenericSum>(exprs[0]);
+          }
         }
     };
 }

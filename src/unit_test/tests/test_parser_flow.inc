@@ -117,9 +117,9 @@ DEFINE_TEST(testParserFtn) {
     auto env = Environment::make();
     Parser parser;
 
-    TEST_CASE(parserTest(parser, env, "(block (defun add (x y) (+ x y)) (add 1 2))",                                          Value(3ll),  true));
-    TEST_CASE(parserTest(parser, env, "(block (var x 3) (var y 2) (defun sum () (+ x y)) (block (var x 4) (var y 5) (sum)))", Value(5ll),  true));
-    TEST_CASE(parserTest(parser, env, "(block (defun inc (x) (+ x 1)) (defun add3 (x) (inc (inc (inc x)))) (add3 5))",        Value(8ll),  true));
+    TEST_CASE(parserTest(parser, env, "(block (defun add (x y) (+ x y)) (add 1 2))",                                              Value(3ll),  true));
+    TEST_CASE(parserTest(parser, env, "(block (var x 3) (var y 2) (defun sumxy () (+ x y)) (block (var x 4) (var y 5) (sumxy)))", Value(5ll),  true));
+    TEST_CASE(parserTest(parser, env, "(block (defun inc (x) (+ x 1)) (defun add3 (x) (inc (inc (inc x)))) (add3 5))",            Value(8ll),  true));
 
     TEST_CASE(parserTest(parser, env, "(progn (defun add4 (x) (defun inc2 (y) (+ y 2)) (inc2 (inc2 x))) (add4 4))", Value(8ll),  true));
     TEST_CASE(parserTest(parser, env, "(add4 1)",                                                                   Value(5ll),  true));

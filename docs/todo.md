@@ -43,6 +43,7 @@
   - **liscount**: list count value
   - **lissort**: list sort
   - **lisrev**: list reverse
+  - Add list support to generic functions
 - Ordered table
   - **orderedmap**: make orderedmap
   - **omlen**: orderedmap length
@@ -56,10 +57,4 @@
   - **omkeys**: orderedmap keys
   - **omvals**: orderedmap values
   - **omitems**: orderedmap items
-
-### Add generic functions
-- Add generic sum function with support for arrays and ranges
-  ```
-  (sum <sequence> [<start> [<end>]]) -> int|real
-  ```
-Note: Should work with future types; list and orderedmap.
+  - Add orderedmap support to generic functions

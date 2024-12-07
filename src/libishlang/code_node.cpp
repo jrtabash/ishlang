@@ -1851,3 +1851,24 @@ Value GenericReverse::exec(Environment::SharedPtr env) const {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+GenericSum::GenericSum(CodeNode::SharedPtr obj)
+    : CodeNode()
+    , obj_(obj)
+{}
+
+Value GenericSum::exec(Environment::SharedPtr env) const {
+    if (obj_) {
+        Value obj = obj_->eval(env);
+        switch (obj.type()) {
+        case Value::eArray: return Generic::sum(obj.array());
+        case Value::eRange: return Generic::sum(obj.range());
+        default:
+            throw InvalidOperandType(
+                typesToString(Value::eArray, Value::eRange),
+                obj.typeToString());
+        }
+    }
+    return Value::Null;
+}

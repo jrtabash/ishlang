@@ -983,6 +983,11 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (reverse <obj>)
 ```
 
+**sum**: Sum array or range
+```
+(sum <obj>)
+```
+
 ### Examples
 ```
 (struct Person (name age))
@@ -1022,6 +1027,8 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (sort seq true)
 (reverse txt)
 (reverse seq)
+(sum rng)
+(sum seq)
 (clear txt)
 (clear seq)
 (clear tab)

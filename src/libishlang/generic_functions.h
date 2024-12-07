@@ -192,6 +192,50 @@ namespace Ishlang {
                 obj.reverse();
             }
         }
+
+        template <Sizable ObjectType>
+        static inline Value sum(const ObjectType &obj) {
+            if (obj.size() == 0) {
+                return Value::Zero;
+            }
+
+            if constexpr (std::is_same_v<ObjectType, Value::Range>) {
+                Value::Long s = 0;
+                auto gen = obj.generator();
+                while (auto i = gen.next()) {
+                    s += *i;
+                }
+                return Value(s);
+            }
+            else {
+                static_assert(std::is_same_v<ObjectType, Value::Array>);
+
+                bool anyReal = false;
+                for (const auto &val : obj) {
+                    if (val.isReal()) {
+                        anyReal = true;
+                    }
+                    else if (!val.isInt()) {
+                        throw InvalidExpression("Unexpected non-numeric sum argument");
+                    }
+                }
+
+                if (anyReal) {
+                    return Value(std::accumulate(
+                                     obj.begin() + 1,
+                                     obj.end(),
+                                     obj.begin()->real(),
+                                     [](Value::Double a, const Value & v) { return a + v.real(); }));
+                }
+                else {
+                    return Value(std::accumulate(
+                                     obj.begin() + 1,
+                                     obj.end(),
+                                     obj.begin()->integer(),
+                                     [](Value::Long a, const Value & v) { return a + v.integer(); }));
+                }
+            }
+        }
     };
 
 }

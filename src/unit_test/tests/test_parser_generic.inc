@@ -325,3 +325,23 @@ DEFINE_TEST(testParserGenericReverse) {
 
     TEST_CASE(parserTest(parser, env, "(sort 5)", Value::Null, false));
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserGenericSum) {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(sum (range 0))",      Value(0ll),   true));
+    TEST_CASE(parserTest(parser, env, "(sum (range 10))",     Value(45ll),  true));
+    TEST_CASE(parserTest(parser, env, "(sum (range -10 0))",  Value(-55ll), true));
+    TEST_CASE(parserTest(parser, env, "(sum (range -10 10))", Value(-10ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(sum (array))",                 Value(0ll),  true));
+    TEST_CASE(parserTest(parser, env, "(sum (array 1 3 5 9))",         Value(18ll), true));
+    TEST_CASE(parserTest(parser, env, "(sum (array -1 -3 -5))",        Value(-9ll), true));
+    TEST_CASE(parserTest(parser, env, "(sum (array 1.1 3.1 5.2 9.2))", Value(18.6), true));
+    TEST_CASE(parserTest(parser, env, "(sum (array 1 3.1 5 9.0))",     Value(18.1), true));
+
+    TEST_CASE(parserTest(parser, env, "(sum 5)",             Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(sum (array 1 'c'))", Value::Null, false));
+}
