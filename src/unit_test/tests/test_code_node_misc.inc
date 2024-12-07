@@ -1,5 +1,4 @@
 #include "code_node.h"
-#include "code_node_util.h"
 #include "environment.h"
 #include "exception.h"
 #include "module.h"
@@ -11,23 +10,6 @@
 #include <map>
 #include <string>
 #include <vector>
-
-using namespace Ishlang;
-
-// -------------------------------------------------------------
-DEFINE_TEST(testCodeNodeUtil) {
-    TEST_CASE(anyOfType(Value::eInteger, Value::eInteger));
-    TEST_CASE(anyOfType(Value::eInteger, Value::eReal, Value::eInteger));
-    TEST_CASE(anyOfType(Value::eInteger, Value::eReal, Value::eInteger, Value::eBoolean));
-
-    TEST_CASE(!anyOfType(Value::eInteger, Value::eReal));
-    TEST_CASE(!anyOfType(Value::eInteger, Value::eReal, Value::eBoolean));
-    TEST_CASE(!anyOfType(Value::eInteger, Value::eReal, Value::eBoolean, Value::eString));
-
-    TEST_CASE(typesToString(Value::eInteger) == "int");
-    TEST_CASE(typesToString(Value::eInteger, Value::eReal) == "int|real");
-    TEST_CASE(typesToString(Value::eInteger, Value::eReal, Value::eBoolean) == "int|real|bool");
-}
 
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeBasic) {

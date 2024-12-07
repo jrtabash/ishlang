@@ -9,6 +9,7 @@
 #include "test_module.inc"
 #include "test_lexer.inc"
 
+#include "test_code_node_util.inc"
 #include "test_code_node_misc.inc"
 #include "test_code_node_ops.inc"
 #include "test_code_node_flow.inc"
