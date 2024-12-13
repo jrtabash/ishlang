@@ -174,7 +174,7 @@ void Interpreter::handleREPLCommand(const std::string &expr) {
     }
     else if (cmd == ":desc") {
         if (size == 1) {
-            throw InvalidCommand(cmd, "missing instance");
+            throw InvalidCommand(cmd, "missing struct or instance");
         }
         else if (size > 2) {
             throw InvalidCommand(cmd, "too many arguments");
