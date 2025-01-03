@@ -140,6 +140,10 @@ The neg operator returns the negative of expression.
 (op <expression> <expression> [<expression> ...])
 ```
 
+- Evaluate all expressions left to right
+- When `<op>` is `and`, stop on and return first false expression, otherwise return true
+- When `<op>` is `or`, stop on and return first true expression, otherwise return false
+
 #### Examples
 ```
 (== x y)
