@@ -2,6 +2,7 @@
 #define ISHLANG_INTERPRETER_H
 
 #include "environment.h"
+#include "interpreter_help.h"
 #include "parser.h"
 
 namespace Ishlang {
@@ -61,6 +62,8 @@ namespace Ishlang {
         bool        batch_;
 
         ParserCB parserCB_;
+
+        HelpDict helpDict_;
     };
 
 } // Int

@@ -74,3 +74,19 @@ The following command describes structs and instances:
       id: 125
   >> 
 ```
+
+## Help Topics
+
+The help command provides support for interactive help in REPL.
+```
+:help [<topic>]
+```
+
+When no topic is provided, the command will show usage info with
+a list of avaiable help topics.
+
+#### Example
+```
+>> :help
+>> :help loop
+```

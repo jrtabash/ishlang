@@ -57,6 +57,7 @@ Interpreter::Interpreter(bool batch, const std::string &path)
     , lastResult_("*")
     , batch_(batch)
     , parserCB_(env_, lastResult_, batch_)
+    , helpDict_()
 {
     env_->def(lastResult_, Value::Null);
     initPath(path);
@@ -180,6 +181,17 @@ void Interpreter::handleREPLCommand(const std::string &expr) {
             throw InvalidCommand(cmd, "too many arguments");
         }
         describe(cmdTokens.front());
+    }
+    else if (cmd == ":help") {
+        if (size == 1) {
+            std::cout << helpDict_.topics() << std::endl;
+        }
+        else if (size == 2) {
+            std::cout << helpDict_.lookup(cmdTokens.front()) << std::endl;
+        }
+        else {
+            throw InvalidCommand(cmd, "too many arguments");
+        }
     }
     else {
         throw InvalidCommand(cmd, "unknown command");

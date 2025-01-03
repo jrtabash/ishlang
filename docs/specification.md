@@ -157,7 +157,7 @@ The neg operator returns the negative of expression.
 (not true)
 ```
 
-## If Statement
+## If Expression
 ```
 (if <condition_expression> <true_expression> [<false_expression>])
 ```
@@ -167,12 +167,12 @@ The neg operator returns the negative of expression.
 (if (> x 0) 1 0)
 ```
 
-## When Statement
+## When Expression
 ```
 (when <condition_expression> <true_expression>)
 ```
 
-The when form is syntactic sugar for the following if/true statement:
+The when form is syntactic sugar for the following if/true expression:
 ```
 (if <condition_expression> <true_expression>)
 ```
@@ -182,12 +182,12 @@ The when form is syntactic sugar for the following if/true statement:
 (when (> x 0) 1)
 ```
 
-## Unless Statement
+## Unless Expression
 ```
 (unless <condition_expression> <false_expression>)
 ```
 
-The unless form is syntactic sugar for the following if/not statement:
+The unless form is syntactic sugar for the following if/not expression:
 ```
 (if (not <condition_expression>) <true_expression>)
 ```
@@ -197,7 +197,7 @@ The unless form is syntactic sugar for the following if/not statement:
 (unless (<= x 0) 1)
 ```
 
-## Cond Statement
+## Cond Expression
 ```
 (cond
   (<condition> <expression>)
@@ -219,7 +219,7 @@ The (true ...) case acts as a default catch all case, and is optional
 ```
 
 ## Progn and Block
-Progn and block define a sequence of expression, and groups them into one expression.
+Progn and block define a sequence of expressions, and groups them into one expression.
 ```
 (progn
   <expression>
@@ -552,7 +552,7 @@ will clone the value resulting from executing expression
 
 **substr**: Return substring from given string
 ```
-(substr <string> <position> [<length>]
+(substr <string> <position> [<length>])
 ```
 
 **strfind**: Find position of character in string
