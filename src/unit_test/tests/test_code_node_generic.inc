@@ -125,7 +125,7 @@ DEFINE_TEST(testCodeNodeGenericGet) {
         for (Value::Long i : {0, 1, 2}) {
             auto val = get(rawSeq, i)->eval(env);
             TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " index=" << i);
-            TEST_CASE_MSG(val.integer() == rawSeq.get(i), "actual=" << val << " index=" << i);
+            TEST_CASE_MSG(val == rawSeq.get(i), "actual=" << val << " index=" << i);
         }
 
         try {
@@ -154,7 +154,7 @@ DEFINE_TEST(testCodeNodeGenericGet) {
         for (Value::Long i : {1, 2}) {
             auto val = get(rawTab, i)->eval(env);
             TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " key=" << i);
-            TEST_CASE_MSG(val.integer() == rawTab.get(Value(i)), "actual=" << val << " key=" << i);
+            TEST_CASE_MSG(val == rawTab.get(Value(i)), "actual=" << val << " key=" << i);
         }
 
         auto val = get(rawTab, Value::Long(3))->eval(env);
@@ -262,7 +262,7 @@ DEFINE_TEST(testCodeNodeGenericSet) {
         for (Value::Long i : {0, 1, 2}) {
             auto val = set("seq", i, 10 * i + 10)->eval(env);
             TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " index=" << i);
-            TEST_CASE_MSG(val.integer() == Value(10 * i + 10), "actual=" << val << " index=" << i);
+            TEST_CASE_MSG(val.integer() == 10 * i + 10, "actual=" << val << " index=" << i);
         }
 
         TEST_CASE_MSG(env->get("seq") == finalSeq, "actual=" << env->get("seq"));
@@ -304,7 +304,7 @@ DEFINE_TEST(testCodeNodeGenericSet) {
         for (auto [i, v] : std::vector<std::pair<Value::Long, Value::Long>>{{1ll, 1000ll}, {2ll, 2000ll}}) {
             auto val = set("tab", i, v)->eval(env);
             TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " key=" << i);
-            TEST_CASE_MSG(val.integer() == Value(v), "actual=" << val << " key=" << i);
+            TEST_CASE_MSG(val.integer() == v, "actual=" << val << " key=" << i);
         }
 
         TEST_CASE_MSG(env->get("tab") == finalTab, "actual=" << env->get("tab"));
@@ -656,17 +656,17 @@ DEFINE_TEST(testCodeNodeGenericSort) {
     { // Array
         auto val = sort("arr")->eval(env);
         TEST_CASE_MSG(val.isArray(), "actual=" << val.typeToString());
-        TEST_CASE_MSG(val.array() == arrval(v1, v2, v3, v4, v5, v6, v7), "actual=" << val);
+        TEST_CASE_MSG(val == arrval(v1, v2, v3, v4, v5, v6, v7), "actual=" << val);
         TEST_CASE_MSG(val == arr(), "actual=" << val);
 
         val = sort("arr", Value::True)->eval(env);
         TEST_CASE_MSG(val.isArray(), "actual=" << val.typeToString());
-        TEST_CASE_MSG(val.array() == arrval(v7, v6, v5, v4, v3, v2, v1), "actual=" << val);
+        TEST_CASE_MSG(val == arrval(v7, v6, v5, v4, v3, v2, v1), "actual=" << val);
         TEST_CASE_MSG(val == arr(), "actual=" << val);
 
         val = sort("arr", Value::False)->eval(env);
         TEST_CASE_MSG(val.isArray(), "actual=" << val.typeToString());
-        TEST_CASE_MSG(val.array() == arrval(v1, v2, v3, v4, v5, v6, v7), "actual=" << val);
+        TEST_CASE_MSG(val == arrval(v1, v2, v3, v4, v5, v6, v7), "actual=" << val);
         TEST_CASE_MSG(val == arr(), "actual=" << val);
 
         try {
@@ -729,12 +729,12 @@ DEFINE_TEST(testCodeNodeGenericReverse) {
     { // Array
         auto val = reverse("arr")->eval(env);
         TEST_CASE_MSG(val.isArray(), "actual=" << val.typeToString());
-        TEST_CASE_MSG(val.array() == arrval(v5, v4, v3, v2, v1), "actual=" << val);
+        TEST_CASE_MSG(val == arrval(v5, v4, v3, v2, v1), "actual=" << val);
         TEST_CASE_MSG(val == arr(), "actual=" << val);
 
         val = reverse("arr")->eval(env);
         TEST_CASE_MSG(val.isArray(), "actual=" << val.typeToString());
-        TEST_CASE_MSG(val.array() == arrval(v1, v2, v3, v4, v5), "actual=" << val);
+        TEST_CASE_MSG(val == arrval(v1, v2, v3, v4, v5), "actual=" << val);
         TEST_CASE_MSG(val == arr(), "actual=" << val);
     }
 
