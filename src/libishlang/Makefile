@@ -1,10 +1,16 @@
+OS_NAME=$(shell uname -s)
 CPP=clang++
 CFLAGS=-std=c++20 -fPIC -Wall -Wextra -Wformat -Werror
-LFLAGS=-shared
 RM=rm -f
 CP=cp
 BUILD=../build
-TARGET=libishlang.so
+ifeq ($(OS_NAME), Darwin)
+	LFLAGS=-dynamiclib
+	TARGET=libishlang.dylib
+else
+	LFLAGS=-shared
+	TARGET=libishlang.so
+endif
 
 OBJS=\
 	exception.o \
