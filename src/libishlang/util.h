@@ -49,9 +49,10 @@ namespace Ishlang {
         static bool setBoolFromString(bool &out, const std::string &str);
 
     public:
+        template <Container ContainerType, ItemPrinter<ContainerType> PrinterType>
         static inline std::ostream &printContainer(std::ostream &out,
-                                                   Container auto const &container,
-                                                   ItemPrinter<decltype(container)> auto const &itemPrinter,
+                                                   ContainerType const &container,
+                                                   PrinterType const &itemPrinter,
                                                    char leftWrapper,
                                                    char rightWrapper,
                                                    std::size_t maxItems = 10);
@@ -85,9 +86,10 @@ namespace Ishlang {
         return n >= 0 ? 1 : -1;
     }
 
+    template <Container ContainerType, ItemPrinter<ContainerType> PrinterType>
     inline std::ostream &Util::printContainer(std::ostream &out,
-                                              Container auto const &container,
-                                              ItemPrinter<decltype(container)> auto const &itemPrinter,
+                                              ContainerType const &container,
+                                              PrinterType const &itemPrinter,
                                               char leftWrapper,
                                               char rightWrapper,
                                               std::size_t maxItems) {

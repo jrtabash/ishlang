@@ -1,4 +1,7 @@
+#include "unit_test_function.h"
+
 #include "code_node.h"
+#include "code_node_util.h"
 #include "environment.h"
 #include "exception.h"
 #include "module.h"
@@ -10,6 +13,8 @@
 #include <map>
 #include <string>
 #include <vector>
+
+using namespace Ishlang;
 
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeBasic) {

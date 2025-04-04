@@ -1,3 +1,5 @@
+#include "unit_test_function.h"
+
 #include "lexer.h"
 
 using namespace Ishlang;

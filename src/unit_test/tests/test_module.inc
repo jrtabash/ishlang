@@ -1,3 +1,5 @@
+#include "unit_test_function.h"
+
 #include "exception.h"
 #include "module.h"
 #include "value.h"

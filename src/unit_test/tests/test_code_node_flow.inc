@@ -1,8 +1,11 @@
+#include "unit_test_function.h"
+
 #include "code_node.h"
 #include "environment.h"
 #include "exception.h"
 #include "hashtable.h"
 #include "integer_range.h"
+#include "lambda.h"
 #include "sequence.h"
 #include "value.h"
 
