@@ -13,12 +13,42 @@ List of todos available in [docs/todo.md](docs/todo.md)
 
 Details on testing are provided in [docs/testing.md](docs/testing.md)
 
-## Example: Hello World Program
+## Hello World
 ```
 (println "Hello World")
 ```
 
-## Basic Commands:
+## Building Ishlang
+Build debug
+```bash
+cd src
+make
+
+# OR
+
+cd src
+make DEBUG=1
+```
+
+Build release
+```bash
+cd src
+make DEBUG=0
+```
+
+## Running Ishlang
+Before running setup library path appropriately:
+
+On Linux
+```bash
+export LD_LIBRARY_PATH=<path>/<to>/<ishlang>/<binaries>
+```
+
+On Darwin
+```bash
+export DYLD_LIBRARY_PATH=<path>/<to>/<ishlang>/<binaries>
+```
+
 Run source file:
 ```bash
 ishlang -f <filename>
@@ -33,6 +63,7 @@ See usage for more information:
 ```bash
 ishlang -h
 ```
+
 ## Ishlang Usage
 ```bash
 Usage:
