@@ -1,0 +1,5 @@
+# ishlang darwin development aliases
+# Load after loading ishlang_dev_aliases
+alias ishexportbuild='export DYLD_LIBRARY_PATH=build/'
+alias ishexportbin='export DYLD_LIBRARY_PATH=/home/${USER}/bin'
+alias ishshowpath='echo $DYLD_LIBRARY_PATH'
