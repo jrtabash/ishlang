@@ -5,6 +5,7 @@
 
 #include <string>
 #include <sstream>
+#include <unordered_map>
 
 using namespace Ishlang;
 
@@ -334,4 +335,23 @@ DEFINE_TEST(testComment) {
         TEST_CASE(Util::nextToken(str, pos) == ")");
         TEST_CASE(pos == std::string::npos);
     }
+}
+
+// -------------------------------------------------------------
+DEFINE_TEST(testIsEqualMapping) {
+    using Mapping = std::unordered_map<int, int>;
+
+    auto const m0 = Mapping{};
+    auto const m1 = Mapping{{1, 10}, {2, 20}};
+    auto const m2 = Mapping{{1, 10}, {2, 20}};
+    auto const m3 = Mapping{{1, 10}, {2, 20}, {3, 30}};
+
+    TEST_CASE(Util::isEqualMapping(m0, m0));
+    TEST_CASE(Util::isEqualMapping(m1, m2));
+    TEST_CASE(Util::isEqualMapping(m2, m1));
+
+    TEST_CASE(!Util::isEqualMapping(m0, m1));
+    TEST_CASE(!Util::isEqualMapping(m1, m0));
+    TEST_CASE(!Util::isEqualMapping(m1, m3));
+    TEST_CASE(!Util::isEqualMapping(m3, m1));
 }

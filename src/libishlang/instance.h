@@ -3,6 +3,7 @@
 
 #include "struct.h"
 #include "value.h"
+#include "util.h"
 
 #include <algorithm>
 #include <ostream>
@@ -81,7 +82,7 @@ namespace Ishlang {
     }
 
     inline bool Instance::membersEqual(const MemberTable &lhs, const MemberTable &rhs) {
-        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+        return Util::isEqualMapping(lhs, rhs);
     }
 
     inline const Value &Instance::initArgOrNull(InitArgs const & initArgs, const std::string &name) {

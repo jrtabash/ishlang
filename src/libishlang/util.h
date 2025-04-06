@@ -57,6 +57,10 @@ namespace Ishlang {
                                                    char rightWrapper,
                                                    std::size_t maxItems = 10);
 
+    public:
+        template <typename MappingType>
+        static inline bool isEqualMapping(MappingType const & lhs, MappingType const & rhs);
+
     public: // Filesystem
         struct TemporaryFile {
             TemporaryFile(const std::string &basename, const std::string &stuffToWrite = "");
@@ -105,6 +109,22 @@ namespace Ishlang {
         }
         out << rightWrapper;
         return out;
+    }
+
+    template <typename MappingType>
+    inline bool Util::isEqualMapping(MappingType const & lhs, MappingType const & rhs) {
+        if (lhs.size() != rhs.size()) {
+            return false;
+        }
+
+        for (auto const & [key, val] : lhs) {
+            auto riter = rhs.find(key);
+            if (riter == rhs.end() || riter->second != val) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     inline const fs::path &Util::TemporaryFile::path() const {

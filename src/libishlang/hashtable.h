@@ -126,11 +126,7 @@ namespace Ishlang {
     }
 
     inline bool Hashtable::tableEqual(const Table &lhs, const Table &rhs) {
-        return (lhs.size() == rhs.size() &&
-                std::equal(lhs.begin(), lhs.end(), rhs.begin(),
-                           [](const auto &lhsNV, const auto &rhsNV) {
-                               return lhsNV.first == rhsNV.first && lhsNV.second == rhsNV.second;
-                           }));
+        return Util::isEqualMapping(lhs, rhs);
     }
 
 }
