@@ -9,6 +9,8 @@ for arg in $@;
 do
     if [ "${arg}" == "-v" ] || [ "${arg}" == "--verbose" ]; then
         verbose=1
+    elif [ "${arg}" == "-d" ] || [ "${arg}" == "--dyld" ]; then
+        export DYLD_LIBRARY_PATH="/Users/${USER}/bin"
     elif [ "${ishlang}" == "" ]; then
         ishlang=${arg}
     elif [ "${ishlang_test_files}" == "" ]; then
@@ -21,7 +23,7 @@ done
 if [ "${ishlang}" == "" ] || [ "${ishlang_test_files}" == "" ] || [ "${tests}" == "" ]; then
     echo "Usage"
     echo ""
-    echo "    $0 [-v|--verbose] <ishlang> <ishlang_test_files> <tests>"
+    echo "    $0 [-v|--verbose] [-d|--dyld] <ishlang> <ishlang_test_files> <tests>"
     echo ""
     echo "            ishlang := ishlang binary"
     echo " ishlang_test_files := ishlang_test_files binary"

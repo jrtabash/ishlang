@@ -3,3 +3,6 @@
 alias ishexportbuild='export DYLD_LIBRARY_PATH=build/'
 alias ishexportbin='export DYLD_LIBRARY_PATH=/home/${USER}/bin'
 alias ishshowpath='echo $DYLD_LIBRARY_PATH'
+
+alias ishruntestsbin='ishsource && ishlang_unit_test && ishlang_run_tests.sh --dyld ~/bin/ishlang ~/bin/ishlang_test_files test_scenarios'
+alias ishruntestsbuild='ishsource && cd build && ./ishlang_unit_test && ../test_runner/ishlang_run_tests.sh ./ishlang ./ishlang_test_files ../test_scenarios && ishsource'
