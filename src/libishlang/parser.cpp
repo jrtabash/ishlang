@@ -1176,6 +1176,15 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("sum", 1));
               return CodeNode::make<GenericSum>(exprs[0]);
           }
+        },
+
+        { "timeit",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("timeit", 1, 3));
+              return CodeNode::make<TimeIt>(exprs[0],
+                                            exprs.size() >= 2 ? exprs[1] : CodeNode::SharedPtr(),
+                                            exprs.size() == 3 ? exprs[2] : CodeNode::SharedPtr());
+          }
         }
     };
 }

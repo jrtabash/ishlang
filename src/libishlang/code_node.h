@@ -1446,6 +1446,21 @@ namespace Ishlang {
         CodeNode::SharedPtr obj_;
     };
 
+    // -------------------------------------------------------------
+    class TimeIt : public CodeNode {
+    public:
+        TimeIt(CodeNode::SharedPtr expr, CodeNode::SharedPtr ntimes = CodeNode::SharedPtr(), CodeNode::SharedPtr showSummary = CodeNode::SharedPtr());
+        virtual ~TimeIt() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr expr_;
+        CodeNode::SharedPtr count_;
+        CodeNode::SharedPtr summary_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_H

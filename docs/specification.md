@@ -1160,3 +1160,20 @@ Examples:
 (hash ftn)
 (hash a)
 ```
+
+## TimeIt Function
+Return average time in microseconds to evaluate expression
+```
+(timeit <expr> [<count>] [<summary>])
+```
+
+The count is the number of times to repeat evaluation. Default count is 1. Allowed count range is [1, 1000].
+
+The summary is a boolean flag to print a time summary. Default summary is true. The summary will show count, sum, mean, min and max.
+
+Example:
+```
+(timeit (sum (range 1000)))
+(timeit (sum (range 1000)) 100)
+(timeit (sum (range 1000)) 100 false)
+```

@@ -661,6 +661,14 @@ Misc Functions
            * If max is greater than 4294967295, then 4294967295 is used. Essentially,
              the call is equivalent to not specifying max.
            * If max is 0, then function returns 0
+
+  timeit - Return average time in microseconds to evaluate expression
+           (timeit <expr> [<count>] [<summary>])
+
+           * The count is number of times to repeat evaluation, defaults to 1
+           * Allowed count range is [1, 1000]
+           * The summary is a flag to print a time summary, defaults to true
+           * The summary will show count, sum, mean, min and max
 )";
 }
 
