@@ -60,6 +60,36 @@ DEFINE_TEST(testCodeNodeMakeArraySV) {
 }
 
 // -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeMakeArraySG) {
+    auto env = Environment::make();
+
+    const std::string ivar = "i";
+    env->def(ivar, Value::Zero);
+
+    Value value =
+        CodeNode::make<MakeArraySG>(
+            CodeNode::make<Literal>(Value(4ll)),
+            CodeNode::make<LambdaExpr>(
+                CodeNode::ParamList(),
+                CodeNode::make<Assign>(
+                    ivar,
+                    CodeNode::make<ArithOp>(
+                        ArithOp::Add,
+                        CodeNode::SharedPtrList{
+                            CodeNode::make<Variable>(ivar),
+                            CodeNode::make<Literal>(Value(3ll))
+                        }))))
+        ->eval(env);
+
+    TEST_CASE_MSG(value.isArray(), "actual=" << value.typeToString());
+    TEST_CASE_MSG(value.array().size() == 4lu, "actual=" << value.array().size());
+    TEST_CASE_MSG(value.array().get(0lu) == Value(3ll), "actual=" << value.array().get(0lu));
+    TEST_CASE_MSG(value.array().get(1lu) == Value(6ll), "actual=" << value.array().get(1lu));
+    TEST_CASE_MSG(value.array().get(2lu) == Value(9ll), "actual=" << value.array().get(2lu));
+    TEST_CASE_MSG(value.array().get(3lu) == Value(12ll), "actual=" << value.array().get(3lu));
+}
+
+// -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeArrayLen) {
     auto env = Environment::make();
 

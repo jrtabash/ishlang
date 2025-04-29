@@ -430,6 +430,9 @@ Array Operations
 
              * Default initial value is null
 
+   arraysg - Make an array from size and generator function
+             (arraysg <size> <generator_function>)
+
     arrlen - Return array length
              (arrlen <array>)
 

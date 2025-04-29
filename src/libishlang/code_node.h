@@ -755,6 +755,21 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    // Make array from size and generator function
+    class MakeArraySG : public CodeNode {
+    public:
+        MakeArraySG(CodeNode::SharedPtr size, CodeNode::SharedPtr genFtn);
+        virtual ~MakeArraySG() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr size_;
+        CodeNode::SharedPtr genFtn_;
+    };
+
+    // -------------------------------------------------------------
     class ArrayLen : public CodeNode {
     public:
         ArrayLen(CodeNode::SharedPtr expr);

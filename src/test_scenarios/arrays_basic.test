@@ -1,7 +1,13 @@
 __CODE__
+(defun make_gen (increment)
+  (var i 0)
+  (lambda () (= i (+ i increment))))
+
 (println (array))
 (println (array 1 2 3))
 (println (arraysv 3 0))
+(println (arraysg 3 (make_gen 1)))
+(println (arraysg 5 (make_gen 2)))
 
 (var a (array 1 2 3 4 5))
 (println a)
@@ -34,6 +40,8 @@ __EXPECT__
 []
 [1 2 3]
 [0 0 0]
+[1 2 3]
+[2 4 6 8 10]
 [1 2 3 4 5]
 5
 1

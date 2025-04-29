@@ -901,6 +901,34 @@ Value MakeArraySV::exec(Environment::SharedPtr env) const {
 }
 
 // -------------------------------------------------------------
+MakeArraySG::MakeArraySG(CodeNode::SharedPtr size, CodeNode::SharedPtr genFtn)
+    : CodeNode()
+    , size_(size)
+    , genFtn_(genFtn)
+{}
+
+Value MakeArraySG::exec(Environment::SharedPtr env) const {
+    if (size_ && genFtn_) {
+        const auto size = evalOperand(env, size_, Value::eInteger);
+        const auto rawSize = size.integer();
+
+        Sequence seq(rawSize, Value::Null);
+        if (rawSize > 0) {
+            const auto gclo = evalOperand(env, genFtn_, Value::eClosure);
+
+            const auto & gftn = gclo.closure();
+            const Lambda::ArgList args;
+
+            for (Value::Long i = 0; i < rawSize; ++i) {
+                seq.set(i, gftn.exec(args));
+            }
+        }
+        return Value(std::move(seq));
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 ArrayLen::ArrayLen(CodeNode::SharedPtr expr)
     : CodeNode()
     , expr_(expr)

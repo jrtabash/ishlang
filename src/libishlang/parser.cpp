@@ -837,6 +837,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "arraysg",
+          [this]() {
+              auto exprs(readAndCheckExprList("arraysg", 2));
+              return CodeNode::make<MakeArraySG>(exprs[0], exprs[1]);
+          }
+        },
+
         { "arrlen",
           [this]() {
               auto exprs(readAndCheckExprList("arrlen", 1));
