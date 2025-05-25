@@ -197,6 +197,17 @@ namespace Ishlang {
         {}
     };
 
+    class FileIOError : public Exception {
+    public:
+        FileIOError(const std::string &msg)
+            : Exception(format("FileIO Error - %s", msg.c_str()))
+        {}
+
+        FileIOError(const std::string &filename, const std::string &msg)
+            : Exception(format("FileIO Error %s - %s", filename.c_str(), msg.c_str()))
+        {}
+    };
+
 }
 
 #endif	// ISHLANG_EXCEPTION_H

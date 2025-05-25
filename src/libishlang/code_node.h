@@ -1476,6 +1476,135 @@ namespace Ishlang {
         CodeNode::SharedPtr summary_;
     };
 
+    // -------------------------------------------------------------
+    class FileOpen : public FileOp {
+    public:
+        FileOpen(CodeNode::SharedPtr filename, CodeNode::SharedPtr mode);
+        virtual ~FileOpen() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr mode_;
+    };
+
+    // -------------------------------------------------------------
+    class FileClose : public FileOp {
+    public:
+        FileClose(CodeNode::SharedPtr file);
+        virtual ~FileClose() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+    };
+
+    // -------------------------------------------------------------
+    class FileFlush : public FileOp {
+    public:
+        FileFlush(CodeNode::SharedPtr file);
+        virtual ~FileFlush() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+    };
+
+    // -------------------------------------------------------------
+    class FileIsOpen : public FileOp {
+    public:
+        FileIsOpen(CodeNode::SharedPtr file);
+        virtual ~FileIsOpen() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+    };
+
+    // -------------------------------------------------------------
+    class FileFName : public FileOp {
+    public:
+        FileFName(CodeNode::SharedPtr file);
+        virtual ~FileFName() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+    };
+
+    // -------------------------------------------------------------
+    class FileFMode : public FileOp {
+    public:
+        FileFMode(CodeNode::SharedPtr file);
+        virtual ~FileFMode() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+    };
+
+    // -------------------------------------------------------------
+    class FileRead : public FileOp {
+    public:
+        FileRead(CodeNode::SharedPtr file);
+        virtual ~FileRead() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+    };
+
+    // -------------------------------------------------------------
+    class FileReadLn : public FileOp {
+    public:
+        FileReadLn(CodeNode::SharedPtr file);
+        virtual ~FileReadLn() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+    };
+
+    // -------------------------------------------------------------
+    class FileWrite : public FileOp {
+    public:
+        FileWrite(CodeNode::SharedPtr file, CodeNode::SharedPtr charOrStr);
+        virtual ~FileWrite() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr charOrStr_;
+    };
+
+    // -------------------------------------------------------------
+    class FileWriteLn : public FileOp {
+    public:
+        FileWriteLn(CodeNode::SharedPtr file, CodeNode::SharedPtr str);
+        virtual ~FileWriteLn() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr str_;
+    };
+
+    // -------------------------------------------------------------
+    class FileExists : public FileOp {
+    public:
+        FileExists(CodeNode::SharedPtr file);
+        virtual ~FileExists() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+    };
+
+    // -------------------------------------------------------------
+    class FileRemove : public FileOp {
+    public:
+        FileRemove(CodeNode::SharedPtr file);
+        virtual ~FileRemove() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_H

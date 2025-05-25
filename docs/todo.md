@@ -1,17 +1,8 @@
 ## TODO
 
-### Add support for file IO
-- Add file type
-- File functions
-  - fopen (modes: r, w, a)
-  - fclose
-  - fflush
-  - fread
-  - freadln
-  - fwrite
-  - fwriteln
+### Additional File IO Support
   - withfile (fopen, do work, fclose)
-  - Add foreach support to iterate over lines
+  - foreach support to iterate over lines
   - Examples
     ```
     (withfile f (fopen "some/path.txt" 'w')

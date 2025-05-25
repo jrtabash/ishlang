@@ -1,9 +1,11 @@
 #include "unit_test_function.h"
 
 #include "exception.h"
+#include "file_io.h"
 #include "hashtable.h"
 #include "integer_range.h"
 #include "sequence.h"
+#include "util.h"
 #include "value.h"
 #include "value_pair.h"
 
@@ -170,6 +172,22 @@ DEFINE_TEST(testValue) {
     }
 
     {
+        Util::TemporaryFile tempFile1("test_file_value1.txt");
+        Util::TemporaryFile tempFile2("test_file_value2.txt");
+
+        Value f1({.filename=tempFile1.path(), .mode=FileMode::Read});
+        Value f2({.filename=tempFile1.path(), .mode=FileMode::Read});
+        Value f3({.filename=tempFile2.path(), .mode=FileMode::Read});
+
+        TEST_CASE(f1.isFile());
+        TEST_CASE(f2.isFile());
+        TEST_CASE(f3.isFile());
+
+        TEST_CASE(f1 == f2);
+        TEST_CASE(f1 != f3);
+    }
+
+    {
         TEST_CASE(Value::stringToType("none")       == Value::eNone);
         TEST_CASE(Value::stringToType("int")        == Value::eInteger);
         TEST_CASE(Value::stringToType("real")       == Value::eReal);
@@ -183,6 +201,7 @@ DEFINE_TEST(testValue) {
         TEST_CASE(Value::stringToType("array")      == Value::eArray);
         TEST_CASE(Value::stringToType("hashmap")    == Value::eHashMap);
         TEST_CASE(Value::stringToType("range")      == Value::eRange);
+        TEST_CASE(Value::stringToType("file")       == Value::eFile);
 
         try {
             Value::stringToType("foobar");

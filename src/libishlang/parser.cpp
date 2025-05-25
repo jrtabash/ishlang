@@ -1192,6 +1192,90 @@ void Parser::initAppFtns() {
                                             exprs.size() >= 2 ? exprs[1] : CodeNode::SharedPtr(),
                                             exprs.size() == 3 ? exprs[2] : CodeNode::SharedPtr());
           }
+        },
+
+        { "fopen",
+          [this]() {
+              auto exprs(readAndCheckExprList("fopen", 2));
+              return CodeNode::make<FileOpen>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "fclose",
+          [this]() {
+              auto exprs(readAndCheckExprList("fclose", 1));
+              return CodeNode::make<FileClose>(exprs[0]);
+          }
+        },
+
+        { "fflush",
+          [this]() {
+              auto exprs(readAndCheckExprList("fflush", 1));
+              return CodeNode::make<FileFlush>(exprs[0]);
+          }
+        },
+
+        { "fisopen",
+          [this]() {
+              auto exprs(readAndCheckExprList("fisopen", 1));
+              return CodeNode::make<FileIsOpen>(exprs[0]);
+          }
+        },
+
+        { "fname",
+          [this]() {
+              auto exprs(readAndCheckExprList("fname", 1));
+              return CodeNode::make<FileFName>(exprs[0]);
+          }
+        },
+
+        { "fmode",
+          [this]() {
+              auto exprs(readAndCheckExprList("fmode", 1));
+              return CodeNode::make<FileFMode>(exprs[0]);
+          }
+        },
+
+        { "fread",
+          [this]() {
+              auto exprs(readAndCheckExprList("fread", 1));
+              return CodeNode::make<FileRead>(exprs[0]);
+          }
+        },
+
+        { "freadln",
+          [this]() {
+              auto exprs(readAndCheckExprList("freadln", 1));
+              return CodeNode::make<FileReadLn>(exprs[0]);
+          }
+        },
+
+        { "fwrite",
+          [this]() {
+              auto exprs(readAndCheckExprList("fwrite", 2));
+              return CodeNode::make<FileWrite>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "fwriteln",
+          [this]() {
+              auto exprs(readAndCheckExprList("fwriteln", 2));
+              return CodeNode::make<FileWriteLn>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "fexists",
+          [this]() {
+              auto exprs(readAndCheckExprList("fexists", 1));
+              return CodeNode::make<FileExists>(exprs[0]);
+          }
+        },
+
+        { "fremove",
+          [this]() {
+              auto exprs(readAndCheckExprList("fremove", 1));
+              return CodeNode::make<FileRemove>(exprs[0]);
+          }
         }
     };
 }

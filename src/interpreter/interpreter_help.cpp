@@ -60,6 +60,7 @@ void HelpDict::populateDict(Dict &dict) {
     tmp.emplace("block", help_block());
     tmp.emplace("misc", help_misc());
     tmp.emplace("import", help_import());
+    tmp.emplace("fileio", help_file_io());
     dict.swap(tmp);
 }
 
@@ -715,5 +716,49 @@ Example
 
   # From/Import as
   (from arith import add as plus sub as minus)
+)";
+}
+
+const char *HelpDict::help_file_io() {
+  return R"(
+File IO
+-------
+   fopen** - Open a file for reading or writing
+             (fopen <filename> <mode>])
+
+             * Mode must be one of 'r' (read), 'w' (write) or 'a' (append)
+
+    fclose - Close file
+             (fclose <file>)
+
+    fflush - Flush file
+             (fflush <file>)
+
+   fisopen - Is file open?
+             (fisopen <file>)
+
+     fname - Get filename
+             (fname <file>)
+
+     fmode - Get mode
+             (fmode <file>)
+
+     fread - Read character
+             (fread <file>)
+
+   freadln - Read line
+             (freadln <file>)
+
+    fwrite - Write character or string
+             (fwrite <file> <char_or_str>)
+
+  fwriteln - Write character or string followed by newline
+             (fwriteln <file> <char_or_str>)
+
+   fexists - Does file exist?
+             (fexists <filename>)
+
+   fremove - Delete file
+             (fremove <filename>)
 )";
 }

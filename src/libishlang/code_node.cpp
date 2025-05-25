@@ -1,6 +1,7 @@
 #include "code_node.h"
 #include "code_node_util.h"
 #include "exception.h"
+#include "file_io.h"
 #include "generic_functions.h"
 #include "lambda.h"
 #include "module.h"
@@ -13,6 +14,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstring>
+#include <filesystem>
 #include <functional>
 #include <limits>
 #include <iomanip>
@@ -21,6 +23,8 @@
 #include <ranges>
 
 using namespace Ishlang;
+
+namespace fs = std::filesystem;
 
 // -------------------------------------------------------------
 IsType::IsType(CodeNode::SharedPtr expr, Value::TypeList types)
@@ -1954,6 +1958,190 @@ Value TimeIt::exec(Environment::SharedPtr env) const {
                       << std::endl;
         }
         return Value(mean);
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileOpen::FileOpen(CodeNode::SharedPtr filename, CodeNode::SharedPtr mode)
+    : FileOp(filename)
+    , mode_(mode)
+{}
+
+Value FileOpen::exec(Environment::SharedPtr env) const {
+    if (file_ && mode_) {
+        auto fname = evalOperand(env, file_, Value::eString).text();
+        const auto fmode = evalOperand(env, mode_, Value::eCharacter).character();
+        return Value(FileParams{.filename=std::move(fname), .mode=FileModeNS::fromChar(fmode)});
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileClose::FileClose(CodeNode::SharedPtr file)
+    : FileOp(file)
+{}
+
+Value FileClose::exec(Environment::SharedPtr env) const {
+    if (file_) {
+        auto fileVal = evalOperand(env, file_, Value::eFile);
+        auto &file = fileVal.file();
+        file.close();
+        return Value(!file.isOpen());
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileFlush::FileFlush(CodeNode::SharedPtr file)
+    : FileOp(file)
+{}
+
+Value FileFlush::exec(Environment::SharedPtr env) const {
+    if (file_) {
+        auto fileVal = evalOperand(env, file_, Value::eFile);
+        auto &file = fileVal.file();
+        file.flush();
+        return Value(file.isOpen());
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileIsOpen::FileIsOpen(CodeNode::SharedPtr file)
+    : FileOp(file)
+{}
+
+Value FileIsOpen::exec(Environment::SharedPtr env) const {
+    if (file_) {
+        const auto fileVal = evalOperand(env, file_, Value::eFile);
+        return Value(fileVal.file().isOpen());
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileFName::FileFName(CodeNode::SharedPtr file)
+    : FileOp(file)
+{}
+
+Value FileFName::exec(Environment::SharedPtr env) const {
+    if (file_) {
+        const auto fileVal = evalOperand(env, file_, Value::eFile);
+        return Value(fileVal.file().filename());
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileFMode::FileFMode(CodeNode::SharedPtr file)
+    : FileOp(file)
+{}
+
+Value FileFMode::exec(Environment::SharedPtr env) const {
+    if (file_) {
+        const auto fileVal = evalOperand(env, file_, Value::eFile);
+        return Value(FileModeNS::toChar(fileVal.file().mode()));
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileRead::FileRead(CodeNode::SharedPtr file)
+    : FileOp(file)
+{}
+
+Value FileRead::exec(Environment::SharedPtr env) const {
+    if (file_) {
+        auto fileVal = evalOperand(env, file_, Value::eFile);
+        auto optC = fileVal.file().read();
+        if (optC) {
+            return Value(*optC);
+        }
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileReadLn::FileReadLn(CodeNode::SharedPtr file)
+    : FileOp(file)
+{}
+
+Value FileReadLn::exec(Environment::SharedPtr env) const {
+    if (file_) {
+        auto fileVal = evalOperand(env, file_, Value::eFile);
+        auto optS = fileVal.file().readln();
+        if (optS) {
+            return Value(*optS);
+        }
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileWrite::FileWrite(CodeNode::SharedPtr file, CodeNode::SharedPtr charOrStr)
+    : FileOp(file)
+    , charOrStr_(charOrStr)
+{}
+
+Value FileWrite::exec(Environment::SharedPtr env) const {
+    if (file_ && charOrStr_) {
+        const auto cOrSVal = evalOperand(env, charOrStr_, Value::eCharacter, Value::eString);
+        auto fileVal = evalOperand(env, file_, Value::eFile);
+        if (cOrSVal.isString()) {
+            fileVal.file().write(cOrSVal.text());
+        }
+        else {
+            fileVal.file().write(cOrSVal.character());
+        }
+        return Value::True;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileWriteLn::FileWriteLn(CodeNode::SharedPtr file, CodeNode::SharedPtr str)
+    : FileOp(file)
+    , str_(str)
+{}
+
+Value FileWriteLn::exec(Environment::SharedPtr env) const {
+    if (file_ && str_) {
+        const auto cOrSVal = evalOperand(env, str_, Value::eCharacter, Value::eString);
+        auto fileVal = evalOperand(env, file_, Value::eFile);
+        if (cOrSVal.isString()) {
+            fileVal.file().writeln(cOrSVal.text());
+        }
+        else {
+            fileVal.file().writeln(cOrSVal.character());
+        }
+        return Value::True;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileExists::FileExists(CodeNode::SharedPtr file)
+    : FileOp(file)
+{}
+
+Value FileExists::exec(Environment::SharedPtr env) const {
+    if (file_) {
+        const auto pathVal = evalOperand(env, file_, Value::eString);
+        return Value(fs::exists(pathVal.text()));
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
+FileRemove::FileRemove(CodeNode::SharedPtr file)
+    : FileOp(file)
+{}
+
+Value FileRemove::exec(Environment::SharedPtr env) const {
+    if (file_) {
+        const auto pathVal = evalOperand(env, file_, Value::eString);
+        return Value(fs::remove(pathVal.text()));
     }
     return Value::Null;
 }

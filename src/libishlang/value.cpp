@@ -1,6 +1,7 @@
 #include "value.h"
 #include "value_pair.h"
 #include "exception.h"
+#include "file_io.h"
 #include "hashtable.h"
 #include "instance.h"
 #include "integer_range.h"
@@ -26,6 +27,7 @@ Instance     Value::NullObject;
 Sequence     Value::NullSequence;
 Hashtable    Value::NullHashtable;
 IntegerRange Value::NullIntegerRange;
+FileStruct   Value::NullFileStruct;
 
 // -------------------------------------------------------------
 Value::Value(const Pair &p)
@@ -85,6 +87,12 @@ Value::Value(const Hashtable &h)
 Value::Value(const IntegerRange &r)
     : type_(eRange)
     , value_(std::make_shared<IntegerRange>(r))
+{}
+
+// -------------------------------------------------------------
+Value::Value(FileParams && fp)
+    : type_(eFile)
+    , value_(std::make_shared<FileStruct>(std::move(fp)))
 {}
 
 // -------------------------------------------------------------
@@ -198,6 +206,7 @@ bool Value::operator==(const Value &rhs) const {
         case eArray:      return *std::get<SequencePtr>(value_) == *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) == *std::get<HashtablePtr>(rhs.value_);
         case eRange:      return *std::get<IntegerRangePtr>(value_) == *std::get<IntegerRangePtr>(rhs.value_);
+        case eFile:       return *std::get<FileStructPtr>(value_) == *std::get<FileStructPtr>(rhs.value_);
         case eNone:       return true;
         }
     }
@@ -223,6 +232,7 @@ bool Value::operator!=(const Value &rhs) const {
         case eArray:      return *std::get<SequencePtr>(value_) != *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) != *std::get<HashtablePtr>(rhs.value_);
         case eRange:      return *std::get<IntegerRangePtr>(value_) != *std::get<IntegerRangePtr>(rhs.value_);
+        case eFile:       return *std::get<FileStructPtr>(value_) != *std::get<FileStructPtr>(rhs.value_);
         case eNone:       return false;
         }
     }
@@ -248,6 +258,7 @@ bool Value::operator<(const Value &rhs) const {
         case eArray:      return *std::get<SequencePtr>(value_) < *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) < *std::get<HashtablePtr>(rhs.value_);
         case eRange:      return *std::get<IntegerRangePtr>(value_) < *std::get<IntegerRangePtr>(rhs.value_);
+        case eFile:       return false;
         case eNone:       return false;
         }
     }
@@ -273,6 +284,7 @@ bool Value::operator>(const Value &rhs) const {
         case eArray:      return *std::get<SequencePtr>(value_) > *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) > *std::get<HashtablePtr>(rhs.value_);
         case eRange:      return *std::get<IntegerRangePtr>(value_) > *std::get<IntegerRangePtr>(rhs.value_);
+        case eFile:       return false;
         case eNone:       return false;
         }
     }
@@ -298,6 +310,7 @@ bool Value::operator<=(const Value &rhs) const {
         case eArray:      return *std::get<SequencePtr>(value_) <= *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) <= *std::get<HashtablePtr>(rhs.value_);
         case eRange:      return *std::get<IntegerRangePtr>(value_) <= *std::get<IntegerRangePtr>(rhs.value_);
+        case eFile:       return false;
         case eNone:       return false;
         }
     }
@@ -323,6 +336,7 @@ bool Value::operator>=(const Value &rhs) const {
         case eArray:      return *std::get<SequencePtr>(value_) >= *std::get<SequencePtr>(rhs.value_);
         case eHashMap:    return *std::get<HashtablePtr>(value_) >= *std::get<HashtablePtr>(rhs.value_);
         case eRange:      return *std::get<IntegerRangePtr>(value_) >= *std::get<IntegerRangePtr>(rhs.value_);
+        case eFile:       return false;
         case eNone:       return false;
         }
     }
@@ -348,6 +362,7 @@ std::string Value::typeToString(Type type) {
         case eArray:      return "array";
         case eHashMap:    return "hashmap";
         case eRange:      return "range";
+        case eFile:       return "file";
     }
     return "unknown";
 }
@@ -367,6 +382,7 @@ Value::Type Value::stringToType(const std::string &str) {
     else if (str == "array")      { return Value::eArray; }
     else if (str == "hashmap")    { return Value::eHashMap; }
     else if (str == "range")      { return Value::eRange; }
+    else if (str == "file")       { return Value::eFile; }
     throw InvalidExpression("unknown value type", str);
     return Value::eNone;
 }
@@ -405,6 +421,10 @@ Value Value::clone() const {
 
     case eRange:
         return Value(*std::get<IntegerRangePtr>(value_));
+
+    case eFile:
+        throw InvalidExpression("cannot clone file");
+        break;
     }
 
     return Value::Null;
@@ -431,6 +451,7 @@ Value Value::asType(Type otherType) const {
     case eArray:
     case eHashMap:
     case eRange:
+    case eFile:
         break;
     }
 
@@ -441,38 +462,40 @@ Value Value::asType(Type otherType) const {
 // -------------------------------------------------------------
 void Value::printC(std::ostream &out, const Value &value) {
     switch (value.type_) {
-    case Value::eNone:       out << "null";                                            break;
-    case Value::eInteger:    out << std::get<Long>(value.value_);                      break;
-    case Value::eReal:       out << std::get<Double>(value.value_);                    break;
-    case Value::eCharacter:  out << '\'' << std::get<Char>(value.value_) << '\'';      break;
-    case Value::eBoolean:    out << (std::get<Bool>(value.value_) ? "true" : "false"); break;
-    case Value::ePair:       out << *std::get<PairPtr>(value.value_);                  break;
-    case Value::eString:     out << '"' << *std::get<StringPtr>(value.value_) << '"';  break;
-    case Value::eClosure:    out << "[Lambda]";                                        break;
-    case Value::eUserType:   out << *std::get<StructPtr>(value.value_);                break;
-    case Value::eUserObject: out << *std::get<InstancePtr>(value.value_);              break;
-    case Value::eArray:      out << *std::get<SequencePtr>(value.value_);              break;
-    case Value::eHashMap:    out << *std::get<HashtablePtr>(value.value_);             break;
-    case Value::eRange:      out << *std::get<IntegerRangePtr>(value.value_);          break;
+    case Value::eNone:       out << "null";                                                       break;
+    case Value::eInteger:    out << std::get<Long>(value.value_);                                 break;
+    case Value::eReal:       out << std::get<Double>(value.value_);                               break;
+    case Value::eCharacter:  out << '\'' << std::get<Char>(value.value_) << '\'';                 break;
+    case Value::eBoolean:    out << (std::get<Bool>(value.value_) ? "true" : "false");            break;
+    case Value::ePair:       out << *std::get<PairPtr>(value.value_);                             break;
+    case Value::eString:     out << '"' << *std::get<StringPtr>(value.value_) << '"';             break;
+    case Value::eClosure:    out << "[Lambda]";                                                   break;
+    case Value::eUserType:   out << *std::get<StructPtr>(value.value_);                           break;
+    case Value::eUserObject: out << *std::get<InstancePtr>(value.value_);                         break;
+    case Value::eArray:      out << *std::get<SequencePtr>(value.value_);                         break;
+    case Value::eHashMap:    out << *std::get<HashtablePtr>(value.value_);                        break;
+    case Value::eRange:      out << *std::get<IntegerRangePtr>(value.value_);                     break;
+    case Value::eFile:       out << "File:" << std::get<FileStructPtr>(value.value_)->filename(); break;
     }
 }
 
 // -------------------------------------------------------------
 void Value::print(const Value &value) {
     switch (value.type_) {
-    case Value::eNone:       std::cout << "null";                                            break;
-    case Value::eInteger:    std::cout << std::get<Long>(value.value_);                      break;
-    case Value::eReal:       std::cout << std::get<Double>(value.value_);                    break;
-    case Value::eCharacter:  std::cout << std::get<Char>(value.value_);                      break;
-    case Value::eBoolean:    std::cout << (std::get<Bool>(value.value_) ? "true" : "false"); break;
-    case Value::ePair:       std::cout << *std::get<PairPtr>(value.value_);                  break;
-    case Value::eString:     std::cout << *std::get<StringPtr>(value.value_);                break;
-    case Value::eClosure:    std::cout << "[Lambda]";                                        break;
-    case Value::eUserType:   std::cout << *std::get<StructPtr>(value.value_);                break;
-    case Value::eUserObject: std::cout << *std::get<InstancePtr>(value.value_);              break;
-    case Value::eArray:      std::cout << *std::get<SequencePtr>(value.value_);              break;
-    case Value::eHashMap:    std::cout << *std::get<HashtablePtr>(value.value_);             break;
-    case Value::eRange:      std::cout << *std::get<IntegerRangePtr>(value.value_);          break;
+    case Value::eNone:       std::cout << "null";                                                       break;
+    case Value::eInteger:    std::cout << std::get<Long>(value.value_);                                 break;
+    case Value::eReal:       std::cout << std::get<Double>(value.value_);                               break;
+    case Value::eCharacter:  std::cout << std::get<Char>(value.value_);                                 break;
+    case Value::eBoolean:    std::cout << (std::get<Bool>(value.value_) ? "true" : "false");            break;
+    case Value::ePair:       std::cout << *std::get<PairPtr>(value.value_);                             break;
+    case Value::eString:     std::cout << *std::get<StringPtr>(value.value_);                           break;
+    case Value::eClosure:    std::cout << "[Lambda]";                                                   break;
+    case Value::eUserType:   std::cout << *std::get<StructPtr>(value.value_);                           break;
+    case Value::eUserObject: std::cout << *std::get<InstancePtr>(value.value_);                         break;
+    case Value::eArray:      std::cout << *std::get<SequencePtr>(value.value_);                         break;
+    case Value::eHashMap:    std::cout << *std::get<HashtablePtr>(value.value_);                        break;
+    case Value::eRange:      std::cout << *std::get<IntegerRangePtr>(value.value_);                     break;
+    case Value::eFile:       std::cout << "File:" << std::get<FileStructPtr>(value.value_)->filename(); break;
     }
 }
 
@@ -491,6 +514,7 @@ std::size_t Value::Hash::operator()(const Value &value) const noexcept {
     case Value::eArray:      return std::hash<const Value::Array *>{}(&value.array());
     case Value::eHashMap:    return std::hash<const Value::HashMap *>{}(&value.hashMap());
     case Value::eRange:      return operator()(value.range());
+    case Value::eFile:       return std::hash<std::string>{}(value.file().filename());
     case Value::eNone:       break;
     }
 

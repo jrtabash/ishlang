@@ -24,6 +24,7 @@ OBJS=\
 	sequence.o \
 	hashtable.o \
 	integer_range.o \
+	file_io.o \
 	code_node.o \
 	lexer.o \
 	parser.o \
@@ -44,7 +45,7 @@ exception.o: exception.h exception.cpp
 util.o: util.h util.cpp exception.h
 	$(CPP) $(CFLAGS) -c util.cpp -o $(BUILD)/util.o
 
-value.o: value.h value.cpp value_pair.h lambda.h instance.h
+value.o: value.h value.cpp value_pair.h lambda.h instance.h file_io.h
 	$(CPP) $(CFLAGS) -c value.cpp -o $(BUILD)/value.o
 
 value_pair.o: value_pair.cpp value_pair.h value.h
@@ -70,6 +71,9 @@ hashtable.o: hashtable.cpp hashtable.h value.h
 
 integer_range.o: integer_range.cpp integer_range.h
 	$(CPP) $(CFLAGS) -c integer_range.cpp -o $(BUILD)/integer_range.o
+
+file_io.o: file_io.cpp file_io.h
+	$(CPP) $(CFLAGS) -c file_io.cpp -o $(BUILD)/file_io.o
 
 code_node.o: code_node.cpp code_node.h code_node_bases.h code_node_util.h value.h parser.h environment.h lambda.h util.h exception.h
 	$(CPP) $(CFLAGS) -c code_node.cpp -o $(BUILD)/code_node.o

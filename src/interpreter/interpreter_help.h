@@ -38,6 +38,7 @@ namespace Ishlang {
         static const char *help_block();
         static const char *help_misc();
         static const char *help_import();
+        static const char *help_file_io();
 
     private:
         Dict dict_;

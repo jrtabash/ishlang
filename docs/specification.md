@@ -1183,3 +1183,83 @@ Example:
 (timeit (sum (range 1000)) 100)
 (timeit (sum (range 1000)) 100 false)
 ```
+
+## File IO
+**fopen**: Open a file for reading or writing
+```
+(fopen <filename> <mode>])
+```
+
+- Mode must be one of 'r' (read), 'w' (write) or 'a' (append)
+
+**fclose**: Close file
+```
+(fclose <file>)
+```
+
+**fflush**: Flush file
+```
+(fflush <file>)
+```
+
+**fisopen**: Is file open?
+```
+(fisopen <file>)
+```
+
+**fname**: Get filename
+```
+(fname <file>)
+```
+
+**fmode**: Get mode
+```
+(fmode <file>)
+```
+
+**fread**: Read character
+```
+(fread <file>)
+```
+
+**freadln**: Read line
+```
+(freadln <file>)
+```
+
+**fwrite**: Write character or string
+```
+(fwrite <file> <char_or_str>)
+```
+
+**fwriteln**: Write character or string followed by newline
+```
+(fwriteln <file> <char_or_str>)
+```
+
+**fexists**: Does file exist?
+```
+(fexists <filename>)
+```
+
+**fremove**: Delete file
+```
+(fremove <filename>)
+```
+
+### Example
+```
+(var filename "path/to/file.txt")
+
+(var f (fopen filename 'w'))
+(fwriteln f "Testing")
+(fclose f)
+
+(fexists filename)
+
+(= f (fopen filename 'r'))
+(freadln f)
+(fclose f)
+
+(fremove filename)
+```

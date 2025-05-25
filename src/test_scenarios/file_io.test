@@ -1,0 +1,48 @@
+__CODE__
+(var fpath "/tmp/file_io_test.ishlang")
+(when (fexists fpath)
+  (fremove fpath))
+
+(var f (fopen fpath 'w'))
+(println (fisopen f))
+
+(fwrite f 'a')
+(fwrite f "bc")
+(fwriteln f "d")
+(fwriteln f "efgh")
+(fwriteln f 'j')
+
+(println (fclose f))
+(println (fisopen f))
+
+(= f (fopen fpath 'r'))
+(println (fisopen f))
+
+(println (fread f))
+(println (freadln f))
+(println (freadln f))
+(println (freadln f))
+(println (freadln f))
+
+(println (fclose f))
+(println (fisopen f))
+
+(println (fexists fpath))
+(println (fremove fpath))
+(println (fexists fpath))
+
+__EXPECT__
+true
+true
+false
+true
+a
+bcd
+efgh
+j
+null
+true
+false
+true
+true
+false

@@ -103,6 +103,23 @@ namespace Ishlang {
         CodeNode::SharedPtrList operands_;
     };
 
+    // -------------------------------------------------------------
+    class FileOp : public CodeNode {
+    public:
+        FileOp(CodeNode::SharedPtr file)
+            : CodeNode()
+            , file_(file)
+        {}
+
+        virtual ~FileOp() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override = 0;
+
+    protected:
+        CodeNode::SharedPtr file_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_BASES_H

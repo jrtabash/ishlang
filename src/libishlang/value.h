@@ -15,6 +15,9 @@ namespace Ishlang {
     class Sequence;
     class Hashtable;
     class IntegerRange;
+    class FileStruct;
+
+    struct FileParams;
 
     using PairPtr = std::shared_ptr<ValuePair>;
     using StringPtr = std::shared_ptr<std::string>;
@@ -24,6 +27,7 @@ namespace Ishlang {
     using SequencePtr = std::shared_ptr<Sequence>;
     using HashtablePtr = std::shared_ptr<Hashtable>;
     using IntegerRangePtr = std::shared_ptr<IntegerRange>;
+    using FileStructPtr = std::shared_ptr<FileStruct>;
 
     struct Value {
     public:
@@ -42,6 +46,7 @@ namespace Ishlang {
         static Sequence     NullSequence;
         static Hashtable    NullHashtable;
         static IntegerRange NullIntegerRange;
+        static FileStruct   NullFileStruct;
         
     public:
         enum Type {
@@ -58,6 +63,7 @@ namespace Ishlang {
             eArray      = 'A',
             eHashMap    = 'H',
             eRange      = 'G',
+            eFile       = 'L',
         };
         using TypeList = std::vector<Type>;
 
@@ -73,6 +79,7 @@ namespace Ishlang {
         using Array      = Sequence;
         using HashMap    = Hashtable;
         using Range      = IntegerRange;
+        using File       = FileStruct;
         
     public:
         inline Value();
@@ -90,6 +97,7 @@ namespace Ishlang {
         Value(const Sequence &s);
         Value(const Hashtable &h);
         Value(const IntegerRange &r);
+        Value(FileParams && fp);
 
         inline Type type() const;
         
@@ -106,6 +114,7 @@ namespace Ishlang {
         inline bool isArray() const;
         inline bool isHashMap() const;
         inline bool isRange() const;
+        inline bool isFile() const;
         
         inline bool isNumber() const;
         
@@ -126,6 +135,8 @@ namespace Ishlang {
         inline HashMap &hashMap();
         inline const Range &range() const;
         inline Range &range();
+        inline const File& file() const;
+        inline File &file();
 
         Value asInt() const;
         Value asReal() const;
@@ -179,7 +190,8 @@ namespace Ishlang {
                                           InstancePtr,
                                           SequencePtr,
                                           HashtablePtr,
-                                          IntegerRangePtr>;
+                                          IntegerRangePtr,
+                                          FileStructPtr>;
 
         Type type_;
         VariantValue value_;
@@ -268,6 +280,10 @@ namespace Ishlang {
         return type_ == eRange;
     }
 
+    inline bool Value::isFile() const {
+        return type_ == eFile;
+    }
+
     inline bool Value::isNumber() const {
         return type_ == eInteger || type_ == eReal;
     }
@@ -338,6 +354,14 @@ namespace Ishlang {
 
     inline auto Value::range() -> Range & {
         return isRange() ? *std::get<IntegerRangePtr>(value_) : NullIntegerRange;
+    }
+
+    inline auto Value::file() const -> const File & {
+        return isFile() ? *std::get<FileStructPtr>(value_) : NullFileStruct;
+    }
+
+    inline auto Value::file() -> File & {
+        return isFile() ? *std::get<FileStructPtr>(value_) : NullFileStruct;
     }
 
     inline std::string Value::typeToString() const {

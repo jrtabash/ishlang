@@ -6,6 +6,7 @@
 #include "test_sequence.inc"
 #include "test_hashtable.inc"
 #include "test_integer_range.inc"
+#include "test_file_io.inc"
 #include "test_module.inc"
 #include "test_lexer.inc"
 
@@ -19,6 +20,7 @@
 #include "test_code_node_hashmap.inc"
 #include "test_code_node_range.inc"
 #include "test_code_node_generic.inc"
+#include "test_code_node_file_io.inc"
 
 #include "test_parser_misc.inc"
 #include "test_parser_ops.inc"
@@ -29,3 +31,4 @@
 #include "test_parser_hashmap.inc"
 #include "test_parser_range.inc"
 #include "test_parser_generic.inc"
+#include "test_parser_file_io.inc"
