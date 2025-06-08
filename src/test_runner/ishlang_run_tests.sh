@@ -90,7 +90,7 @@ do
     rm ${code_file} ${expect_file} ${out_file}
 done
 
-count=$(ls ${tests}/*.test | wc -l)
+count=$(ls ${tests}/*.test | wc -l | sed "s/[ ]*//")
 if [ ${verbose} -eq 1 ]; then
     echo ""
 fi
