@@ -390,9 +390,10 @@ Value Foreach::exec(Environment::SharedPtr env) const {
             case Value::eArray:   return impl(loopEnv, contValue.array());
             case Value::eHashMap: return impl(loopEnv, contValue.hashMap());
             case Value::eRange:   return implRange(loopEnv, contValue.range());
+            case Value::eFile:    return implFile(loopEnv, contValue.file());
             default:
                 throw InvalidExpressionType(
-                    typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange),
+                    typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange, Value::eFile),
                     contValue.typeToString());
             }
         }
@@ -422,6 +423,15 @@ Value Foreach::implRange(Environment::SharedPtr loopEnv, const IntegerRange &ran
     auto gen = range.generator();
     while (auto i = gen.next()) {
         loopEnv->set(name_, Value(*i));
+        result = body_->eval(loopEnv);
+    }
+    return result;
+}
+
+Value Foreach::implFile(Environment::SharedPtr loopEnv, FileStruct &file) const {
+    Value result = Value::Null;
+    while (auto optLine = file.readln()) {
+        loopEnv->set(name_, Value(std::move(*optLine)));
         result = body_->eval(loopEnv);
     }
     return result;

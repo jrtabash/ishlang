@@ -2,7 +2,6 @@
 
 ### Additional File IO Support
   - withfile (fopen, do work, fclose)
-  - foreach support to iterate over lines
   - Examples
     ```
     (withfile f (fopen "some/path.txt" 'w')

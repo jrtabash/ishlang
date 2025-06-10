@@ -2,6 +2,7 @@
 
 #include "environment.h"
 #include "parser.h"
+#include "util.h"
 #include "value.h"
 
 using namespace Ishlang;
@@ -69,8 +70,16 @@ DEFINE_TEST(testParserLoop) {
 
 // -------------------------------------------------------------
 DEFINE_TEST(testParserForeach) {
+    Util::TemporaryFile tempFile("testParserForeach.txt",
+                                 "1\n"
+                                 "22\n"
+                                 "333\n"
+                                 "4444\n");
+
     auto env = Environment::make();
     Parser parser;
+
+    const auto openFile = std::string("(fopen \"") + tempFile.path().c_str() + "\" 'r')";
 
     auto add_var = [&](const char *name, const char *val) {
         const auto expr = std::string("(var ") + name + " " + val + ")";
@@ -80,12 +89,14 @@ DEFINE_TEST(testParserForeach) {
     add_var("arr", "(array 1 2 3 4 5)");
     add_var("ht", "(hashmap (pair 1 10) (pair 2 20))");
     add_var("rng", "(range 10)");
+    add_var("file", openFile.c_str());
     add_var("strCnt", "0");
     add_var("arrSum", "0");
     add_var("htSum", "0");
     add_var("keySum", "0");
     add_var("valSum", "0");
     add_var("rngSum", "0");
+    add_var("fileCat", "\"\"");
     add_var("dummy", "0");
 
     TEST_CASE(parserTest(parser, env, "(foreach c str (= strCnt (+ strCnt 1)))",                        Value(6ll),  true));
@@ -93,6 +104,7 @@ DEFINE_TEST(testParserForeach) {
     TEST_CASE(parserTest(parser, env, "(foreach kv ht (= htSum (+ htSum (* (first kv) (second kv)))))", Value(50ll), true));
     TEST_CASE(parserTest(parser, env, "(foreach kv ht (progn (= keySum (+ keySum (first kv))) (= valSum (+ valSum (second kv)))))", Value(30ll), true));
     TEST_CASE(parserTest(parser, env, "(foreach i rng (= rngSum (+ rngSum i)))",                        Value(45ll), true));
+    TEST_CASE(parserTest(parser, env, "(foreach l file (strcat fileCat l))",                            Value("1223334444"), true));
 
     add_var("arrCnt", "0");
     TEST_CASE(parserTest(parser, env, "(foreach i arr (progn (when (> i 3) (break)) (= arrCnt (+ arrCnt 1))))", Value::Null, true));
@@ -102,6 +114,8 @@ DEFINE_TEST(testParserForeach) {
     TEST_CASE(parserTest(parser, env, "(foreach x)",               Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(foreach x str)",           Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(foreach x 5 (+ dummy 1))", Value::Null, false));
+
+    TEST_CASE(parserTest(parser, env, "(fclose file)", Value::True, true));
 }
 
 // -------------------------------------------------------------

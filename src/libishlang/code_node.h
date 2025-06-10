@@ -379,6 +379,7 @@ namespace Ishlang {
         Value impl(Environment::SharedPtr loopEnv, const Container &container) const;
 
         Value implRange(Environment::SharedPtr loopEnv, const IntegerRange &range) const;
+        Value implFile(Environment::SharedPtr loopEnv, FileStruct &file) const;
 
     private:
         std::string         name_;

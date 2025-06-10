@@ -3,7 +3,7 @@ Ishlang is a fully parenthesized prefix notation programming language inspired b
 
 The name Ishlang (ish-lang) is shorthand for "Lisp'ish programming language", and was chosen to pay homage to Lisp. Though it is inspired by Lisp, the language diverts considerably from Lisp, and is not a lisp implementation.
 
-The language supports a rich set of features, including branching, looping, functions, nested-functions, recursion, lambdas/closures, pairs, arrays, hashmaps, ranges, structs and modules.
+The language supports a rich set of features, including branching, looping, functions, nested-functions, recursion, lambdas/closures, pairs, arrays, hashmaps, ranges, structs, file IO and modules.
 
 More details about the language available in [docs/specification.md](docs/specification.md)
 

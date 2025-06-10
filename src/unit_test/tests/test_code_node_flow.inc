@@ -3,10 +3,12 @@
 #include "code_node.h"
 #include "environment.h"
 #include "exception.h"
+#include "file_io.h"
 #include "hashtable.h"
 #include "integer_range.h"
 #include "lambda.h"
 #include "sequence.h"
+#include "util.h"
 #include "value.h"
 
 using namespace Ishlang;
@@ -412,6 +414,42 @@ DEFINE_TEST(testCodeNodeForeach) {
         auto const & sum = env->get("sum");
         TEST_CASE_MSG(sum.isInt(), "actual=" << sum.typeToString());
         TEST_CASE_MSG(sum.integer() == 90ll, "actual=" << sum);
+    }
+
+    { // File
+        Util::TemporaryFile tempFile("testCodeNodeForeach.txt",
+                                     "1\n"
+                                     "22\n"
+                                     "333\n"
+                                     "4444\n");
+
+        auto env = Environment::make();
+        env->def("str", Value(""));
+
+        const auto fileVal = CodeNode::make<Define>(
+            "f",
+            CodeNode::make<FileOpen>(
+                CodeNode::make<Literal>(Value(tempFile.path())),
+                CodeNode::make<Literal>(Value('r'))))->eval(env);
+        TEST_CASE(fileVal.isFile());
+        TEST_CASE(fileVal.file().isOpen());
+
+        const auto result = CodeNode::make<Foreach>(
+            "line",
+            var("f"),
+            CodeNode::make<StringCat>(var("str"), var("line")))->eval(env);
+        TEST_CASE_MSG(result.isString(), "actual=" << result.typeToString());
+        TEST_CASE_MSG(result.text() == "1223334444", "actual=" << result.text());
+
+        auto const & str = env->get("str");
+        TEST_CASE_MSG(str.isString(), "actual=" << str.typeToString());
+        TEST_CASE_MSG(str.text() == "1223334444", "actual=" << str.text());
+
+        const auto closeVal = CodeNode::make<FileClose>(
+            CodeNode::make<Variable>("f"))->eval(env);
+        TEST_CASE(closeVal.isBool());
+        TEST_CASE(closeVal.boolean());
+        TEST_CASE(!fileVal.file().isOpen());
     }
 }
 

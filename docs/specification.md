@@ -21,6 +21,7 @@ Every expression in ishlang evaluates to a value. A value can hold any of the fo
 - array
 - hashmap
 - range
+- file
 - closure
 - usertype
 - userobject
@@ -292,7 +293,7 @@ Conditional only form:
 ```
 
 - Loop over each element in `<iterable_expression>`
-- Iterable expression can be a string, array, hashmap or range
+- Iterable expression can be a string, array, hashmap, range or file
 - The `<var>` variable is read-only and cannot directly modify iterable elemets
 
 ### Example - sum array elements
@@ -314,6 +315,14 @@ Conditional only form:
 (var sum 0)
 (foreach i (range 10)
   (= sum (+ sum i)))
+```
+
+### Example - print file
+```
+(var f (fopen "path/to/file.txt" 'r'))
+(foreach line f
+  (println line))
+(fclose f)
 ```
 
 ## Functions
@@ -405,7 +414,7 @@ Is type of?
 
 Check expression type matches any of provided types.
 
-`<type>` must be one of: none, int, real, char, bool, string, pair, array, hashmap, range, closure, usertype, userobject
+`<type>` must be one of: none, int, real, char, bool, string, pair, array, hashmap, range, file, closure, usertype, userobject
 
 ### Example
 ```
@@ -1191,6 +1200,7 @@ Example:
 ```
 
 - Mode must be one of 'r' (read), 'w' (write) or 'a' (append)
+- Use foreach to iterate over lines in a file
 
 **fclose**: Close file
 ```

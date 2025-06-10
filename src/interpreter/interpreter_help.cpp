@@ -727,6 +727,7 @@ File IO
              (fopen <filename> <mode>])
 
              * Mode must be one of 'r' (read), 'w' (write) or 'a' (append)
+             * Use foreach to iterate over lines in a file
 
     fclose - Close file
              (fclose <file>)
