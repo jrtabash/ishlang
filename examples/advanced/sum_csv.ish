@@ -1,0 +1,27 @@
+(defun split_csv_line (line)
+  (strsplit line ','))
+
+(defun process_csv_file (csv_file)
+  (var sums (hashmap))
+  (var header (split_csv_line (freadln csv_file)))
+  (var size (len header))
+
+  (foreach line csv_file
+    (block
+      (var values (split_csv_line line))
+      (foreach i (range size)
+        (set sums (get header i)
+          (+ (astype (get values i) int)
+             (get sums (get header i) 0))))))
+
+  sums)
+
+(defun main ()
+  (var csv (fopen "data/numbers.csv" 'r'))
+  (var sums (process_csv_file csv))
+  (fclose csv)
+
+  (foreach s sums
+    (println (first s) ": " (second s))))
+
+(main)
