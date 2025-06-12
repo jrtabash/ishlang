@@ -1,17 +1,5 @@
 ## TODO
 
-### Additional File IO Support
-  - withfile (fopen, do work, fclose)
-  - Examples
-    ```
-    (withfile f (fopen "some/path.txt" 'w')
-      (fwriteln f "some text"))
-
-    (withfile f (fopen "some/path.txt" 'r')
-      (foreach line f
-        (println line)))
-    ```
-
 ### Implement built-in data structures:
 - List
   - **list**: make list

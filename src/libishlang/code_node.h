@@ -1606,6 +1606,19 @@ namespace Ishlang {
         virtual Value exec(Environment::SharedPtr env) const override;
     };
 
+    // -------------------------------------------------------------
+    class WithFile : public FileOp {
+    public:
+        WithFile(const std::string &name, CodeNode::SharedPtr file, CodeNode::SharedPtr body);
+        virtual ~WithFile() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        std::string name_;
+        CodeNode::SharedPtr body_;
+    };
 }
 
 #endif	// ISHLANG_CODE_NODE_H

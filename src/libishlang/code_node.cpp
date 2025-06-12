@@ -2155,3 +2155,31 @@ Value FileRemove::exec(Environment::SharedPtr env) const {
     }
     return Value::Null;
 }
+
+// -------------------------------------------------------------
+WithFile::WithFile(const std::string &name, CodeNode::SharedPtr file, CodeNode::SharedPtr body)
+    : FileOp(file)
+    , name_(name)
+    , body_(body)
+{}
+
+Value WithFile::exec(Environment::SharedPtr env) const {
+    if (file_ && body_) {
+        auto fileVal = evalOperand(env, file_, Value::eFile);
+
+        try {
+            auto withEnv = Environment::make(env);
+            withEnv->def(name_, fileVal);
+
+            auto result = body_->eval(withEnv);
+
+            fileVal.file().close();
+            return result;
+        }
+        catch (...) {
+            fileVal.file().close();
+            throw;
+        }
+    }
+    return Value::Null;
+}

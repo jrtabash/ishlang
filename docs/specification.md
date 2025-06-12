@@ -1201,6 +1201,7 @@ Example:
 
 - Mode must be one of 'r' (read), 'w' (write) or 'a' (append)
 - Use foreach to iterate over lines in a file
+- Use withfile to open a file, do work and close file
 
 **fclose**: Close file
 ```
@@ -1257,7 +1258,7 @@ Example:
 (fremove <filename>)
 ```
 
-### Example
+### Example 1
 ```
 (var filename "path/to/file.txt")
 
@@ -1272,4 +1273,13 @@ Example:
 (fclose f)
 
 (fremove filename)
+```
+
+### Example 2
+```
+(var filename "path/to/file.txt")
+
+(withfile f (fopen filename 'r')
+  (foreach line f
+    (println line)))
 ```

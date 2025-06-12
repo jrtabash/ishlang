@@ -17,9 +17,9 @@
   sums)
 
 (defun main ()
-  (var csv (fopen "data/numbers.csv" 'r'))
-  (var sums (process_csv_file csv))
-  (fclose csv)
+  (var sums
+    (withfile csv (fopen "data/numbers.csv" 'r')
+      (process_csv_file csv)))
 
   (foreach s sums
     (println (first s) ": " (second s))))

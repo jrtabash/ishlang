@@ -248,3 +248,41 @@ DEFINE_TEST(testCodeNodeFileIO_ExistsAndRemove) {
     TEST_CASE(value.isBool());
     TEST_CASE(!value.boolean());
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeFileIO_WithFileRead) {
+    Util::TemporaryFile tempFile("testCodeNodeFileIO_WithFileRead.txt",
+                                 "12\n"
+                                 "345\n"
+                                 "6789\n");
+
+    auto env = Environment::make();
+    env->def("catText", Value(""));
+
+    const auto fileVal = CodeNode::make<Define>(
+        "file",
+        CodeNode::make<FileOpen>(
+            CodeNode::make<Literal>(Value(tempFile.path())),
+            CodeNode::make<Literal>(Value('r'))))->eval(env);
+    TEST_CASE(fileVal.isFile());
+    TEST_CASE(fileVal.file().isOpen());
+
+    const auto result = CodeNode::make<WithFile>(
+        "f",
+        CodeNode::make<Variable>("file"),
+        CodeNode::make<Foreach>(
+            "line",
+            CodeNode::make<Variable>("f"),
+            CodeNode::make<StringCat>(
+                CodeNode::make<Variable>("catText"),
+                CodeNode::make<Variable>("line"))))->eval(env);
+
+    TEST_CASE(!fileVal.file().isOpen());
+
+    TEST_CASE_MSG(result.isString(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(result.text() == "123456789", "actual=" << result.text());
+
+    auto const &catText = env->get("catText");
+    TEST_CASE_MSG(catText.isString(), "actual=" << catText.typeToString());
+    TEST_CASE_MSG(catText.text() == "123456789", "actual=" << catText.text());
+}

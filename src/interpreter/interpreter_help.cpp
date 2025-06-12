@@ -728,6 +728,7 @@ File IO
 
              * Mode must be one of 'r' (read), 'w' (write) or 'a' (append)
              * Use foreach to iterate over lines in a file
+             * Use withfile to open a file, do work and close file
 
     fclose - Close file
              (fclose <file>)

@@ -27,6 +27,12 @@ __CODE__
 (println (fclose f))
 (println (fisopen f))
 
+(var all_lines "")
+(withfile fd (fopen fpath 'r')
+  (foreach line fd
+    (strcat all_lines line)))
+(println all_lines)
+
 (println (fexists fpath))
 (println (fremove fpath))
 (println (fexists fpath))
@@ -43,6 +49,7 @@ j
 null
 true
 false
+abcdefghj
 true
 true
 false

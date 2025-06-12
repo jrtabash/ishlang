@@ -1276,6 +1276,14 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("fremove", 1));
               return CodeNode::make<FileRemove>(exprs[0]);
           }
+        },
+
+        { "withfile",
+          [this]() {
+              const auto name(readName());
+              auto exprs(readAndCheckExprList("withfile", 2));
+              return CodeNode::make<WithFile>(name, exprs[0], exprs[1]);
+          }
         }
     };
 }

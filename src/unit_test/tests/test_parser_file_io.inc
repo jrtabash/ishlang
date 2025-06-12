@@ -144,3 +144,36 @@ DEFINE_TEST(testParserFileIO_ExistsAndRemove) {
     TEST_CASE(parserTest(parser, env, fexists(tempFile.path()),      Value::False, true));
     TEST_CASE(parserTest(parser, env, fremove(tempFile.path()),      Value::False, true));
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserFileIO_WithFileRead) {
+    Util::TemporaryFile tempFile("testParserFileIO_WithFileRead.txt",
+                                 "12\n"
+                                 "345\n"
+                                 "6789\n");
+
+    auto env = Environment::make();
+    Parser parser;
+
+    env->def("catText", Value(""));
+
+    const auto fopen = std::string("(fopen \"") + tempFile.path().c_str() + "\" 'r')";
+    const auto foreach = "(foreach line f (strcat catText line))";
+    const auto withfile = [&](const std::string &file) {
+        return std::string("(withfile f ") + file + ' ' + foreach + ')';
+    };
+
+    TEST_CASE(parserTest(parser, env, withfile(fopen), Value("123456789"), true));
+
+    auto const &catText = env->get("catText");
+    TEST_CASE_MSG(catText.isString(), "actual=" << catText.typeToString());
+    TEST_CASE_MSG(catText.text() == "123456789", "actual=" << catText.text());
+
+    const auto fileExpr = std::string("(progn ")
+            + "(var file (fopen \"" + tempFile.path().c_str() + "\" 'r')) "
+            + "(fisopen file))";
+
+    TEST_CASE(parserTest(parser, env, fileExpr, Value::True, true));
+    TEST_CASE(parserTest(parser, env, withfile("file"), Value("123456789123456789"), true));
+    TEST_CASE(parserTest(parser, env, "(fisopen file)", Value::False, true));
+}
