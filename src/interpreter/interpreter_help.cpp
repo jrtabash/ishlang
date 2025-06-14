@@ -61,6 +61,7 @@ void HelpDict::populateDict(Dict &dict) {
     tmp.emplace("misc", help_misc());
     tmp.emplace("import", help_import());
     tmp.emplace("fileio", help_file_io());
+    tmp.emplace("repl", help_repl());
     dict.swap(tmp);
 }
 
@@ -72,7 +73,8 @@ Every expression in ishlang evaluates to a value.
 A value can hold any of the following types:
 
   none int real char bool string pair
-  array hashmap range closure usertype userobject
+  array hashmap range file closure
+  usertype userobject
 
 Examples:
        none: null
@@ -85,6 +87,7 @@ Examples:
       array: (array 1 2)
     hashmap: (hashmap (pair 1 100))
       range: (range 10)
+       file: (fopen "path/to/file.txt" 'r')
     closure: (lambda () 42)
    usertype: (struct Foo (bar))
  userobject: (makeinstance Foo)
@@ -723,7 +726,7 @@ const char *HelpDict::help_file_io() {
   return R"(
 File IO
 -------
-   fopen** - Open a file for reading or writing
+     fopen - Open a file for reading or writing
              (fopen <filename> <mode>])
 
              * Mode must be one of 'r' (read), 'w' (write) or 'a' (append)
@@ -762,5 +765,29 @@ File IO
 
    fremove - Delete file
              (fremove <filename>)
+)";
+}
+
+const char *HelpDict::help_repl() {
+    return R"(
+REPL Commands
+-------------
+    :exit - Quit interpreter
+    :quit - Quit interpreter
+       ^D - Quit interpreter
+
+        * - Access result of last evaulation
+
+    :load - Load source file
+            :load <filename>
+
+   :batch - Switch batch mode on/off
+            :batch [<bool>]
+
+    :desc - Describe struct or instance
+            :desc <name>
+
+    :help - Help topics
+            :help [<topic>]
 )";
 }
