@@ -136,7 +136,7 @@ Variadic Operations: + - * / % ^
 Binary operations: += -= *= /= %= ^=
   (<op> <name> <expression>)
 
-  Apply arithmetic operation and assign result in <name>.
+  Apply arithmetic operation and assign result to <name>.
   The variable referenced by <name> must be defined.
 
 Negation Operation:

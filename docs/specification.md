@@ -123,7 +123,7 @@ When more than 2 operands are given to op, the expression is equivalent to a bin
 (<op> <name> <expression>)
 ```
 
-Apply arithmetic operation and assign result in `<name>`. The variable referenced by `<name>` must be defined.
+Apply arithmetic operation and assign result to `<name>`. The variable referenced by `<name>` must be defined.
 
 #### Example
 ```
