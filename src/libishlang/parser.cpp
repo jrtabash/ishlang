@@ -459,6 +459,13 @@ void Parser::initAppFtns() {
         { "%", MakeVariadicExpression<ArithOp>("%", *this, ArithOp::Mod) },
         { "^", MakeVariadicExpression<ArithOp>("^", *this, ArithOp::Pow) },
 
+        { "+=", MakeUpdateExpression<ArithAssignOp>("+=", *this, ArithAssignOp::Add) },
+        { "-=", MakeUpdateExpression<ArithAssignOp>("-=", *this, ArithAssignOp::Sub) },
+        { "*=", MakeUpdateExpression<ArithAssignOp>("*=", *this, ArithAssignOp::Mul) },
+        { "/=", MakeUpdateExpression<ArithAssignOp>("/=", *this, ArithAssignOp::Div) },
+        { "%=", MakeUpdateExpression<ArithAssignOp>("%=", *this, ArithAssignOp::Mod) },
+        { "^=", MakeUpdateExpression<ArithAssignOp>("^=", *this, ArithAssignOp::Pow) },
+
         { "==", MakeBinaryExpression<CompOp>("==", *this, CompOp::EQ) },
         { "!=", MakeBinaryExpression<CompOp>("!=", *this, CompOp::NE) },
         { "<",  MakeBinaryExpression<CompOp>("<",  *this, CompOp::LT) },

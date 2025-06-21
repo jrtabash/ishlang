@@ -21,10 +21,23 @@ DEFINE_TEST(testTokenType) {
     TEST_CASE(Lexer::tokenType("-") == Lexer::Symbol);
     TEST_CASE(Lexer::tokenType("+") == Lexer::Symbol);
     TEST_CASE(Lexer::tokenType("*") == Lexer::Symbol);
-    TEST_CASE(Lexer::tokenType("<") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("/") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("%") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("^") == Lexer::Symbol);
     TEST_CASE(Lexer::tokenType("=") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("<") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType(">") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("?") == Lexer::Symbol);
     TEST_CASE(Lexer::tokenType("==") == Lexer::Symbol);
     TEST_CASE(Lexer::tokenType("!=") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("<=") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType(">=") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("+=") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("-=") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("*=") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("/=") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("%=") == Lexer::Symbol);
+    TEST_CASE(Lexer::tokenType("^=") == Lexer::Symbol);
 
     TEST_CASE(Lexer::tokenType("(") == Lexer::LeftP);
     TEST_CASE(Lexer::tokenType(")") == Lexer::RightP);

@@ -63,6 +63,20 @@ namespace Ishlang {
             ExprOp exprOp_;
         };
 
+        template <typename ExprType>
+        struct MakeUpdateExpression {
+            using ExprOp = typename ExprType::Type;
+
+            inline MakeUpdateExpression(const std::string &name, Parser &parser, ExprOp exprOp);
+
+            inline CodeNode::SharedPtr operator()();
+
+        private:
+            const std::string name_;
+            Parser &parser_;
+            ExprOp exprOp_;
+        };
+
     private:
         template <typename ExprType>
         struct MakeVariadicExpression {
@@ -120,6 +134,20 @@ namespace Ishlang {
     inline CodeNode::SharedPtr Parser::MakeBinaryExpression<ExprType>::operator()() {
         auto exprs(parser_.readAndCheckExprList(name_.c_str(), 2));
         return CodeNode::make<ExprType>(exprOp_, exprs[0], exprs[1]);
+    }
+
+    template <typename ExprType>
+    inline Parser::MakeUpdateExpression<ExprType>::MakeUpdateExpression(const std::string &name, Parser &parser, ExprOp exprOp)
+        : name_(name)
+        , parser_(parser)
+        , exprOp_(exprOp)
+    {}
+
+    template <typename ExprType>
+    inline CodeNode::SharedPtr Parser::MakeUpdateExpression<ExprType>::operator()() {
+        const auto varName(parser_.readName());
+        auto exprs(parser_.readAndCheckExprList(name_.c_str(), 1));
+        return CodeNode::make<ExprType>(exprOp_, varName, exprs[0]);
     }
 
     template <typename ExprType>

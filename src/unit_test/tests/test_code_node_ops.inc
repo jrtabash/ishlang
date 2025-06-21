@@ -219,6 +219,80 @@ DEFINE_TEST(testCodeNodeArithOpVariadic) {
 }
 
 // -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeArithAssignOp) {
+    auto env = Environment::make();
+
+    constexpr const char *num = "num";
+    constexpr const char *txt = "txt";
+    constexpr const char *ten = "oth";
+    env->def(num, Value::Zero);
+    env->def(txt, Value("test"));
+    env->def(ten, Value(10ll));
+
+    const auto update = [](ArithAssignOp::Type op, const char * varName, Value delta) {
+        return CodeNode::make<ArithAssignOp>(op, varName, CodeNode::make<Literal>(delta));
+    };
+
+    Value result;
+
+    result = update(ArithAssignOp::Add, num, Value(10ll))->eval(env);
+    TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(env->get(num) == Value(10ll), "actual=" << env->get(num));
+
+    result = update(ArithAssignOp::Sub, num, Value(5ll))->eval(env);
+    TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(env->get(num) == Value(5ll), "actual=" << env->get(num));
+
+    result = update(ArithAssignOp::Mul, num, Value(4ll))->eval(env);
+    TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(env->get(num) == Value(20ll), "actual=" << env->get(num));
+
+    result = update(ArithAssignOp::Div, num, Value(2ll))->eval(env);
+    TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(env->get(num) == Value(10ll), "actual=" << env->get(num));
+
+    result = update(ArithAssignOp::Mod, num, Value(4ll))->eval(env);
+    TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(env->get(num) == Value(2ll), "actual=" << env->get(num));
+
+    result = update(ArithAssignOp::Pow, num, Value(3ll))->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(env->get(num) == Value(8.0), "actual=" << env->get(num));
+
+    result = update(ArithAssignOp::Add, num, Value(2ll))->eval(env);
+    TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
+    TEST_CASE_MSG(env->get(num) == Value(10.0), "actual=" << env->get(num));
+
+    try {
+        update(ArithAssignOp::Add, txt, Value(1ll))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidExpressionType &ex) {}
+    catch (...) { TEST_CASE(false); }
+
+    try {
+        update(ArithAssignOp::Div, num, Value::Zero)->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const DivByZero &ex) {}
+    catch (...) { TEST_CASE(false); }
+
+    try {
+        update(ArithAssignOp::Mod, num, Value::Zero)->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {}
+    catch (...) { TEST_CASE(false); }
+
+    try {
+        update(ArithAssignOp::Mod, ten, Value::Zero)->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const DivByZero &ex) {}
+    catch (...) { TEST_CASE(false); }
+}
+
+// -------------------------------------------------------------
 #define TEST_COMP(TYPE, LHS, RHS, RVALUE) \
     comp.reset(new CompOp(CompOp::TYPE, LHS, RHS)); \
     result = comp->eval(env); \

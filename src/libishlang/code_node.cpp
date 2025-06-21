@@ -138,9 +138,7 @@ Value ArithOp::exec(Environment::SharedPtr env) const {
 
         case Mod:
             if (real) {
-                throw InvalidOperandType(
-                    Value::typeToString(Value::eReal),
-                    Value::typeToString(Value::eInteger));
+                throw InvalidOperandType(Value::typeToString(Value::eInteger), Value::typeToString(Value::eReal));
             }
             if (isDivByZero<Value::Long>(values)) { throw DivByZero(); }
             return accum<Value::Long>(values, std::modulus<Value::Long>());
@@ -150,6 +148,69 @@ Value ArithOp::exec(Environment::SharedPtr env) const {
         }
     }
     return Value::Zero;
+}
+
+// -------------------------------------------------------------
+ArithAssignOp::ArithAssignOp(Type type, const std::string &name, CodeNode::SharedPtr delta)
+    : CodeNode()
+    , type_(type)
+    , name_(name)
+    , delta_(delta)
+{}
+
+Value ArithAssignOp::exec(Environment::SharedPtr env) const {
+    if (delta_) {
+        const auto & nameVal = env->get(name_);
+        if (!nameVal.isNumber()) {
+            throw InvalidExpressionType(typesToString(Value::eInteger, Value::eReal), nameVal.typeToString());
+        }
+
+        const auto deltaVal = evalOperand(env, delta_, Value::eInteger, Value::eReal);
+        const bool real = nameVal.isReal() || deltaVal.isReal();
+
+        Value updtVal;
+        switch (type_) {
+        case Add:
+            if (real) { updtVal = Value(nameVal.real() + deltaVal.real()); }
+            else      { updtVal = Value(nameVal.integer() + deltaVal.integer()); }
+            break;
+
+        case Sub:
+            if (real) { updtVal = Value(nameVal.real() - deltaVal.real()); }
+            else      { updtVal = Value(nameVal.integer() - deltaVal.integer()); }
+            break;
+
+        case Mul:
+            if (real) { updtVal = Value(nameVal.real() * deltaVal.real()); }
+            else      { updtVal = Value(nameVal.integer() * deltaVal.integer()); }
+            break;
+
+        case Div:
+            if (real) {
+                if (Util::isZero(deltaVal.real())) { throw DivByZero(); }
+                updtVal = Value(nameVal.real() / deltaVal.real());
+            }
+            else {
+                if (deltaVal.integer() == 0) { throw DivByZero(); }
+                updtVal = Value(nameVal.integer() / deltaVal.integer());
+            }
+            break;
+
+        case Mod:
+            if (real) {
+                throw InvalidOperandType(Value::typeToString(Value::eInteger), Value::typeToString(Value::eReal));
+            }
+            if (deltaVal.integer() == 0) { throw DivByZero(); }
+            updtVal = Value(nameVal.integer() % deltaVal.integer());
+            break;
+
+        case Pow:
+            updtVal = Value(std::pow(nameVal.real(), deltaVal.real()));
+            break;
+        }
+        return env->set(name_, updtVal);
+    }
+    return Value::Null;
 }
 
 // -------------------------------------------------------------

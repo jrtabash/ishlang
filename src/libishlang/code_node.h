@@ -217,6 +217,31 @@ namespace Ishlang {
     private:
         Type type_;
     };
+
+    // -------------------------------------------------------------
+    class ArithAssignOp : public CodeNode {
+    public:
+        enum Type {
+            Add = '+', // +=
+            Sub = '-', // -=
+            Mul = '*', // *=
+            Div = '/', // /=
+            Mod = '%', // %=
+            Pow = '^', // ^=
+        };
+
+    public:
+        ArithAssignOp(Type type, const std::string &name, CodeNode::SharedPtr delta);
+        virtual ~ArithAssignOp() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        Type type_;
+        std::string name_;
+        CodeNode::SharedPtr delta_;
+    };
     
     // -------------------------------------------------------------
     class CompOp : public BinaryOp {

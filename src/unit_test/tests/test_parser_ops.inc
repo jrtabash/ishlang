@@ -35,6 +35,31 @@ DEFINE_TEST(testParserArith) {
 }
 
 // -------------------------------------------------------------
+DEFINE_TEST(testParserArithAssign) {
+    auto env = Environment::make();
+    Parser parser;
+
+    env->def("num", Value(10ll));
+    env->def("txt", Value("text"));
+    env->def("ten", Value(10ll));
+
+    TEST_CASE(parserTest(parser, env, "(+= num 10)", Value(20ll), true));
+    TEST_CASE(parserTest(parser, env, "(-= num 5)",  Value(15ll), true));
+    TEST_CASE(parserTest(parser, env, "(*= num 4)",  Value(60ll), true));
+    TEST_CASE(parserTest(parser, env, "(/= num 6)",  Value(10ll), true));
+    TEST_CASE(parserTest(parser, env, "(%= num 4)",  Value(2ll),  true));
+    TEST_CASE(parserTest(parser, env, "(^= num 4)",  Value(16.0), true));
+    TEST_CASE(parserTest(parser, env, "(+= num 4)",  Value(20.0), true));
+
+    TEST_CASE(parserTest(parser, env, "(+=)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(+= 1)",       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(+= txt 1)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(+= num 'c')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(/= ten 0)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(%= ten 0)",   Value::Null, false));
+}
+
+// -------------------------------------------------------------
 DEFINE_TEST(testParserComp) {
     auto env = Environment::make();
     Parser parser;

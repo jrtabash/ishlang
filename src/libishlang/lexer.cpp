@@ -50,6 +50,9 @@ Lexer::TokenType Lexer::tokenType(const std::string &token) {
     static const std::unordered_set<char> singles({
             '-', '+', '*', '/', '%', '^', '=', '<', '>', '?'});
 
+    static const std::unordered_set<std::string> doubles({
+            "==", "!=", "<=", ">=", "+=", "-=", "*=", "/=", "%=", "^="});
+
     static const std::unordered_set<char> notAllowed({
             '(', ')', '-', '+', '[', ']', '{', '}', '~', '!', '@',
             '#', '$', '%', '^', '&', '*', '=', '|', '\\', ',',
@@ -65,7 +68,7 @@ Lexer::TokenType Lexer::tokenType(const std::string &token) {
     else if (size == 1 && singles.find(token[0]) != singles.end()) {
         return Symbol;
     }
-    else if (token == "==" || token == "!=" || token == "<=" || token == ">=") {
+    else if (size == 2 && doubles.find(token) != doubles.end()) {
         return Symbol;
     }
     else if (token[0] == '\'') {

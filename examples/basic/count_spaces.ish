@@ -1,15 +1,15 @@
 (defun countSpacesLoop (str)
   (var count 0)
-  (loop (var i 0) (< i (len str)) (= i (+ i 1))
+  (loop (var i 0) (< i (len str)) (+= i 1)
         (when (== (get str i) ' ')
-          (= count (+ count 1))))
+          (+= count 1)))
   count)
 
 (defun countSpacesForeach (str)
   (var count 0)
   (foreach c str
     (when (== c ' ')
-      (= count (+ count 1))))
+      (+= count 1)))
   count)
 
 (defun printCount (tag cnt)

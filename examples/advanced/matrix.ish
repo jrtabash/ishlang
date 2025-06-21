@@ -3,7 +3,7 @@
 
 (defun matrix (n m)
   (var mat (makeinstance Matrix (data (array))))
-  (loop (var r 0) (< r n) (= r (+ r 1))
+  (loop (var r 0) (< r n) (+= r 1)
         (arrpush (get mat data) (arraysv m 0)))
   mat)
 
@@ -21,15 +21,15 @@
 
 (defun matrix_id (n)
   (var mat (matrix n n))
-  (loop (var i 0) (< i n) (= i (+ i 1))
+  (loop (var i 0) (< i n) (+= i 1)
         (matrix_set mat i i 1))
   mat)
 
 (defun matrix_random (n m)
   ;; Generate a random nxm matrix with values in range [0.0, 1.0]
   (var mat (matrix n m))
-  (loop (var i 0) (< i n) (= i (+ i 1))
-        (loop (var j 0) (< j m) (= j (+ j 1))
+  (loop (var i 0) (< i n) (+= i 1)
+        (loop (var j 0) (< j m) (+= j 1)
               (matrix_set mat i j (/ (rand 1000000000) 1000000000.0))))
   mat)
 
@@ -43,7 +43,7 @@
   (if (== (* n m) (len arr))
       (progn
         (var mat (matrix n m))
-        (loop (var i 0) (< i (len arr)) (= i (+ i 1))
+        (loop (var i 0) (< i (len arr)) (+= i 1)
               (matrix_set mat (row i) (col i) (get arr i)))
         mat)
     (progn
@@ -55,8 +55,8 @@
            (== (matrix_m lhs) (matrix_m rhs)))
       (progn
         (var ret (matrix (matrix_n lhs) (matrix_m lhs)))
-        (loop (var i 0) (< i (matrix_n lhs)) (= i (+ i 1))
-              (loop (var j 0) (< j (matrix_m lhs)) (= j (+ j 1))
+        (loop (var i 0) (< i (matrix_n lhs)) (+= i 1)
+              (loop (var j 0) (< j (matrix_m lhs)) (+= j 1)
                     (matrix_set ret i j (+ (matrix_get lhs i j) (matrix_get rhs i j)))))
         ret)
     (progn
@@ -66,14 +66,14 @@
 (defun matrix_mul (lhs rhs)
   (defun aggregate (i j)
     (var agg 0)
-    (loop (var k 0) (< k (matrix_n rhs)) (= k (+ k 1))
-          (= agg (+ agg (* (matrix_get lhs i k) (matrix_get rhs k j))))))
+    (loop (var k 0) (< k (matrix_n rhs)) (+= k 1)
+          (+= agg (* (matrix_get lhs i k) (matrix_get rhs k j)))))
 
   (if (== (matrix_m lhs) (matrix_n rhs))
       (progn
         (var ret (matrix (matrix_n lhs) (matrix_m rhs)))
-        (loop (var i 0) (< i (matrix_n lhs)) (= i (+ i 1))
-              (loop (var j 0) (< j (matrix_m rhs)) (= j (+ j 1))
+        (loop (var i 0) (< i (matrix_n lhs)) (+= i 1)
+              (loop (var j 0) (< j (matrix_m rhs)) (+= j 1)
                     (matrix_set ret i j (aggregate i j))))
         ret)
     (progn
@@ -85,7 +85,7 @@
       (println mat)
     (progn
       (var lastRowIndex (- (matrix_n mat) 1))
-      (loop (var i 0) (< i (matrix_n mat)) (= i (+ i 1))
+      (loop (var i 0) (< i (matrix_n mat)) (+= i 1)
             (progn
               (if (== i 0) (print "[") (print " "))
               (print (get (get mat data) i))

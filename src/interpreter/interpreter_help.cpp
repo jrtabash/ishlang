@@ -128,10 +128,16 @@ Arithmetic
 Variadic Operations: + - * / % ^
   (<op> <expr> <expr> [<expr> ...])
 
-When more than 2 operands are given to <op>, the expression
-is equivalent to a binary left to right aggregation.
-Example:
-  (+ 1 2 3) <=> (+ (+ 1 2) 3)
+  When more than 2 operands are given to <op>, the expression
+  is equivalent to a binary left to right aggregation.
+  Example:
+    (+ 1 2 3) <=> (+ (+ 1 2) 3)
+
+Binary operations: += -= *= /= %= ^=
+  (<op> <name> <expression>)
+
+  Apply arithmetic operation and assign result in <name>.
+  The variable referenced by <name> must be defined.
 
 Negation Operation:
   (neg <expr>)

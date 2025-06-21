@@ -118,6 +118,24 @@ When more than 2 operands are given to op, the expression is equivalent to a bin
 (* 2 4 6)
 ```
 
+### Binary operations: += -= *= /= %= ^=
+```
+(<op> <name> <expression>)
+```
+
+Apply arithmetic operation and assign result in `<name>`. The variable referenced by `<name>` must be defined.
+
+#### Example
+```
+(var x 10)
+(+= x 10)
+(-= x 5)
+(*= x 2)
+(/= x 3)
+(%= x 4)
+(^= x 4)
+```
+
 ### Unary operation:
 ```
 (neg <expression>)
