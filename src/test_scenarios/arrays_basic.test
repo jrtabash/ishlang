@@ -1,7 +1,7 @@
 __CODE__
 (defun make_gen (increment)
   (var i 0)
-  (lambda () (= i (+ i increment))))
+  (lambda () (+= i increment)))
 
 (println (array))
 (println (array 1 2 3))

@@ -809,7 +809,7 @@ the check is true for every character in the string.
 (println (arrget a 1))
 (println (arraysv 5))
 (println (arraysv 10 0))
-(arraysg 3 ((lambda () (var i 0) (lambda () (= i (+ i 1))))))
+(arraysg 3 ((lambda () (var i 0) (lambda () (+= i 1)))))
 (println (arrfind a 2))
 (println (arrcount a 2))
 (println (arrsort a))

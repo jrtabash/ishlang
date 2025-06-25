@@ -52,14 +52,14 @@ DEFINE_TEST(testParserMakeArraySG) {
 
     env->def("i", Value::Zero);
 
-    TEST_CASE(parserTest(parser, env, "(arraysg 0 (lambda () (= i (+ i 1))))",                         Value(Sequence()),             true));
-    TEST_CASE(parserTest(parser, env, "(arraysg 3 (lambda () (= i (+ i 1))))",                         Value(Sequence({v1, v2, v3})), true));
-    TEST_CASE(parserTest(parser, env, "(arraysg 2 ((lambda () (var g 0) (lambda () (= g (+ g 2))))))", Value(Sequence({v2, v4})),     true));
+    TEST_CASE(parserTest(parser, env, "(arraysg 0 (lambda () (= i (+ i 1))))",                    Value(Sequence()),             true));
+    TEST_CASE(parserTest(parser, env, "(arraysg 3 (lambda () (= i (+ i 1))))",                    Value(Sequence({v1, v2, v3})), true));
+    TEST_CASE(parserTest(parser, env, "(arraysg 2 ((lambda () (var g 0) (lambda () (+= g 2)))))", Value(Sequence({v2, v4})),     true));
 
-    TEST_CASE(parserTest(parser, env, "(arraysg)",                               Value::Null, false));
-    TEST_CASE(parserTest(parser, env, "(arraysg 5)",                             Value::Null, false));
-    TEST_CASE(parserTest(parser, env, "(arraysg 5 10)",                          Value::Null, false));
-    TEST_CASE(parserTest(parser, env, "(arraysg 'a' (lambda () (= i (+ i 1))))", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arraysg)",                          Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arraysg 5)",                        Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arraysg 5 10)",                     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(arraysg 'a' (lambda () (+= i 1)))", Value::Null, false));
 }
 
 // -------------------------------------------------------------
