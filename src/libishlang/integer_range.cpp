@@ -31,7 +31,7 @@ void IntegerRange::checkValid() {
         throw Exception("Range step 0");
     }
 
-    if (Util::sign(end_ - begin_) != Util::sign(step_)) {
+    if (end_ != begin_ && Util::sign(end_ - begin_) != Util::sign(step_)) {
         throw Exception(Exception::format("Invalid range %lld:%lld:%lld", begin_, step_, end_));
     }
 }

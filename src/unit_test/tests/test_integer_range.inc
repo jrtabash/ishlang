@@ -27,6 +27,8 @@ DEFINE_TEST(testIntegerRange) {
     TEST_INT_RANGE(IntegerRange(-2, 23, 3), -2, 23, 3, 9);
     TEST_INT_RANGE(IntegerRange(-2, -23, -3), -2, -23, -3, 7);
     TEST_INT_RANGE(IntegerRange(-23, -2, 3), -23, -2, 3, 7);
+    TEST_INT_RANGE(IntegerRange(1, 1, 1), 1, 1, 1, 0);
+    TEST_INT_RANGE(IntegerRange(-1, -1, -1), -1, -1, -1, 0);
 
     try {
         IntegerRange(1, 10, 0);
@@ -129,6 +131,18 @@ DEFINE_TEST(testIntegerRangeGenerator) {
 
     {
         const auto rng = IntegerRange(0, 0, 1);
+        auto gen = rng.generator();
+        TEST_CASE(gen.next() == std::nullopt);
+    }
+
+    {
+        const auto rng = IntegerRange(1, 1, 1);
+        auto gen = rng.generator();
+        TEST_CASE(gen.next() == std::nullopt);
+    }
+
+    {
+        const auto rng = IntegerRange(-1, -1, -1);
         auto gen = rng.generator();
         TEST_CASE(gen.next() == std::nullopt);
     }

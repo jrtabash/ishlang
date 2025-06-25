@@ -20,6 +20,8 @@ DEFINE_TEST(testParserMakeRange) {
     TEST_CASE(parserTest(parser, env, "(range -10 -1)",    Value(IntegerRange(-10, -1, 1)),  true));
     TEST_CASE(parserTest(parser, env, "(range -10 0 2)",   Value(IntegerRange(-10, 0, 2)),   true));
     TEST_CASE(parserTest(parser, env, "(range -1 -10 -1)", Value(IntegerRange(-1, -10, -1)), true));
+    TEST_CASE(parserTest(parser, env, "(range 1 1 1)",     Value(IntegerRange(1, 1, 1)),     true));
+    TEST_CASE(parserTest(parser, env, "(range -1 -1 -1)",  Value(IntegerRange(-1, -1, -1)),  true));
 
     TEST_CASE(parserTest(parser, env, "(range)",          Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(range -10)",      Value::Null, false));
@@ -61,12 +63,18 @@ DEFINE_TEST(testParserExpand) {
 
     env->def("rng1", Value(IntegerRange(1, 6, 2)));
     env->def("rng2", Value(IntegerRange(7, 9, 2)));
+    env->def("rng3", Value(IntegerRange(10, 10, 1)));
+    env->def("rng4", Value(IntegerRange(-2, -2, -2)));
 
     const auto val1 = Value(Sequence(std::vector{Value(1ll), Value(3ll), Value(5ll)}));
     const auto val2 = Value(Sequence(std::vector{Value(1ll), Value(3ll), Value(5ll), Value(7ll)}));
+    const auto val3 = Value(Sequence());
+    const auto val4 = Value(Sequence());
 
     TEST_CASE(parserTest(parser, env, "(expand rng1)",      val1, true));
     TEST_CASE(parserTest(parser, env, "(expand rng1 rng2)", val2, true));
+    TEST_CASE(parserTest(parser, env, "(expand rng3)",      val3, true));
+    TEST_CASE(parserTest(parser, env, "(expand rng4)",      val4, true));
 
     TEST_CASE(parserTest(parser, env, "(expand)",        Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(expand 1)",      Value::Null, false));
