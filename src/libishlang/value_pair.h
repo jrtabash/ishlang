@@ -26,6 +26,8 @@ namespace Ishlang {
         inline const Value & first() const noexcept;
         inline const Value & second() const noexcept;
 
+        constexpr std::size_t size() const noexcept { return 2; }
+
     public:
         friend std::ostream &operator<<(std::ostream &out, const ValuePair &p) {
             out << '(' << p.first() << ' ' << p.second() << ')';

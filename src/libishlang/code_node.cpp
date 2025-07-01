@@ -1725,9 +1725,10 @@ Value GenericLen::exec(Environment::SharedPtr env) const {
         case Value::eArray:   return Generic::length(objVal.array());
         case Value::eHashMap: return Generic::length(objVal.hashMap());
         case Value::eRange:   return Generic::length(objVal.range());
+        case Value::ePair:    return Generic::length(objVal.pair());
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange, Value::ePair),
                 objVal.typeToString());
         }
     }
@@ -1748,9 +1749,10 @@ Value GenericEmpty::exec(Environment::SharedPtr env) const {
         case Value::eArray:   return Generic::empty(objVal.array());
         case Value::eHashMap: return Generic::empty(objVal.hashMap());
         case Value::eRange:   return Generic::empty(objVal.range());
+        case Value::ePair:    return Generic::empty(objVal.pair());
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange, Value::ePair),
                 objVal.typeToString());
         }
     }
@@ -1783,9 +1785,12 @@ Value GenericGet::exec(Environment::SharedPtr env) const {
                 ? Generic::get(objVal.userObject(), key_->identifierName())
                 : Generic::get(objVal.userObject(), key_->eval(env));
 
+        case Value::ePair:
+            return Generic::get(objVal.pair(), key_->eval(env));
+
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eUserObject),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eUserObject, Value::ePair),
                 objVal.typeToString());
         }
     }
@@ -1877,9 +1882,10 @@ Value GenericFind::exec(Environment::SharedPtr env) const {
         case Value::eString:  return Generic::find(objVal.text(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
         case Value::eArray:   return Generic::find(objVal.array(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
         case Value::eHashMap: return Generic::find(objVal.hashMap(), itemVal);
+        case Value::ePair:    return Generic::find(objVal.pair(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::ePair),
                 objVal.typeToString());
         }
     }
@@ -1903,9 +1909,10 @@ Value GenericCount::exec(Environment::SharedPtr env) const {
         case Value::eString:  return Generic::count(objVal.text(), itemVal);
         case Value::eArray:   return Generic::count(objVal.array(), itemVal);
         case Value::eHashMap: return Generic::count(objVal.hashMap(), itemVal);
+        case Value::ePair:    return Generic::count(objVal.pair(), itemVal);
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::ePair),
                 objVal.typeToString());
         }
     }
@@ -1970,9 +1977,10 @@ Value GenericSum::exec(Environment::SharedPtr env) const {
         switch (obj.type()) {
         case Value::eArray: return Generic::sum(obj.array());
         case Value::eRange: return Generic::sum(obj.range());
+        case Value::ePair:  return Generic::sum(obj.pair());
         default:
             throw InvalidOperandType(
-                typesToString(Value::eArray, Value::eRange),
+                typesToString(Value::eArray, Value::eRange, Value::ePair),
                 obj.typeToString());
         }
     }

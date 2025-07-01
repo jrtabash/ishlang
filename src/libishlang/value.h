@@ -1,6 +1,7 @@
 #ifndef ISHLANG_VALUE_H
 #define ISHLANG_VALUE_H
 
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -155,6 +156,9 @@ namespace Ishlang {
         static Type stringToType(const std::string &str);
         
         inline std::string typeToString() const;
+
+        template <typename RawType>
+        static const char *rawTypeToCStr() noexcept;
 
         Value clone() const;
         Value asType(Type otherType) const;
@@ -366,6 +370,27 @@ namespace Ishlang {
 
     inline std::string Value::typeToString() const {
         return typeToString(type_);
+    }
+
+    template <typename RawType>
+    const char *Value::rawTypeToCStr() noexcept {
+        if constexpr (std::is_same_v<RawType, Long>) { return "int"; }
+        else if constexpr (std::is_same_v<RawType, Double>) { return "real"; }
+        else if constexpr (std::is_same_v<RawType, Char>) { return "char"; }
+        else if constexpr (std::is_same_v<RawType, Bool>) { return "bool"; }
+        else if constexpr (std::is_same_v<RawType, Pair>) { return "pair"; }
+        else if constexpr (std::is_same_v<RawType, Text>) { return "string"; }
+        else if constexpr (std::is_same_v<RawType, Func>) { return "closure"; }
+        else if constexpr (std::is_same_v<RawType, UserType>) { return "usertype"; }
+        else if constexpr (std::is_same_v<RawType, UserObject>) { return "userobject"; }
+        else if constexpr (std::is_same_v<RawType, Array>) { return "array"; }
+        else if constexpr (std::is_same_v<RawType, HashMap>) { return "hashmap"; }
+        else if constexpr (std::is_same_v<RawType, Range>) { return "range"; }
+        else if constexpr (std::is_same_v<RawType, File>) { return "file"; }
+        else {
+            assert(false);
+            return "unknown";
+        }
     }
 
     inline std::size_t Value::Hash::combine(std::size_t hash1, std::size_t hash2) {

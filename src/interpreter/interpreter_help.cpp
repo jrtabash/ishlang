@@ -425,6 +425,8 @@ Pair Operations
 
   second - Get second item
            (second <pair>)
+
+See ":help generic" for information on pair generic functions support.
 )";
 }
 
@@ -574,16 +576,16 @@ const char *HelpDict::help_generic() {
     return R"(
 Generic Functions
 -----------------
-      len - Length of string, array, hashmap or range
+      len - Length of string, array, hashmap, pair or range
             (len <object>)
 
-    empty - Is string, array, hashmap or range empty?
+    empty - Is string, array, hashmap, pair or range empty?
             (empty <object>)
 
-      get - Get value at index, key or member from string, array, hashmap or userobject
+      get - Get value at index, key or member from string, array, hashmap, pair or userobject
             (get <object> <key> [<default_return>])
 
-            * For string and array, key must be an integer
+            * For string, pair and array, key must be an integer
             * For userobject, key must be a member name/symbol or a string
             * The parameter default_return applies to hashmap and is ignored otherwise
 
@@ -596,14 +598,14 @@ Generic Functions
     clear - Clear string, array or hashmap
             (clear <object>)
 
-     find - Get position or key of value in string, array or hashmap
+     find - Get position or key of value in string, array, pair or hashmap
             (find <object> <item> [<position>])
 
             * For string, item must be a character
-            * The parameter position applies to string and array and is ignored otherwise
+            * The parameter position applies to string, pair and array and is ignored otherwise
             * When provided, position must be an integer, and is used as the search start index
 
-    count - Count number of times value occurs in string, array or hashmap
+    count - Count number of times value occurs in string, array, pair or hashmap
             (count <object> <item>)
 
             * For string, item must be a character
@@ -616,7 +618,7 @@ Generic Functions
   reverse - Reverse string or array
             (reverse <obj>)
 
-      sum - Sum array or range
+      sum - Sum array, pair or range
             (sum <obj>)
 )";
 }

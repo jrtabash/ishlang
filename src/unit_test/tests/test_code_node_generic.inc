@@ -9,6 +9,7 @@
 #include "sequence.h"
 #include "struct.h"
 #include "value.h"
+#include "value_pair.h"
 
 #include <optional>
 #include <string>
@@ -39,6 +40,10 @@ DEFINE_TEST(testCodeNodeGenericLen) {
     val = len(IntegerRange(10))->eval(env);
     TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
     TEST_CASE_MSG(val.integer() == 10, "actual=" << val);
+
+    val = len(ValuePair(Value(2ll), Value(3ll)))->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.integer() == 2, "actual=" << val);
 
     try {
         len(5ll)->eval(env);
@@ -73,6 +78,10 @@ DEFINE_TEST(testCodeNodeGenericEmpty) {
     val = isEmpty(IntegerRange(0, 0, 1))->eval(env);
     TEST_CASE_MSG(val.isBool(), "actual=" << Value::typeToString(val.type()));
     TEST_CASE_MSG(val.boolean(), "actual=" << val);
+
+    val = isEmpty(ValuePair(Value(2ll), Value(3ll)))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(!val.boolean(), "actual=" << val);
 
     try {
         isEmpty(5ll)->eval(env);
@@ -196,6 +205,36 @@ DEFINE_TEST(testCodeNodeGenericGet) {
             TEST_CASE(false);
         }
         catch (const UnknownMember &) {}
+        catch (...) {
+            TEST_CASE(false);
+        }
+    }
+
+    { // Pair
+        const auto rawPair = ValuePair(Value(2ll), Value(3ll));
+
+        auto val = get(rawPair, 0ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " index=0");
+        TEST_CASE_MSG(val == rawPair.first(), "actual=" << val << " index=0");
+
+        val = get(rawPair, 1ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " index=1");
+        TEST_CASE_MSG(val == rawPair.second(), "actual=" << val << " index=1");
+
+        try {
+            get(rawPair, "0")->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const InvalidOperandType &) {}
+        catch (...) {
+            TEST_CASE(false);
+        }
+
+        try {
+            get(rawPair, 2ll)->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const OutOfRange &) {}
         catch (...) {
             TEST_CASE(false);
         }
@@ -511,6 +550,44 @@ DEFINE_TEST(testCodeNodeGenericFind) {
         TEST_CASE_MSG(val.isNull(), "actual=" << val.typeToString());
     }
 
+    { // Pair
+        const auto rawPair = ValuePair(Value(2ll), Value(3ll));
+
+        auto val = find(rawPair, 2ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
+
+        val = find(rawPair, 3ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 1ll, "actual=" << val);
+
+        val = find(rawPair, 5ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == -1ll, "actual=" << val);
+
+        try {
+            find(rawPair, 3ll, 5ll)->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const OutOfRange &ex) {
+            TEST_CASE_MSG(std::string("Out of range: pair find position access") == ex.what(), "actual='" << ex.what() << "'");
+        }
+        catch (...) {
+            TEST_CASE(false);
+        }
+
+        try {
+            find(rawPair, 3ll, -1ll)->eval(env);
+            TEST_CASE(false);
+        }
+        catch (const OutOfRange &ex) {
+            TEST_CASE_MSG(std::string("Out of range: pair find position access") == ex.what(), "actual='" << ex.what() << "'");
+        }
+        catch (...) {
+            TEST_CASE(false);
+        }
+    }
+
     try {
         find(5ll, 0ll)->eval(env);
         TEST_CASE(false);
@@ -588,6 +665,27 @@ DEFINE_TEST(testCodeNodeGenericCount) {
         TEST_CASE_MSG(val.integer() == 1ll, "actual=" << val);
 
         val = count(rawTab, 400ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
+    }
+
+    { // Pair
+        const auto rawPair1 = ValuePair(Value(2ll), Value(3ll));
+        const auto rawPair2 = ValuePair(Value(5ll), Value(5ll));
+
+        auto val = count(rawPair1, 3ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 1ll, "actual=" << val);
+
+        val = count(rawPair1, 2ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 1ll, "actual=" << val);
+
+        val = count(rawPair2, 5ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 2ll, "actual=" << val);
+
+        val = count(rawPair1, 5ll)->eval(env);
         TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
         TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
     }
@@ -776,6 +874,10 @@ DEFINE_TEST(testCodeNodeGenericSum) {
     env->def("arr2", arrval(f1, f2, f3));
     env->def("arr3", arrval(v1, f2, v3));
     env->def("mix", arrval(v1, c1, f1));
+    env->def("p0", ValuePair(v4, v5));
+    env->def("p1", ValuePair(f2, f3));
+    env->def("p2", ValuePair(v2, f3));
+    env->def("p3", ValuePair(v2, c1));
 
     const auto sum = [](const char *obj) {
         return CodeNode::make<GenericSum>(CodeNode::make<Variable>(obj));
@@ -794,11 +896,11 @@ DEFINE_TEST(testCodeNodeGenericSum) {
     { // array
         auto val = sum("arr0")->eval(env);
         TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
-        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
 
         val = sum("arr1")->eval(env);
         TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
-        TEST_CASE_MSG(val.integer() == 15ll, "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 15ll, "actual=" << val);
 
         val = sum("arr2")->eval(env);
         TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
@@ -807,6 +909,20 @@ DEFINE_TEST(testCodeNodeGenericSum) {
         val = sum("arr3")->eval(env);
         TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
         TEST_CASE_MSG(val.real() == 6.2, "actual=" << val);
+    }
+
+    { // pair
+        auto val = sum("p0")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 9ll, "actual=" << val);
+
+        val = sum("p1")->eval(env);
+        TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.real() == 5.5, "actual=" << val);
+
+        val = sum("p2")->eval(env);
+        TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.real() == 5.3, "actual=" << val);
     }
 
     try {
@@ -821,11 +937,22 @@ DEFINE_TEST(testCodeNodeGenericSum) {
     }
 
     try {
+        sum("p3")->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidExpression &ex) {
+        TEST_CASE_MSG(std::string("Invalid expression - Unexpected non-numeric sum argument") == ex.what(), "actual='" << ex.what() << "'");
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
         sum("num")->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &ex) {
-        TEST_CASE_MSG(std::string("Invalid operand type, expected=array|range actual=int") == ex.what(), "actual='" << ex.what() << "'");
+        TEST_CASE_MSG(std::string("Invalid operand type, expected=array|range|pair actual=int") == ex.what(), "actual='" << ex.what() << "'");
     }
     catch (...) {
         TEST_CASE(false);

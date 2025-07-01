@@ -52,7 +52,9 @@ namespace Ishlang {
                 return obj.get(key.text());
             }
             else {
-                static_assert(std::is_same_v<ObjectType, Value::Text> || std::is_same_v<ObjectType, Value::Array>);
+                static_assert(std::is_same_v<ObjectType, Value::Text> ||
+                              std::is_same_v<ObjectType, Value::Array> ||
+                              std::is_same_v<ObjectType, Value::Pair>);
 
                 if (!key.isInt()) {
                     throw InvalidOperandType(Value::typeToString(Value::eInteger), key.typeToString());
@@ -65,6 +67,9 @@ namespace Ishlang {
 
                 if constexpr (std::is_same_v<ObjectType, Value::Text>) {
                     return Value(obj[pos]);
+                }
+                else if constexpr (std::is_same_v<ObjectType, Value::Pair>) {
+                    return pos == 0 ? obj.first() : obj.second();
                 }
                 else {
                     return obj.get(pos);
@@ -121,7 +126,9 @@ namespace Ishlang {
                 return obj.find(item);
             }
             else {
-                static_assert(std::is_same_v<ObjectType, Value::Text> || std::is_same_v<ObjectType, Value::Array>);
+                static_assert(std::is_same_v<ObjectType, Value::Text> ||
+                              std::is_same_v<ObjectType, Value::Array> ||
+                              std::is_same_v<ObjectType, Value::Pair>);
 
                 if (!pos.isInt()) {
                     throw InvalidOperandType(Value::typeToString(Value::eInteger), pos.typeToString());
@@ -129,7 +136,7 @@ namespace Ishlang {
 
                 const auto rawPos = pos.integer();
                 if (rawPos < 0 || static_cast<std::size_t>(rawPos) >= obj.size()) {
-                    throw OutOfRange(Exception::format("%s find position access", std::is_same_v<ObjectType, Value::Text> ? "string" : "array"));
+                    throw OutOfRange(Exception::format("%s find position access", Value::rawTypeToCStr<ObjectType>()));
                 }
 
                 if constexpr (std::is_same_v<ObjectType, Value::Text>) {
@@ -139,6 +146,11 @@ namespace Ishlang {
 
                     auto result = obj.find(item.character(), rawPos);
                     return result != std::string::npos ? Value(Value::Long(result)) : Value(-1ll);
+                }
+                else if constexpr (std::is_same_v<ObjectType, Value::Pair>) {
+                    if (rawPos < 1 && item == obj.first()) { return Value::Zero; }
+                    if (rawPos < 2 && item == obj.second()) { return Value(1ll); }
+                    return Value(-1ll);
                 }
                 else {
                     auto result = obj.find(item, rawPos);
@@ -155,6 +167,10 @@ namespace Ishlang {
                 }
 
                 return Value(Value::Long(std::count(obj.begin(), obj.end(), item.character())));
+            }
+            else if constexpr (std::is_same_v<ObjectType, Value::Pair>) {
+                return Value(static_cast<Value::Long>(obj.first() == item) +
+                             static_cast<Value::Long>(obj.second() == item));
             }
             else {
                 static_assert(std::is_same_v<ObjectType, Value::Array> || std::is_same_v<ObjectType, Value::HashMap>);
@@ -206,6 +222,18 @@ namespace Ishlang {
                     s += *i;
                 }
                 return Value(s);
+            }
+            else if constexpr (std::is_same_v<ObjectType, Value::Pair>) {
+                auto const &f = obj.first();
+                auto const &s = obj.second();
+
+                if (!f.isNumber() || !s.isNumber()) {
+                    throw InvalidExpression("Unexpected non-numeric sum argument");
+                }
+
+                return (f.isReal() || s.isReal())
+                     ? Value(f.real() + s.real())
+                     : Value(f.integer() + s.integer());
             }
             else {
                 static_assert(std::is_same_v<ObjectType, Value::Array>);

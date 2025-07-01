@@ -960,22 +960,22 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 ```
 
 ## Generic Functions
-**len**: Length of string, array, hashmap or range
+**len**: Length of string, array, hashmap, pair or range
 ```
 (len <object>)
 ```
 
-**empty**: Is string, array, hashmap or range empty?
+**empty**: Is string, array, hashmap, pair or range empty?
 ```
 (empty <object>)
 ```
 
-**get**: Get value at index, key or member from string, array, hashmap or userobject
+**get**: Get value at index, key or member from string, array, hashmap, pair or userobject
 ```
 (get <object> <key> [<default_return>])
 ```
 
-- For string and array, key must be an integer
+- For string, pair and array, key must be an integer
 - For userobject, key must be a member name/symbol or a string
 - The parameter default_return applies to hashmap and is ignored otherwise
 
@@ -992,16 +992,16 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (clear <object>)
 ```
 
-**find**: Get position or key of value in string, array or hashmap
+**find**: Get position or key of value in string, array, pair or hashmap
 ```
 (find <object> <item> [<position>])
 ```
 
 - For string, item must be a character
-- The parameter position applies to string and array and is ignored otherwise
+- The parameter position applies to string, pair and array and is ignored otherwise
 - When provided, position must be an integer, and is used as the search start index
 
-**count**: Count number of times value occurs in string, array or hashmap
+**count**: Count number of times value occurs in string, array, pair or hashmap
 ```
 (count <object> <item>)
 ```
@@ -1020,7 +1020,7 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (reverse <obj>)
 ```
 
-**sum**: Sum array or range
+**sum**: Sum array, pair or range
 ```
 (sum <obj>)
 ```
@@ -1032,28 +1032,34 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (var seq (array 1 2 3))
 (var tab (hashmap (pair 1 10) (pair 2 20)))
 (var obj (makeinstance Person (name "Jon") (age 25)))
-(bar rng (range 10))
+(var rng (range 10))
+(var cpl (pair 5 10))
 
 (len txt)
 (len seq)
 (len tab)
 (len rng)
+(len cpl)
 (empty txt)
 (empty seq)
 (empty tab)
 (empty rng)
+(empty cpl)
 (get txt 0)
 (get seq 1)
 (get tab 2 200)
 (get obj name)
 (get obj "name")
+(get cpl 0)
 (find txt 'l')
 (find txt 'l' 3)
 (find seq 3)
 (find tab 20)
+(find cpl 10)
 (count txt 'l')
 (count seq 2)
 (count tab 20)
+(count cpl 5)
 (set txt 0 'H')
 (set seq 1 20)
 (set tab 3 30)
@@ -1066,6 +1072,7 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (reverse seq)
 (sum rng)
 (sum seq)
+(sum cpl)
 (clear txt)
 (clear seq)
 (clear tab)

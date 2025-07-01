@@ -7,6 +7,7 @@
 #include "sequence.h"
 #include "struct.h"
 #include "value.h"
+#include "value_pair.h"
 
 #include <vector>
 
@@ -25,6 +26,7 @@ DEFINE_TEST(testParserGenericLen) {
     TEST_CASE(parserTest(parser, env, "(len (hashmap (pair 2 4)))", Value(1ll), true));
     TEST_CASE(parserTest(parser, env, "(len (range 1 1))",          Value(0ll), true));
     TEST_CASE(parserTest(parser, env, "(len (range 5))",            Value(5ll), true));
+    TEST_CASE(parserTest(parser, env, "(len (pair 1 2))",           Value(2ll), true));
 
     TEST_CASE(parserTest(parser, env, "(len)",   Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(len 5)", Value::Null, false));
@@ -43,6 +45,7 @@ DEFINE_TEST(testParserGenericEmpty) {
     TEST_CASE(parserTest(parser, env, "(empty (hashmap (pair 2 4)))", Value::False, true));
     TEST_CASE(parserTest(parser, env, "(empty (range 1 1))",          Value::True,  true));
     TEST_CASE(parserTest(parser, env, "(empty (range 5))",            Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(empty (pair 1 2))",           Value::False, true));
 
     TEST_CASE(parserTest(parser, env, "(empty)",   Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(empty 5)", Value::Null, false));
@@ -55,6 +58,7 @@ DEFINE_TEST(testParserGenericGet) {
 
     env->def("txt", Value("abc"));
     env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll)})));
+    env->def("cpl", ValuePair(Value(2ll), Value(3ll)));
 
     Hashtable ht;
     ht.set(Value(1ll), Value(10ll));
@@ -82,12 +86,17 @@ DEFINE_TEST(testParserGenericGet) {
     TEST_CASE(parserTest(parser, env, "(get inst name)",     Value("Jon"), true));
     TEST_CASE(parserTest(parser, env, "(get inst age)",      Value(25ll), true));
 
+    TEST_CASE(parserTest(parser, env, "(get cpl 0)", Value(2ll), true));
+    TEST_CASE(parserTest(parser, env, "(get cpl 1)", Value(3ll), true));
+
     TEST_CASE(parserTest(parser, env, "(get txt 'a')",  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(get txt 5)",    Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(get seq 'a')",  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(get seq 5)",    Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(get inst 5)",   Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(get inst mem)", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get cpl 2)",    Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(get cpl 'a')",  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(get 5 0)",      Value::Null, false));
 }
 
@@ -182,6 +191,7 @@ DEFINE_TEST(testParserGenericFind) {
     Parser parser;
     env->def("txt", Value("abcdef"));
     env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll), Value(4ll), Value(5ll)})));
+    env->def("cpl", ValuePair(Value(2ll), Value(3ll)));
 
     Hashtable ht;
     ht.set(Value(1ll), Value(10ll));
@@ -214,11 +224,18 @@ DEFINE_TEST(testParserGenericFind) {
     TEST_CASE(parserTest(parser, env, "(find ht 30)", Value(3ll),  true));
     TEST_CASE(parserTest(parser, env, "(find ht 40)", Value::Null, true));
 
+    TEST_CASE(parserTest(parser, env, "(find cpl 2)",   Value(0ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find cpl 3)",   Value(1ll),  true));
+    TEST_CASE(parserTest(parser, env, "(find cpl 2 1)", Value(-1ll), true));
+    TEST_CASE(parserTest(parser, env, "(find cpl 3 1)", Value(1ll),  true));
+
     TEST_CASE(parserTest(parser, env, "(find txt 1)",      Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(find txt 'a' 7)",  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(find txt 'a' -1)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(find seq 3 6)",    Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(find seq 3 -1)",   Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(find cpl 2 2)",    Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(find cpl 2 -1)",   Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(find 5 0)",        Value::Null, false));
 }
 
@@ -228,6 +245,8 @@ DEFINE_TEST(testParserGenericCount) {
     Parser parser;
     env->def("txt", Value("abacbadef"));
     env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(1ll), Value(2ll), Value(3ll), Value(1ll), Value(4ll), Value(5ll)})));
+    env->def("cpl", ValuePair(Value(2ll), Value(3ll)));
+    env->def("rpt", ValuePair(Value(5ll), Value(5ll)));
 
     Hashtable ht;
     ht.set(Value(1ll), Value(10ll));
@@ -252,6 +271,11 @@ DEFINE_TEST(testParserGenericCount) {
     TEST_CASE(parserTest(parser, env, "(count ht 20)", Value(2ll), true));
     TEST_CASE(parserTest(parser, env, "(count ht 30)", Value(1ll), true));
     TEST_CASE(parserTest(parser, env, "(count ht 40)", Value(0ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(count cpl 2)", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(count cpl 3)", Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(count cpl 5)", Value(0ll), true));
+    TEST_CASE(parserTest(parser, env, "(count rpt 5)", Value(2ll), true));
 
     TEST_CASE(parserTest(parser, env, "(count txt 1)", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(count 5 0)",   Value::Null, false));
@@ -344,6 +368,11 @@ DEFINE_TEST(testParserGenericSum) {
     TEST_CASE(parserTest(parser, env, "(sum (array 1.1 3.1 5.2 9.2))", Value(18.6), true));
     TEST_CASE(parserTest(parser, env, "(sum (array 1 3.1 5 9.0))",     Value(18.1), true));
 
+    TEST_CASE(parserTest(parser, env, "(sum (pair 2 3))",     Value(5ll), true));
+    TEST_CASE(parserTest(parser, env, "(sum (pair 2.5 3.0))", Value(5.5), true));
+    TEST_CASE(parserTest(parser, env, "(sum (pair 2.5 3))",   Value(5.5), true));
+
     TEST_CASE(parserTest(parser, env, "(sum 5)",             Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(sum (array 1 'c'))", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(sum (pair 2 'c'))",  Value::Null, false));
 }

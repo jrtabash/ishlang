@@ -6,18 +6,21 @@ __CODE__
 (var tab (hashmap (pair "one" 1) (pair "two" 2)))
 (var rng (range 0 100 2))
 (var obj (makeinstance Person (name "Jon") (age 25)))
+(var cpl (pair 5 10))
 
 (println "== len ==")
 (println (len txt))
 (println (len seq))
 (println (len tab))
 (println (len rng))
+(println (len cpl))
 
 (println "== empty ==")
 (println (empty txt))
 (println (empty seq))
 (println (empty tab))
 (println (empty rng))
+(println (empty cpl))
 
 (println "== get ==")
 (println (get txt 0))
@@ -38,18 +41,24 @@ __CODE__
 (println (get obj "name"))
 (println (get obj "age"))
 
+(println (get cpl 0))
+(println (get cpl 1))
+
 (println "== find ==")
 (println (find txt 'W'))
 (println (find txt 'W' 4))
 (println (find seq 7))
 (println (find seq 7 2))
 (println (find tab 2))
+(println (find cpl 5))
+(println (find cpl 10 1))
 
 (println "== count ==")
 (println (count txt 'l'))
 (println (count txt 'o'))
 (println (count seq 3))
 (println (count tab 2))
+(println (count cpl 5))
 
 (println "== set ==")
 (println (set txt 6 'w'))
@@ -95,6 +104,7 @@ __CODE__
 (println (sum (array 1 2 3 4 5)))
 (println (sum (array 1.1 2.2 3.3)))
 (println (sum (array 1 2.1 3 4 5)))
+(println (sum cpl))
 
 __EXPECT__
 == len ==
@@ -102,7 +112,9 @@ __EXPECT__
 5
 2
 50
+2
 == empty ==
+false
 false
 false
 false
@@ -122,15 +134,20 @@ Jon
 25
 Jon
 25
+5
+10
 == find ==
 6
 6
 3
 3
 two
+0
+1
 == count ==
 3
 2
+1
 1
 1
 == set ==
@@ -171,3 +188,4 @@ John
 15
 6.6
 15.1
+15

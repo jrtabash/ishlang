@@ -443,3 +443,23 @@ DEFINE_TEST(testValuePair) {
     TEST_CASE(!(ValuePair(two, three) >= ValuePair(two, four)) );
 }
 #undef TEST_PAIR_EQUAL
+
+// -------------------------------------------------------------
+#define TEST_RAW_TYPE_TO_CSTR(RAWTYPE, RAWCSTR) \
+    TEST_CASE(std::string(RAWCSTR) == Value::rawTypeToCStr<RAWTYPE>())
+DEFINE_TEST(testValueRawTypeToCStr) {
+    TEST_RAW_TYPE_TO_CSTR(Value::Long, "int");
+    TEST_RAW_TYPE_TO_CSTR(Value::Double, "real");
+    TEST_RAW_TYPE_TO_CSTR(Value::Char, "char");
+    TEST_RAW_TYPE_TO_CSTR(Value::Bool, "bool");
+    TEST_RAW_TYPE_TO_CSTR(Value::Pair, "pair");
+    TEST_RAW_TYPE_TO_CSTR(Value::Text, "string");
+    TEST_RAW_TYPE_TO_CSTR(Value::Func, "closure");
+    TEST_RAW_TYPE_TO_CSTR(Value::UserType, "usertype");
+    TEST_RAW_TYPE_TO_CSTR(Value::UserObject, "userobject");
+    TEST_RAW_TYPE_TO_CSTR(Value::Array, "array");
+    TEST_RAW_TYPE_TO_CSTR(Value::HashMap, "hashmap");
+    TEST_RAW_TYPE_TO_CSTR(Value::Range, "range");
+    TEST_RAW_TYPE_TO_CSTR(Value::File, "file");
+}
+#undef TEST_RAW_TYPE_TO_CSTR
