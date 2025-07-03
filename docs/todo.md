@@ -1,5 +1,37 @@
 ## TODO
 
+### Add more generic functions
+- Apply
+  - (apply `<function>` `<arguments>`)
+  - Supports array, pair, range
+  - Example: `(apply (lambda (x y z) (* x y z)) (array 2 3 4))` >= `24`
+- Map
+  - (map `<object>` `<function>`)
+  - Supports string, array, pair, hashmap or range
+  - The map over range case should collect into an array
+  - Example: `(map (array 1 2 3) (lambda (x) (* 2 x)))` -> `(array 2 4 6)`
+- Reduce
+  - (reduce `<object>` `<init>` `<function>`)
+  - Supports string, array, pair, hashmap or range
+  - Example: `(reduce (array 1 2 3) 0 (lambda (a x) (+ a x)))` -> `6`
+- Filter
+  - (filter `<object>` `<predicate>`)
+  - Supports string, array, hashmap or range
+  - The filter over a range case should collect into an array
+  - Example: `(filter (array 1 2 3) (lambda (x) (<= x 2)))` -> `(array 1 2)`
+- All
+  - (all `<object>` `<predicate>`)
+  - Supports string, array, pair, hashmap or range
+  - Example: `(all (array 2 4 6) (lambda (i) (== (% i 2) 0)))` -> `true`
+- Any
+  - (any `<object>` `<predicate>`)
+  - Supports string, array, pair, hashmap or range
+  - Example: `(any (array 1 2 3) (lambda (i) (== (% i 2) 0)))` -> `true`
+- Find if
+  - (findif `<object>` `<predicate>` [`<position>`])
+  - Supports string, array, pair or hashmap
+  - Example: `(findif (array 1 3 5 6 7) (lambda (i) (== (% i 2) 0)))` -> `3`
+
 ### Implement built-in data structures:
 - List
   - **list**: make list
