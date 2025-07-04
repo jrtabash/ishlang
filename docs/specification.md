@@ -1025,6 +1025,13 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (sum <obj>)
 ```
 
+**apply**: Apply function to array, pair or range
+```
+(apply <ftn> <obj>)
+```
+
+- Length of `<ftn>` parameters must match `<obj>` length
+
 ### Examples
 ```
 (struct Person (name age))
@@ -1073,6 +1080,8 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (sum rng)
 (sum seq)
 (sum cpl)
+(apply (lambda (x y z) (/ (+ x y z) 3.0)) seq)
+(apply (lambda (x y) (+ x y)) cpl)
 (clear txt)
 (clear seq)
 (clear tab)

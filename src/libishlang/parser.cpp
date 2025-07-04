@@ -1192,6 +1192,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "apply",
+          [this]() {
+              auto exprs(readAndCheckExprList("apply", 2));
+              return CodeNode::make<GenericApply>(exprs[0], exprs[1]);
+          }
+        },
+
         { "timeit",
           [this]() {
               auto exprs(readAndCheckRangeExprList("timeit", 1, 3));

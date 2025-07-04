@@ -1988,6 +1988,31 @@ Value GenericSum::exec(Environment::SharedPtr env) const {
 }
 
 // -------------------------------------------------------------
+GenericApply::GenericApply(CodeNode::SharedPtr ftn, CodeNode::SharedPtr args)
+    : CodeNode()
+    , ftn_(ftn)
+    , args_(args)
+{}
+
+Value GenericApply::exec(Environment::SharedPtr env) const {
+    if (ftn_) {
+        const auto ftnVal = evalOperand(env, ftn_, Value::eClosure);
+        const auto argsVal = args_->eval(env);
+
+        switch (argsVal.type()) {
+        case Value::eArray: return Generic::apply(ftnVal.closure(), argsVal.array());
+        case Value::ePair:  return Generic::apply(ftnVal.closure(), argsVal.pair());
+        case Value::eRange: return Generic::apply(ftnVal.closure(), argsVal.range());
+        default:
+            throw InvalidOperandType(
+                typesToString(Value::eArray, Value::ePair, Value::eRange),
+                argsVal.typeToString());
+        }
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 TimeIt::TimeIt(CodeNode::SharedPtr expr, CodeNode::SharedPtr count, CodeNode::SharedPtr summary)
     : CodeNode()
     , expr_(expr)

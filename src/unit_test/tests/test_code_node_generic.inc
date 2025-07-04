@@ -6,6 +6,7 @@
 #include "hashtable.h"
 #include "instance.h"
 #include "integer_range.h"
+#include "lambda.h"
 #include "sequence.h"
 #include "struct.h"
 #include "value.h"
@@ -953,6 +954,116 @@ DEFINE_TEST(testCodeNodeGenericSum) {
     }
     catch (const InvalidOperandType &ex) {
         TEST_CASE_MSG(std::string("Invalid operand type, expected=array|range|pair actual=int") == ex.what(), "actual='" << ex.what() << "'");
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeGenericApply) {
+    auto env = Environment::make();
+
+    const auto v1 = Value(1ll);
+    const auto v2 = Value(2ll);
+    const auto v3 = Value(3ll);
+
+    env->def("num", Value(5ll));
+    env->def("rng0", Value(IntegerRange(1, 1)));
+    env->def("rng1", Value(IntegerRange(1, 2)));
+    env->def("rng2", Value(IntegerRange(1, 3)));
+    env->def("rng3", Value(IntegerRange(1, 4)));
+    env->def("arr0", arrval());
+    env->def("arr1", arrval(v1));
+    env->def("arr2", arrval(v1, v2));
+    env->def("arr3", arrval(v1, v2, v3));
+    env->def("p", ValuePair(v1, v2));
+
+    const auto adder = [](size_t paramsSize) {
+        Lambda::ParamList params;
+        CodeNode::SharedPtrList addArgs;
+        for (size_t i = 0; i < paramsSize; ++i) {
+            const auto name = std::string("p") + std::to_string(i); 
+            params.push_back(name);
+            addArgs.push_back(CodeNode::make<Variable>(name));
+        }
+
+        if (paramsSize == 0) {
+            return CodeNode::make<LambdaExpr>(params, CodeNode::make<Literal>(Value::Zero));
+        }
+        else if (paramsSize == 1) {
+            return CodeNode::make<LambdaExpr>(params, CodeNode::make<Variable>(params[0]));
+        }
+        else {
+            return CodeNode::make<LambdaExpr>(params, CodeNode::make<ArithOp>(ArithOp::Add, addArgs));
+        }
+    };
+
+    const auto apply = [](CodeNode::SharedPtr ftn, const char *obj) {
+        return CodeNode::make<GenericApply>(ftn, CodeNode::make<Variable>(obj));
+    };
+
+    { // range
+        auto val = apply(adder(0), "rng0")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
+
+        val = apply(adder(1), "rng1")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 1ll, "actual=" << val);
+
+        val = apply(adder(2), "rng2")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 3ll, "actual=" << val);
+
+        val = apply(adder(3), "rng3")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 6ll, "actual=" << val);
+    }
+
+    { // array
+        auto val = apply(adder(0), "arr0")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
+
+        val = apply(adder(1), "arr1")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 1ll, "actual=" << val);
+
+        val = apply(adder(2), "arr2")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 3ll, "actual=" << val);
+
+        val = apply(adder(3), "arr3")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 6ll, "actual=" << val);
+    }
+
+    { // pair
+        auto val = apply(adder(2), "p")->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 3ll, "actual=" << val);
+    }
+
+    try {
+        apply(adder(3), "arr2")->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidArgsSize &ex) {
+        TEST_CASE_MSG(std::string("Invalid apply arguments list - params size(3) is not equal to args size (2)") == ex.what(),
+                      "actual='" << ex.what() << "'");
+    }
+    catch (...) {
+        TEST_CASE(false);
+    }
+
+    try {
+        apply(adder(1), "num")->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &ex) {
+        TEST_CASE_MSG(std::string("Invalid operand type, expected=array|pair|range actual=int") == ex.what(),
+                      "actual='" << ex.what() << "'");
     }
     catch (...) {
         TEST_CASE(false);

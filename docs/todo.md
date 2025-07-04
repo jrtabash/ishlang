@@ -1,10 +1,6 @@
 ## TODO
 
 ### Add more generic functions
-- Apply
-  - (apply `<function>` `<arguments>`)
-  - Supports array, pair, range
-  - Example: `(apply (lambda (x y z) (* x y z)) (array 2 3 4))` >= `24`
 - Map
   - (map `<object>` `<function>`)
   - Supports string, array, pair, hashmap or range

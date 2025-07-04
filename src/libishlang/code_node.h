@@ -1488,6 +1488,20 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class GenericApply : public CodeNode {
+    public:
+        GenericApply(CodeNode::SharedPtr ftn, CodeNode::SharedPtr args);
+        virtual ~GenericApply() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr ftn_;
+        CodeNode::SharedPtr args_;
+    };
+
+    // -------------------------------------------------------------
     class TimeIt : public CodeNode {
     public:
         TimeIt(CodeNode::SharedPtr expr, CodeNode::SharedPtr ntimes = CodeNode::SharedPtr(), CodeNode::SharedPtr showSummary = CodeNode::SharedPtr());

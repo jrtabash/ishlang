@@ -128,7 +128,16 @@ namespace Ishlang {
     class InvalidArgsSize : public Exception {
     public:
         InvalidArgsSize(size_t paramsSize, size_t argsSize) 
-            : Exception(format("Invalid arguments list - params size(%lu) is not equal to args size(%lu)", paramsSize, argsSize))
+            : Exception(format("Invalid arguments list - params size(%lu) is not equal to args size(%lu)",
+                               paramsSize,
+                               argsSize))
+        {}
+
+        InvalidArgsSize(const char* name, size_t paramsSize, size_t argsSize)
+            : Exception(format("Invalid %s arguments list - params size(%lu) is not equal to args size (%lu)",
+                               name,
+                               paramsSize,
+                               argsSize))
         {}
     };
 

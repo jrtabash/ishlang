@@ -2,6 +2,7 @@
 #define ISHLANG_GENERIC_FUNCTIONS_H
 
 #include "code_node_util.h"
+#include "lambda.h"
 #include "value.h"
 
 #include <concepts>
@@ -262,6 +263,33 @@ namespace Ishlang {
                                      obj.begin()->integer(),
                                      [](Value::Long a, const Value & v) { return a + v.integer(); }));
                 }
+            }
+        }
+
+        template <Sizable ObjectType>
+        static inline Value apply(const Lambda& ftn, const ObjectType &obj) {
+            if (obj.size() != ftn.paramsSize()) {
+                throw InvalidArgsSize("apply", ftn.paramsSize(), obj.size());
+            }
+
+            if constexpr (std::is_same_v<ObjectType, Value::Range>) {
+                Lambda::ArgList ftnArgs;
+
+                auto gen = obj.generator();
+                while (auto i = gen.next()) {
+                    ftnArgs.push_back(Value(*i));
+                }
+                return ftn.exec(ftnArgs);
+            }
+            else if constexpr (std::is_same_v<ObjectType, Value::Pair>) {
+                Lambda::ArgList ftnArgs = { obj.first(), obj.second() };
+                return ftn.exec(ftnArgs);
+            }
+            else {
+                static_assert(std::is_same_v<ObjectType, Value::Array>);
+
+                Lambda::ArgList ftnArgs(obj.begin(), obj.end());
+                return ftn.exec(ftnArgs);
             }
         }
     };

@@ -620,6 +620,11 @@ Generic Functions
 
       sum - Sum array, pair or range
             (sum <obj>)
+
+    apply - Apply function to array, pair or range
+            (apply <ftn> <obj>)
+
+            * Length of <ftn> parameters must match <obj> length
 )";
 }
 

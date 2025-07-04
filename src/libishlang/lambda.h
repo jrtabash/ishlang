@@ -20,6 +20,8 @@ namespace Ishlang {
         Lambda() = default;
         Lambda(const ParamList &params, CodeNode::SharedPtr body, Environment::SharedPtr env);
 
+        inline std::size_t paramsSize() const noexcept;
+
         Value exec(const ArgList &args) const;
 
         inline bool operator==(const Lambda &rhs) const;
@@ -41,6 +43,10 @@ namespace Ishlang {
 
     // --------------------------------------------------------------------------------
     // INLINE
+
+    inline std::size_t Lambda::paramsSize() const noexcept {
+        return params_.size();
+    }
 
     inline bool Lambda::operator==(const Lambda &rhs) const {
         return paramEqual(params_, rhs.params_) && body_ == rhs.body_ && env_ == rhs.env_;

@@ -376,3 +376,24 @@ DEFINE_TEST(testParserGenericSum) {
     TEST_CASE(parserTest(parser, env, "(sum (array 1 'c'))", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(sum (pair 2 'c'))",  Value::Null, false));
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserGenericApply) {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(apply (lambda () 0) (array))",                    Value(0ll), true));
+    TEST_CASE(parserTest(parser, env, "(apply (lambda (x) x) (array 1))",                 Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(apply (lambda (x y) (+ x y)) (array 1 2))",       Value(3ll), true));
+    TEST_CASE(parserTest(parser, env, "(apply (lambda (x y z) (+ x y z)) (array 1 2 3))", Value(6ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(apply (lambda () 0) (range 1 1))",              Value(0ll), true));
+    TEST_CASE(parserTest(parser, env, "(apply (lambda (x) x) (range 1 2))",             Value(1ll), true));
+    TEST_CASE(parserTest(parser, env, "(apply (lambda (x y) (+ x y)) (range 1 3))",     Value(3ll), true));
+    TEST_CASE(parserTest(parser, env, "(apply (lambda (x y z) (+ x y z)) (range 1 4))", Value(6ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(apply (lambda (x y) (+ x y)) (pair 1 2))", Value(3ll), true));
+
+    TEST_CASE(parserTest(parser, env, "(apply (lambda (x) x) 5)",           Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(apply (lambda (x) x) (array 1 2))", Value::Null, false));
+}
