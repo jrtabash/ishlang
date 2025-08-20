@@ -1,5 +1,5 @@
 CPP=clang++
-CFLAGS=-std=c++20 -Wall -Wextra -Wformat -Werror
+CFLAGS=-std=$(CPPSTD) -Wall -Wextra -Wformat -Werror
 RM=rm -f
 CP=cp
 BUILD=../build

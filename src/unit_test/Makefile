@@ -1,5 +1,5 @@
 CPP=clang++
-CFLAGS=-std=c++20 -fPIC -Wall -Wextra -Wformat -Werror
+CFLAGS=-std=$(CPPSTD) -fPIC -Wall -Wextra -Wformat -Werror
 LFLAGS=
 INCS=-I../libishlang -I../unit_test
 LIBSPATH=-L../build

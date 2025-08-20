@@ -1,6 +1,6 @@
 OS_NAME=$(shell uname -s)
 CPP=clang++
-CFLAGS=-std=c++20 -fPIC -Wall -Wextra -Wformat -Werror
+CFLAGS=-std=$(CPPSTD) -fPIC -Wall -Wextra -Wformat -Werror
 RM=rm -f
 CP=cp
 BUILD=../build
