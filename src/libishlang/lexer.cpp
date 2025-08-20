@@ -2,6 +2,8 @@
 #include "exception.h"
 #include "util.h"
 
+#include <algorithm>
+
 using namespace Ishlang;
 
 // -------------------------------------------------------------
