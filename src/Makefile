@@ -10,9 +10,21 @@ endif
 
 all:
 	$(MKDIR) $(BUILD)
+	make .libishlang
+	make .interpreter
+	make .unit_test
+	make .test_runner
+
+.libishlang:
 	make DEBUG=$(DBGFLAG) CPPSTD=$(CPPSTD) -C libishlang
+
+.interpreter:
 	make DEBUG=$(DBGFLAG) CPPSTD=$(CPPSTD) -C interpreter
+
+.unit_test:
 	make DEBUG=$(DBGFLAG) CPPSTD=$(CPPSTD) -C unit_test
+
+.test_runner:
 	make DEBUG=$(DBGFLAG) CPPSTD=$(CPPSTD) -C test_runner
 
 clean:
