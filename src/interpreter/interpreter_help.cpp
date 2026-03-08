@@ -686,7 +686,7 @@ Misc Functions
            (timeit <expr> [<count>] [<summary>])
 
            * The count is number of times to repeat evaluation, defaults to 1
-           * Allowed count range is [1, 1000]
+           * Allowed count range is [1, 1000000000]
            * The summary is a flag to print a time summary, defaults to true
            * The summary will show count, sum, mean, min and max
 )";

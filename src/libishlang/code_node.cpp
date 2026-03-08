@@ -2026,7 +2026,7 @@ Value TimeIt::exec(Environment::SharedPtr env) const {
         Value::Long min = 0;
         Value::Long max = 0;
 
-        const auto count = std::min(std::max(count_ ? evalOperand(env, count_, Value::eInteger).integer() : 1ll, 1ll), 1000ll);
+        const auto count = std::min( std::max(count_ ? evalOperand(env, count_, Value::eInteger).integer() : 1ll, 1ll), 1000000000ll);
         const auto summary = summary_ ? evalOperand(env, summary_, Value::eBoolean).boolean() : true;
 
         for (Value::Long i = 0; i < count; ++i) {
@@ -2055,7 +2055,7 @@ Value TimeIt::exec(Environment::SharedPtr env) const {
                       << "\n-----------------------------"
                       << "\n  count: " << count
                       << "\n    sum: " << sum
-                      << "\n   mean: " << std::fixed << std::setprecision(3) << mean
+                      << "\n   mean: " << std::fixed << std::setprecision(6) << mean
                       << "\n    min: " << min
                       << "\n    max: " << max
                       << "\n"
