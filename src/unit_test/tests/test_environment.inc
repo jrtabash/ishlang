@@ -127,6 +127,13 @@ DEFINE_TEST(testEnvironment) {
     }
     catch (const UnknownSymbol &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
+
+    try {
+        child->clear();
+        TEST_CASE(child->size() == 0);
+        TEST_CASE(env->size() > 0);
+    }
+    catch (...) { TEST_CASE(false); }
 }
 
 // -------------------------------------------------------------

@@ -28,6 +28,7 @@ namespace Ishlang {
         inline bool exists(const std::string &name) const noexcept;
         inline bool empty() const noexcept;
         inline std::size_t size() const noexcept;
+        inline void clear() noexcept;
 
         inline void foreach(EnvForeachInvocable auto && ftn) const;
 
@@ -54,6 +55,11 @@ namespace Ishlang {
 
     inline std::size_t Environment::size() const noexcept {
         return table_.size();
+    }
+
+    inline void Environment::clear() noexcept {
+        // Do not clear parent
+        table_.clear();
     }
 
     inline void Environment::foreach(EnvForeachInvocable auto && ftn) const {

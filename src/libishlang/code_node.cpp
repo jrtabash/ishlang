@@ -2022,42 +2022,27 @@ TimeIt::TimeIt(CodeNode::SharedPtr expr, CodeNode::SharedPtr count, CodeNode::Sh
 
 Value TimeIt::exec(Environment::SharedPtr env) const {
     if (expr_) {
-        Value::Long sum = 0;
-        Value::Long min = 0;
-        Value::Long max = 0;
-
         const auto count = std::min( std::max(count_ ? evalOperand(env, count_, Value::eInteger).integer() : 1ll, 1ll), 1000000000ll);
         const auto summary = summary_ ? evalOperand(env, summary_, Value::eBoolean).boolean() : true;
 
+        auto tEnv = Environment::make(env);
+
+        auto const start = std::chrono::high_resolution_clock::now();
         for (Value::Long i = 0; i < count; ++i) {
-            auto tEnv = Environment::make(env);
-
-            auto start = std::chrono::high_resolution_clock::now();
+            tEnv->clear();
             expr_->eval(tEnv);
-            auto end = std::chrono::high_resolution_clock::now();
-
-            Value::Long const duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-            if (sum > 0) {
-                sum += duration;
-                min = std::min(min, duration);
-                max = std::max(max, duration);
-            }
-            else {
-                sum = duration;
-                min = duration;
-                max = duration;
-            }
         }
+        auto const end = std::chrono::high_resolution_clock::now();
 
-        const auto mean = sum / static_cast<double>(count);
+        Value::Long const total = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        const auto mean = total / static_cast<double>(count);
+
         if (summary) {
             std::cout << "\nTimeIt Summary / Microseconds"
                       << "\n-----------------------------"
                       << "\n  count: " << count
-                      << "\n    sum: " << sum
+                      << "\n  total: " << total
                       << "\n   mean: " << std::fixed << std::setprecision(6) << mean
-                      << "\n    min: " << min
-                      << "\n    max: " << max
                       << "\n"
                       << std::endl;
         }
