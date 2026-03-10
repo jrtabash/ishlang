@@ -32,9 +32,11 @@
   (istypeof (list_head list) none))
 
 (defun list_foreach (list ftn)
-  (unless (list_empty list)
-    (loop (var cur (list_head list)) (not (istypeof cur none)) (= cur (node_next cur))
-          (ftn cur))))
+  (var cur (list_head list))
+  (while (not (istypeof cur none))
+    (progn
+      (ftn cur)
+      (= cur (node_next cur)))))
 
 (defun list_len (list)
   (var size 0)

@@ -22,5 +22,5 @@
 (println "'")
 
 (var tokState (makeTokenizerState message))
-(loop (< (get tokState position) (get tokState length))
+(while (< (get tokState position) (get tokState length))
       (println (nextToken tokState))))
