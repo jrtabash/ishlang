@@ -201,6 +201,8 @@ const char *HelpDict::help_loop() {
     return R"(
 Looping
 -------
+WARNING: loop is deprecated, prefer to use foreach or while
+
 General Loop Expression:
   (loop <decl_expr> <cond_expr> <next_expr>
     <body_expr>)
@@ -220,6 +222,15 @@ Conditional Loop Expression:
     (loop (<= trm 10)
       (= agg (+ agg trm))
       (= trm (+ trm 1)))
+
+While Expression:
+  (while <cond_expr>
+    <body_expr>)
+
+  Example:
+    (var total 0)
+    (while (< total 10)
+      (= total (+ total 1)))
 
 Foreach Expression:
   (foreach <var> <iterable_expr>

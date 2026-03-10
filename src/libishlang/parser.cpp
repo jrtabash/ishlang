@@ -570,6 +570,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "while",
+          [this]() {
+              auto forms(readAndCheckExprList("while", 2));
+              return CodeNode::make<While>(forms[0], forms[1]);
+          }
+        },
+
         { "foreach",
           [this]() {
               const auto name(readName());

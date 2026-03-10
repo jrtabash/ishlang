@@ -432,6 +432,31 @@ Value Loop::exec(Environment::SharedPtr env) const {
 }
 
 // -------------------------------------------------------------
+While::While(CodeNode::SharedPtr cond, CodeNode::SharedPtr body)
+    : CodeNode()
+    , cond_(cond)
+    , body_(body)
+{}
+
+Value While::exec(Environment::SharedPtr env) const {
+    if (cond_ && body_) {
+        auto whileEnv = Environment::make(env);
+
+        Value result;
+        try {
+            while (evalExpression(whileEnv, cond_, Value::eBoolean).boolean()) {
+                result = body_->eval(whileEnv);
+            }
+        }
+        catch (const Break::Except &) { return Value::Null; }
+        catch (...) { throw; }
+
+        return result;
+    }
+    return Value::Null;
+}
+
+// -------------------------------------------------------------
 Foreach::Foreach(const std::string &name, CodeNode::SharedPtr container, CodeNode::SharedPtr body)
     : CodeNode()
     , name_(name)

@@ -69,6 +69,23 @@ DEFINE_TEST(testParserLoop) {
 }
 
 // -------------------------------------------------------------
+DEFINE_TEST(testParserWhile) {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(while false 10)",                                               Value::Null, true));
+    TEST_CASE(parserTest(parser, env, "(block (var sum 0) (while (< sum 5) (= sum (+ sum 2))))",        Value(6ll),  true));
+    TEST_CASE(parserTest(parser, env, "(while true (break))",                                           Value::Null, true));
+    TEST_CASE(parserTest(parser, env, "(block (var sum 0) (while true (progn (= sum 3) (break))))",     Value::Null, true));
+    TEST_CASE(parserTest(parser, env, "(block (var sum 0) (while true (progn (= sum 3) (break))) sum)", Value(3ll),  true));
+
+    TEST_CASE(parserTest(parser, env, "(while (var i 1) (< i 4) (= i (+ i 1)))", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(while 5 (+ 1 2))",                       Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(while true)",                            Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(while)",                                 Value::Null, false));
+}
+
+// -------------------------------------------------------------
 DEFINE_TEST(testParserForeach) {
     Util::TemporaryFile tempFile("testParserForeach.txt",
                                  "1\n"

@@ -295,6 +295,59 @@ DEFINE_TEST(testCodeNodeLoop) {
 }
 
 // -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeWhile) {
+    auto env = Environment::make();
+
+    { // While
+        env->def("count", Value(1ll));
+
+        CodeNode::SharedPtr wLoop(
+                new While(
+                    CodeNode::SharedPtr(
+                        new CompOp(CompOp::LT,
+                                   CodeNode::SharedPtr(new Variable("count")),
+                                   CodeNode::SharedPtr(new Literal(Value(32ll))))),
+                    CodeNode::SharedPtr(
+                        new Assign("count", CodeNode::SharedPtr(
+                                                new ArithOp(ArithOp::Mul,
+                                                            { CodeNode::SharedPtr(new Variable("count")),
+                                                              CodeNode::SharedPtr(new Literal(Value(2ll))) }))))));
+        Value result = wLoop->eval(env);
+        TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+        TEST_CASE_MSG(result.integer() == 32ll, "actual=" << result);
+    }
+
+    { // Break
+        env->def("x", Value(0ll));
+
+        CodeNode::SharedPtrList exprs;
+        exprs.push_back(
+            CodeNode::SharedPtr(
+                new Assign("x", CodeNode::SharedPtr(
+                                    new ArithOp(ArithOp::Add,
+                                                { CodeNode::SharedPtr(new Variable("x")),
+                                                  CodeNode::SharedPtr(new Literal(Value(1ll))) })))));
+        exprs.push_back(
+            CodeNode::SharedPtr(
+                new If(CodeNode::SharedPtr(
+                           new CompOp(CompOp::EQ,
+                                      CodeNode::SharedPtr(new Variable("x")),
+                                      CodeNode::SharedPtr(new Literal(Value(2ll))))),
+                       CodeNode::SharedPtr(new Break()),
+                       CodeNode::SharedPtr())));
+
+        CodeNode::SharedPtr wLoop(
+                new While(
+                    CodeNode::SharedPtr(new Literal(Value::True)),
+                    CodeNode::SharedPtr(new ProgN(exprs))));
+
+        Value result = wLoop->eval(env);
+        TEST_CASE_MSG(result.isNull(), "actual=" << result.typeToString());
+        TEST_CASE_MSG(env->get("x") == Value(2ll), "actual=" << env->get("x"));
+    }
+}
+
+// -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeForeach) {
     auto var = [](const char *name) {
         return CodeNode::make<Variable>(name);

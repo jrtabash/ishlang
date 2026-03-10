@@ -17,7 +17,13 @@ __CODE__
   (= count (+ count 1)))
 (println count)
 
+(= count 0)
+(while (< count 100)
+  (= count (+ count 1)))
+(println count)
+
 __EXPECT__
 55
 55
+100
 100

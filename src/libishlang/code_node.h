@@ -391,6 +391,20 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
+    class While : public CodeNode {
+    public:
+        While(CodeNode::SharedPtr cond, CodeNode::SharedPtr body);
+        virtual ~While() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        CodeNode::SharedPtr cond_;
+        CodeNode::SharedPtr body_;
+    };
+
+    // -------------------------------------------------------------
     class Foreach : public CodeNode {
     public:
         Foreach(const std::string &name, CodeNode::SharedPtr container, CodeNode::SharedPtr body);

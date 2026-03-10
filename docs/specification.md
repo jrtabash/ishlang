@@ -274,7 +274,8 @@ In the progn case the variable x is defined in the enclosing environment, and as
 exists outside the boundary of progn. In the block case, the variable x is defined in
 the block environment, and is not available outside the scope of block.
 
-## Looping
+## Loop
+#### WARNING: loop is deprecated, prefer using foreach or while
 General form:
 ```
 (loop <decl_expression> <cond_expression> <next_expression>
@@ -302,6 +303,19 @@ Conditional only form:
   (progn
     (= term (+ term 1))
     (= count (+ count term))))
+```
+
+## While
+```
+(while <cond_expression>
+  <body_expression>)
+```
+
+### Example
+```
+(var count 0)
+(while (< count 55)
+  (= count (+ count 5)))
 ```
 
 ## Foreach
