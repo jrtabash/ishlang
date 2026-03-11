@@ -61,7 +61,6 @@ namespace Ishlang {
         static inline bool tableEqual(const Table &lhs, const Table &rhs);
 
     private:
-        static std::size_t maxDisplaySize_;
         Table table_;
     };
 

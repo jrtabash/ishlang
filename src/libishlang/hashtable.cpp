@@ -5,8 +5,6 @@
 
 using namespace Ishlang;
 
-std::size_t Hashtable::maxDisplaySize_ = 10;
-
 // -------------------------------------------------------------
 Hashtable::Hashtable(Table && table)
     : table_(table)

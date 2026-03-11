@@ -62,7 +62,6 @@ namespace Ishlang {
         static inline bool vectorEqual(const Vector &lhs, const Vector &rhs);
 
     private:
-        static std::size_t maxDisplaySize_;
         Vector vector_;
     };
 
