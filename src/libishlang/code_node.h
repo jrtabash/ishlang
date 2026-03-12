@@ -3,7 +3,7 @@
 
 #include "code_node_bases.h"
 #include "environment.h"
-#include "hashtable.h"
+#include "generic_table.h"
 #include "instance.h"
 #include "integer_range.h"
 #include "struct.h"

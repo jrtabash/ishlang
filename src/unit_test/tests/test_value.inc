@@ -2,7 +2,7 @@
 
 #include "exception.h"
 #include "file_io.h"
-#include "hashtable.h"
+#include "generic_table.h"
 #include "integer_range.h"
 #include "sequence.h"
 #include "util.h"
@@ -200,6 +200,7 @@ DEFINE_TEST(testValue) {
         TEST_CASE(Value::stringToType("userobject") == Value::eUserObject);
         TEST_CASE(Value::stringToType("array")      == Value::eArray);
         TEST_CASE(Value::stringToType("hashmap")    == Value::eHashMap);
+        TEST_CASE(Value::stringToType("orderedmap") == Value::eOrderedMap);
         TEST_CASE(Value::stringToType("range")      == Value::eRange);
         TEST_CASE(Value::stringToType("file")       == Value::eFile);
 
@@ -266,6 +267,7 @@ DEFINE_TEST(testValueAsType) {
     Value const stringFalse = Value("false");
     Value const array1 = Value(Sequence(1, int1));
     Value const ht = Value(Hashtable());
+    Value const ot = Value(OrderedTable());
     Value const rng = Value(IntegerRange());
 
     { // asInt
@@ -280,6 +282,7 @@ DEFINE_TEST(testValueAsType) {
         TEST_ASTYPE_EXCEPT(null,   asInt(), "int");
         TEST_ASTYPE_EXCEPT(array1, asInt(), "int");
         TEST_ASTYPE_EXCEPT(ht,     asInt(), "int");
+        TEST_ASTYPE_EXCEPT(ot,     asInt(), "int");
         TEST_ASTYPE_EXCEPT(rng,    asInt(), "int");
     }
 
@@ -295,6 +298,7 @@ DEFINE_TEST(testValueAsType) {
         TEST_ASTYPE_EXCEPT(null,   asReal(), "real");
         TEST_ASTYPE_EXCEPT(array1, asReal(), "real");
         TEST_ASTYPE_EXCEPT(ht,     asReal(), "real");
+        TEST_ASTYPE_EXCEPT(ot,     asReal(), "real");
         TEST_ASTYPE_EXCEPT(rng,    asReal(), "real");
     }
 
@@ -310,6 +314,7 @@ DEFINE_TEST(testValueAsType) {
         TEST_ASTYPE_EXCEPT(null,   asChar(), "char");
         TEST_ASTYPE_EXCEPT(array1, asChar(), "char");
         TEST_ASTYPE_EXCEPT(ht,     asChar(), "char");
+        TEST_ASTYPE_EXCEPT(ot,     asChar(), "char");
         TEST_ASTYPE_EXCEPT(rng,    asChar(), "char");
     }
 
@@ -330,6 +335,7 @@ DEFINE_TEST(testValueAsType) {
         TEST_ASTYPE_EXCEPT(string25, asBool(), "bool");
         TEST_ASTYPE_EXCEPT(array1,   asBool(), "bool");
         TEST_ASTYPE_EXCEPT(ht,       asBool(), "bool");
+        TEST_ASTYPE_EXCEPT(ot,       asBool(), "bool");
         TEST_ASTYPE_EXCEPT(rng,      asBool(), "bool");
     }
 
@@ -344,6 +350,7 @@ DEFINE_TEST(testValueAsType) {
         TEST_ASTYPE_EXCEPT(null,   asString(), "string");
         TEST_ASTYPE_EXCEPT(array1, asString(), "string");
         TEST_ASTYPE_EXCEPT(ht,     asString(), "string");
+        TEST_ASTYPE_EXCEPT(ot,     asString(), "string");
         TEST_ASTYPE_EXCEPT(rng,    asString(), "string");
     }
 
@@ -459,6 +466,7 @@ DEFINE_TEST(testValueRawTypeToCStr) {
     TEST_RAW_TYPE_TO_CSTR(Value::UserObject, "userobject");
     TEST_RAW_TYPE_TO_CSTR(Value::Array, "array");
     TEST_RAW_TYPE_TO_CSTR(Value::HashMap, "hashmap");
+    TEST_RAW_TYPE_TO_CSTR(Value::OrderedMap, "orderedmap");
     TEST_RAW_TYPE_TO_CSTR(Value::Range, "range");
     TEST_RAW_TYPE_TO_CSTR(Value::File, "file");
 }

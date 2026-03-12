@@ -1,7 +1,7 @@
 #include "unit_test_function.h"
 
 #include "environment.h"
-#include "hashtable.h"
+#include "generic_table.h"
 #include "parser.h"
 #include "value.h"
 

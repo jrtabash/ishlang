@@ -4,7 +4,7 @@
 #include "environment.h"
 #include "exception.h"
 #include "file_io.h"
-#include "hashtable.h"
+#include "generic_table.h"
 #include "integer_range.h"
 #include "lambda.h"
 #include "sequence.h"

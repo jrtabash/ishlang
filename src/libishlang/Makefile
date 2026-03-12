@@ -22,7 +22,6 @@ OBJS=\
 	struct.o \
 	instance.o \
 	sequence.o \
-	hashtable.o \
 	integer_range.o \
 	file_io.o \
 	code_node.o \
@@ -65,9 +64,6 @@ instance.o: instance.cpp instance.h value.h exception.h
 
 sequence.o: sequence.cpp sequence.h value.h exception.h
 	$(CPP) $(CFLAGS) -c sequence.cpp -o $(BUILD)/sequence.o
-
-hashtable.o: hashtable.cpp hashtable.h value.h
-	$(CPP) $(CFLAGS) -c hashtable.cpp -o $(BUILD)/hashtable.o
 
 integer_range.o: integer_range.cpp integer_range.h
 	$(CPP) $(CFLAGS) -c integer_range.cpp -o $(BUILD)/integer_range.o

@@ -15,6 +15,7 @@ namespace Ishlang {
     class Instance;
     class Sequence;
     class Hashtable;
+    class OrderedTable;
     class IntegerRange;
     class FileStruct;
 
@@ -27,6 +28,7 @@ namespace Ishlang {
     using InstancePtr = std::shared_ptr<Instance>;
     using SequencePtr = std::shared_ptr<Sequence>;
     using HashtablePtr = std::shared_ptr<Hashtable>;
+    using OrderedTablePtr = std::shared_ptr<OrderedTable>;
     using IntegerRangePtr = std::shared_ptr<IntegerRange>;
     using FileStructPtr = std::shared_ptr<FileStruct>;
 
@@ -46,6 +48,7 @@ namespace Ishlang {
         static Instance     NullObject;
         static Sequence     NullSequence;
         static Hashtable    NullHashtable;
+        static OrderedTable NullOrderedTable;
         static IntegerRange NullIntegerRange;
         static FileStruct   NullFileStruct;
         
@@ -63,6 +66,7 @@ namespace Ishlang {
             eUserObject = 'O',
             eArray      = 'A',
             eHashMap    = 'H',
+            eOrderedMap = 'M',
             eRange      = 'G',
             eFile       = 'L',
         };
@@ -79,6 +83,7 @@ namespace Ishlang {
         using UserObject = Instance;
         using Array      = Sequence;
         using HashMap    = Hashtable;
+        using OrderedMap = OrderedTable;
         using Range      = IntegerRange;
         using File       = FileStruct;
         
@@ -97,6 +102,7 @@ namespace Ishlang {
         Value(const Instance &o);
         Value(const Sequence &s);
         Value(const Hashtable &h);
+        Value(const OrderedTable &m);
         Value(const IntegerRange &r);
         Value(FileParams && fp);
 
@@ -114,6 +120,7 @@ namespace Ishlang {
         inline bool isUserObject() const;
         inline bool isArray() const;
         inline bool isHashMap() const;
+        inline bool isOrderedMap() const;
         inline bool isRange() const;
         inline bool isFile() const;
         
@@ -134,6 +141,8 @@ namespace Ishlang {
         inline Array &array();
         inline const HashMap &hashMap() const;
         inline HashMap &hashMap();
+        inline const OrderedMap &orderedMap() const;
+        inline OrderedMap &orderedMap();
         inline const Range &range() const;
         inline Range &range();
         inline const File& file() const;
@@ -194,6 +203,7 @@ namespace Ishlang {
                                           InstancePtr,
                                           SequencePtr,
                                           HashtablePtr,
+                                          OrderedTablePtr,
                                           IntegerRangePtr,
                                           FileStructPtr>;
 
@@ -280,6 +290,10 @@ namespace Ishlang {
         return type_ == eHashMap;
     }
 
+    inline bool Value::isOrderedMap() const {
+        return type_ == eOrderedMap;
+    }
+
     inline bool Value::isRange() const {
         return type_ == eRange;
     }
@@ -352,6 +366,14 @@ namespace Ishlang {
         return isHashMap() ? *std::get<HashtablePtr>(value_) : NullHashtable;
     }
 
+    inline auto Value::orderedMap() const -> const OrderedMap & {
+        return isOrderedMap() ? *std::get<OrderedTablePtr>(value_) : NullOrderedTable;
+    }
+
+    inline auto Value::orderedMap() -> OrderedMap & {
+        return isOrderedMap() ? *std::get<OrderedTablePtr>(value_) : NullOrderedTable;
+    }
+
     inline auto Value::range() const -> const Range & {
         return isRange() ? *std::get<IntegerRangePtr>(value_) : NullIntegerRange;
     }
@@ -385,6 +407,7 @@ namespace Ishlang {
         else if constexpr (std::is_same_v<RawType, UserObject>) { return "userobject"; }
         else if constexpr (std::is_same_v<RawType, Array>) { return "array"; }
         else if constexpr (std::is_same_v<RawType, HashMap>) { return "hashmap"; }
+        else if constexpr (std::is_same_v<RawType, OrderedMap>) { return "orderedmap"; }
         else if constexpr (std::is_same_v<RawType, Range>) { return "range"; }
         else if constexpr (std::is_same_v<RawType, File>) { return "file"; }
         else {

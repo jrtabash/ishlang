@@ -1,6 +1,6 @@
 #include "unit_test_function.h"
 
-#include "hashtable.h"
+#include "generic_table.h"
 #include "value.h"
 
 using namespace Ishlang;

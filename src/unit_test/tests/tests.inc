@@ -5,6 +5,7 @@
 #include "test_struct.inc"
 #include "test_sequence.inc"
 #include "test_hashtable.inc"
+#include "test_ordered_table.inc"
 #include "test_integer_range.inc"
 #include "test_file_io.inc"
 #include "test_module.inc"

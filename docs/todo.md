@@ -50,7 +50,7 @@
   - **lissort**: list sort
   - **lisrev**: list reverse
   - Add list support to generic functions
-- Ordered table
+- Ordered table [In-Progress]
   - **orderedmap**: make orderedmap
   - **omlen**: orderedmap length
   - **omhas**: orderedmap has key
