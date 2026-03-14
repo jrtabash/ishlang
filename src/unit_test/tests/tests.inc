@@ -19,6 +19,7 @@
 #include "test_code_node_string.inc"
 #include "test_code_node_array.inc"
 #include "test_code_node_hashmap.inc"
+#include "test_code_node_orderedmap.inc"
 #include "test_code_node_range.inc"
 #include "test_code_node_generic.inc"
 #include "test_code_node_file_io.inc"

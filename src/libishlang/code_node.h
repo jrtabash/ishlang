@@ -1081,47 +1081,62 @@ namespace Ishlang {
     };
 
     // -------------------------------------------------------------
-    class MakeHashMap : public CodeNode {
+    template <typename MapType>
+    class MakeMapImpl : public CodeNode {
     public:
-        MakeHashMap(CodeNode::SharedPtrList pairs = CodeNode::SharedPtrList());
-        virtual ~MakeHashMap() {}
+        using Table = typename MapType::Table;
+
+    public:
+        MakeMapImpl(CodeNode::SharedPtrList pairs = CodeNode::SharedPtrList());
+        virtual ~MakeMapImpl() {}
 
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        static void append(Hashtable::Table &table, const Sequence &arr);
-        static void append(Hashtable::Table &table, const ValuePair &pair);
+        static void append(Table &table, const Sequence &arr);
+        static void append(Table &table, const ValuePair &pair);
 
     private:
         CodeNode::SharedPtrList pairs_;
     };
 
+    using MakeHashMap = MakeMapImpl<Hashtable>;
+    using MakeOrderedMap = MakeMapImpl<OrderedTable>;
+
     // -------------------------------------------------------------
-    class HashMapLen : public CodeNode {
+    template <typename MapType>
+    class MapLenImpl : public CodeNode {
     public:
-        HashMapLen(CodeNode::SharedPtr htExpr);
-        virtual ~HashMapLen() {}
+        MapLenImpl(CodeNode::SharedPtr tblExpr);
+        virtual ~MapLenImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
     };
 
+    using HashMapLen = MapLenImpl<Hashtable>;
+    using OrderedMapLen = MapLenImpl<OrderedTable>;
+
     // -------------------------------------------------------------
-    class HashMapContains : public CodeNode {
+    template <typename MapType>
+    class MapContainsImpl : public CodeNode {
     public:
-        HashMapContains(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr);
-        virtual ~HashMapContains() {}
+        MapContainsImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr keyExpr);
+        virtual ~MapContainsImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
         CodeNode::SharedPtr keyExpr_;
     };
+
+    using HashMapContains = MapContainsImpl<Hashtable>;
+    using OrderedMapContains = MapContainsImpl<OrderedTable>;
 
     // -------------------------------------------------------------
     class HashMapGet : public CodeNode {

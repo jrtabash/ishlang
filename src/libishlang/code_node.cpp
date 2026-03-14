@@ -1395,17 +1395,19 @@ Value Hash::exec(Environment::SharedPtr env) const {
 }
 
 // -------------------------------------------------------------
-MakeHashMap::MakeHashMap(CodeNode::SharedPtrList pairs)
+template <typename MapType>
+MakeMapImpl<MapType>::MakeMapImpl(CodeNode::SharedPtrList pairs)
     : CodeNode()
     , pairs_(pairs)
 {}
 
-Value MakeHashMap::exec(Environment::SharedPtr env) const {
+template <typename MapType>
+Value MakeMapImpl<MapType>::exec(Environment::SharedPtr env) const {
     if (pairs_.empty()) {
-        return Value(Hashtable());
+        return Value(MapType());
     }
     else {
-        Hashtable::Table table;
+        Table table;
         for (const auto &pairCode : pairs_) {
             auto pairValue = pairCode->eval(env);
             if (pairValue.isPair()) {
@@ -1420,46 +1422,79 @@ Value MakeHashMap::exec(Environment::SharedPtr env) const {
                     pairValue.typeToString());
             }
         }
-        return Value(Hashtable(std::move(table)));
+        return Value(MapType(std::move(table)));
     }
 }
 
-void MakeHashMap::append(Hashtable::Table & table, const Sequence &arr) {
+template <typename MapType>
+void MakeMapImpl<MapType>::append(Table & table, const Sequence &arr) {
     if (arr.size() != 2) { throw InvalidExpression("Wrong array size, expecting 2"); }
     table.emplace(arr.get(0), arr.get(1));
 }
 
-void MakeHashMap::append(Hashtable::Table & table, const ValuePair &pair) {
+template <typename MapType>
+void MakeMapImpl<MapType>::append(Table & table, const ValuePair &pair) {
     table.emplace(pair.first(), pair.second());
 }
 
+namespace Ishlang {
+    template class MakeMapImpl<Hashtable>;
+    template class MakeMapImpl<OrderedTable>;
+}
+
 // -------------------------------------------------------------
-HashMapLen::HashMapLen(CodeNode::SharedPtr htExpr)
+template <typename MapType>
+MapLenImpl<MapType>::MapLenImpl(CodeNode::SharedPtr tblExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
 {}
 
-Value HashMapLen::exec(Environment::SharedPtr env) const {
-    if (htExpr_) {
-        const Value hm = evalOperand(env, htExpr_, Value::eHashMap);
-        return Generic::length(hm.hashMap());
+template <typename MapType>
+Value MapLenImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_) {
+        const Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            return Generic::length(m.hashMap());
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            return Generic::length(m.orderedMap());
+        }
     }
     return Value::Zero;
 }
 
+namespace Ishlang {
+    template class MapLenImpl<Hashtable>;
+    template class MapLenImpl<OrderedTable>;
+}
+
 // -------------------------------------------------------------
-HashMapContains::HashMapContains(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr)
+template <typename MapType>
+MapContainsImpl<MapType>::MapContainsImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr keyExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
     , keyExpr_(keyExpr)
 {}
 
-Value HashMapContains::exec(Environment::SharedPtr env) const {
-    if (htExpr_ && keyExpr_) {
-        const Value hm = evalOperand(env, htExpr_, Value::eHashMap);
-        return Value(hm.hashMap().exists(keyExpr_->eval(env)));
+template <typename MapType>
+Value MapContainsImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_ && keyExpr_) {
+        const Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            return Value(m.hashMap().exists(keyExpr_->eval(env)));
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            return Value(m.orderedMap().exists(keyExpr_->eval(env)));
+        }
     }
     return Value::False;
+}
+
+namespace Ishlang {
+    template class MapContainsImpl<Hashtable>;
+    template class MapContainsImpl<OrderedTable>;
 }
 
 // -------------------------------------------------------------
