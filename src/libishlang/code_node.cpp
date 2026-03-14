@@ -1498,140 +1498,257 @@ namespace Ishlang {
 }
 
 // -------------------------------------------------------------
-HashMapGet::HashMapGet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr defaultExpr)
+template <typename MapType>
+MapGetImpl<MapType>::MapGetImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr defaultExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
     , keyExpr_(keyExpr)
     , defaultExpr_(defaultExpr)
 {}
 
-Value HashMapGet::exec(Environment::SharedPtr env) const {
-    if (htExpr_ && keyExpr_) {
-        const Value hm = evalOperand(env, htExpr_, Value::eHashMap);
+template <typename MapType>
+Value MapGetImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_ && keyExpr_) {
+        const Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
         const Value key = keyExpr_->eval(env);
         const Value defaultRet = defaultExpr_ ? defaultExpr_->eval(env) : Value::Null;
-        return Generic::get(hm.hashMap(), key, defaultRet);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            return Generic::get(m.hashMap(), key, defaultRet);
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            return Generic::get(m.orderedMap(), key, defaultRet);
+        }
     }
     return Value::Null;
 }
 
+namespace Ishlang {
+    template class MapGetImpl<Hashtable>;
+    template class MapGetImpl<OrderedTable>;
+}
+
 // -------------------------------------------------------------
-HashMapSet::HashMapSet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr valueExpr)
+template <typename MapType>
+MapSetImpl<MapType>::MapSetImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr valueExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
     , keyExpr_(keyExpr)
     , valueExpr_(valueExpr)
 {}
 
-Value HashMapSet::exec(Environment::SharedPtr env) const {
-    if (htExpr_ && keyExpr_ && valueExpr_) {
-        Value hm = evalOperand(env, htExpr_, Value::eHashMap);
+template <typename MapType>
+Value MapSetImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_ && keyExpr_ && valueExpr_) {
+        Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
         Value value = valueExpr_->eval(env);
-        Generic::set(hm.hashMap(), keyExpr_->eval(env), value);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            Generic::set(m.hashMap(), keyExpr_->eval(env), value);
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            Generic::set(m.orderedMap(), keyExpr_->eval(env), value);
+        }
         return value;
     }
     return Value::Null;
 }
 
+namespace Ishlang {
+    template class MapSetImpl<Hashtable>;
+    template class MapSetImpl<OrderedTable>;
+}
+
 // -------------------------------------------------------------
-HashMapRemove::HashMapRemove(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr)
+template <typename MapType>
+MapRemoveImpl<MapType>::MapRemoveImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr keyExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
     , keyExpr_(keyExpr)
 {}
 
-Value HashMapRemove::exec(Environment::SharedPtr env) const {
-    if (htExpr_ && keyExpr_) {
-        Value hm = evalOperand(env, htExpr_, Value::eHashMap);
-        hm.hashMap().remove(keyExpr_->eval(env));
+template <typename MapType>
+Value MapRemoveImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_ && keyExpr_) {
+        Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            m.hashMap().remove(keyExpr_->eval(env));
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            m.orderedMap().remove(keyExpr_->eval(env));
+        }
     }
     return Value::Null;
 }
 
+namespace Ishlang {
+    template class MapRemoveImpl<Hashtable>;
+    template class MapRemoveImpl<OrderedTable>;
+}
+
 // -------------------------------------------------------------
-HashMapClear::HashMapClear(CodeNode::SharedPtr htExpr)
+template <typename MapType>
+MapClearImpl<MapType>::MapClearImpl(CodeNode::SharedPtr tblExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
 {}
 
-Value HashMapClear::exec(Environment::SharedPtr env) const {
-    if (htExpr_) {
-        Value hm = evalOperand(env, htExpr_, Value::eHashMap);
-        hm.hashMap().clear();
+template <typename MapType>
+Value MapClearImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_) {
+        Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            m.hashMap().clear();
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            m.orderedMap().clear();
+        }
     }
     return Value::Null;
 }
 
+namespace Ishlang {
+    template class MapClearImpl<Hashtable>;
+    template class MapClearImpl<OrderedTable>;
+}
+
 // -------------------------------------------------------------
-HashMapFind::HashMapFind(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueExpr)
+template <typename MapType>
+MapFindImpl<MapType>::MapFindImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr valueExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
     , valueExpr_(valueExpr)
 {}
 
-Value HashMapFind::exec(Environment::SharedPtr env) const {
-    if (htExpr_ && valueExpr_) {
-        return Generic::find(evalOperand(env, htExpr_, Value::eHashMap).hashMap(),
-                             valueExpr_->eval(env));
+template <typename MapType>
+Value MapFindImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_ && valueExpr_) {
+        Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            return Generic::find(m.hashMap(), valueExpr_->eval(env));
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            return Generic::find(m.orderedMap(), valueExpr_->eval(env));
+        }
     }
     return Value::Null;
 }
 
+namespace Ishlang {
+    template class MapFindImpl<Hashtable>;
+    template class MapFindImpl<OrderedTable>;
+}
+
 // -------------------------------------------------------------
-HashMapCount::HashMapCount(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueExpr)
+template <typename MapType>
+MapCountImpl<MapType>::MapCountImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr valueExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
     , valueExpr_(valueExpr)
 {}
 
-Value HashMapCount::exec(Environment::SharedPtr env) const {
-    if (htExpr_ && valueExpr_) {
-        return Generic::count(evalOperand(env, htExpr_, Value::eHashMap).hashMap(),
-                              valueExpr_->eval(env));
+template <typename MapType>
+Value MapCountImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_ && valueExpr_) {
+        const Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            return Generic::count(m.hashMap(), valueExpr_->eval(env));
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            return Generic::count(m.orderedMap(), valueExpr_->eval(env));
+        }
     }
     return Value::Zero;
 }
 
+namespace Ishlang {
+    template class MapCountImpl<Hashtable>;
+    template class MapCountImpl<OrderedTable>;
+}
+
 // -------------------------------------------------------------
-HashMapKeys::HashMapKeys(CodeNode::SharedPtr htExpr)
+template <typename MapType>
+MapKeysImpl<MapType>::MapKeysImpl(CodeNode::SharedPtr tblExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
 {}
 
-Value HashMapKeys::exec(Environment::SharedPtr env) const {
-    if (htExpr_) {
-        const Value hm = evalOperand(env, htExpr_, Value::eHashMap);
-        return Value(hm.hashMap().keys());
+template <typename MapType>
+Value MapKeysImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_) {
+        const Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            return Value(m.hashMap().keys());
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            return Value(m.orderedMap().keys());
+        }
     }
     return Value::Null;
 }
 
+namespace Ishlang {
+    template class MapKeysImpl<Hashtable>;
+    template class MapKeysImpl<OrderedTable>;
+}
+
 // -------------------------------------------------------------
-HashMapValues::HashMapValues(CodeNode::SharedPtr htExpr)
+template <typename MapType>
+MapValuesImpl<MapType>::MapValuesImpl(CodeNode::SharedPtr tblExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
 {}
 
-Value HashMapValues::exec(Environment::SharedPtr env) const {
-    if (htExpr_) {
-        const Value hm = evalOperand(env, htExpr_, Value::eHashMap);
-        return Value(hm.hashMap().values());
+template <typename MapType>
+Value MapValuesImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_) {
+        const Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            return Value(m.hashMap().values());
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            return Value(m.orderedMap().values());
+        }
     }
     return Value::Null;
 }
 
+namespace Ishlang {
+    template class MapValuesImpl<Hashtable>;
+    template class MapValuesImpl<OrderedTable>;
+}
+
 // -------------------------------------------------------------
-HashMapItems::HashMapItems(CodeNode::SharedPtr htExpr)
+template <typename MapType>
+MapItemsImpl<MapType>::MapItemsImpl(CodeNode::SharedPtr tblExpr)
     : CodeNode()
-    , htExpr_(htExpr)
+    , tblExpr_(tblExpr)
 {}
 
-Value HashMapItems::exec(Environment::SharedPtr env) const {
-    if (htExpr_) {
-        const Value hm = evalOperand(env, htExpr_, Value::eHashMap);
-        return Value(hm.hashMap().items());
+template <typename MapType>
+Value MapItemsImpl<MapType>::exec(Environment::SharedPtr env) const {
+    if (tblExpr_) {
+        const Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
+        if constexpr (std::is_same_v<MapType, Hashtable>) {
+            return Value(m.hashMap().items());
+        }
+        else {
+            static_assert(std::is_same_v<MapType, OrderedTable>);
+            return Value(m.orderedMap().items());
+        }
     }
     return Value::Null;
+}
+
+namespace Ishlang {
+    template class MapItemsImpl<Hashtable>;
+    template class MapItemsImpl<OrderedTable>;
 }
 
 // -------------------------------------------------------------

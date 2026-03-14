@@ -1139,128 +1139,164 @@ namespace Ishlang {
     using OrderedMapContains = MapContainsImpl<OrderedTable>;
 
     // -------------------------------------------------------------
-    class HashMapGet : public CodeNode {
+    template <typename MapType>
+    class MapGetImpl : public CodeNode {
     public:
-        HashMapGet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr defaultExpr = CodeNode::SharedPtr());
-        virtual ~HashMapGet() {}
+        MapGetImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr defaultExpr = CodeNode::SharedPtr());
+        virtual ~MapGetImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
         CodeNode::SharedPtr keyExpr_;
         CodeNode::SharedPtr defaultExpr_;
     };
 
+    using HashMapGet = MapGetImpl<Hashtable>;
+    using OrderedMapGet = MapGetImpl<OrderedTable>;
+
     // -------------------------------------------------------------
-    class HashMapSet : public CodeNode {
+    template <typename MapType>
+    class MapSetImpl : public CodeNode {
     public:
-        HashMapSet(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr valueExpr);
-        virtual ~HashMapSet() {}
+        MapSetImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr keyExpr, CodeNode::SharedPtr valueExpr);
+        virtual ~MapSetImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
         CodeNode::SharedPtr keyExpr_;
         CodeNode::SharedPtr valueExpr_;
     };
 
+    using HashMapSet = MapSetImpl<Hashtable>;
+    using OrderedMapSet = MapSetImpl<OrderedTable>;
+
     // -------------------------------------------------------------
-    class HashMapRemove : public CodeNode {
+    template <typename MapType>
+    class MapRemoveImpl : public CodeNode {
     public:
-        HashMapRemove(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr keyExpr);
-        virtual ~HashMapRemove() {}
+        MapRemoveImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr keyExpr);
+        virtual ~MapRemoveImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
         CodeNode::SharedPtr keyExpr_;
     };
 
+    using HashMapRemove = MapRemoveImpl<Hashtable>;
+    using OrderedMapRemove = MapRemoveImpl<OrderedTable>;
+
     // -------------------------------------------------------------
-    class HashMapClear : public CodeNode {
+    template <typename MapType>
+    class MapClearImpl : public CodeNode {
     public:
-        HashMapClear(CodeNode::SharedPtr htExpr);
-        virtual ~HashMapClear() {}
+        MapClearImpl(CodeNode::SharedPtr tblExpr);
+        virtual ~MapClearImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
     };
 
+    using HashMapClear = MapClearImpl<Hashtable>;
+    using OrderedMapClear = MapClearImpl<OrderedTable>;
+
     // -------------------------------------------------------------
-    class HashMapFind : public CodeNode {
+    template <typename MapType>
+    class MapFindImpl : public CodeNode {
     public:
-        HashMapFind(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueExpr);
-        virtual ~HashMapFind() {}
+        MapFindImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr valueExpr);
+        virtual ~MapFindImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
         CodeNode::SharedPtr valueExpr_;
     };
 
+    using HashMapFind = MapFindImpl<Hashtable>;
+    using OrderedMapFind = MapFindImpl<OrderedTable>;
+
     // -------------------------------------------------------------
-    class HashMapCount : public CodeNode {
+    template <typename MapType>
+    class MapCountImpl : public CodeNode {
     public:
-        HashMapCount(CodeNode::SharedPtr htExpr, CodeNode::SharedPtr valueExpr);
-        virtual ~HashMapCount() {}
+        MapCountImpl(CodeNode::SharedPtr tblExpr, CodeNode::SharedPtr valueExpr);
+        virtual ~MapCountImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
         CodeNode::SharedPtr valueExpr_;
     };
 
+    using HashMapCount = MapCountImpl<Hashtable>;
+    using OrderedMapCount = MapCountImpl<OrderedTable>;
+
     // -------------------------------------------------------------
-    class HashMapKeys : public CodeNode {
+    template <typename MapType>
+    class MapKeysImpl : public CodeNode {
     public:
-        HashMapKeys(CodeNode::SharedPtr htExpr);
-        virtual ~HashMapKeys() {}
+        MapKeysImpl(CodeNode::SharedPtr tblExpr);
+        virtual ~MapKeysImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
     };
 
+    using HashMapKeys = MapKeysImpl<Hashtable>;
+    using OrderedMapKeys = MapKeysImpl<OrderedTable>;
+
     // -------------------------------------------------------------
-    class HashMapValues : public CodeNode {
+    template <typename MapType>
+    class MapValuesImpl : public CodeNode {
     public:
-        HashMapValues(CodeNode::SharedPtr htExpr);
-        virtual ~HashMapValues() {}
+        MapValuesImpl(CodeNode::SharedPtr tblExpr);
+        virtual ~MapValuesImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
     };
 
+    using HashMapValues = MapValuesImpl<Hashtable>;
+    using OrderedMapValues = MapValuesImpl<OrderedTable>;
+
     // -------------------------------------------------------------
-    class HashMapItems : public CodeNode {
+    template <typename MapType>
+    class MapItemsImpl : public CodeNode {
     public:
-        HashMapItems(CodeNode::SharedPtr htExpr);
-        virtual ~HashMapItems() {}
+        MapItemsImpl(CodeNode::SharedPtr tblExpr);
+        virtual ~MapItemsImpl() {}
 
     protected:
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        CodeNode::SharedPtr htExpr_;
+        CodeNode::SharedPtr tblExpr_;
     };
+
+    using HashMapItems = MapItemsImpl<Hashtable>;
+    using OrderedMapItems = MapItemsImpl<OrderedTable>;
 
     // -------------------------------------------------------------
     class MakePair : public CodeNode {

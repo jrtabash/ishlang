@@ -43,7 +43,8 @@ namespace Ishlang {
 
         template <typename ObjectType>
         static inline Value get(const ObjectType &obj, const Value &key, const Value &defaultRet = Value::Null) {
-            if constexpr (std::is_same_v<ObjectType, Value::HashMap>) {
+            if constexpr (std::is_same_v<ObjectType, Value::HashMap> ||
+                          std::is_same_v<ObjectType, Value::OrderedMap>) {
                 return Value(obj.get(key, defaultRet));
             }
             else if constexpr (std::is_same_v<ObjectType, Value::UserObject>) {
@@ -84,7 +85,8 @@ namespace Ishlang {
 
         template <typename ObjectType>
         static inline void set(ObjectType &obj, const Value &key, const Value &value) {
-            if constexpr (std::is_same_v<ObjectType, Value::HashMap>) {
+            if constexpr (std::is_same_v<ObjectType, Value::HashMap> ||
+                          std::is_same_v<ObjectType, Value::OrderedMap>) {
                 obj.set(key, value);
             }
             else if constexpr (std::is_same_v<ObjectType, Value::UserObject>) {
@@ -123,7 +125,8 @@ namespace Ishlang {
 
         template <typename ObjectType>
         static inline Value find(const ObjectType &obj, const Value &item, const Value &pos = Value::Zero) {
-            if constexpr (std::is_same_v<ObjectType, Value::HashMap>) {
+            if constexpr (std::is_same_v<ObjectType, Value::HashMap> ||
+                          std::is_same_v<ObjectType, Value::OrderedMap>) {
                 return obj.find(item);
             }
             else {
@@ -174,7 +177,9 @@ namespace Ishlang {
                              static_cast<Value::Long>(obj.second() == item));
             }
             else {
-                static_assert(std::is_same_v<ObjectType, Value::Array> || std::is_same_v<ObjectType, Value::HashMap>);
+                static_assert(std::is_same_v<ObjectType, Value::Array> ||
+                              std::is_same_v<ObjectType, Value::HashMap> ||
+                              std::is_same_v<ObjectType, Value::OrderedMap>);
                 return Value(Value::Long(obj.count(item)));
             }
         }
