@@ -31,6 +31,7 @@
 #include "test_parser_string.inc"
 #include "test_parser_array.inc"
 #include "test_parser_hashmap.inc"
+#include "test_parser_orderedmap.inc"
 #include "test_parser_range.inc"
 #include "test_parser_generic.inc"
 #include "test_parser_file_io.inc"

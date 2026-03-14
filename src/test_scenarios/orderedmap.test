@@ -1,0 +1,41 @@
+__CODE__
+(var ot (orderedmap))
+(println (omlen ot))
+
+(omset ot "one" 1)
+(println (omlen ot))
+(println (omhas ot "one"))
+(println (omget ot "one"))
+
+(omset ot "two" 2)
+(println (omlen ot))
+(println (omhas ot "two"))
+(println (omget ot "two"))
+
+(println (omhas ot "foobar"))
+
+(omrem ot "two")
+(println (omlen ot))
+(println (omhas ot "two"))
+(println (omhas ot "one"))
+
+(omclr ot)
+(println (omlen ot))
+(println (omhas ot "two"))
+(println (omhas ot "one"))
+
+__EXPECT__
+0
+1
+true
+1
+2
+true
+2
+false
+1
+false
+true
+0
+false
+false

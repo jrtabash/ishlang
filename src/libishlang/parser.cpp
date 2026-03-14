@@ -1061,6 +1061,89 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "orderedmap",
+          [this]() {
+              return CodeNode::make<MakeOrderedMap>(readExprList());
+          }
+        },
+
+        { "omlen",
+          [this]() {
+              auto exprs(readAndCheckExprList("omlen", 1));
+              return CodeNode::make<OrderedMapLen>(exprs[0]);
+          }
+        },
+
+        { "omhas",
+          [this]() {
+              auto exprs(readAndCheckExprList("omhas", 2));
+              return CodeNode::make<OrderedMapContains>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "omget",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("omget", 2, 3));
+              return CodeNode::make<OrderedMapGet>(exprs[0], exprs[1], exprs.size() == 3 ? exprs[2] : CodeNode::SharedPtr());
+          }
+        },
+
+        { "omset",
+          [this]() {
+              auto exprs(readAndCheckExprList("omset", 3));
+              return CodeNode::make<OrderedMapSet>(exprs[0], exprs[1], exprs[2]);
+          }
+        },
+
+        { "omrem",
+          [this]() {
+              auto exprs(readAndCheckExprList("omrem", 2));
+              return CodeNode::make<OrderedMapRemove>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "omclr",
+          [this]() {
+              auto exprs(readAndCheckExprList("omclr", 1));
+              return CodeNode::make<OrderedMapClear>(exprs[0]);
+          }
+        },
+
+        { "omfind",
+          [this]() {
+              auto exprs(readAndCheckExprList("omfind", 2));
+              return CodeNode::make<OrderedMapFind>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "omcount",
+          [this]() {
+              auto exprs(readAndCheckExprList("omcount", 2));
+              return CodeNode::make<OrderedMapCount>(exprs[0], exprs[1]);
+          }
+        },
+
+        { "omkeys",
+          [this]() {
+              auto exprs(readAndCheckExprList("omkeys", 1));
+              return CodeNode::make<OrderedMapKeys>(exprs[0]);
+          }
+        },
+
+        { "omvals",
+          [this]() {
+              auto exprs(readAndCheckExprList("omvals", 1));
+              return CodeNode::make<OrderedMapValues>(exprs[0]);
+          }
+        },
+
+        { "omitems",
+          [this]() {
+              auto exprs(readAndCheckExprList("omitems", 1));
+              return CodeNode::make<OrderedMapItems>(exprs[0]);
+          }
+        },
+
         { "pair",
           [this]() {
               auto exprs(readAndCheckExprList("pair", 2));

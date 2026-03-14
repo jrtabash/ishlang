@@ -47,7 +47,7 @@ DEFINE_TEST(testParserHashMapLen) {
 
     TEST_CASE(parserTest(parser, env, "(hmlen 10)",                  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(hmlen)",                     Value::Null, false));
-    TEST_CASE(parserTest(parser, env, "(hmlen (hashamp) (hashmap))", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(hmlen (hashmap) (hashmap))", Value::Null, false));
 }
 
 // -------------------------------------------------------------

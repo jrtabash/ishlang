@@ -1,0 +1,30 @@
+__CODE__
+(var ot (orderedmap (array "one" 1) (array "two" 2) (array "three" 3)))
+(println (omlen ot))
+
+(println (omfind ot 1))
+(println (omfind ot 2))
+(println (omfind ot 3))
+(println (omfind ot 4))
+
+(= ot (orderedmap (pair "one" 1) (pair "two" 2) (pair "three" 3) (pair "two2" 2) (pair "two3" 2) (pair "three2" 3) (pair "four" 4)))
+(println (omlen ot))
+
+(println (omcount ot 1))
+(println (omcount ot 2))
+(println (omcount ot 3))
+(println (omcount ot 4))
+(println (omcount ot 5))
+
+__EXPECT__
+3
+one
+two
+three
+null
+7
+1
+3
+2
+1
+0
