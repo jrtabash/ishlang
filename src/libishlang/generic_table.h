@@ -45,6 +45,10 @@ namespace Ishlang {
         inline Sequence values() const;
         inline Sequence items() const;
 
+        inline Sequence reverseKeys() const;
+        inline Sequence reverseValues() const;
+        inline Sequence reverseItems() const;
+
         inline std::size_t size() const;
 
         inline Table::const_iterator begin() const noexcept;
@@ -167,6 +171,15 @@ namespace Ishlang {
     }
 
     template <typename TableType>
+    inline Sequence GenericTable<TableType>::reverseKeys() const {
+        return Sequence::generate(
+            table_.size(),
+            [iter = table_.rbegin()]() mutable {
+                return (iter++)->first;
+            });
+    }
+
+    template <typename TableType>
     inline Sequence GenericTable<TableType>::values() const {
         return Sequence::generate(
             table_.size(),
@@ -176,10 +189,29 @@ namespace Ishlang {
     }
 
     template <typename TableType>
+    inline Sequence GenericTable<TableType>::reverseValues() const {
+        return Sequence::generate(
+            table_.size(),
+            [iter = table_.rbegin()]() mutable {
+                return (iter++)->second;
+            });
+    }
+
+    template <typename TableType>
     inline Sequence GenericTable<TableType>::items() const {
         return Sequence::generate(
             table_.size(),
             [iter = table_.begin()]() mutable {
+                auto kv = *iter++;
+                return Value(ValuePair(kv.first, kv.second));
+            });
+    }
+
+    template <typename TableType>
+    inline Sequence GenericTable<TableType>::reverseItems() const {
+        return Sequence::generate(
+            table_.size(),
+            [iter = table_.rbegin()]() mutable {
                 auto kv = *iter++;
                 return Value(ValuePair(kv.first, kv.second));
             });

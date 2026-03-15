@@ -1673,22 +1673,28 @@ namespace Ishlang {
 }
 
 // -------------------------------------------------------------
-template <typename MapType>
-MapKeysImpl<MapType>::MapKeysImpl(CodeNode::SharedPtr tblExpr)
+template <typename MapType, typename OrderingType>
+MapKeysImpl<MapType, OrderingType>::MapKeysImpl(CodeNode::SharedPtr tblExpr)
     : CodeNode()
     , tblExpr_(tblExpr)
 {}
 
-template <typename MapType>
-Value MapKeysImpl<MapType>::exec(Environment::SharedPtr env) const {
+template <typename MapType, typename OrderingType>
+Value MapKeysImpl<MapType, OrderingType>::exec(Environment::SharedPtr env) const {
     if (tblExpr_) {
         const Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
         if constexpr (std::is_same_v<MapType, Hashtable>) {
+            static_assert(OrderingType::isStorage());
             return Value(m.hashMap().keys());
         }
         else {
             static_assert(std::is_same_v<MapType, OrderedTable>);
-            return Value(m.orderedMap().keys());
+            if constexpr (OrderingType::isReverse()) {
+                return Value(m.orderedMap().reverseKeys());
+            }
+            else {
+                return Value(m.orderedMap().keys());
+            }
         }
     }
     return Value::Null;
@@ -1697,25 +1703,32 @@ Value MapKeysImpl<MapType>::exec(Environment::SharedPtr env) const {
 namespace Ishlang {
     template class MapKeysImpl<Hashtable>;
     template class MapKeysImpl<OrderedTable>;
+    template class MapKeysImpl<OrderedTable, ReverseOrder>;
 }
 
 // -------------------------------------------------------------
-template <typename MapType>
-MapValuesImpl<MapType>::MapValuesImpl(CodeNode::SharedPtr tblExpr)
+template <typename MapType, typename OrderingType>
+MapValuesImpl<MapType, OrderingType>::MapValuesImpl(CodeNode::SharedPtr tblExpr)
     : CodeNode()
     , tblExpr_(tblExpr)
 {}
 
-template <typename MapType>
-Value MapValuesImpl<MapType>::exec(Environment::SharedPtr env) const {
+template <typename MapType, typename OrderingType>
+Value MapValuesImpl<MapType, OrderingType>::exec(Environment::SharedPtr env) const {
     if (tblExpr_) {
         const Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
         if constexpr (std::is_same_v<MapType, Hashtable>) {
+            static_assert(OrderingType::isStorage());
             return Value(m.hashMap().values());
         }
         else {
             static_assert(std::is_same_v<MapType, OrderedTable>);
-            return Value(m.orderedMap().values());
+            if constexpr (OrderingType::isReverse()) {
+                return Value(m.orderedMap().reverseValues());
+            }
+            else {
+                return Value(m.orderedMap().values());
+            }
         }
     }
     return Value::Null;
@@ -1724,25 +1737,32 @@ Value MapValuesImpl<MapType>::exec(Environment::SharedPtr env) const {
 namespace Ishlang {
     template class MapValuesImpl<Hashtable>;
     template class MapValuesImpl<OrderedTable>;
+    template class MapValuesImpl<OrderedTable, ReverseOrder>;
 }
 
 // -------------------------------------------------------------
-template <typename MapType>
-MapItemsImpl<MapType>::MapItemsImpl(CodeNode::SharedPtr tblExpr)
+template <typename MapType, typename OrderingType>
+MapItemsImpl<MapType, OrderingType>::MapItemsImpl(CodeNode::SharedPtr tblExpr)
     : CodeNode()
     , tblExpr_(tblExpr)
 {}
 
-template <typename MapType>
-Value MapItemsImpl<MapType>::exec(Environment::SharedPtr env) const {
+template <typename MapType, typename OrderingType>
+Value MapItemsImpl<MapType, OrderingType>::exec(Environment::SharedPtr env) const {
     if (tblExpr_) {
         const Value m = evalOperand(env, tblExpr_, Value::eHashMap, Value::eOrderedMap);
         if constexpr (std::is_same_v<MapType, Hashtable>) {
+            static_assert(OrderingType::isStorage());
             return Value(m.hashMap().items());
         }
         else {
             static_assert(std::is_same_v<MapType, OrderedTable>);
-            return Value(m.orderedMap().items());
+            if constexpr (OrderingType::isReverse()) {
+                return Value(m.orderedMap().reverseItems());
+            }
+            else {
+                return Value(m.orderedMap().items());
+            }
         }
     }
     return Value::Null;
@@ -1751,6 +1771,7 @@ Value MapItemsImpl<MapType>::exec(Environment::SharedPtr env) const {
 namespace Ishlang {
     template class MapItemsImpl<Hashtable>;
     template class MapItemsImpl<OrderedTable>;
+    template class MapItemsImpl<OrderedTable, ReverseOrder>;
 }
 
 // -------------------------------------------------------------

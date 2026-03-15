@@ -596,6 +596,15 @@ Orderedmap Operations
      omitems - Return array of orderedmap key/value pairs
                (omitems <orderedmap>)
 
+     omrkeys - Return array of orderedmap reverse keys
+               (omrkeys <orderedmap>)
+
+     omrvals - Return array of orderedmap reverse values
+               (omrvals <orderedmap>)
+
+    omritems - Return array of orderedmap reverse key/value pairs
+               (omritems <orderedmap>)
+
 See ":help generic" for information on orderedmap generic functions support.
 )";
 }

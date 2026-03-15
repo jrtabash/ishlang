@@ -571,3 +571,128 @@ DEFINE_TEST(testCodeNodeOrderedMapItems) {
         TEST_CASE(false);
     }
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeOrderedMapReverseKeys) {
+    auto env = Environment::make();
+
+    {
+        OrderedTable ot;
+        ot.set(Value('b'), Value(2ll));
+        ot.set(Value('c'), Value(3ll));
+        ot.set(Value('a'), Value(1ll));
+        env->def("ot", Value(ot));
+    }
+
+    CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
+
+    auto keys = [&env, &ot]() {
+        return CodeNode::make<OrderedMapReverseKeys>(ot)->eval(env);
+    };
+
+    const Value ks = keys();
+    TEST_CASE(ks.isArray());
+
+    const Sequence &seq = ks.array();
+    TEST_CASE_MSG(seq.size() == 3, "actual=" << seq.size());
+
+    TEST_CASE_MSG(seq.get(0) == Value('c'), "actual=" << seq.get(0));
+    TEST_CASE_MSG(seq.get(1) == Value('b'), "actual=" << seq.get(1));
+    TEST_CASE_MSG(seq.get(2) == Value('a'), "actual=" << seq.get(2));
+
+    try {
+        CodeNode::make<OrderedMapReverseKeys>(CodeNode::make<Literal>(Value('a')))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeOrderedMapReverseValues) {
+    auto env = Environment::make();
+
+    {
+        OrderedTable ot;
+        ot.set(Value('c'), Value(3ll));
+        ot.set(Value('a'), Value(1ll));
+        ot.set(Value('2'), Value(2ll));
+        ot.set(Value('b'), Value(2ll));
+        env->def("ot", Value(ot));
+    }
+
+    CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
+
+    auto values = [&env, &ot]() {
+        return CodeNode::make<OrderedMapReverseValues>(ot)->eval(env);
+    };
+
+    const Value vs = values();
+    TEST_CASE(vs.isArray());
+
+    const Sequence &vals = vs.array();
+    TEST_CASE_MSG(vals.size() == 4, "actual=" << vals.size());
+
+    TEST_CASE_MSG(vals.get(0) == Value(3ll), "actual=" << vals.get(0));
+    TEST_CASE_MSG(vals.get(1) == Value(2ll), "actual=" << vals.get(1));
+    TEST_CASE_MSG(vals.get(2) == Value(1ll), "actual=" << vals.get(2));
+    TEST_CASE_MSG(vals.get(3) == Value(2ll), "actual=" << vals.get(3));
+
+    try {
+        CodeNode::make<OrderedMapReverseValues>(CodeNode::make<Literal>(Value(1ll)))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeOrderedMapReverseItems) {
+    auto env = Environment::make();
+
+    {
+        OrderedTable ot;
+        ot.set(Value('c'), Value(3ll));
+        ot.set(Value('a'), Value(1ll));
+        ot.set(Value('2'), Value(2ll));
+        ot.set(Value('b'), Value(2ll));
+        env->def("ot", Value(ot));
+    }
+
+    CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
+
+    auto items = [&env, &ot]() {
+        return CodeNode::make<OrderedMapReverseItems>(ot)->eval(env);
+    };
+
+    const Value itms = items();
+    TEST_CASE(itms.isArray());
+
+    const Sequence &pairs = itms.array();
+    TEST_CASE_MSG(pairs.size() == 4, "actual=" << pairs.size());
+
+    // Keys
+    TEST_CASE_MSG(pairs.get(0).pair().first() == Value('c'), "actual=" << pairs.get(0).pair().first());
+    TEST_CASE_MSG(pairs.get(1).pair().first() == Value('b'), "actual=" << pairs.get(1).pair().first());
+    TEST_CASE_MSG(pairs.get(2).pair().first() == Value('a'), "actual=" << pairs.get(2).pair().first());
+    TEST_CASE_MSG(pairs.get(3).pair().first() == Value('2'), "actual=" << pairs.get(3).pair().first());
+
+    // Values
+    TEST_CASE_MSG(pairs.get(0).pair().second() == Value(3ll), "actual=" << pairs.get(0).pair().second());
+    TEST_CASE_MSG(pairs.get(1).pair().second() == Value(2ll), "actual=" << pairs.get(1).pair().second());
+    TEST_CASE_MSG(pairs.get(2).pair().second() == Value(1ll), "actual=" << pairs.get(2).pair().second());
+    TEST_CASE_MSG(pairs.get(3).pair().second() == Value(2ll), "actual=" << pairs.get(3).pair().second());
+
+    try {
+        CodeNode::make<OrderedMapReverseItems>(CodeNode::make<Literal>(Value(1ll)))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}

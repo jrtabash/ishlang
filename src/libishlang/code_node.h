@@ -17,6 +17,19 @@
 namespace Ishlang {
 
     // -------------------------------------------------------------
+    struct StorageOrderType {};
+    struct ReverseOrderType {};
+
+    template <typename OrderType>
+    struct ContentOrdering {
+        static constexpr bool isStorage() noexcept { return std::is_same_v<OrderType, StorageOrderType>; }
+        static constexpr bool isReverse() noexcept { return std::is_same_v<OrderType, ReverseOrderType>; }
+    };
+
+    using StorageOrder = ContentOrdering<StorageOrderType>;
+    using ReverseOrder = ContentOrdering<ReverseOrderType>;
+
+    // -------------------------------------------------------------
     class Literal : public CodeNode {
     public:
         Literal(const Value &value) : CodeNode(), value_(value) {}
@@ -1248,7 +1261,7 @@ namespace Ishlang {
     using OrderedMapCount = MapCountImpl<OrderedTable>;
 
     // -------------------------------------------------------------
-    template <typename MapType>
+    template <typename MapType, typename OrderingType = StorageOrder>
     class MapKeysImpl : public CodeNode {
     public:
         MapKeysImpl(CodeNode::SharedPtr tblExpr);
@@ -1263,9 +1276,10 @@ namespace Ishlang {
 
     using HashMapKeys = MapKeysImpl<Hashtable>;
     using OrderedMapKeys = MapKeysImpl<OrderedTable>;
+    using OrderedMapReverseKeys = MapKeysImpl<OrderedTable, ReverseOrder>;
 
     // -------------------------------------------------------------
-    template <typename MapType>
+    template <typename MapType, typename OrderingType = StorageOrder>
     class MapValuesImpl : public CodeNode {
     public:
         MapValuesImpl(CodeNode::SharedPtr tblExpr);
@@ -1280,9 +1294,10 @@ namespace Ishlang {
 
     using HashMapValues = MapValuesImpl<Hashtable>;
     using OrderedMapValues = MapValuesImpl<OrderedTable>;
+    using OrderedMapReverseValues = MapValuesImpl<OrderedTable, ReverseOrder>;
 
     // -------------------------------------------------------------
-    template <typename MapType>
+    template <typename MapType, typename OrderingType = StorageOrder>
     class MapItemsImpl : public CodeNode {
     public:
         MapItemsImpl(CodeNode::SharedPtr tblExpr);
@@ -1297,6 +1312,7 @@ namespace Ishlang {
 
     using HashMapItems = MapItemsImpl<Hashtable>;
     using OrderedMapItems = MapItemsImpl<OrderedTable>;
+    using OrderedMapReverseItems = MapItemsImpl<OrderedTable, ReverseOrder>;
 
     // -------------------------------------------------------------
     class MakePair : public CodeNode {

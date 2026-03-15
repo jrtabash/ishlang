@@ -91,9 +91,9 @@ DEFINE_TEST(testOrderedTableCount) {
 
 // -------------------------------------------------------------
 DEFINE_TEST(testOrderedTableKeysValues) {
-    const auto kOne = Value("one");
-    const auto kTwo = Value("two");
-    const auto kThree = Value("three");
+    const auto kOne = Value("111");
+    const auto kTwo = Value("222");
+    const auto kThree = Value("333");
 
     const auto vOne = Value(1ll);
     const auto vTwo = Value(2ll);
@@ -115,31 +115,66 @@ DEFINE_TEST(testOrderedTableKeysValues) {
     const Sequence keys = ot.keys();
     const Sequence values = ot.values();
     const Sequence items = ot.items();
+
     TEST_CASE_MSG(keys.size() == 3, "actual=" << keys.size());
     TEST_CASE_MSG(values.size() == 3, "actual=" << values.size());
     TEST_CASE_MSG(items.size() == 3, "actual=" << items.size());
 
-    std::size_t result = 0;
-    result = keys.count(kOne);   TEST_CASE_MSG(result == 1, "actual=" << result);
-    result = keys.count(kTwo);   TEST_CASE_MSG(result == 1, "actual=" << result);
-    result = keys.count(kThree); TEST_CASE_MSG(result == 1, "actual=" << result);
+    TEST_CASE_MSG(keys.get(0) == kOne, "actual=" << keys.get(0));
+    TEST_CASE_MSG(keys.get(1) == kTwo, "actual=" << keys.get(1));
+    TEST_CASE_MSG(keys.get(2) == kThree, "actual=" << keys.get(2));
 
-    result = values.count(vOne);   TEST_CASE_MSG(result == 1, "actual=" << result);
-    result = values.count(vTwo);   TEST_CASE_MSG(result == 1, "actual=" << result);
-    result = values.count(vThree); TEST_CASE_MSG(result == 1, "actual=" << result);
+    TEST_CASE_MSG(values.get(0) == vOne, "actual=" << values.get(0));
+    TEST_CASE_MSG(values.get(1) == vTwo, "actual=" << values.get(1));
+    TEST_CASE_MSG(values.get(2) == vThree, "actual=" << values.get(2));
 
-    result = items.count(pOne);   TEST_CASE_MSG(result == 1, "actual=" << result);
-    result = items.count(pTwo);   TEST_CASE_MSG(result == 1, "actual=" << result);
-    result = items.count(pThree); TEST_CASE_MSG(result == 1, "actual=" << result);
+    TEST_CASE_MSG(items.get(0) == pOne, "actual=" << items.get(0));
+    TEST_CASE_MSG(items.get(1) == pTwo, "actual=" << items.get(1));
+    TEST_CASE_MSG(items.get(2) == pThree, "actual=" << items.get(2));
+}
 
-    for (std::size_t i = 0; i < keys.size(); ++i) {
-        const auto & key = keys.get(i);
-        const auto & value = values.get(i);
-        const auto & pair = items.get(i).pair();
+// -------------------------------------------------------------
+DEFINE_TEST(testOrderedTableReverseKeysValues) {
+    const auto kOne = Value("1");
+    const auto kTwo = Value("2");
+    const auto kThree = Value("3");
 
-        TEST_CASE_MSG(ot.get(key) == value, "index=" << i << " key=" << key << " value=" << value);
-        TEST_CASE_MSG(ot.get(pair.first()) == pair.second(), "index=" << i << " key=" << pair.first() << " value=" << pair.second());
-    }
+    const auto vOne = Value(100ll);
+    const auto vTwo = Value(200ll);
+    const auto vThree = Value(300ll);
+
+    const auto pOne = Value(Value::Pair(kOne, vOne));
+    const auto pTwo = Value(Value::Pair(kTwo, vTwo));
+    const auto pThree = Value(Value::Pair(kThree, vThree));
+
+    OrderedTable ot;
+    TEST_CASE(ot.reverseKeys() == Sequence());
+    TEST_CASE(ot.reverseValues() == Sequence());
+    TEST_CASE(ot.reverseItems() == Sequence());
+
+    ot.set(kOne, vOne);
+    ot.set(kTwo, vTwo);
+    ot.set(kThree, vThree);
+
+    const Sequence keys = ot.reverseKeys();
+    const Sequence values = ot.reverseValues();
+    const Sequence items = ot.reverseItems();
+
+    TEST_CASE_MSG(keys.size() == 3, "actual=" << keys.size());
+    TEST_CASE_MSG(values.size() == 3, "actual=" << values.size());
+    TEST_CASE_MSG(items.size() == 3, "actual=" << items.size());
+
+    TEST_CASE_MSG(keys.get(0) == kThree, "actual=" << keys.get(0));
+    TEST_CASE_MSG(keys.get(1) == kTwo, "actual=" << keys.get(1));
+    TEST_CASE_MSG(keys.get(2) == kOne, "actual=" << keys.get(2));
+
+    TEST_CASE_MSG(values.get(0) == vThree, "actual=" << values.get(0));
+    TEST_CASE_MSG(values.get(1) == vTwo, "actual=" << values.get(1));
+    TEST_CASE_MSG(values.get(2) == vOne, "actual=" << values.get(2));
+
+    TEST_CASE_MSG(items.get(0) == pThree, "actual=" << items.get(0));
+    TEST_CASE_MSG(items.get(1) == pTwo, "actual=" << items.get(1));
+    TEST_CASE_MSG(items.get(2) == pOne, "actual=" << items.get(2));
 }
 
 // -------------------------------------------------------------

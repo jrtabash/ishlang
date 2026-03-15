@@ -1144,6 +1144,27 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "omrkeys",
+          [this]() {
+              auto exprs(readAndCheckExprList("omrkeys", 1));
+              return CodeNode::make<OrderedMapReverseKeys>(exprs[0]);
+          }
+        },
+
+        { "omrvals",
+          [this]() {
+              auto exprs(readAndCheckExprList("omrvals", 1));
+              return CodeNode::make<OrderedMapReverseValues>(exprs[0]);
+          }
+        },
+
+        { "omritems",
+          [this]() {
+              auto exprs(readAndCheckExprList("omritems", 1));
+              return CodeNode::make<OrderedMapReverseItems>(exprs[0]);
+          }
+        },
+
         { "pair",
           [this]() {
               auto exprs(readAndCheckExprList("pair", 2));

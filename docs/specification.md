@@ -983,6 +983,21 @@ Note: Using pair and array can be mixed in same orderedmap expression. See examp
 (omitems <orderedmap>)
 ```
 
+**omrkeys**: Return array of orderedmap reverse keys
+```
+(omrkeys <orderedmap>)
+```
+
+**omrvals**: Return array of orderedmap reverse values
+```
+(omrvals <orderedmap>)
+```
+
+**omritems**: Return array of orderedmap reverse key/value pairs
+```
+(omritems <orderedmap>)
+```
+
 ### Examples
 ```
 (var ot (orderedmap (array "one" 1) (array "two" 2) (array "four" 4)))
@@ -999,6 +1014,9 @@ Note: Using pair and array can be mixed in same orderedmap expression. See examp
 (omkeys ot)
 (omvals ot)
 (omitems ot)
+(omrkeys ot)
+(omrvals ot)
+(omritems ot)
 (omclr ot)
 ```
 

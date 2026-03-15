@@ -1,0 +1,42 @@
+__CODE__
+(var ot (orderedmap (array "one" 1) (array "two" 2) (array "three" 3) (array "two2" 2)))
+
+(var keys (omrkeys ot))
+(var vals (omrvals ot))
+(var items (omritems ot))
+
+(println (arrlen keys))
+(println (arrlen vals))
+(println (arrlen items))
+
+(println (== (get keys 0) "two2"))
+(println (== (get keys 1) "two"))
+(println (== (get keys 2) "three"))
+(println (== (get keys 3) "one"))
+
+(println (== (get vals 0) 2))
+(println (== (get vals 1) 2))
+(println (== (get vals 2) 3))
+(println (== (get vals 3) 1))
+
+(println (== (get items 0) (pair "two2" 2)))
+(println (== (get items 1) (pair "two" 2)))
+(println (== (get items 2) (pair "three" 3)))
+(println (== (get items 3) (pair "one" 1)))
+
+__EXPECT__
+4
+4
+4
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true

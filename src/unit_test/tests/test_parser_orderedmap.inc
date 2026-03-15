@@ -271,8 +271,9 @@ DEFINE_TEST(testParserOrderedMapKeys) {
     ot.set(Value('c'), Value(3ll));
     env->def("ot", Value(ot));
 
-    TEST_CASE(parserTest(parser, env, "(omkeys (orderedmap))", Value(Sequence()), true));
-    TEST_CASE(parserTest(parser, env, "(arrlen (omkeys ot))",  Value(3ll),        true));
+    TEST_CASE(parserTest(parser, env, "(omkeys (orderedmap))",                Value(Sequence()), true));
+    TEST_CASE(parserTest(parser, env, "(arrlen (omkeys ot))",                 Value(3ll),        true));
+    TEST_CASE(parserTest(parser, env, "(== (omkeys ot) (array 'a' 'b' 'c'))", Value::True,       true));
 
     TEST_CASE(parserTest(parser, env, "(omkeys)",         Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(omkeys ot 'a')",  Value::Null, false));
@@ -291,8 +292,9 @@ DEFINE_TEST(testParserOrderedMapVals) {
     ot.set(Value('2'), Value(2ll));
     env->def("ot", Value(ot));
 
-    TEST_CASE(parserTest(parser, env, "(omvals (orderedmap))", Value(Sequence()), true));
-    TEST_CASE(parserTest(parser, env, "(arrlen (omvals ot))",  Value(4ll),        true));
+    TEST_CASE(parserTest(parser, env, "(omvals (orderedmap))",            Value(Sequence()), true));
+    TEST_CASE(parserTest(parser, env, "(arrlen (omvals ot))",             Value(4ll),        true));
+    TEST_CASE(parserTest(parser, env, "(== (omvals ot) (array 2 1 2 3))", Value::True,       true));
 
     TEST_CASE(parserTest(parser, env, "(omvals)",         Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(omvals ot 'a')",  Value::Null, false));
@@ -313,8 +315,71 @@ DEFINE_TEST(testParserOrderedMapItems) {
 
     TEST_CASE(parserTest(parser, env, "(omitems (orderedmap))", Value(Sequence()), true));
     TEST_CASE(parserTest(parser, env, "(arrlen (omitems ot))",  Value(4ll),        true));
+    TEST_CASE(parserTest(parser, env, "(== (omitems ot) (array (pair '2' 2) (pair 'a' 1) (pair 'b' 2) (pair 'c' 3)))", Value::True, true));
 
     TEST_CASE(parserTest(parser, env, "(omitems)",         Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(omitems ot 'a')",  Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(omitems 'a' 'b')", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserOrderedMapReverseKeys) {
+    auto env = Environment::make();
+    Parser parser;
+
+    OrderedTable ot;
+    ot.set(Value('a'), Value(1ll));
+    ot.set(Value('b'), Value(2ll));
+    ot.set(Value('c'), Value(3ll));
+    env->def("ot", Value(ot));
+
+    TEST_CASE(parserTest(parser, env, "(omrkeys (orderedmap))",                Value(Sequence()), true));
+    TEST_CASE(parserTest(parser, env, "(arrlen (omrkeys ot))",                 Value(3ll),        true));
+    TEST_CASE(parserTest(parser, env, "(== (omrkeys ot) (array 'c' 'b' 'a'))", Value::True,       true));
+
+    TEST_CASE(parserTest(parser, env, "(omrkeys)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(omrkeys ot 'a')",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(omrkeys 'a' 'b')", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserOrderedMapReverseVals) {
+    auto env = Environment::make();
+    Parser parser;
+
+    OrderedTable ot;
+    ot.set(Value('a'), Value(1ll));
+    ot.set(Value('b'), Value(2ll));
+    ot.set(Value('c'), Value(3ll));
+    ot.set(Value('2'), Value(2ll));
+    env->def("ot", Value(ot));
+
+    TEST_CASE(parserTest(parser, env, "(omrvals (orderedmap))",            Value(Sequence()), true));
+    TEST_CASE(parserTest(parser, env, "(arrlen (omrvals ot))",             Value(4ll),        true));
+    TEST_CASE(parserTest(parser, env, "(== (omrvals ot) (array 3 2 1 2))", Value::True,       true));
+
+    TEST_CASE(parserTest(parser, env, "(omrvals)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(omrvals ot 'a')",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(omrvals 'a' 'b')", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserOrderedMapReverseItems) {
+    auto env = Environment::make();
+    Parser parser;
+
+    OrderedTable ot;
+    ot.set(Value('a'), Value(1ll));
+    ot.set(Value('b'), Value(2ll));
+    ot.set(Value('c'), Value(3ll));
+    ot.set(Value('2'), Value(2ll));
+    env->def("ot", Value(ot));
+
+    TEST_CASE(parserTest(parser, env, "(omritems (orderedmap))", Value(Sequence()), true));
+    TEST_CASE(parserTest(parser, env, "(arrlen (omritems ot))",  Value(4ll),        true));
+    TEST_CASE(parserTest(parser, env, "(== (omritems ot) (array (pair 'c' 3) (pair 'b' 2) (pair 'a' 1) (pair '2' 2)))", Value::True, true));
+
+    TEST_CASE(parserTest(parser, env, "(omritems)",         Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(omritems ot 'a')",  Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(omritems 'a' 'b')", Value::Null, false));
 }
