@@ -20,6 +20,7 @@ Every expression in ishlang evaluates to a value. A value can hold any of the fo
 - pair
 - array
 - hashmap
+- orderedmap
 - range
 - file
 - closure
@@ -325,7 +326,7 @@ Conditional only form:
 ```
 
 - Loop over each element in `<iterable_expression>`
-- Iterable expression can be a string, array, hashmap, range or file
+- Iterable expression can be a string, array, hashmap, orderedmap, range or file
 - The `<var>` variable is read-only and cannot directly modify iterable elemets
 
 ### Example - sum array elements
@@ -446,7 +447,7 @@ Is type of?
 
 Check expression type matches any of provided types.
 
-`<type>` must be one of: none, int, real, char, bool, string, pair, array, hashmap, range, file, closure, usertype, userobject
+`<type>` must be one of: none, int, real, char, bool, string, pair, array, hashmap, orderedmap, range, file, closure, usertype, userobject
 
 ### Example
 ```
@@ -918,6 +919,89 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (hmclr ht)
 ```
 
+## Orderedmap Operations
+
+**orderedmap**: Make an orderedmap
+```
+(orderedmap [(pair <key> <value>) [(pair <key> <value>) ...]])
+(orderedmap [(array <key> <value>) [(array <key> <value>) ...]])
+```
+Note: Using pair and array can be mixed in same orderedmap expression. See example below.
+
+**omlen**: Return orderedmap length
+```
+(omlen <orderedmap>)
+```
+
+**omhas**: Check if key is in orderedmap
+```
+(omhas <orderedmap> <key>)
+```
+
+**omget**: Get orderedmap value for given key. Returns default_return when key is not found. Default default_return value is null
+```
+(omget <orderedmap> <key> [<default_return])
+```
+
+**omset**: Set orderedmap value for given key
+```
+(omset <orderedmap> <key> <value>)
+```
+
+**omrem**: Remove orderedmap value with given key
+```
+(omrem <orderedmap> <key>)
+```
+
+**omclr**: Clear orderedmap
+```
+(omclr <orderedmap>)
+```
+
+**omfind**: Find orderedmap key with given value
+```
+(omfind <orderedmap> <value>)
+```
+
+**omcount**: Count number of occurrences of value in orderedmap
+```
+(omcount <orderedmap> <value>)
+```
+
+**omkeys**: Return array of orderedmap keys
+```
+(omkeys <orderedmap>)
+```
+
+**omvals**: Return array of orderedmap values
+```
+(omvals <orderedmap>)
+```
+
+**omitems**: Return array of orderedmap key/value pairs
+```
+(omitems <orderedmap>)
+```
+
+### Examples
+```
+(var ot (orderedmap (array "one" 1) (array "two" 2) (array "four" 4)))
+(var ot2 (orderedmap (pair "one" 1) (pair "two" 2)))
+(var ot3 (orderedmap (pair "one" 1) (array "two" 2) (pair "three" 3)))
+(omlen ot)
+(omhas ot "one")
+(omget ot "two")
+(omget ot "two" 0)
+(omset ot "three" 3)
+(omrem ot "three")
+(omfind ot 2)
+(omcount ot 1)
+(omkeys ot)
+(omvals ot)
+(omitems ot)
+(omclr ot)
+```
+
 ## Range Operations
 
 **range**: Make a range
@@ -974,26 +1058,26 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 ```
 
 ## Generic Functions
-**len**: Length of string, array, hashmap, pair or range
+**len**: Length of string, array, hashmap, orderedmap, pair or range
 ```
 (len <object>)
 ```
 
-**empty**: Is string, array, hashmap, pair or range empty?
+**empty**: Is string, array, hashmap, orderedmap, pair or range empty?
 ```
 (empty <object>)
 ```
 
-**get**: Get value at index, key or member from string, array, hashmap, pair or userobject
+**get**: Get value at index, key or member from string, array, hashmap, orderedmap, pair or userobject
 ```
 (get <object> <key> [<default_return>])
 ```
 
 - For string, pair and array, key must be an integer
 - For userobject, key must be a member name/symbol or a string
-- The parameter default_return applies to hashmap and is ignored otherwise
+- The parameter default_return applies to hashmap and orderedmap, and is ignored otherwise
 
-**set**: Set value at index, key or member for string, array, hashmap or userobject
+**set**: Set value at index, key or member for string, array, hashmap, orderedmap or userobject
 ```
 (set <object> <key> <value>)
 ```
@@ -1001,12 +1085,12 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 - For string and array, key must be an integer
 - For userobject, key must be a member name/symbol or a string
 
-**clear**: Clear string, array or hashmap
+**clear**: Clear string, array, hashmap or orderedmap
 ```
 (clear <object>)
 ```
 
-**find**: Get position or key of value in string, array, pair or hashmap
+**find**: Get position or key of value in string, array, pair, hashmap or orderedmap
 ```
 (find <object> <item> [<position>])
 ```
@@ -1015,7 +1099,7 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 - The parameter position applies to string, pair and array and is ignored otherwise
 - When provided, position must be an integer, and is used as the search start index
 
-**count**: Count number of times value occurs in string, array, pair or hashmap
+**count**: Count number of times value occurs in string, array, pair, hashmap or orderedmap
 ```
 (count <object> <item>)
 ```
@@ -1052,6 +1136,7 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (var txt "hello")
 (var seq (array 1 2 3))
 (var tab (hashmap (pair 1 10) (pair 2 20)))
+(var ord (orderedmap (pair 1 10) (pair 2 20)))
 (var obj (makeinstance Person (name "Jon") (age 25)))
 (var rng (range 10))
 (var cpl (pair 5 10))
@@ -1059,16 +1144,19 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (len txt)
 (len seq)
 (len tab)
+(len ord)
 (len rng)
 (len cpl)
 (empty txt)
 (empty seq)
 (empty tab)
+(empty ord)
 (empty rng)
 (empty cpl)
 (get txt 0)
 (get seq 1)
 (get tab 2 200)
+(get ord 2 200)
 (get obj name)
 (get obj "name")
 (get cpl 0)
@@ -1076,14 +1164,17 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (find txt 'l' 3)
 (find seq 3)
 (find tab 20)
+(find ord 20)
 (find cpl 10)
 (count txt 'l')
 (count seq 2)
 (count tab 20)
+(count ord 20)
 (count cpl 5)
 (set txt 0 'H')
 (set seq 1 20)
 (set tab 3 30)
+(set ord 3 30)
 (set obj age 26)
 (set obj "age" 27)
 (sort txt true)
@@ -1099,6 +1190,7 @@ Note: Using pair and array can be mixed in same hashmap expression. See example 
 (clear txt)
 (clear seq)
 (clear tab)
+(clear ord)
 ```
 
 ## Comments

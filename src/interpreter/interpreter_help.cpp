@@ -1,5 +1,7 @@
 #include "interpreter_help.h"
 
+#include <format>
+
 using namespace Ishlang;
 
 HelpDict::HelpDict()
@@ -18,7 +20,7 @@ std::string HelpDict::topics() const {
 
     unsigned i = 0;
     for (auto && [key, _] : dict_) {
-        topics += '\t' + key;
+        topics += std::format(" {:>11}", key);
         if (++i > 3) {
             topics += "\n ";
             i = 0;
@@ -55,6 +57,7 @@ void HelpDict::populateDict(Dict &dict) {
     tmp.emplace("pair", help_pair());
     tmp.emplace("array", help_array());
     tmp.emplace("hashmap", help_hashmap());
+    tmp.emplace("orderedmap", help_orderedmap());
     tmp.emplace("range", help_range());
     tmp.emplace("generic", help_generic());
     tmp.emplace("block", help_block());
@@ -73,7 +76,7 @@ Every expression in ishlang evaluates to a value.
 A value can hold any of the following types:
 
   none int real char bool string pair
-  array hashmap range file closure
+  array hashmap orderedmap range file closure
   usertype userobject
 
 Examples:
@@ -86,6 +89,7 @@ Examples:
        pair: (pair 1 2)
       array: (array 1 2)
     hashmap: (hashmap (pair 1 100))
+ orderedmap: (orderedmap (pair 1 100))
       range: (range 10)
        file: (fopen "path/to/file.txt" 'r')
     closure: (lambda () 42)
@@ -546,6 +550,56 @@ See ":help generic" for information on hashmap generic functions support.
 )";
 }
 
+const char *HelpDict::help_orderedmap() {
+return R"(
+Orderedmap Operations
+---------------------
+  orderedmap - Make a orderedmap
+               (orderedmap [(pair <key> <value>) [(pair <key> <value>) ...]])
+               (orderedmap [(array <key> <value>) [(array <key> <value>) ...]])
+
+               * Using pair and array can be mixed in same orderedmap expression
+
+       omlen - Return orderedmap length
+               (omlen <orderedmap>)
+
+       omhas - Check if key is in orderedmap
+               (omhas <orderedmap> <key>)
+
+       omget - Get orderedmap value for given key
+               (omget <orderedmap> <key> [<default_return])
+
+               * Returns default_return when key is not found
+               * Default default_return value is null
+
+       omset - Set orderedmap value for given key
+               (omset <orderedmap> <key> <value>)
+
+       omrem - Remove orderedmap value with given key
+               (omrem <orderedmap> <key>)
+
+       omclr - Clear orderedmap
+               (omclr <orderedmap>)
+
+      omfind - Find orderedmap key with given value
+               (omfind <orderedmap> <value>)
+
+     omcount - Count number of occurrences of value in orderedmap
+               (omcount <orderedmap> <value>)
+
+      omkeys - Return array of orderedmap keys
+               (omkeys <orderedmap>)
+
+      omvals - Return array of orderedmap values
+               (omvals <orderedmap>)
+
+     omitems - Return array of orderedmap key/value pairs
+               (omitems <orderedmap>)
+
+See ":help generic" for information on orderedmap generic functions support.
+)";
+}
+
 const char *HelpDict::help_range() {
     return R"(
 Range Operations
@@ -587,36 +641,36 @@ const char *HelpDict::help_generic() {
     return R"(
 Generic Functions
 -----------------
-      len - Length of string, array, hashmap, pair or range
+      len - Length of string, array, hashmap, orderedmap, pair or range
             (len <object>)
 
-    empty - Is string, array, hashmap, pair or range empty?
+    empty - Is string, array, hashmap, orderedmap, pair or range empty?
             (empty <object>)
 
-      get - Get value at index, key or member from string, array, hashmap, pair or userobject
+      get - Get value at index, key or member from string, array, hashmap, orderedmap, pair or userobject
             (get <object> <key> [<default_return>])
 
             * For string, pair and array, key must be an integer
             * For userobject, key must be a member name/symbol or a string
-            * The parameter default_return applies to hashmap and is ignored otherwise
+            * The parameter default_return applies to hashmap and orderedmap, and is ignored otherwise
 
-      set - Set value at index, key or member for string, array, hashmap or userobject
+      set - Set value at index, key or member for string, array, hashmap, orderedmap or userobject
             (set <object> <key> <value>)
 
             * For string and array, key must be an integer
             * For userobject, key must be a member name/symbol or a string
 
-    clear - Clear string, array or hashmap
+    clear - Clear string, array, hashmap, orderedmap
             (clear <object>)
 
-     find - Get position or key of value in string, array, pair or hashmap
+     find - Get position or key of value in string, array, pair, hashmap or orderedmap
             (find <object> <item> [<position>])
 
             * For string, item must be a character
             * The parameter position applies to string, pair and array and is ignored otherwise
             * When provided, position must be an integer, and is used as the search start index
 
-    count - Count number of times value occurs in string, array, pair or hashmap
+    count - Count number of times value occurs in string, array, pair, hashmap or orderedmap
             (count <object> <item>)
 
             * For string, item must be a character

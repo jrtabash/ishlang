@@ -33,6 +33,7 @@ namespace Ishlang {
         static const char *help_pair();
         static const char *help_array();
         static const char *help_hashmap();
+        static const char *help_orderedmap();
         static const char *help_range();
         static const char *help_generic();
         static const char *help_block();
