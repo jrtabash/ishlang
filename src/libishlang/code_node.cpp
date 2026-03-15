@@ -472,14 +472,15 @@ Value Foreach::exec(Environment::SharedPtr env) const {
         try {
             auto contValue = container_->eval(loopEnv);
             switch (contValue.type()) {
-            case Value::eString:  return impl(loopEnv, contValue.text());
-            case Value::eArray:   return impl(loopEnv, contValue.array());
-            case Value::eHashMap: return impl(loopEnv, contValue.hashMap());
-            case Value::eRange:   return implRange(loopEnv, contValue.range());
-            case Value::eFile:    return implFile(loopEnv, contValue.file());
+            case Value::eString:     return impl(loopEnv, contValue.text());
+            case Value::eArray:      return impl(loopEnv, contValue.array());
+            case Value::eHashMap:    return impl(loopEnv, contValue.hashMap());
+            case Value::eOrderedMap: return impl(loopEnv, contValue.orderedMap());
+            case Value::eRange:      return implRange(loopEnv, contValue.range());
+            case Value::eFile:       return implFile(loopEnv, contValue.file());
             default:
                 throw InvalidExpressionType(
-                    typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange, Value::eFile),
+                    typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eOrderedMap, Value::eRange, Value::eFile),
                     contValue.typeToString());
             }
         }
@@ -493,7 +494,8 @@ template <typename Container>
 Value Foreach::impl(Environment::SharedPtr loopEnv, const Container &container) const {
     Value result = Value::Null;
     for (const auto &item : container) {
-        if constexpr (std::is_same_v<Container, Hashtable>) {
+        if constexpr (std::is_same_v<Container, Hashtable> ||
+                      std::is_same_v<Container, OrderedTable>) {
             loopEnv->set(name_, Value(ValuePair(item.first, item.second)));
         }
         else {
@@ -1898,14 +1900,15 @@ Value GenericLen::exec(Environment::SharedPtr env) const {
     if (object_) {
         auto objVal = object_->eval(env);
         switch (objVal.type()) {
-        case Value::eString:  return Generic::length(objVal.text());
-        case Value::eArray:   return Generic::length(objVal.array());
-        case Value::eHashMap: return Generic::length(objVal.hashMap());
-        case Value::eRange:   return Generic::length(objVal.range());
-        case Value::ePair:    return Generic::length(objVal.pair());
+        case Value::eString:     return Generic::length(objVal.text());
+        case Value::eArray:      return Generic::length(objVal.array());
+        case Value::eHashMap:    return Generic::length(objVal.hashMap());
+        case Value::eOrderedMap: return Generic::length(objVal.orderedMap());
+        case Value::eRange:      return Generic::length(objVal.range());
+        case Value::ePair:       return Generic::length(objVal.pair());
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange, Value::ePair),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eOrderedMap, Value::eRange, Value::ePair),
                 objVal.typeToString());
         }
     }
@@ -1922,14 +1925,15 @@ Value GenericEmpty::exec(Environment::SharedPtr env) const {
     if (object_) {
         auto objVal = object_->eval(env);
         switch (objVal.type()) {
-        case Value::eString:  return Generic::empty(objVal.text());
-        case Value::eArray:   return Generic::empty(objVal.array());
-        case Value::eHashMap: return Generic::empty(objVal.hashMap());
-        case Value::eRange:   return Generic::empty(objVal.range());
-        case Value::ePair:    return Generic::empty(objVal.pair());
+        case Value::eString:     return Generic::empty(objVal.text());
+        case Value::eArray:      return Generic::empty(objVal.array());
+        case Value::eHashMap:    return Generic::empty(objVal.hashMap());
+        case Value::eOrderedMap: return Generic::empty(objVal.orderedMap());
+        case Value::eRange:      return Generic::empty(objVal.range());
+        case Value::ePair:       return Generic::empty(objVal.pair());
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eRange, Value::ePair),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eOrderedMap, Value::eRange, Value::ePair),
                 objVal.typeToString());
         }
     }
@@ -1957,6 +1961,9 @@ Value GenericGet::exec(Environment::SharedPtr env) const {
         case Value::eHashMap:
             return Generic::get(objVal.hashMap(), key_->eval(env), defaultRet_ ? defaultRet_->eval(env) : Value::Null);
 
+        case Value::eOrderedMap:
+            return Generic::get(objVal.orderedMap(), key_->eval(env), defaultRet_ ? defaultRet_->eval(env) : Value::Null);
+
         case Value::eUserObject:
             return key_->isIdentifier()
                 ? Generic::get(objVal.userObject(), key_->identifierName())
@@ -1967,7 +1974,7 @@ Value GenericGet::exec(Environment::SharedPtr env) const {
 
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eUserObject, Value::ePair),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eOrderedMap, Value::eUserObject, Value::ePair),
                 objVal.typeToString());
         }
     }
@@ -2000,6 +2007,10 @@ Value GenericSet::exec(Environment::SharedPtr env) const {
             Generic::set(objVal.hashMap(), key_->eval(env), value);
             break;
 
+        case Value::eOrderedMap:
+            Generic::set(objVal.orderedMap(), key_->eval(env), value);
+            break;
+
         case Value::eUserObject:
             if (key_->isIdentifier()) {
                 Generic::set(objVal.userObject(), key_->identifierName(), value);
@@ -2011,7 +2022,7 @@ Value GenericSet::exec(Environment::SharedPtr env) const {
 
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eUserObject),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eOrderedMap, Value::eUserObject),
                 objVal.typeToString());
         }
 
@@ -2030,12 +2041,13 @@ Value GenericClear::exec(Environment::SharedPtr env) const {
     if (object_) {
         auto objVal = object_->eval(env);
         switch (objVal.type()) {
-        case Value::eString:  return Generic::clear(objVal.text());
-        case Value::eArray:   return Generic::clear(objVal.array());
-        case Value::eHashMap: return Generic::clear(objVal.hashMap());
+        case Value::eString:     return Generic::clear(objVal.text());
+        case Value::eArray:      return Generic::clear(objVal.array());
+        case Value::eHashMap:    return Generic::clear(objVal.hashMap());
+        case Value::eOrderedMap: return Generic::clear(objVal.orderedMap());
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eOrderedMap),
                 objVal.typeToString());
         }
     }
@@ -2056,13 +2068,14 @@ Value GenericFind::exec(Environment::SharedPtr env) const {
         auto itemVal = item_->eval(env);
 
         switch (objVal.type()) {
-        case Value::eString:  return Generic::find(objVal.text(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
-        case Value::eArray:   return Generic::find(objVal.array(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
-        case Value::eHashMap: return Generic::find(objVal.hashMap(), itemVal);
-        case Value::ePair:    return Generic::find(objVal.pair(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
+        case Value::eString:     return Generic::find(objVal.text(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
+        case Value::eArray:      return Generic::find(objVal.array(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
+        case Value::eHashMap:    return Generic::find(objVal.hashMap(), itemVal);
+        case Value::eOrderedMap: return Generic::find(objVal.orderedMap(), itemVal);
+        case Value::ePair:       return Generic::find(objVal.pair(), itemVal, pos_ ? pos_->eval(env) : Value::Zero);
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::ePair),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eOrderedMap, Value::ePair),
                 objVal.typeToString());
         }
     }
@@ -2083,13 +2096,14 @@ Value GenericCount::exec(Environment::SharedPtr env) const {
         auto itemVal = item_->eval(env);
 
         switch (objVal.type()) {
-        case Value::eString:  return Generic::count(objVal.text(), itemVal);
-        case Value::eArray:   return Generic::count(objVal.array(), itemVal);
-        case Value::eHashMap: return Generic::count(objVal.hashMap(), itemVal);
-        case Value::ePair:    return Generic::count(objVal.pair(), itemVal);
+        case Value::eString:     return Generic::count(objVal.text(), itemVal);
+        case Value::eArray:      return Generic::count(objVal.array(), itemVal);
+        case Value::eHashMap:    return Generic::count(objVal.hashMap(), itemVal);
+        case Value::eOrderedMap: return Generic::count(objVal.orderedMap(), itemVal);
+        case Value::ePair:       return Generic::count(objVal.pair(), itemVal);
         default:
             throw InvalidOperandType(
-                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::ePair),
+                typesToString(Value::eString, Value::eArray, Value::eHashMap, Value::eOrderedMap, Value::ePair),
                 objVal.typeToString());
         }
     }

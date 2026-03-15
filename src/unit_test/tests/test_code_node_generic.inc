@@ -38,6 +38,10 @@ DEFINE_TEST(testCodeNodeGenericLen) {
     TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
     TEST_CASE_MSG(val.integer() == 0, "actual=" << val);
 
+    val = len(OrderedTable())->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.integer() == 0, "actual=" << val);
+
     val = len(IntegerRange(10))->eval(env);
     TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
     TEST_CASE_MSG(val.integer() == 10, "actual=" << val);
@@ -73,6 +77,10 @@ DEFINE_TEST(testCodeNodeGenericEmpty) {
     TEST_CASE_MSG(val.boolean(), "actual=" << val);
 
     val = isEmpty(Hashtable())->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.boolean(), "actual=" << val);
+
+    val = isEmpty(OrderedTable())->eval(env);
     TEST_CASE_MSG(val.isBool(), "actual=" << Value::typeToString(val.type()));
     TEST_CASE_MSG(val.boolean(), "actual=" << val);
 
@@ -161,6 +169,24 @@ DEFINE_TEST(testCodeNodeGenericGet) {
 
     { // HashMap
         auto rawTab = Hashtable();
+        rawTab.set(Value(1ll), Value(100ll));
+        rawTab.set(Value(2ll), Value(200ll));
+        for (Value::Long i : {1, 2}) {
+            auto val = get(rawTab, i)->eval(env);
+            TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " key=" << i);
+            TEST_CASE_MSG(val == rawTab.get(Value(i)), "actual=" << val << " key=" << i);
+        }
+
+        auto val = get(rawTab, Value::Long(3))->eval(env);
+        TEST_CASE_MSG(val.isNull(), "actual=" << Value::typeToString(val.type()) << " key=3");
+
+        val = get(rawTab, Value::Long(3), Value(300ll))->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " key=3");
+        TEST_CASE_MSG(val.integer() == 300, "actual=" << val << " key=3");
+    }
+
+    { // OrderedMap
+        auto rawTab = OrderedTable();
         rawTab.set(Value(1ll), Value(100ll));
         rawTab.set(Value(2ll), Value(200ll));
         for (Value::Long i : {1, 2}) {
@@ -352,6 +378,26 @@ DEFINE_TEST(testCodeNodeGenericSet) {
         TEST_CASE_MSG(env->get("tab") == finalTab, "actual=" << env->get("tab"));
     }
 
+    { // OrderedMap
+        auto rawTab = OrderedTable();
+        rawTab.set(Value(1ll), Value(100ll));
+        rawTab.set(Value(2ll), Value(200ll));
+        env->def("tab2", Value(rawTab));
+
+        auto ft = OrderedTable();
+        ft.set(Value(1ll), Value(1000ll));
+        ft.set(Value(2ll), Value(2000ll));
+        const auto finalTab = Value(ft);
+
+        for (auto [i, v] : std::vector<std::pair<Value::Long, Value::Long>>{{1ll, 1000ll}, {2ll, 2000ll}}) {
+            auto val = set("tab2", i, v)->eval(env);
+            TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()) << " key=" << i);
+            TEST_CASE_MSG(val.integer() == v, "actual=" << val << " key=" << i);
+        }
+
+        TEST_CASE_MSG(env->get("tab2") == finalTab, "actual=" << env->get("tab"));
+    }
+
     { // UserObject
         auto rawType = Struct("Person", Struct::MemberList{"name", "age"});
         env->def("obj", Value(Instance(rawType, Instance::InitArgs{{"name", Value("J")}, {"age", Value(20ll)}})));
@@ -423,6 +469,10 @@ DEFINE_TEST(testCodeNodeGenericClear) {
     rawTab.set(Value(1ll), Value(100ll));
     env->def("h", rawTab);
 
+    auto rawTab2 = OrderedTable();
+    rawTab2.set(Value(1ll), Value(100ll));
+    env->def("o", rawTab2);
+
     auto clr = [](char const * name) {
         return CodeNode::make<GenericClear>(CodeNode::make<Variable>(name));
     };
@@ -441,6 +491,11 @@ DEFINE_TEST(testCodeNodeGenericClear) {
     TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
     TEST_CASE_MSG(val.integer() == 1, "actual=" << val);
     TEST_CASE_MSG(env->get("h") == Value(Hashtable()), "actual=" << env->get("h"));
+
+    val = clr("o")->eval(env);
+    TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
+    TEST_CASE_MSG(val.integer() == 1, "actual=" << val);
+    TEST_CASE_MSG(env->get("o") == Value(OrderedTable()), "actual=" << env->get("o"));
 
     try {
         clr("i")->eval(env);
@@ -539,6 +594,20 @@ DEFINE_TEST(testCodeNodeGenericFind) {
 
     { // HashMap
         auto rawTab = Hashtable();
+        rawTab.set(Value(1ll), Value(100ll));
+        rawTab.set(Value(2ll), Value(200ll));
+        rawTab.set(Value(3ll), Value(300ll));
+
+        auto val = find(rawTab, 200ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 2ll, "actual=" << val);
+
+        val = find(rawTab, 400ll)->eval(env);
+        TEST_CASE_MSG(val.isNull(), "actual=" << val.typeToString());
+    }
+
+    { // OrderedMap
+        auto rawTab = OrderedTable();
         rawTab.set(Value(1ll), Value(100ll));
         rawTab.set(Value(2ll), Value(200ll));
         rawTab.set(Value(3ll), Value(300ll));
@@ -652,6 +721,26 @@ DEFINE_TEST(testCodeNodeGenericCount) {
 
     { // HashMap
         auto rawTab = Hashtable();
+        rawTab.set(Value(1ll), Value(100ll));
+        rawTab.set(Value(2ll), Value(200ll));
+        rawTab.set(Value(20ll), Value(200ll));
+        rawTab.set(Value(3ll), Value(300ll));
+
+        auto val = count(rawTab, 200ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 2ll, "actual=" << val);
+
+        val = count(rawTab, 100ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 1ll, "actual=" << val);
+
+        val = count(rawTab, 400ll)->eval(env);
+        TEST_CASE_MSG(val.isInt(), "actual=" << val.typeToString());
+        TEST_CASE_MSG(val.integer() == 0ll, "actual=" << val);
+    }
+
+    { // OrderedMap
+        auto rawTab = OrderedTable();
         rawTab.set(Value(1ll), Value(100ll));
         rawTab.set(Value(2ll), Value(200ll));
         rawTab.set(Value(20ll), Value(200ll));

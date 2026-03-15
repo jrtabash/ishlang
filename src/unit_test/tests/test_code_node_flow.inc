@@ -451,6 +451,46 @@ DEFINE_TEST(testCodeNodeForeach) {
         TEST_CASE_MSG(valSum.integer() == 150ll, "actual=" << valSum);
     }
 
+    { // OrderedTable
+        auto env = Environment::make();
+        OrderedTable ot;
+        for (auto [k, v] : {
+                std::pair{ 1ll, 10ll },
+                std::pair{ 2ll, 20ll },
+                std::pair{ 3ll, 30ll },
+                std::pair{ 4ll, 40ll },
+                std::pair{ 5ll, 50ll } }) {
+            ot.set(Value(k), Value(v));
+        }
+        env->def("ot", Value(ot));
+        env->def("cnt", Value(0ll));
+        env->def("keySum", Value(0ll));
+        env->def("valSum", Value(0ll));
+
+        auto foreach = CodeNode::make<Foreach>(
+            "kv",
+            var("ot"),
+            progn(
+                assign("cnt", add(var("cnt"), lit(1ll))),
+                assign("keySum", add(var("keySum"), first(var("kv")))),
+                assign("valSum", add(var("valSum"), second(var("kv"))))));
+        Value result = foreach->eval(env);
+        TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
+        TEST_CASE_MSG(result.integer() == 150ll, "actual=" << result);
+
+        auto const & cnt = env->get("cnt");
+        TEST_CASE_MSG(cnt.isInt(), "actual=" << cnt.typeToString());
+        TEST_CASE_MSG(cnt.integer() == 5ll, "actual=" << cnt);
+
+        auto const & keySum = env->get("keySum");
+        TEST_CASE_MSG(keySum.isInt(), "actual=" << keySum.typeToString());
+        TEST_CASE_MSG(keySum.integer() == 15ll, "actual=" << keySum);
+
+        auto const & valSum = env->get("valSum");
+        TEST_CASE_MSG(valSum.isInt(), "actual=" << valSum.typeToString());
+        TEST_CASE_MSG(valSum.integer() == 150ll, "actual=" << valSum);
+    }
+
     { // Range
         auto env = Environment::make();
         env->def("rng", Value(IntegerRange(0, 20, 2)));

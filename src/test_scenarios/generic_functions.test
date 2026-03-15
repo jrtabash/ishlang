@@ -4,6 +4,7 @@ __CODE__
 (var txt "Hello World!")
 (var seq (array 1 3 5 7 9))
 (var tab (hashmap (pair "one" 1) (pair "two" 2)))
+(var ord (orderedmap (pair "one" 1) (pair "two" 2)))
 (var rng (range 0 100 2))
 (var obj (makeinstance Person (name "Jon") (age 25)))
 (var cpl (pair 5 10))
@@ -12,6 +13,7 @@ __CODE__
 (println (len txt))
 (println (len seq))
 (println (len tab))
+(println (len ord))
 (println (len rng))
 (println (len cpl))
 
@@ -19,6 +21,7 @@ __CODE__
 (println (empty txt))
 (println (empty seq))
 (println (empty tab))
+(println (empty ord))
 (println (empty rng))
 (println (empty cpl))
 
@@ -36,6 +39,11 @@ __CODE__
 (println (get tab "three"))
 (println (get tab "three" 3))
 
+(println (get ord "one"))
+(println (get ord "two"))
+(println (get ord "three"))
+(println (get ord "three" 3))
+
 (println (get obj name))
 (println (get obj age))
 (println (get obj "name"))
@@ -50,6 +58,7 @@ __CODE__
 (println (find seq 7))
 (println (find seq 7 2))
 (println (find tab 2))
+(println (find ord 2))
 (println (find cpl 5))
 (println (find cpl 10 1))
 
@@ -58,18 +67,21 @@ __CODE__
 (println (count txt 'o'))
 (println (count seq 3))
 (println (count tab 2))
+(println (count ord 2))
 (println (count cpl 5))
 
 (println "== set ==")
 (println (set txt 6 'w'))
 (println (set seq 2 50))
 (println (set tab "two" 20))
+(println (set ord "two" 20))
 (println (set obj "name" "John"))
 (println (set obj age 24))
 
 (println (get txt 6))
 (println (get seq 2))
 (println (get tab "two"))
+(println (get ord "two"))
 (println (get obj name))
 (println (get obj age))
 
@@ -77,11 +89,13 @@ __CODE__
 (println (clear txt))
 (println (clear seq))
 (println (clear tab))
+(println (clear ord))
 
 (println "== len ==")
 (println (len txt))
 (println (len seq))
 (println (len tab))
+(println (len ord))
 
 (println "== sort ==")
 (println (sort (array 2 1 5 4 3)))
@@ -116,9 +130,11 @@ __EXPECT__
 12
 5
 2
+2
 50
 2
 == empty ==
+false
 false
 false
 false
@@ -135,6 +151,10 @@ e
 2
 null
 3
+1
+2
+null
+3
 Jon
 25
 Jon
@@ -147,6 +167,7 @@ Jon
 3
 3
 two
+two
 0
 1
 == count ==
@@ -155,14 +176,17 @@ two
 1
 1
 1
+1
 == set ==
 w
 50
+20
 20
 John
 24
 w
 50
+20
 20
 John
 24
@@ -170,7 +194,9 @@ John
 12
 5
 2
+2
 == len ==
+0
 0
 0
 0
