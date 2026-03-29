@@ -222,12 +222,11 @@ namespace Ishlang {
             }
 
             if constexpr (std::is_same_v<ObjectType, Value::Range>) {
-                Value::Long s = 0;
-                auto gen = obj.generator();
-                while (auto i = gen.next()) {
-                    s += *i;
-                }
-                return Value(s);
+                constexpr auto One = Value::Long(1);
+                constexpr auto Two = Value::Long(2);
+
+                const auto n = Value::Long(obj.size());
+                return Value(n * ( (Two * obj.begin()) + ((n - One) * obj.step()) ) / Two);
             }
             else if constexpr (std::is_same_v<ObjectType, Value::Pair>) {
                 auto const &f = obj.first();

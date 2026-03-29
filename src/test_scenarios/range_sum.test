@@ -1,0 +1,37 @@
+__CODE__
+(defun sum_compare (rng)
+    (println (== (sum rng) (sum (expand rng)))))
+
+(sum_compare (range 0))
+(sum_compare (range 1))
+(sum_compare (range 2))
+(sum_compare (range 10))
+(sum_compare (range 0 -1 -1))
+
+(sum_compare (range 1 101))
+(sum_compare (range 1 101 2))
+(sum_compare (range 1 101 3))
+
+(sum_compare (range -10 12))
+(sum_compare (range -10 12 2))
+(sum_compare (range -10 12 3))
+
+(sum_compare (range 11 -8 -1))
+(sum_compare (range 11 -8 -2))
+(sum_compare (range 11 -8 -3))
+
+__EXPECT__
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
