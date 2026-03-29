@@ -1,37 +1,53 @@
 __CODE__
-(defun sum_compare (rng)
-    (println (== (sum rng) (sum (expand rng)))))
+(defun sum_check (rng)
+    (var s (sum rng))
+    (println s)
+    (println (== s (sum (expand rng)))))
 
-(sum_compare (range 0))
-(sum_compare (range 1))
-(sum_compare (range 2))
-(sum_compare (range 10))
-(sum_compare (range 0 -1 -1))
+(sum_check (range 0))
+(sum_check (range 1))
+(sum_check (range 2))
+(sum_check (range 10))
+(sum_check (range 0 -1 -1))
 
-(sum_compare (range 1 101))
-(sum_compare (range 1 101 2))
-(sum_compare (range 1 101 3))
+(sum_check (range 1 101))
+(sum_check (range 1 101 2))
+(sum_check (range 1 101 3))
 
-(sum_compare (range -10 12))
-(sum_compare (range -10 12 2))
-(sum_compare (range -10 12 3))
+(sum_check (range -10 12))
+(sum_check (range -10 12 2))
+(sum_check (range -10 12 3))
 
-(sum_compare (range 11 -8 -1))
-(sum_compare (range 11 -8 -2))
-(sum_compare (range 11 -8 -3))
+(sum_check (range 11 -8 -1))
+(sum_check (range 11 -8 -2))
+(sum_check (range 11 -8 -3))
 
 __EXPECT__
+0
 true
+0
 true
+1
 true
+45
 true
+0
 true
+5050
 true
+2500
 true
+1717
 true
+11
 true
+0
 true
+4
 true
+38
 true
+20
 true
+14
 true
