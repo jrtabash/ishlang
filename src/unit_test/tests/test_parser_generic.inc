@@ -56,17 +56,17 @@ DEFINE_TEST(testParserGenericGet) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("txt", Value("abc"));
-    env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll)})));
-    env->def("cpl", ValuePair(Value(2ll), Value(3ll)));
+    env->defByName("txt", Value("abc"));
+    env->defByName("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll)})));
+    env->defByName("cpl", ValuePair(Value(2ll), Value(3ll)));
 
     Hashtable ht;
     ht.set(Value(1ll), Value(10ll));
     ht.set(Value(2ll), Value(20ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
     auto rawStruct = Struct("Person", Struct::MemberList{"name", "age"});
-    env->def("inst", Value(Instance(rawStruct, Instance::InitArgs{{"name", Value("Jon")}, {"age", Value(25ll)}})));
+    env->defByName("inst", Value(Instance(rawStruct, Instance::InitArgs{{"name", Value("Jon")}, {"age", Value(25ll)}})));
 
     TEST_CASE(parserTest(parser, env, "(get txt 0)",   Value('a'),  true));
     TEST_CASE(parserTest(parser, env, "(get txt 1)",   Value('b'),  true));
@@ -105,29 +105,29 @@ DEFINE_TEST(testParserGenericSet) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("txt", Value("abc"));
-    env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll)})));
+    env->defByName("txt", Value("abc"));
+    env->defByName("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll)})));
 
     Hashtable ht;
     ht.set(Value(1ll), Value(10ll));
     ht.set(Value(2ll), Value(20ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
     auto rawStruct = Struct("Person", Struct::MemberList{"name", "age"});
-    env->def("inst", Value(Instance(rawStruct, Instance::InitArgs{{"name", Value("J")}, {"age", Value(20ll)}})));
+    env->defByName("inst", Value(Instance(rawStruct, Instance::InitArgs{{"name", Value("J")}, {"age", Value(20ll)}})));
 
     TEST_CASE(parserTest(parser, env, "(set txt 0 'A')", Value('A'),  true));
     TEST_CASE(parserTest(parser, env, "(set txt 1 'B')", Value('B'),  true));
     TEST_CASE(parserTest(parser, env, "(set txt 2 'C')", Value('C'),  true));
 
-    TEST_CASE_MSG(env->get("txt") == Value("ABC"), "actual=" << env->get("txt"));
+    TEST_CASE_MSG(env->getByName("txt") == Value("ABC"), "actual=" << env->getByName("txt"));
 
     TEST_CASE(parserTest(parser, env, "(set seq 0 10)", Value(10ll),  true));
     TEST_CASE(parserTest(parser, env, "(set seq 1 20)", Value(20ll),  true));
     TEST_CASE(parserTest(parser, env, "(set seq 2 30)", Value(30ll),  true));
 
-    TEST_CASE_MSG(env->get("seq") == Value(Sequence(std::vector{Value(10ll), Value(20ll), Value(30ll)})),
-                  "actual=" << env->get("seq"));
+    TEST_CASE_MSG(env->getByName("seq") == Value(Sequence(std::vector{Value(10ll), Value(20ll), Value(30ll)})),
+                  "actual=" << env->getByName("seq"));
 
     TEST_CASE(parserTest(parser, env, "(set ht 1 10)", Value(10ll), true));
     TEST_CASE(parserTest(parser, env, "(set ht 2 20)", Value(20ll), true));
@@ -137,15 +137,15 @@ DEFINE_TEST(testParserGenericSet) {
     ht2.set(Value(1ll), Value(10ll));
     ht2.set(Value(2ll), Value(20ll));
     ht2.set(Value(3ll), Value(30ll));
-    TEST_CASE_MSG(env->get("ht") == Value(ht2), "actual=" << env->get("ht"));
+    TEST_CASE_MSG(env->getByName("ht") == Value(ht2), "actual=" << env->getByName("ht"));
 
     TEST_CASE(parserTest(parser, env, "(set inst \"name\" \"JJ\")", Value("JJ"),  true));
     TEST_CASE(parserTest(parser, env, "(set inst \"age\" 23)",      Value(23ll),  true));
     TEST_CASE(parserTest(parser, env, "(set inst name \"Jon\")",    Value("Jon"), true));
     TEST_CASE(parserTest(parser, env, "(set inst age 25)",          Value(25ll),  true));
 
-    TEST_CASE_MSG(env->get("inst") == Value(Instance(rawStruct, Instance::InitArgs{{"name", Value("Jon")}, {"age", Value(25ll)}})),
-                  "actual=" << env->get("inst"));
+    TEST_CASE_MSG(env->getByName("inst") == Value(Instance(rawStruct, Instance::InitArgs{{"name", Value("Jon")}, {"age", Value(25ll)}})),
+                  "actual=" << env->getByName("inst"));
 
     TEST_CASE(parserTest(parser, env, "(set txt 0)",     Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(set seq 0)",     Value::Null, false));
@@ -166,12 +166,12 @@ DEFINE_TEST(testParserGenericClear) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("a", Value(Sequence(std::vector{Value::Zero, Value::Null})));
-    env->def("s", Value("1234"));
+    env->defByName("a", Value(Sequence(std::vector{Value::Zero, Value::Null})));
+    env->defByName("s", Value("1234"));
 
     auto rawTab = Hashtable();
     rawTab.set(Value(1ll), Value(100ll));
-    env->def("h", rawTab);
+    env->defByName("h", rawTab);
 
     TEST_CASE(parserTest(parser, env, "(clear a)", Value(2ll), true));
     TEST_CASE(parserTest(parser, env, "(clear s)", Value(4ll), true));
@@ -189,15 +189,15 @@ DEFINE_TEST(testParserGenericClear) {
 DEFINE_TEST(testParserGenericFind) {
     auto env = Environment::make();
     Parser parser;
-    env->def("txt", Value("abcdef"));
-    env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll), Value(4ll), Value(5ll)})));
-    env->def("cpl", ValuePair(Value(2ll), Value(3ll)));
+    env->defByName("txt", Value("abcdef"));
+    env->defByName("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll), Value(4ll), Value(5ll)})));
+    env->defByName("cpl", ValuePair(Value(2ll), Value(3ll)));
 
     Hashtable ht;
     ht.set(Value(1ll), Value(10ll));
     ht.set(Value(2ll), Value(20ll));
     ht.set(Value(3ll), Value(30ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
     TEST_CASE(parserTest(parser, env, "(find txt 'a')", Value(0ll),  true));
     TEST_CASE(parserTest(parser, env, "(find txt 'd')", Value(3ll),  true));
@@ -243,17 +243,17 @@ DEFINE_TEST(testParserGenericFind) {
 DEFINE_TEST(testParserGenericCount) {
     auto env = Environment::make();
     Parser parser;
-    env->def("txt", Value("abacbadef"));
-    env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(1ll), Value(2ll), Value(3ll), Value(1ll), Value(4ll), Value(5ll)})));
-    env->def("cpl", ValuePair(Value(2ll), Value(3ll)));
-    env->def("rpt", ValuePair(Value(5ll), Value(5ll)));
+    env->defByName("txt", Value("abacbadef"));
+    env->defByName("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(1ll), Value(2ll), Value(3ll), Value(1ll), Value(4ll), Value(5ll)})));
+    env->defByName("cpl", ValuePair(Value(2ll), Value(3ll)));
+    env->defByName("rpt", ValuePair(Value(5ll), Value(5ll)));
 
     Hashtable ht;
     ht.set(Value(1ll), Value(10ll));
     ht.set(Value(2ll), Value(20ll));
     ht.set(Value(3ll), Value(30ll));
     ht.set(Value(4ll), Value(20ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
     TEST_CASE(parserTest(parser, env, "(count txt 'a')", Value(3ll), true));
     TEST_CASE(parserTest(parser, env, "(count txt 'b')", Value(2ll), true));
@@ -294,8 +294,8 @@ DEFINE_TEST(testParserGenericSort) {
     const auto v6 = Value(6ll);
     const auto v7 = Value(7ll);
 
-    env->def("txt", Value("3216574"));
-    env->def("seq", arrval(v3, v2, v1, v6, v5, v7, v4));
+    env->defByName("txt", Value("3216574"));
+    env->defByName("seq", arrval(v3, v2, v1, v6, v5, v7, v4));
 
     TEST_CASE(parserTest(parser, env, "(sort txt)",       Value("1234567"), true));
     TEST_CASE(parserTest(parser, env, "(sort txt true)",  Value("7654321"), true));
@@ -330,8 +330,8 @@ DEFINE_TEST(testParserGenericReverse) {
     const auto v4 = Value(4ll);
     const auto v5 = Value(5ll);
 
-    env->def("txt", Value("12345"));
-    env->def("seq", arrval(v1, v2, v3, v4, v5));
+    env->defByName("txt", Value("12345"));
+    env->defByName("seq", arrval(v1, v2, v3, v4, v5));
 
     TEST_CASE(parserTest(parser, env, "(reverse txt)", Value("54321"), true));
     TEST_CASE(parserTest(parser, env, "(reverse txt)", Value("12345"), true));

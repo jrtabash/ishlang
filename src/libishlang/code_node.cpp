@@ -154,13 +154,13 @@ Value ArithOp::exec(Environment::SharedPtr env) const {
 ArithAssignOp::ArithAssignOp(Type type, const std::string &name, CodeNode::SharedPtr delta)
     : CodeNode()
     , type_(type)
-    , name_(name)
+    , iden_(Environment::idenTable().mapName(name))
     , delta_(delta)
 {}
 
 Value ArithAssignOp::exec(Environment::SharedPtr env) const {
     if (delta_) {
-        const auto & nameVal = env->get(name_);
+        const auto & nameVal = env->get(iden_);
         if (!nameVal.isNumber()) {
             throw InvalidExpressionType(typesToString(Value::eInteger, Value::eReal), nameVal.typeToString());
         }
@@ -208,7 +208,7 @@ Value ArithAssignOp::exec(Environment::SharedPtr env) const {
             updtVal = Value(std::pow(nameVal.real(), deltaVal.real()));
             break;
         }
-        return env->set(name_, updtVal);
+        return env->set(iden_, updtVal);
     }
     return Value::Null;
 }
@@ -459,7 +459,7 @@ Value While::exec(Environment::SharedPtr env) const {
 // -------------------------------------------------------------
 Foreach::Foreach(const std::string &name, CodeNode::SharedPtr container, CodeNode::SharedPtr body)
     : CodeNode()
-    , name_(name)
+    , iden_(Environment::idenTable().mapName(name))
     , container_(container)
     , body_(body)
 {}
@@ -467,7 +467,7 @@ Foreach::Foreach(const std::string &name, CodeNode::SharedPtr container, CodeNod
 Value Foreach::exec(Environment::SharedPtr env) const {
     if (container_ && body_) {
         auto loopEnv = Environment::make(env);
-        loopEnv->def(name_, Value::Null);
+        loopEnv->def(iden_, Value::Null);
 
         try {
             auto contValue = container_->eval(loopEnv);
@@ -496,10 +496,10 @@ Value Foreach::impl(Environment::SharedPtr loopEnv, const Container &container) 
     for (const auto &item : container) {
         if constexpr (std::is_same_v<Container, Hashtable> ||
                       std::is_same_v<Container, OrderedTable>) {
-            loopEnv->set(name_, Value(ValuePair(item.first, item.second)));
+            loopEnv->set(iden_, Value(ValuePair(item.first, item.second)));
         }
         else {
-            loopEnv->set(name_, item);
+            loopEnv->set(iden_, item);
         }
         result = body_->eval(loopEnv);
     }
@@ -510,7 +510,7 @@ Value Foreach::implRange(Environment::SharedPtr loopEnv, const IntegerRange &ran
     Value result = Value::Null;
     auto gen = range.generator();
     while (auto i = gen.next()) {
-        loopEnv->set(name_, Value(*i));
+        loopEnv->set(iden_, Value(*i));
         result = body_->eval(loopEnv);
     }
     return result;
@@ -519,7 +519,7 @@ Value Foreach::implRange(Environment::SharedPtr loopEnv, const IntegerRange &ran
 Value Foreach::implFile(Environment::SharedPtr loopEnv, FileStruct &file) const {
     Value result = Value::Null;
     while (auto optLine = file.readln()) {
-        loopEnv->set(name_, Value(std::move(*optLine)));
+        loopEnv->set(iden_, Value(std::move(*optLine)));
         result = body_->eval(loopEnv);
     }
     return result;
@@ -558,7 +558,7 @@ Value LambdaApp::exec(Environment::SharedPtr env) const {
 // -------------------------------------------------------------
 FunctionExpr::FunctionExpr(const std::string &name, const ParamList &params, CodeNode::SharedPtr body)
     : LambdaExpr(params, body)
-    , name_(name)
+    , iden_(Environment::idenTable().mapName(name))
 {}
 
 Value FunctionExpr::exec(Environment::SharedPtr env) const {
@@ -566,17 +566,17 @@ Value FunctionExpr::exec(Environment::SharedPtr env) const {
     if (!lambdaVal.isClosure()) {
         throw InvalidExpressionType(Value::typeToString(Value::eClosure), lambdaVal.typeToString());
     }
-    return env->def(name_, lambdaVal);
+    return env->def(iden_, lambdaVal);
 }
 
 // -------------------------------------------------------------
 FunctionApp::FunctionApp(const std::string &name, SharedPtrList args)
     : LambdaApp(CodeNode::SharedPtr(), args)
-    , name_(name)
+    , iden_(Environment::idenTable().mapName(name))
 {}
 
 Value FunctionApp::exec(Environment::SharedPtr env) const {
-    closureVar_ = env->get(name_);
+    closureVar_ = env->get(iden_);
     return LambdaApp::exec(env);
 }
 
@@ -614,7 +614,7 @@ StructExpr::StructExpr(const std::string &name, const Struct::MemberList &member
 
 Value StructExpr::exec(Environment::SharedPtr env) const {
     Value structValue(struct_);
-    return env->def(struct_.name(), structValue);
+    return env->defByName(struct_.name(), structValue);
 }
 
 // -------------------------------------------------------------
@@ -661,12 +661,12 @@ Value StructName::exec(Environment::SharedPtr env) const {
 // -------------------------------------------------------------
 MakeInstance::MakeInstance(const std::string &name, const NameSharedPtrs &initList)
     : CodeNode()
-    , name_(name)
+    , iden_(Environment::idenTable().mapName(name))
     , initList_(initList)
 {}
 
 Value MakeInstance::exec(Environment::SharedPtr env) const {
-    const Value structValue = env->get(name_);
+    const Value structValue = env->get(iden_);
     if (!structValue.isUserType()) {
         throw InvalidExpressionType(Value::typeToString(Value::eUserType), structValue.typeToString());
     }
@@ -2450,7 +2450,7 @@ Value FileRemove::exec(Environment::SharedPtr env) const {
 // -------------------------------------------------------------
 WithFile::WithFile(const std::string &name, CodeNode::SharedPtr file, CodeNode::SharedPtr body)
     : FileOp(file)
-    , name_(name)
+    , iden_(Environment::idenTable().mapName(name))
     , body_(body)
 {}
 
@@ -2460,7 +2460,7 @@ Value WithFile::exec(Environment::SharedPtr env) const {
 
         try {
             auto withEnv = Environment::make(env);
-            withEnv->def(name_, fileVal);
+            withEnv->def(iden_, fileVal);
 
             auto result = body_->eval(withEnv);
 

@@ -50,7 +50,7 @@ DEFINE_TEST(testParserMakeArraySG) {
     const Value v3(3ll);
     const Value v4(4ll);
 
-    env->def("i", Value::Zero);
+    env->defByName("i", Value::Zero);
 
     TEST_CASE(parserTest(parser, env, "(arraysg 0 (lambda () (= i (+ i 1))))",                    Value(Sequence()),             true));
     TEST_CASE(parserTest(parser, env, "(arraysg 3 (lambda () (= i (+ i 1))))",                    Value(Sequence({v1, v2, v3})), true));
@@ -92,7 +92,7 @@ DEFINE_TEST(testParserArraySet) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("arr", Value(Sequence({Value(1ll), Value(2ll), Value(3ll), Value(4ll), Value(5ll)})));
+    env->defByName("arr", Value(Sequence({Value(1ll), Value(2ll), Value(3ll), Value(4ll), Value(5ll)})));
 
     TEST_CASE(parserTest(parser, env, "(arrset arr 0 'a')", Value('a'),  true));
     TEST_CASE(parserTest(parser, env, "(arrset arr 2 'C')", Value('C'),  true));
@@ -110,7 +110,7 @@ DEFINE_TEST(testParserArrayPush) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("arr", Value(Sequence()));
+    env->defByName("arr", Value(Sequence()));
 
     Value expected = Value(Sequence({Value(1ll)}));
     TEST_CASE(parserTest(parser, env, "(arrpush arr 1)", expected, true));
@@ -127,7 +127,7 @@ DEFINE_TEST(testParserArrayPop) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("arr", arrval(Value(0ll), Value(1ll)));
+    env->defByName("arr", arrval(Value(0ll), Value(1ll)));
 
     TEST_CASE(parserTest(parser, env, "(arrpop arr)", Value(1ll),         true));
     TEST_CASE(parserTest(parser, env, "arr",          arrval(Value(0ll)), true));
@@ -143,7 +143,7 @@ DEFINE_TEST(testParserArrayFind) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c'), Value('a')})));
+    env->defByName("arr", Value(Sequence({Value('a'), Value('b'), Value('c'), Value('a')})));
 
     TEST_CASE(parserTest(parser, env, "(arrfind arr 'a')", Value(0ll),  true));
     TEST_CASE(parserTest(parser, env, "(arrfind arr 'b')", Value(1ll),  true));
@@ -171,7 +171,7 @@ DEFINE_TEST(testParserArrayCount) {
     const Value v3(3ll);
     const Value v4(4ll);
 
-    env->def("arr", Value(Sequence({v1, v2, v3, v2, v3, v4, v3, v4, v4, v4})));
+    env->defByName("arr", Value(Sequence({v1, v2, v3, v2, v3, v4, v3, v4, v4, v4})));
 
     TEST_CASE(parserTest(parser, env, "(arrcount arr 1)", Value(1ll), true));
     TEST_CASE(parserTest(parser, env, "(arrcount arr 2)", Value(2ll), true));
@@ -189,8 +189,8 @@ DEFINE_TEST(testParserArraySort) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("arr1", Value(Sequence({Value('b'), Value('d'), Value('c'), Value('a')})));
-    env->def("arr2", Value(Sequence({Value(2ll), Value(3ll), Value(4ll), Value(1ll)})));
+    env->defByName("arr1", Value(Sequence({Value('b'), Value('d'), Value('c'), Value('a')})));
+    env->defByName("arr2", Value(Sequence({Value(2ll), Value(3ll), Value(4ll), Value(1ll)})));
 
     const Value arr1Asc(Sequence({Value('a'), Value('b'), Value('c'), Value('d')}));
     const Value arr2Asc(Sequence({Value(1ll), Value(2ll), Value(3ll), Value(4ll)}));
@@ -225,8 +225,8 @@ DEFINE_TEST(testParserArrayReverse) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("arr1", Value(Sequence({Value('b'), Value('d'), Value('c'), Value('a')})));
-    env->def("arr2", Value(Sequence({Value(2ll), Value(3ll), Value(4ll), Value(1ll)})));
+    env->defByName("arr1", Value(Sequence({Value('b'), Value('d'), Value('c'), Value('a')})));
+    env->defByName("arr2", Value(Sequence({Value(2ll), Value(3ll), Value(4ll), Value(1ll)})));
 
     const Value arr1Orig(Sequence({Value('b'), Value('d'), Value('c'), Value('a')}));
     const Value arr2Orig(Sequence({Value(2ll), Value(3ll), Value(4ll), Value(1ll)}));
@@ -249,7 +249,7 @@ DEFINE_TEST(testParserArrayClear) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("a", Value(Sequence({Value('a'), Value('b'), Value('c')})));
+    env->defByName("a", Value(Sequence({Value('a'), Value('b'), Value('c')})));
 
     TEST_CASE(parserTest(parser, env, "(arrlen a)", Value(3ll),  true));
     TEST_CASE(parserTest(parser, env, "(arrclr a)", Value::Null, true));
@@ -265,7 +265,7 @@ DEFINE_TEST(testParserArrayInsert) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("arr", Value(Sequence()));
+    env->defByName("arr", Value(Sequence()));
 
     const Value v0 = Value::Zero;
     const Value v1 = Value(1ll);
@@ -308,7 +308,7 @@ DEFINE_TEST(testParserArrayRemove) {
     const Value v4 = Value(4ll);
     const Value v5 = Value(5ll);
 
-    env->def("arr", arrval(v0, v1, v2, v3, v4, v5));
+    env->defByName("arr", arrval(v0, v1, v2, v3, v4, v5));
 
     TEST_CASE(parserTest(parser, env, "(arrrem arr 4)", Value::Null,                true));
     TEST_CASE(parserTest(parser, env, "arr",            arrval(v0, v1, v2, v3, v5), true));

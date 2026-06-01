@@ -1,5 +1,6 @@
 #include "test_util.inc"
 #include "test_value.inc"
+#include "test_iden_table.inc"
 #include "test_environment.inc"
 #include "test_lambda.inc"
 #include "test_struct.inc"

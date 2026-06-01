@@ -40,7 +40,7 @@ DEFINE_TEST(testParserStrSrt) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("str", Value("12345"));
+    env->defByName("str", Value("12345"));
 
     TEST_CASE(parserTest(parser, env, "(strset str 0 'a')", Value('a'),  true));
     TEST_CASE(parserTest(parser, env, "(strset str 2 'C')", Value('C'),  true));
@@ -58,7 +58,7 @@ DEFINE_TEST(testParserStringCat) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("str", Value("abc"));
+    env->defByName("str", Value("abc"));
 
     TEST_CASE(parserTest(parser, env, "(strcat str \"def\")", Value("abcdef"),    true));
     TEST_CASE(parserTest(parser, env, "(strcat str \"gh\")",  Value("abcdefgh"),  true));
@@ -76,7 +76,7 @@ DEFINE_TEST(testParserSubString) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("str", Value("0123456789"));
+    env->defByName("str", Value("0123456789"));
 
     TEST_CASE(parserTest(parser, env, "(substr str 0)",    Value("0123456789"), true));
     TEST_CASE(parserTest(parser, env, "(substr str 5)",    Value("56789"),      true));
@@ -96,7 +96,7 @@ DEFINE_TEST(testParserStringFind) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("str", Value("0123456789"));
+    env->defByName("str", Value("0123456789"));
 
     TEST_CASE(parserTest(parser, env, "(strfind str '0')",     Value::Zero, true));
     TEST_CASE(parserTest(parser, env, "(strfind str '4')",     Value(4ll),  true));
@@ -117,7 +117,7 @@ DEFINE_TEST(testParserStringCount) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("str", Value("0120344501223678910"));
+    env->defByName("str", Value("0120344501223678910"));
 
     TEST_CASE(parserTest(parser, env, "(strcount str '9')", Value(1ll),  true));
     TEST_CASE(parserTest(parser, env, "(strcount str '8')", Value(1ll),  true));
@@ -141,10 +141,10 @@ DEFINE_TEST(testParserStringCompare) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("str1", Value("abcde"));
-    env->def("str2", Value("abcde"));
-    env->def("str3", Value("bcdef"));
-    env->def("str4", Value("abcdef"));
+    env->defByName("str1", Value("abcde"));
+    env->defByName("str2", Value("abcde"));
+    env->defByName("str3", Value("bcdef"));
+    env->defByName("str4", Value("abcdef"));
 
     TEST_CASE(parserTest(parser, env, "(strcmp str1 str2)", Value::Zero, true));
     TEST_CASE(parserTest(parser, env, "(strcmp str2 str1)", Value::Zero, true));
@@ -165,8 +165,8 @@ DEFINE_TEST(testParserStringSort) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("str1", Value("badc"));
-    env->def("str2", Value("3421"));
+    env->defByName("str1", Value("badc"));
+    env->defByName("str2", Value("3421"));
 
     TEST_CASE(parserTest(parser, env, "(progn (strsort str1) str1)",       Value("abcd"), true));
     TEST_CASE(parserTest(parser, env, "(progn (strsort str1 true) str1)",  Value("dcba"), true));
@@ -196,8 +196,8 @@ DEFINE_TEST(testParserStringReverse) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("str1", Value("abcd"));
-    env->def("str2", Value("1234"));
+    env->defByName("str1", Value("abcd"));
+    env->defByName("str2", Value("1234"));
 
     TEST_CASE(parserTest(parser, env, "(progn (strrev str1) str1)", Value("dcba"), true));
     TEST_CASE(parserTest(parser, env, "(progn (strrev str1) str1)", Value("abcd"), true));
@@ -240,17 +240,17 @@ DEFINE_TEST(testParserStrCharCheck) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("cUp", Value('U'));
-    env->def("cLo", Value('l'));
-    env->def("cNm", Value('5'));
-    env->def("cPt", Value('?'));
-    env->def("cSp", Value(' '));
-    env->def("sUp", Value("UPP"));
-    env->def("sLo", Value("low"));
-    env->def("sNm", Value("123"));
-    env->def("sPt", Value("@?!"));
-    env->def("sSp", Value(" \t\n"));
-    env->def("mix", Value("Ul5? "));
+    env->defByName("cUp", Value('U'));
+    env->defByName("cLo", Value('l'));
+    env->defByName("cNm", Value('5'));
+    env->defByName("cPt", Value('?'));
+    env->defByName("cSp", Value(' '));
+    env->defByName("sUp", Value("UPP"));
+    env->defByName("sLo", Value("low"));
+    env->defByName("sNm", Value("123"));
+    env->defByName("sPt", Value("@?!"));
+    env->defByName("sSp", Value(" \t\n"));
+    env->defByName("mix", Value("Ul5? "));
 
     TEST_CASE(parserTest(parser, env, "(isupper cUp)", Value::True, true));
     TEST_CASE(parserTest(parser, env, "(islower cLo)", Value::True, true));
@@ -308,12 +308,12 @@ DEFINE_TEST(testParserStrCharTransform) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("cUp", Value('A'));
-    env->def("cLo", Value('a'));
-    env->def("cNm", Value('5'));
-    env->def("sUp", Value("ABC"));
-    env->def("sLo", Value("abc"));
-    env->def("sNm", Value("123"));
+    env->defByName("cUp", Value('A'));
+    env->defByName("cLo", Value('a'));
+    env->defByName("cNm", Value('5'));
+    env->defByName("sUp", Value("ABC"));
+    env->defByName("sLo", Value("abc"));
+    env->defByName("sNm", Value("123"));
 
     TEST_CASE(parserTest(parser, env, "(toupper cUp)", Value('A'), true));
     TEST_CASE(parserTest(parser, env, "(toupper cLo)", Value('A'), true));

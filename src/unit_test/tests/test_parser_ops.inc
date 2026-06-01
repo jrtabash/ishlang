@@ -39,9 +39,9 @@ DEFINE_TEST(testParserArithAssign) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("num", Value(10ll));
-    env->def("txt", Value("text"));
-    env->def("ten", Value(10ll));
+    env->defByName("num", Value(10ll));
+    env->defByName("txt", Value("text"));
+    env->defByName("ten", Value(10ll));
 
     TEST_CASE(parserTest(parser, env, "(+= num 10)", Value(20ll), true));
     TEST_CASE(parserTest(parser, env, "(-= num 5)",  Value(15ll), true));

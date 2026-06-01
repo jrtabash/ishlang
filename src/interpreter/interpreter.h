@@ -1,6 +1,7 @@
 #ifndef ISHLANG_INTERPRETER_H
 #define ISHLANG_INTERPRETER_H
 
+#include "iden_table.h"
 #include "environment.h"
 #include "interpreter_help.h"
 #include "parser.h"
@@ -30,12 +31,12 @@ namespace Ishlang {
 
     private:
         struct ParserCB {
-            ParserCB(Environment::SharedPtr env, std::string &lastResult, bool &batch);
+            ParserCB(Environment::SharedPtr env, IdenType &lastResult, bool &batch);
             void operator()(CodeNode::SharedPtr &code);
 
         private:
             Environment::SharedPtr  env;
-            std::string            &lastResult;
+            IdenType               &lastResult;
             const bool             &batch;
         };
 
@@ -58,7 +59,7 @@ namespace Ishlang {
 
         std::string prompt_;
         std::string contPrompt_;
-        std::string lastResult_;
+        IdenType    lastResult_;
         bool        batch_;
 
         ParserCB parserCB_;

@@ -298,9 +298,9 @@ DEFINE_TEST(testCodeNodeImportModule) {
         TEST_CASE(env->exists(varName("add")));
         TEST_CASE(env->exists(varName("sub")));
 
-        TEST_CASE(env->get(varName("PI")).isReal());
-        TEST_CASE(env->get(varName("add")).isClosure());
-        TEST_CASE(env->get(varName("sub")).isClosure());
+        TEST_CASE(env->getByName(varName("PI")).isReal());
+        TEST_CASE(env->getByName(varName("add")).isClosure());
+        TEST_CASE(env->getByName(varName("sub")).isClosure());
     }
 
     {
@@ -317,9 +317,9 @@ DEFINE_TEST(testCodeNodeImportModule) {
         TEST_CASE(env->exists(varAsName("add")));
         TEST_CASE(env->exists(varAsName("sub")));
 
-        TEST_CASE(env->get(varAsName("PI")).isReal());
-        TEST_CASE(env->get(varAsName("add")).isClosure());
-        TEST_CASE(env->get(varAsName("sub")).isClosure());
+        TEST_CASE(env->getByName(varAsName("PI")).isReal());
+        TEST_CASE(env->getByName(varAsName("add")).isClosure());
+        TEST_CASE(env->getByName(varAsName("sub")).isClosure());
     }
 }
 
@@ -344,9 +344,9 @@ DEFINE_TEST(testCodeNodeFromModuleImport) {
         TEST_CASE(env->exists("add"));
         TEST_CASE(env->exists("plus"));
 
-        TEST_CASE(env->get("add").isClosure());
-        TEST_CASE(env->get("plus").isClosure());
-        TEST_CASE(env->get("add") == env->get("plus"));
+        TEST_CASE(env->getByName("add").isClosure());
+        TEST_CASE(env->getByName("plus").isClosure());
+        TEST_CASE(env->getByName("add") == env->getByName("plus"));
     }
 
     {
@@ -362,8 +362,8 @@ DEFINE_TEST(testCodeNodeFromModuleImport) {
         TEST_CASE(env->exists("add"));
         TEST_CASE(env->exists("minus"));
 
-        TEST_CASE(env->get("add").isClosure());
-        TEST_CASE(env->get("minus").isClosure());
+        TEST_CASE(env->getByName("add").isClosure());
+        TEST_CASE(env->getByName("minus").isClosure());
     }
 }
 
@@ -450,7 +450,7 @@ DEFINE_TEST(testCodeNodePairOperations) {
     TEST_CASE_MSG(value.pair().first() == Value(1ll), "actual=" << value.pair().first());
     TEST_CASE_MSG(value.pair().second() == Value(2ll), "actual=" << value.pair().second());
 
-    env->def("p", value);
+    env->defByName("p", value);
 
     Value fValue = CodeNode::make<PairFirst>(CodeNode::make<Variable>("p"))->eval(env);
     TEST_CASE_MSG(fValue == Value(1ll), "actual=" << fValue);

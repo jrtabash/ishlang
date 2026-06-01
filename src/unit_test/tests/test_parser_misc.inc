@@ -194,9 +194,9 @@ DEFINE_TEST(testParserImportModule) {
 
         TEST_CASE_MSG(env->size() == 6, "actual=" << env->size());
 
-        TEST_CASE(env->get(varName("PI")) == env->get(varAsName("PI")));
-        TEST_CASE(env->get(varName("add")) == env->get(varAsName("add")));
-        TEST_CASE(env->get(varName("sub")) == env->get(varAsName("sub")));
+        TEST_CASE(env->getByName(varName("PI")) == env->getByName(varAsName("PI")));
+        TEST_CASE(env->getByName(varName("add")) == env->getByName(varAsName("add")));
+        TEST_CASE(env->getByName(varName("sub")) == env->getByName(varAsName("sub")));
 
         TEST_CASE(parserTest(parser, env, "(import pimporttest)",         Value::Null, false));
         TEST_CASE(parserTest(parser, env, "(import pimporttest as test)", Value::Null, false));
@@ -232,8 +232,8 @@ DEFINE_TEST(testParserFromModuleImport) {
 
         TEST_CASE_MSG(env->size() == 4, "actual=" << env->size());
 
-        TEST_CASE(env->get("add") == env->get("plus"));
-        TEST_CASE(env->get("sub") == env->get("minus"));
+        TEST_CASE(env->getByName("add") == env->getByName("plus"));
+        TEST_CASE(env->getByName("sub") == env->getByName("minus"));
 
         TEST_CASE(parserTest(parser, env, "(from pfromtest import add)", Value::Null, false));
         TEST_CASE(parserTest(parser, env, "(from pfromtest import sub)", Value::Null, false));
@@ -252,8 +252,8 @@ DEFINE_TEST(testParserFromModuleImport) {
 
         TEST_CASE_MSG(env->size() == 4, "actual=" << env->size());
 
-        TEST_CASE(env->get("add") == env->get("plus"));
-        TEST_CASE(env->get("sub") == env->get("minus"));
+        TEST_CASE(env->getByName("add") == env->getByName("plus"));
+        TEST_CASE(env->getByName("sub") == env->getByName("minus"));
     }
 
     {
@@ -298,7 +298,7 @@ DEFINE_TEST(testParserPairOperations) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("p", Value(Value::Pair(Value('a'), Value('b'))));
+    env->defByName("p", Value(Value::Pair(Value('a'), Value('b'))));
 
     TEST_CASE(parserTest(parser, env, "(pair 'a' 'b')", Value(Value::Pair(Value('a'), Value('b'))), true));
 

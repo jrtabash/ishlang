@@ -195,7 +195,7 @@ DEFINE_TEST(testCodeNodeHashMapGet) {
     ht.set(kOne, vOne);
     ht.set(kTwo, vTwo);
     ht.set(kThree, vThree);
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
     auto get = [&env](const Value &key, const std::optional<Value> &defaultValue = std::nullopt) {
         return CodeNode::make<HashMapGet>(CodeNode::make<Variable>("ht"),
@@ -231,7 +231,7 @@ DEFINE_TEST(testCodeNodeHashMapGet) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeHashMapSet) {
     auto env = Environment::make();
-    env->def("ht", Value(Hashtable()));
+    env->defByName("ht", Value(Hashtable()));
 
     CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
 
@@ -242,8 +242,8 @@ DEFINE_TEST(testCodeNodeHashMapSet) {
                    return CodeNode::make<HashMapSet>(ht, clit(key), ilit(val))->eval(env);
                };
 
-    auto htget = [&env](Value::Char key) { return env->get("ht").hashMap().get(Value(key)); };
-    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
+    auto htget = [&env](Value::Char key) { return env->getByName("ht").hashMap().get(Value(key)); };
+    auto htlen = [&env]() { return env->getByName("ht").hashMap().size(); };
 
     Value result = set('a', 1);
     TEST_CASE_MSG(result == Value(1ll), "actual=" << result);
@@ -284,7 +284,7 @@ DEFINE_TEST(testCodeNodeHashMapRemove) {
         ht.set(Value('a'), Value(1ll));
         ht.set(Value('b'), Value(2ll));
         ht.set(Value('c'), Value(3ll));
-        env->def("ht", Value(ht));
+        env->defByName("ht", Value(ht));
     }
 
     CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
@@ -295,8 +295,8 @@ DEFINE_TEST(testCodeNodeHashMapRemove) {
                       return CodeNode::make<HashMapRemove>(ht, clit(key))->eval(env);
                   };
 
-    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
-    auto hthas = [&env](Value::Char key) { return env->get("ht").hashMap().exists(Value(key)); };
+    auto htlen = [&env]() { return env->getByName("ht").hashMap().size(); };
+    auto hthas = [&env](Value::Char key) { return env->getByName("ht").hashMap().exists(Value(key)); };
 
     TEST_CASE_MSG(htlen() == 3, "actual=" << htlen());
     TEST_CASE(hthas('a'));
@@ -339,7 +339,7 @@ DEFINE_TEST(testCodeNodeHashMapClear) {
         ht.set(Value('a'), Value(1ll));
         ht.set(Value('b'), Value(2ll));
         ht.set(Value('c'), Value(3ll));
-        env->def("ht", Value(ht));
+        env->defByName("ht", Value(ht));
     }
 
     CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
@@ -348,8 +348,8 @@ DEFINE_TEST(testCodeNodeHashMapClear) {
                      return CodeNode::make<HashMapClear>(ht)->eval(env);
                  };
 
-    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
-    auto hthas = [&env](Value::Char key) { return env->get("ht").hashMap().exists(Value(key)); };
+    auto htlen = [&env]() { return env->getByName("ht").hashMap().size(); };
+    auto hthas = [&env](Value::Char key) { return env->getByName("ht").hashMap().exists(Value(key)); };
 
     TEST_CASE(htlen() == 3);
     TEST_CASE(hthas('a'));
@@ -382,7 +382,7 @@ DEFINE_TEST(testCodeNodeHashMapFind) {
         ht.set(Value('a'), Value(1ll));
         ht.set(Value('b'), Value(2ll));
         ht.set(Value('c'), Value(3ll));
-        env->def("ht", Value(ht));
+        env->defByName("ht", Value(ht));
     }
 
     CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
@@ -419,7 +419,7 @@ DEFINE_TEST(testCodeNodeHashMapCount) {
         ht.set(Value('b'), Value(2ll));
         ht.set(Value('c'), Value(3ll));
         ht.set(Value('2'), Value(2ll));
-        env->def("ht", Value(ht));
+        env->defByName("ht", Value(ht));
     }
 
     CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
@@ -455,7 +455,7 @@ DEFINE_TEST(testCodeNodeHashMapKeys) {
         ht.set(Value('a'), Value(1ll));
         ht.set(Value('b'), Value(2ll));
         ht.set(Value('c'), Value(3ll));
-        env->def("ht", Value(ht));
+        env->defByName("ht", Value(ht));
     }
 
     CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
@@ -495,7 +495,7 @@ DEFINE_TEST(testCodeNodeHashMapValues) {
         ht.set(Value('b'), Value(2ll));
         ht.set(Value('c'), Value(3ll));
         ht.set(Value('2'), Value(2ll));
-        env->def("ht", Value(ht));
+        env->defByName("ht", Value(ht));
     }
 
     CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");
@@ -535,7 +535,7 @@ DEFINE_TEST(testCodeNodeHashMapItems) {
         ht.set(Value('b'), Value(2ll));
         ht.set(Value('c'), Value(3ll));
         ht.set(Value('2'), Value(2ll));
-        env->def("ht", Value(ht));
+        env->defByName("ht", Value(ht));
     }
 
     CodeNode::SharedPtr ht = CodeNode::make<Variable>("ht");

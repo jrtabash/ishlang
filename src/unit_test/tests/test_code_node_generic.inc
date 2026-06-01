@@ -289,7 +289,7 @@ DEFINE_TEST(testCodeNodeGenericSet) {
     };
 
     { // String
-        env->def("txt", Value("hello"));
+        env->defByName("txt", Value("hello"));
         const auto finalTxt = Value("HELLO");
 
         for (auto [i, c] : std::vector<std::pair<Value::Long, char>>{{0ll, 'H'}, {1ll, 'E'}, {2ll, 'L'}, {3ll, 'L'}, {4ll, 'O'}}) {
@@ -298,7 +298,7 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             TEST_CASE_MSG(val.character() == c, "actual=" << val << " index=" << i);
         }
 
-        TEST_CASE_MSG(env->get("txt") == finalTxt, "actual=" << env->get("txt"));
+        TEST_CASE_MSG(env->getByName("txt") == finalTxt, "actual=" << env->getByName("txt"));
 
         try {
             set("txt", "0", 'T')->eval(env);
@@ -309,7 +309,7 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             TEST_CASE(false);
         }
 
-        TEST_CASE_MSG(env->get("txt") == finalTxt, "actual=" << env->get("txt"));
+        TEST_CASE_MSG(env->getByName("txt") == finalTxt, "actual=" << env->getByName("txt"));
 
         try {
             set("txt", 5ll, 'T')->eval(env);
@@ -320,11 +320,11 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             TEST_CASE(false);
         }
 
-        TEST_CASE_MSG(env->get("txt") == finalTxt, "actual=" << env->get("txt"));
+        TEST_CASE_MSG(env->getByName("txt") == finalTxt, "actual=" << env->getByName("txt"));
     }
 
     { // Array
-        env->def("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll)})));
+        env->defByName("seq", Value(Sequence(std::vector{Value(1ll), Value(2ll), Value(3ll)})));
         const auto finalSeq = Value(Sequence(std::vector{Value(10ll), Value(20ll), Value(30ll)}));
 
         for (Value::Long i : {0, 1, 2}) {
@@ -333,7 +333,7 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             TEST_CASE_MSG(val.integer() == 10 * i + 10, "actual=" << val << " index=" << i);
         }
 
-        TEST_CASE_MSG(env->get("seq") == finalSeq, "actual=" << env->get("seq"));
+        TEST_CASE_MSG(env->getByName("seq") == finalSeq, "actual=" << env->getByName("seq"));
 
         try {
             set("seq", "0", 25ll)->eval(env);
@@ -344,7 +344,7 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             TEST_CASE(false);
         }
 
-        TEST_CASE_MSG(env->get("seq") == finalSeq, "actual=" << env->get("seq"));
+        TEST_CASE_MSG(env->getByName("seq") == finalSeq, "actual=" << env->getByName("seq"));
 
         try {
             set("seq", 5ll, 25ll)->eval(env);
@@ -355,14 +355,14 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             TEST_CASE(false);
         }
 
-        TEST_CASE_MSG(env->get("seq") == finalSeq, "actual=" << env->get("seq"));
+        TEST_CASE_MSG(env->getByName("seq") == finalSeq, "actual=" << env->getByName("seq"));
     }
 
     { // HashMap
         auto rawTab = Hashtable();
         rawTab.set(Value(1ll), Value(100ll));
         rawTab.set(Value(2ll), Value(200ll));
-        env->def("tab", Value(rawTab));
+        env->defByName("tab", Value(rawTab));
 
         auto ft = Hashtable();
         ft.set(Value(1ll), Value(1000ll));
@@ -375,14 +375,14 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             TEST_CASE_MSG(val.integer() == v, "actual=" << val << " key=" << i);
         }
 
-        TEST_CASE_MSG(env->get("tab") == finalTab, "actual=" << env->get("tab"));
+        TEST_CASE_MSG(env->getByName("tab") == finalTab, "actual=" << env->getByName("tab"));
     }
 
     { // OrderedMap
         auto rawTab = OrderedTable();
         rawTab.set(Value(1ll), Value(100ll));
         rawTab.set(Value(2ll), Value(200ll));
-        env->def("tab2", Value(rawTab));
+        env->defByName("tab2", Value(rawTab));
 
         auto ft = OrderedTable();
         ft.set(Value(1ll), Value(1000ll));
@@ -395,12 +395,12 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             TEST_CASE_MSG(val.integer() == v, "actual=" << val << " key=" << i);
         }
 
-        TEST_CASE_MSG(env->get("tab2") == finalTab, "actual=" << env->get("tab"));
+        TEST_CASE_MSG(env->getByName("tab2") == finalTab, "actual=" << env->getByName("tab"));
     }
 
     { // UserObject
         auto rawType = Struct("Person", Struct::MemberList{"name", "age"});
-        env->def("obj", Value(Instance(rawType, Instance::InitArgs{{"name", Value("J")}, {"age", Value(20ll)}})));
+        env->defByName("obj", Value(Instance(rawType, Instance::InitArgs{{"name", Value("J")}, {"age", Value(20ll)}})));
 
         auto finalInst = Value(Instance(rawType, Instance::InitArgs{{"name", Value("Jon")}, {"age", Value(25ll)}}));
 
@@ -422,7 +422,7 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             CodeNode::make<Literal>(Value(25ll)))->eval(env);
         TEST_CASE_MSG(val == Value(25ll), "actual=" << val);
 
-        TEST_CASE_MSG(env->get("obj") == finalInst, "actual=" << env->get("obj"));
+        TEST_CASE_MSG(env->getByName("obj") == finalInst, "actual=" << env->getByName("obj"));
 
         try {
             set("obj", 0ll, "Test")->eval(env);
@@ -433,7 +433,7 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             TEST_CASE(false);
         }
 
-        TEST_CASE_MSG(env->get("obj") == finalInst, "actual=" << env->get("obj"));
+        TEST_CASE_MSG(env->getByName("obj") == finalInst, "actual=" << env->getByName("obj"));
 
         try {
             set("obj", "address", "Test")->eval(env);
@@ -444,11 +444,11 @@ DEFINE_TEST(testCodeNodeGenericSet) {
             TEST_CASE(false);
         }
 
-        TEST_CASE_MSG(env->get("obj") == finalInst, "actual=" << env->get("obj"));
+        TEST_CASE_MSG(env->getByName("obj") == finalInst, "actual=" << env->getByName("obj"));
     }
 
     try {
-        env->def("dummy", Value(5ll));
+        env->defByName("dummy", Value(5ll));
         set("dummy", 0ll, 100ll)->eval(env);
         TEST_CASE(false);
     }
@@ -461,17 +461,17 @@ DEFINE_TEST(testCodeNodeGenericSet) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeGenericClear) {
     auto env = Environment::make();
-    env->def("a", Value(Sequence(std::vector{Value::Zero, Value::Null})));
-    env->def("s", Value("1234"));
-    env->def("i", Value(5ll));
+    env->defByName("a", Value(Sequence(std::vector{Value::Zero, Value::Null})));
+    env->defByName("s", Value("1234"));
+    env->defByName("i", Value(5ll));
 
     auto rawTab = Hashtable();
     rawTab.set(Value(1ll), Value(100ll));
-    env->def("h", rawTab);
+    env->defByName("h", rawTab);
 
     auto rawTab2 = OrderedTable();
     rawTab2.set(Value(1ll), Value(100ll));
-    env->def("o", rawTab2);
+    env->defByName("o", rawTab2);
 
     auto clr = [](char const * name) {
         return CodeNode::make<GenericClear>(CodeNode::make<Variable>(name));
@@ -480,22 +480,22 @@ DEFINE_TEST(testCodeNodeGenericClear) {
     auto val = clr("a")->eval(env);
     TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
     TEST_CASE_MSG(val.integer() == 2, "actual=" << val);
-    TEST_CASE_MSG(env->get("a") == Value(Sequence()), "actual=" << env->get("a"));
+    TEST_CASE_MSG(env->getByName("a") == Value(Sequence()), "actual=" << env->getByName("a"));
 
     val = clr("s")->eval(env);
     TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
     TEST_CASE_MSG(val.integer() == 4, "actual=" << val);
-    TEST_CASE_MSG(env->get("s") == Value(""), "actual=" << env->get("s"));
+    TEST_CASE_MSG(env->getByName("s") == Value(""), "actual=" << env->getByName("s"));
 
     val = clr("h")->eval(env);
     TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
     TEST_CASE_MSG(val.integer() == 1, "actual=" << val);
-    TEST_CASE_MSG(env->get("h") == Value(Hashtable()), "actual=" << env->get("h"));
+    TEST_CASE_MSG(env->getByName("h") == Value(Hashtable()), "actual=" << env->getByName("h"));
 
     val = clr("o")->eval(env);
     TEST_CASE_MSG(val.isInt(), "actual=" << Value::typeToString(val.type()));
     TEST_CASE_MSG(val.integer() == 1, "actual=" << val);
-    TEST_CASE_MSG(env->get("o") == Value(OrderedTable()), "actual=" << env->get("o"));
+    TEST_CASE_MSG(env->getByName("o") == Value(OrderedTable()), "actual=" << env->getByName("o"));
 
     try {
         clr("i")->eval(env);
@@ -802,9 +802,9 @@ DEFINE_TEST(testCodeNodeGenericSort) {
     const auto v6 = Value(6ll);
     const auto v7 = Value(7ll);
 
-    env->def("num", Value(5ll));
-    env->def("str", Value("3215674"));
-    env->def("arr", arrval(v3, v2, v1, v5, v6, v7, v4));
+    env->defByName("num", Value(5ll));
+    env->defByName("str", Value("3215674"));
+    env->defByName("arr", arrval(v3, v2, v1, v5, v6, v7, v4));
 
     const auto sort = [](const char *obj, const Value &desc = Value::Null) {
         return CodeNode::make<GenericSort>(
@@ -812,8 +812,8 @@ DEFINE_TEST(testCodeNodeGenericSort) {
             desc != Value::Null ? CodeNode::make<Literal>(desc) : CodeNode::SharedPtr());
     };
 
-    const auto str = [&env]() { return env->get("str"); };
-    const auto arr = [&env]() { return env->get("arr"); };
+    const auto str = [&env]() { return env->getByName("str"); };
+    const auto arr = [&env]() { return env->getByName("arr"); };
 
     { // String
         auto val = sort("str")->eval(env);
@@ -893,16 +893,16 @@ DEFINE_TEST(testCodeNodeGenericReverse) {
     const auto v4 = Value(4ll);
     const auto v5 = Value(5ll);
 
-    env->def("num", Value(5ll));
-    env->def("str", Value("12345"));
-    env->def("arr", arrval(v1, v2, v3, v4, v5));
+    env->defByName("num", Value(5ll));
+    env->defByName("str", Value("12345"));
+    env->defByName("arr", arrval(v1, v2, v3, v4, v5));
 
     const auto reverse = [](const char *obj) {
         return CodeNode::make<GenericReverse>(CodeNode::make<Variable>(obj));
     };
 
-    const auto str = [&env]() { return env->get("str"); };
-    const auto arr = [&env]() { return env->get("arr"); };
+    const auto str = [&env]() { return env->getByName("str"); };
+    const auto arr = [&env]() { return env->getByName("arr"); };
 
     { // String
         auto val = reverse("str")->eval(env);
@@ -956,18 +956,18 @@ DEFINE_TEST(testCodeNodeGenericSum) {
 
     const auto c1 = Value('c');
 
-    env->def("num", Value(5ll));
-    env->def("rng0", Value(IntegerRange(0)));
-    env->def("rng1", Value(IntegerRange(10)));
-    env->def("arr0", arrval());
-    env->def("arr1", arrval(v1, v2, v3, v4, v5));
-    env->def("arr2", arrval(f1, f2, f3));
-    env->def("arr3", arrval(v1, f2, v3));
-    env->def("mix", arrval(v1, c1, f1));
-    env->def("p0", ValuePair(v4, v5));
-    env->def("p1", ValuePair(f2, f3));
-    env->def("p2", ValuePair(v2, f3));
-    env->def("p3", ValuePair(v2, c1));
+    env->defByName("num", Value(5ll));
+    env->defByName("rng0", Value(IntegerRange(0)));
+    env->defByName("rng1", Value(IntegerRange(10)));
+    env->defByName("arr0", arrval());
+    env->defByName("arr1", arrval(v1, v2, v3, v4, v5));
+    env->defByName("arr2", arrval(f1, f2, f3));
+    env->defByName("arr3", arrval(v1, f2, v3));
+    env->defByName("mix", arrval(v1, c1, f1));
+    env->defByName("p0", ValuePair(v4, v5));
+    env->defByName("p1", ValuePair(f2, f3));
+    env->defByName("p2", ValuePair(v2, f3));
+    env->defByName("p3", ValuePair(v2, c1));
 
     const auto sum = [](const char *obj) {
         return CodeNode::make<GenericSum>(CodeNode::make<Variable>(obj));
@@ -1057,16 +1057,16 @@ DEFINE_TEST(testCodeNodeGenericApply) {
     const auto v2 = Value(2ll);
     const auto v3 = Value(3ll);
 
-    env->def("num", Value(5ll));
-    env->def("rng0", Value(IntegerRange(1, 1)));
-    env->def("rng1", Value(IntegerRange(1, 2)));
-    env->def("rng2", Value(IntegerRange(1, 3)));
-    env->def("rng3", Value(IntegerRange(1, 4)));
-    env->def("arr0", arrval());
-    env->def("arr1", arrval(v1));
-    env->def("arr2", arrval(v1, v2));
-    env->def("arr3", arrval(v1, v2, v3));
-    env->def("p", ValuePair(v1, v2));
+    env->defByName("num", Value(5ll));
+    env->defByName("rng0", Value(IntegerRange(1, 1)));
+    env->defByName("rng1", Value(IntegerRange(1, 2)));
+    env->defByName("rng2", Value(IntegerRange(1, 3)));
+    env->defByName("rng3", Value(IntegerRange(1, 4)));
+    env->defByName("arr0", arrval());
+    env->defByName("arr1", arrval(v1));
+    env->defByName("arr2", arrval(v1, v2));
+    env->defByName("arr3", arrval(v1, v2, v3));
+    env->defByName("p", ValuePair(v1, v2));
 
     const auto adder = [](size_t paramsSize) {
         Lambda::ParamList params;

@@ -195,7 +195,7 @@ DEFINE_TEST(testCodeNodeOrderedMapGet) {
     ot.set(kOne, vOne);
     ot.set(kTwo, vTwo);
     ot.set(kThree, vThree);
-    env->def("ot", Value(ot));
+    env->defByName("ot", Value(ot));
 
     auto get = [&env](const Value &key, const std::optional<Value> &defaultValue = std::nullopt) {
         return CodeNode::make<OrderedMapGet>(
@@ -232,7 +232,7 @@ DEFINE_TEST(testCodeNodeOrderedMapGet) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeOrderedMapSet) {
     auto env = Environment::make();
-    env->def("ot", Value(OrderedTable()));
+    env->defByName("ot", Value(OrderedTable()));
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
 
@@ -243,8 +243,8 @@ DEFINE_TEST(testCodeNodeOrderedMapSet) {
         return CodeNode::make<OrderedMapSet>(ot, clit(key), ilit(val))->eval(env);
     };
 
-    auto otget = [&env](Value::Char key) { return env->get("ot").orderedMap().get(Value(key)); };
-    auto otlen = [&env]() { return env->get("ot").orderedMap().size(); };
+    auto otget = [&env](Value::Char key) { return env->getByName("ot").orderedMap().get(Value(key)); };
+    auto otlen = [&env]() { return env->getByName("ot").orderedMap().size(); };
 
     Value result = set('a', 1);
     TEST_CASE_MSG(result == Value(1ll), "actual=" << result);
@@ -285,7 +285,7 @@ DEFINE_TEST(testCodeNodeOrderedMapRemove) {
         ot.set(Value('a'), Value(1ll));
         ot.set(Value('b'), Value(2ll));
         ot.set(Value('c'), Value(3ll));
-        env->def("ot", Value(ot));
+        env->defByName("ot", Value(ot));
     }
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
@@ -296,8 +296,8 @@ DEFINE_TEST(testCodeNodeOrderedMapRemove) {
         return CodeNode::make<OrderedMapRemove>(ot, clit(key))->eval(env);
     };
 
-    auto otlen = [&env]() { return env->get("ot").orderedMap().size(); };
-    auto othas = [&env](Value::Char key) { return env->get("ot").orderedMap().exists(Value(key)); };
+    auto otlen = [&env]() { return env->getByName("ot").orderedMap().size(); };
+    auto othas = [&env](Value::Char key) { return env->getByName("ot").orderedMap().exists(Value(key)); };
 
     TEST_CASE_MSG(otlen() == 3, "actual=" << otlen());
     TEST_CASE(othas('a'));
@@ -340,7 +340,7 @@ DEFINE_TEST(testCodeNodeOrderedMapClear) {
         ot.set(Value('a'), Value(1ll));
         ot.set(Value('b'), Value(2ll));
         ot.set(Value('c'), Value(3ll));
-        env->def("ot", Value(ot));
+        env->defByName("ot", Value(ot));
     }
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
@@ -349,8 +349,8 @@ DEFINE_TEST(testCodeNodeOrderedMapClear) {
         return CodeNode::make<OrderedMapClear>(ot)->eval(env);
     };
 
-    auto otlen = [&env]() { return env->get("ot").orderedMap().size(); };
-    auto othas = [&env](Value::Char key) { return env->get("ot").orderedMap().exists(Value(key)); };
+    auto otlen = [&env]() { return env->getByName("ot").orderedMap().size(); };
+    auto othas = [&env](Value::Char key) { return env->getByName("ot").orderedMap().exists(Value(key)); };
 
     TEST_CASE(otlen() == 3);
     TEST_CASE(othas('a'));
@@ -383,7 +383,7 @@ DEFINE_TEST(testCodeNodeOrderedMapFind) {
         ot.set(Value('a'), Value(1ll));
         ot.set(Value('b'), Value(2ll));
         ot.set(Value('c'), Value(3ll));
-        env->def("ot", Value(ot));
+        env->defByName("ot", Value(ot));
     }
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
@@ -420,7 +420,7 @@ DEFINE_TEST(testCodeNodeOrderedMapCount) {
         ot.set(Value('b'), Value(2ll));
         ot.set(Value('c'), Value(3ll));
         ot.set(Value('2'), Value(2ll));
-        env->def("ot", Value(ot));
+        env->defByName("ot", Value(ot));
     }
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
@@ -456,7 +456,7 @@ DEFINE_TEST(testCodeNodeOrderedMapKeys) {
         ot.set(Value('b'), Value(2ll));
         ot.set(Value('c'), Value(3ll));
         ot.set(Value('a'), Value(1ll));
-        env->def("ot", Value(ot));
+        env->defByName("ot", Value(ot));
     }
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
@@ -495,7 +495,7 @@ DEFINE_TEST(testCodeNodeOrderedMapValues) {
         ot.set(Value('a'), Value(1ll));
         ot.set(Value('2'), Value(2ll));
         ot.set(Value('b'), Value(2ll));
-        env->def("ot", Value(ot));
+        env->defByName("ot", Value(ot));
     }
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
@@ -535,7 +535,7 @@ DEFINE_TEST(testCodeNodeOrderedMapItems) {
         ot.set(Value('a'), Value(1ll));
         ot.set(Value('2'), Value(2ll));
         ot.set(Value('b'), Value(2ll));
-        env->def("ot", Value(ot));
+        env->defByName("ot", Value(ot));
     }
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
@@ -581,7 +581,7 @@ DEFINE_TEST(testCodeNodeOrderedMapReverseKeys) {
         ot.set(Value('b'), Value(2ll));
         ot.set(Value('c'), Value(3ll));
         ot.set(Value('a'), Value(1ll));
-        env->def("ot", Value(ot));
+        env->defByName("ot", Value(ot));
     }
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
@@ -620,7 +620,7 @@ DEFINE_TEST(testCodeNodeOrderedMapReverseValues) {
         ot.set(Value('a'), Value(1ll));
         ot.set(Value('2'), Value(2ll));
         ot.set(Value('b'), Value(2ll));
-        env->def("ot", Value(ot));
+        env->defByName("ot", Value(ot));
     }
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");
@@ -660,7 +660,7 @@ DEFINE_TEST(testCodeNodeOrderedMapReverseItems) {
         ot.set(Value('a'), Value(1ll));
         ot.set(Value('2'), Value(2ll));
         ot.set(Value('b'), Value(2ll));
-        env->def("ot", Value(ot));
+        env->defByName("ot", Value(ot));
     }
 
     CodeNode::SharedPtr ot = CodeNode::make<Variable>("ot");

@@ -225,9 +225,9 @@ DEFINE_TEST(testCodeNodeArithAssignOp) {
     constexpr const char *num = "num";
     constexpr const char *txt = "txt";
     constexpr const char *ten = "oth";
-    env->def(num, Value::Zero);
-    env->def(txt, Value("test"));
-    env->def(ten, Value(10ll));
+    env->defByName(num, Value::Zero);
+    env->defByName(txt, Value("test"));
+    env->defByName(ten, Value(10ll));
 
     const auto update = [](ArithAssignOp::Type op, const char * varName, Value delta) {
         return CodeNode::make<ArithAssignOp>(op, varName, CodeNode::make<Literal>(delta));
@@ -237,31 +237,31 @@ DEFINE_TEST(testCodeNodeArithAssignOp) {
 
     result = update(ArithAssignOp::Add, num, Value(10ll))->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
-    TEST_CASE_MSG(env->get(num) == Value(10ll), "actual=" << env->get(num));
+    TEST_CASE_MSG(env->getByName(num) == Value(10ll), "actual=" << env->getByName(num));
 
     result = update(ArithAssignOp::Sub, num, Value(5ll))->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
-    TEST_CASE_MSG(env->get(num) == Value(5ll), "actual=" << env->get(num));
+    TEST_CASE_MSG(env->getByName(num) == Value(5ll), "actual=" << env->getByName(num));
 
     result = update(ArithAssignOp::Mul, num, Value(4ll))->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
-    TEST_CASE_MSG(env->get(num) == Value(20ll), "actual=" << env->get(num));
+    TEST_CASE_MSG(env->getByName(num) == Value(20ll), "actual=" << env->getByName(num));
 
     result = update(ArithAssignOp::Div, num, Value(2ll))->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
-    TEST_CASE_MSG(env->get(num) == Value(10ll), "actual=" << env->get(num));
+    TEST_CASE_MSG(env->getByName(num) == Value(10ll), "actual=" << env->getByName(num));
 
     result = update(ArithAssignOp::Mod, num, Value(4ll))->eval(env);
     TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
-    TEST_CASE_MSG(env->get(num) == Value(2ll), "actual=" << env->get(num));
+    TEST_CASE_MSG(env->getByName(num) == Value(2ll), "actual=" << env->getByName(num));
 
     result = update(ArithAssignOp::Pow, num, Value(3ll))->eval(env);
     TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
-    TEST_CASE_MSG(env->get(num) == Value(8.0), "actual=" << env->get(num));
+    TEST_CASE_MSG(env->getByName(num) == Value(8.0), "actual=" << env->getByName(num));
 
     result = update(ArithAssignOp::Add, num, Value(2ll))->eval(env);
     TEST_CASE_MSG(result.isReal(), "actual=" << result.typeToString());
-    TEST_CASE_MSG(env->get(num) == Value(10.0), "actual=" << env->get(num));
+    TEST_CASE_MSG(env->getByName(num) == Value(10.0), "actual=" << env->getByName(num));
 
     try {
         update(ArithAssignOp::Add, txt, Value(1ll))->eval(env);

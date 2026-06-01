@@ -47,7 +47,7 @@ Value Module::import(Environment::SharedPtr importEnv, const OptionalName &asNam
     const std::string &importName = asName ? *asName : name_;
     env_->foreach(
         [&importEnv, &importName](const std::string &varName, const Value &varValue) {
-            importEnv->def(importName + '.' + varName, varValue);
+            importEnv->defByName(importName + '.' + varName, varValue);
         });
     return Value::True;
 }
@@ -56,7 +56,7 @@ Value Module::import(Environment::SharedPtr importEnv, const OptionalName &asNam
 Value Module::alias(Environment::SharedPtr aliasEnv, const std::string &name, const OptionalName &asName) {
     if (env_->exists(name)) {
         const std::string &aliasName = asName ? *asName : name;
-        aliasEnv->def(aliasName, env_->get(name));
+        aliasEnv->defByName(aliasName, env_->get(env_->idenTable().mapName(name)));
         return Value::True;
     }
     return Value::False;

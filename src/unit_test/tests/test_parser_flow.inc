@@ -125,7 +125,7 @@ DEFINE_TEST(testParserForeach) {
 
     add_var("arrCnt", "0");
     TEST_CASE(parserTest(parser, env, "(foreach i arr (progn (when (> i 3) (break)) (= arrCnt (+ arrCnt 1))))", Value::Null, true));
-    TEST_CASE(env->get("arrCnt") == Value(3ll));
+    TEST_CASE(env->getByName("arrCnt") == Value(3ll));
 
     TEST_CASE(parserTest(parser, env, "(foreach)",                 Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(foreach x)",               Value::Null, false));

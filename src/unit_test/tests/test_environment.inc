@@ -14,8 +14,8 @@ DEFINE_TEST(testEnvironment) {
     TEST_CASE(env->size() == 0);
 
     try {
-        env->def("x", Value::Null);
-        env->def("y", Value::Null);
+        env->defByName("x", Value::Null);
+        env->defByName("y", Value::Null);
     }
     catch (const DuplicateDef &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
@@ -27,7 +27,7 @@ DEFINE_TEST(testEnvironment) {
     TEST_CASE(!env->exists("z"));
 
     try {
-        env->def("x", Value::Null);
+        env->defByName("x", Value::Null);
         TEST_CASE(false);
     }
     catch (const DuplicateDef &ex) { TEST_CASE(true); }
@@ -35,40 +35,40 @@ DEFINE_TEST(testEnvironment) {
 
     try {
         auto childEnv = Environment::make(env);
-        childEnv->def("x", Value::True);
+        childEnv->defByName("x", Value::True);
     }
     catch (const DuplicateDef &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
 
     try {
-        env->get("nothing");
+        env->getByName("nothing");
         TEST_CASE(false);
     }
     catch (const UnknownSymbol &ex) {}
     catch (...) { TEST_CASE(false); }
 
     try {
-        TEST_CASE_MSG(env->get("x").isNull(), "actual=" << env->get("x"));
-        TEST_CASE_MSG(env->get("y").isNull(), "actual=" << env->get("y"));
+        TEST_CASE_MSG(env->getByName("x").isNull(), "actual=" << env->getByName("x"));
+        TEST_CASE_MSG(env->getByName("y").isNull(), "actual=" << env->getByName("y"));
     }
     catch (const UnknownSymbol &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
 
     try {
-        env->set("x", Value(2ll));
-        env->set("y", Value('c'));
+        env->setByName("x", Value(2ll));
+        env->setByName("y", Value('c'));
 
-        TEST_CASE_MSG(env->get("x").integer() == 2ll, "actual=" << env->get("x"));
-        TEST_CASE_MSG(env->get("y").character() == 'c', "actual=" << env->get("y"));
+        TEST_CASE_MSG(env->getByName("x").integer() == 2ll, "actual=" << env->getByName("x"));
+        TEST_CASE_MSG(env->getByName("y").character() == 'c', "actual=" << env->getByName("y"));
     }
     catch (const UnknownSymbol &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
 
     try {
-        env->set("x", Value(24ll));
+        env->setByName("x", Value(24ll));
 
-        TEST_CASE_MSG(env->get("x").integer() == 24ll, "actual=" << env->get("x"));
-        TEST_CASE_MSG(env->get("y").character() == 'c', "actual=" << env->get("y"));
+        TEST_CASE_MSG(env->getByName("x").integer() == 24ll, "actual=" << env->getByName("x"));
+        TEST_CASE_MSG(env->getByName("y").character() == 'c', "actual=" << env->getByName("y"));
     }
     catch (const UnknownSymbol &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
@@ -76,54 +76,54 @@ DEFINE_TEST(testEnvironment) {
     auto child = Environment::make(env);
 
     try {
-        child->get("nothing");
+        child->getByName("nothing");
         TEST_CASE(false);
     }
     catch (const UnknownSymbol &ex) {}
     catch (...) { TEST_CASE(false); }
 
     try {
-        child->def("z", Value(true));
+        child->defByName("z", Value(true));
 
-        TEST_CASE_MSG(child->get("x").integer() == 24ll, "actual=" << child->get("x"));
-        TEST_CASE_MSG(child->get("y").character() == 'c', "actual=" << child->get("y"));
-        TEST_CASE_MSG(child->get("z").boolean() == true, "actual=" << child->get("z"));
+        TEST_CASE_MSG(child->getByName("x").integer() == 24ll, "actual=" << child->getByName("x"));
+        TEST_CASE_MSG(child->getByName("y").character() == 'c', "actual=" << child->getByName("y"));
+        TEST_CASE_MSG(child->getByName("z").boolean() == true, "actual=" << child->getByName("z"));
     }
     catch (const DuplicateDef &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
 
     try {
-        child->set("z", Value(false));
-        child->set("x", Value(30ll));
+        child->setByName("z", Value(false));
+        child->setByName("x", Value(30ll));
 
-        TEST_CASE_MSG(child->get("x").integer() == 30ll, "actual=" << child->get("x"));
-        TEST_CASE_MSG(child->get("y").character() == 'c', "actual=" << child->get("y"));
-        TEST_CASE_MSG(child->get("z").boolean() == false, "actual=" << child->get("z"));
+        TEST_CASE_MSG(child->getByName("x").integer() == 30ll, "actual=" << child->getByName("x"));
+        TEST_CASE_MSG(child->getByName("y").character() == 'c', "actual=" << child->getByName("y"));
+        TEST_CASE_MSG(child->getByName("z").boolean() == false, "actual=" << child->getByName("z"));
     }
     catch (const UnknownSymbol &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
 
     try {
-        TEST_CASE_MSG(env->get("x").integer() == 30ll, "actual=" << env->get("x"));
-        TEST_CASE_MSG(env->get("y").character() == 'c', "actual=" << env->get("y"));
+        TEST_CASE_MSG(env->getByName("x").integer() == 30ll, "actual=" << env->getByName("x"));
+        TEST_CASE_MSG(env->getByName("y").character() == 'c', "actual=" << env->getByName("y"));
     }
     catch (const UnknownSymbol &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
 
     try {
-        child->def("x", Value('a'));
+        child->defByName("x", Value('a'));
 
-        TEST_CASE_MSG(child->get("x").character() == 'a', "actual=" << child->get("x"));
-        TEST_CASE_MSG(child->get("x").integer() == 0ll, "actual=" << child->get("x"));
-        TEST_CASE_MSG(child->get("y").character() == 'c', "actual=" << child->get("y"));
-        TEST_CASE_MSG(child->get("z").boolean() == false, "actual=" << child->get("z"));
+        TEST_CASE_MSG(child->getByName("x").character() == 'a', "actual=" << child->getByName("x"));
+        TEST_CASE_MSG(child->getByName("x").integer() == 0ll, "actual=" << child->getByName("x"));
+        TEST_CASE_MSG(child->getByName("y").character() == 'c', "actual=" << child->getByName("y"));
+        TEST_CASE_MSG(child->getByName("z").boolean() == false, "actual=" << child->getByName("z"));
     }
     catch (const DuplicateDef &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
 
     try {
-        TEST_CASE_MSG(env->get("x").integer() == 30ll, "actual=" << env->get("x"));
-        TEST_CASE_MSG(env->get("y").character() == 'c', "actual=" << env->get("y"));
+        TEST_CASE_MSG(env->getByName("x").integer() == 30ll, "actual=" << env->getByName("x"));
+        TEST_CASE_MSG(env->getByName("y").character() == 'c', "actual=" << env->getByName("y"));
     }
     catch (const UnknownSymbol &ex) { TEST_CASE(false); }
     catch (...) { TEST_CASE(false); }
@@ -139,9 +139,9 @@ DEFINE_TEST(testEnvironment) {
 // -------------------------------------------------------------
 DEFINE_TEST(testEnvironmentForeach) {
     auto env = Environment::make();
-    env->def("one", Value(1ll));
-    env->def("two", Value(2ll));
-    env->def("three", Value(3ll));
+    env->defByName("one", Value(1ll));
+    env->defByName("two", Value(2ll));
+    env->defByName("three", Value(3ll));
 
     unsigned count = 0;
     std::unordered_map<std::string, Value> nameValues{

@@ -9,7 +9,7 @@ using namespace Ishlang;
 // -------------------------------------------------------------
 DEFINE_TEST(testLambda) {
     auto env = Environment::make();
-    env->def("x", Value::Zero);
+    env->defByName("x", Value::Zero);
 
     const Lambda::ParamList params({"x", "y"});
     CodeNode::SharedPtr body(

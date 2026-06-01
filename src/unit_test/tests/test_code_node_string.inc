@@ -94,7 +94,7 @@ DEFINE_TEST(testCodeNodeStringGet) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeStringSet) {
     auto env = Environment::make();
-    env->def("str", Value("abc"));
+    env->defByName("str", Value("abc"));
 
     CodeNode::SharedPtr var = CodeNode::make<Variable>("str");
 
@@ -162,7 +162,7 @@ DEFINE_TEST(testCodeNodeStringSet) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeStringCat) {
     auto env = Environment::make();
-    env->def("str", Value("abc"));
+    env->defByName("str", Value("abc"));
 
     CodeNode::SharedPtr var = CodeNode::make<Variable>("str");
 
@@ -204,7 +204,7 @@ DEFINE_TEST(testCodeNodeStringCat) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeSubString) {
     auto env = Environment::make();
-    env->def("str", Value("0123456789"));
+    env->defByName("str", Value("0123456789"));
 
     CodeNode::SharedPtr var = CodeNode::make<Variable>("str");
     CodeNode::SharedPtr minus1 = CodeNode::make<Literal>(Value(-1ll));
@@ -270,7 +270,7 @@ DEFINE_TEST(testCodeNodeSubString) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeStringFind) {
     auto env = Environment::make();
-    env->def("str", Value("0123456789"));
+    env->defByName("str", Value("0123456789"));
 
     CodeNode::SharedPtr var = CodeNode::make<Variable>("str");
 
@@ -348,7 +348,7 @@ DEFINE_TEST(testCodeNodeStringFind) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeStringCount) {
     auto env = Environment::make();
-    env->def("str", Value("0120344501223678910"));
+    env->defByName("str", Value("0120344501223678910"));
 
     CodeNode::SharedPtr var = CodeNode::make<Variable>("str");
 
@@ -391,11 +391,11 @@ DEFINE_TEST(testCodeNodeStringCount) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeStringCompare) {
     auto env = Environment::make();
-    env->def("str1", Value("abcde"));
-    env->def("str2", Value("bcdef"));
-    env->def("str3", Value("cdefg"));
-    env->def("str4", Value("cdefg"));
-    env->def("num", Value::Zero);
+    env->defByName("str1", Value("abcde"));
+    env->defByName("str2", Value("bcdef"));
+    env->defByName("str3", Value("cdefg"));
+    env->defByName("str4", Value("cdefg"));
+    env->defByName("num", Value::Zero);
 
     CodeNode::SharedPtr str1 = CodeNode::make<Variable>("str1");
     CodeNode::SharedPtr str2 = CodeNode::make<Variable>("str2");
@@ -441,13 +441,13 @@ DEFINE_TEST(testCodeNodeStringCompare) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeStringSort) {
     auto env = Environment::make();
-    env->def("str0", Value(""));
-    env->def("str1", Value("a"));
-    env->def("str2", Value("ba"));
-    env->def("str3", Value("bca"));
-    env->def("str4", Value("dbca"));
-    env->def("str5", Value("bdcabdcdcd"));
-    env->def("num", Value::Zero);
+    env->defByName("str0", Value(""));
+    env->defByName("str1", Value("a"));
+    env->defByName("str2", Value("ba"));
+    env->defByName("str3", Value("bca"));
+    env->defByName("str4", Value("dbca"));
+    env->defByName("str5", Value("bdcabdcdcd"));
+    env->defByName("num", Value::Zero);
 
     CodeNode::SharedPtr str0 = CodeNode::make<Variable>("str0");
     CodeNode::SharedPtr str1 = CodeNode::make<Variable>("str1");
@@ -523,12 +523,12 @@ DEFINE_TEST(testCodeNodeStringSort) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeStringReverse) {
     auto env = Environment::make();
-    env->def("str0", Value(""));
-    env->def("str1", Value("a"));
-    env->def("str2", Value("ab"));
-    env->def("str3", Value("abc"));
-    env->def("str4", Value("abcd"));
-    env->def("num", Value::Zero);
+    env->defByName("str0", Value(""));
+    env->defByName("str1", Value("a"));
+    env->defByName("str2", Value("ab"));
+    env->defByName("str3", Value("abc"));
+    env->defByName("str4", Value("abcd"));
+    env->defByName("num", Value::Zero);
 
     CodeNode::SharedPtr str0 = CodeNode::make<Variable>("str0");
     CodeNode::SharedPtr str1 = CodeNode::make<Variable>("str1");

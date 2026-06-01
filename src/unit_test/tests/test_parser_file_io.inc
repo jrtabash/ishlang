@@ -155,7 +155,7 @@ DEFINE_TEST(testParserFileIO_WithFileRead) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("catText", Value(""));
+    env->defByName("catText", Value(""));
 
     const auto fopen = std::string("(fopen \"") + tempFile.path().c_str() + "\" 'r')";
     const auto foreach = "(foreach line f (strcat catText line))";
@@ -165,7 +165,7 @@ DEFINE_TEST(testParserFileIO_WithFileRead) {
 
     TEST_CASE(parserTest(parser, env, withfile(fopen), Value("123456789"), true));
 
-    auto const &catText = env->get("catText");
+    auto const &catText = env->getByName("catText");
     TEST_CASE_MSG(catText.isString(), "actual=" << catText.typeToString());
     TEST_CASE_MSG(catText.text() == "123456789", "actual=" << catText.text());
 

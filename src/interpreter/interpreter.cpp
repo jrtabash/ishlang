@@ -12,7 +12,7 @@ using namespace Ishlang;
 // -------------------------------------------------------------
 
 // -------------------------------------------------------------
-Interpreter::ParserCB::ParserCB(Environment::SharedPtr env, std::string &lastResult, bool &batch)
+Interpreter::ParserCB::ParserCB(Environment::SharedPtr env, IdenType &lastResult, bool &batch)
     : env(env)
     , lastResult(lastResult)
     , batch(batch)
@@ -54,7 +54,7 @@ Interpreter::Interpreter(bool batch, const std::string &path)
     , env_(Environment::make())
     , prompt_(">>")
     , contPrompt_("..")
-    , lastResult_("*")
+    , lastResult_(Environment::idenTable().mapName("*"))
     , batch_(batch)
     , parserCB_(env_, lastResult_, batch_)
     , helpDict_()
@@ -125,7 +125,7 @@ void Interpreter::setArguments(char ** argv, int begin, int end) {
     for (int i = begin; i < end; ++i) {
         arguments.push(Value(argv[i]));
     }
-    env_->def("argv", Value(arguments));
+    env_->defByName("argv", Value(arguments));
 }
 
 // -------------------------------------------------------------
@@ -200,7 +200,7 @@ void Interpreter::handleREPLCommand(const std::string &expr) {
 
 // -------------------------------------------------------------
 void Interpreter::describe(const std::string &name) const {
-    const Value &value = env_->get(name);
+    const Value &value = env_->getByName(name);
     if (value.isUserType()) {
         value.userType().describe();
     }

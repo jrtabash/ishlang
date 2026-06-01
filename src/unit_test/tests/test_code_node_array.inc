@@ -64,7 +64,7 @@ DEFINE_TEST(testCodeNodeMakeArraySG) {
     auto env = Environment::make();
 
     const std::string ivar = "i";
-    env->def(ivar, Value::Zero);
+    env->defByName(ivar, Value::Zero);
 
     Value value =
         CodeNode::make<MakeArraySG>(
@@ -125,7 +125,7 @@ DEFINE_TEST(testCodeNodeArrayLen) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeArrayGet) {
     auto env = Environment::make();
-    env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
+    env->defByName("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
 
     const CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
@@ -160,7 +160,7 @@ DEFINE_TEST(testCodeNodeArrayGet) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeArraySet) {
     auto env = Environment::make();
-    env->def("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
+    env->defByName("arr", Value(Sequence({Value('a'), Value('b'), Value('c')})));
 
     CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
@@ -212,7 +212,7 @@ DEFINE_TEST(testCodeNodeArraySet) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeArrayPush) {
     auto env = Environment::make();
-    env->def("arr", Value(Sequence()));
+    env->defByName("arr", Value(Sequence()));
 
     CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
@@ -235,7 +235,7 @@ DEFINE_TEST(testCodeNodeArrayPush) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeArrayPop) {
     auto env = Environment::make();
-    env->def("arr", arrval(Value(0ll), Value(1ll)));
+    env->defByName("arr", arrval(Value(0ll), Value(1ll)));
 
     CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
@@ -270,7 +270,7 @@ DEFINE_TEST(testCodeNodeArrayFind) {
     Value const c('c');
     Value const d('d');
 
-    env->def("arr", Value(Sequence({a, b, c, a, b, c})));
+    env->defByName("arr", Value(Sequence({a, b, c, a, b, c})));
 
     CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
@@ -326,7 +326,7 @@ DEFINE_TEST(testCodeNodeArrayCount) {
     const Value v3(3ll);
     const Value v4(4ll);
 
-    env->def("arr", Value(Sequence({v1, v2, v3, v2, v3, v4, v3, v4, v4, v4})));
+    env->defByName("arr", Value(Sequence({v1, v2, v3, v2, v3, v4, v3, v4, v4, v4})));
 
     CodeNode::SharedPtr var = CodeNode::make<Variable>("arr");
 
@@ -360,8 +360,8 @@ DEFINE_TEST(testCodeNodeArraySort) {
     const Value v3(3ll);
     const Value v4(4ll);
 
-    env->def("arr", Value::Null);
-    env->def("num", Value::Zero);
+    env->defByName("arr", Value::Null);
+    env->defByName("num", Value::Zero);
 
     CodeNode::SharedPtr arr = CodeNode::make<Variable>("arr");
     CodeNode::SharedPtr num = CodeNode::make<Variable>("num");
@@ -372,7 +372,7 @@ DEFINE_TEST(testCodeNodeArraySort) {
 
     auto mkarr =
         [&](std::initializer_list<Value> seq) {
-            env->set("arr", Value(Sequence(seq)));
+            env->setByName("arr", Value(Sequence(seq)));
             return arr;
         };
 
@@ -433,15 +433,15 @@ DEFINE_TEST(testCodeNodeArrayReverse) {
     const Value v3(3ll);
     const Value v4(4ll);
 
-    env->def("arr", Value::Null);
-    env->def("num", Value::Zero);
+    env->defByName("arr", Value::Null);
+    env->defByName("num", Value::Zero);
 
     CodeNode::SharedPtr arr = CodeNode::make<Variable>("arr");
     CodeNode::SharedPtr num = CodeNode::make<Variable>("num");
 
     auto mkarr =
         [&](std::initializer_list<Value> seq) {
-            env->set("arr", Value(Sequence(seq)));
+            env->setByName("arr", Value(Sequence(seq)));
             return arr;
         };
 
@@ -484,7 +484,7 @@ DEFINE_TEST(testCodeNodeArrayClear) {
     const Value v2(2ll);
     const Value v3(3ll);
 
-    env->def("arr", Value(Sequence({v1, v2, v3})));
+    env->defByName("arr", Value(Sequence({v1, v2, v3})));
 
     CodeNode::SharedPtr arr = CodeNode::make<Variable>("arr");
 
@@ -524,8 +524,8 @@ DEFINE_TEST(testCodeNodeArrayInsert) {
     const Value v4 = Value(4ll);
     const Value v5 = Value(5ll);
 
-    env->def("arr", Value(Sequence()));
-    env->def("num", Value::Zero);
+    env->defByName("arr", Value(Sequence()));
+    env->defByName("num", Value::Zero);
 
     auto testcase =
         [this, &env](CodeNode::SharedPtr arrCode, const Value &pos, const Value &item, const Value &expect) {
@@ -583,8 +583,8 @@ DEFINE_TEST(testCodeNodeArrayRemove) {
     const Value v4 = Value(4ll);
     const Value v5 = Value(5ll);
 
-    env->def("arr", Value(Sequence({v0, v1, v2, v3, v4, v5})));
-    env->def("num", Value::Zero);
+    env->defByName("arr", Value(Sequence({v0, v1, v2, v3, v4, v5})));
+    env->defByName("num", Value::Zero);
 
     auto testcase =
         [this, &env](CodeNode::SharedPtr arrCode, const Value &pos, const Value &expect) {

@@ -14,7 +14,7 @@ DEFINE_TEST(testParserStruct) {
     const Struct stest("Person", {"name", "age"});
     TEST_CASE(parserTest(parser, env, "(struct Person (name age))", Value(stest), true));
 
-    const Value &sValue = env->get("Person");
+    const Value &sValue = env->getByName("Person");
     TEST_CASE_MSG(sValue.isUserType(), "actual=" << sValue.typeToString());
 
     const Struct &s = sValue.userType();

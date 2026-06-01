@@ -4,6 +4,7 @@
 #include "code_node_bases.h"
 #include "environment.h"
 #include "generic_table.h"
+#include "iden_table.h"
 #include "instance.h"
 #include "integer_range.h"
 #include "struct.h"
@@ -100,7 +101,7 @@ namespace Ishlang {
     // -------------------------------------------------------------
     class Variable : public CodeNode {
     public:
-        Variable(const std::string &name) : CodeNode(), name_(name) {}
+        Variable(const std::string &name) : CodeNode(), iden_(Environment::idenTable().mapName(name)) {}
         virtual ~Variable() {}
 
     public:
@@ -109,55 +110,55 @@ namespace Ishlang {
         }
 
         virtual const std::string &identifierName() const override {
-            return name_;
+            return Environment::idenTable().getName(iden_);
         }
 
     protected:
-        virtual Value exec(Environment::SharedPtr env) const override { return env->get(name_); }
+        virtual Value exec(Environment::SharedPtr env) const override { return env->get(iden_); }
 
     private:
-        std::string name_;
+        IdenType iden_;
     };
 
     // -------------------------------------------------------------
     class Define : public CodeNode {
     public:
-        Define(const std::string &name, CodeNode::SharedPtr code) : CodeNode(), name_(name), code_(code) {}
+        Define(const std::string &name, CodeNode::SharedPtr code) : CodeNode(), iden_(Environment::idenTable().mapName(name)), code_(code) {}
         virtual ~Define() {}
         
     protected:
-        virtual Value exec(Environment::SharedPtr env) const override { return env->def(name_, code_ ? code_->eval(env) : Value::Null); }
+        virtual Value exec(Environment::SharedPtr env) const override { return env->def(iden_, code_ ? code_->eval(env) : Value::Null); }
 
     private:
-        std::string         name_;
+        IdenType            iden_;
         CodeNode::SharedPtr code_;
     };
     
     // -------------------------------------------------------------
     class Assign : public CodeNode {
     public:
-        Assign(const std::string &name, CodeNode::SharedPtr code) : CodeNode(), name_(name), code_(code) {}
+        Assign(const std::string &name, CodeNode::SharedPtr code) : CodeNode(), iden_(Environment::idenTable().mapName(name)), code_(code) {}
         virtual ~Assign() {}
 
     protected:
-        virtual Value exec(Environment::SharedPtr env) const override { return env->set(name_, code_ ? code_->eval(env) : Value::Null); }
+        virtual Value exec(Environment::SharedPtr env) const override { return env->set(iden_, code_ ? code_->eval(env) : Value::Null); }
         
     private:
-        std::string         name_;
+        IdenType            iden_;
         CodeNode::SharedPtr code_;
     };
 
     // -------------------------------------------------------------
     class Exists : public CodeNode {
     public:
-        Exists(const std::string &name) : name_(name) {}
+        Exists(const std::string &name) : iden_(Environment::idenTable().mapName(name)) {}
         virtual ~Exists() {}
 
     protected:
-        virtual Value exec(Environment::SharedPtr env) const override { return Value(env->exists(name_)); }
+        virtual Value exec(Environment::SharedPtr env) const override { return Value(env->exists(iden_)); }
 
     private:
-        std::string name_;
+        IdenType iden_;
     };
 
     // -------------------------------------------------------------
@@ -252,7 +253,7 @@ namespace Ishlang {
 
     private:
         Type type_;
-        std::string name_;
+        IdenType iden_;
         CodeNode::SharedPtr delta_;
     };
     
@@ -434,7 +435,7 @@ namespace Ishlang {
         Value implFile(Environment::SharedPtr loopEnv, FileStruct &file) const;
 
     private:
-        std::string         name_;
+        IdenType            iden_;
         CodeNode::SharedPtr container_;
         CodeNode::SharedPtr body_;
     };
@@ -480,7 +481,7 @@ namespace Ishlang {
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        std::string name_;
+        IdenType iden_;
     };
 
     // -------------------------------------------------------------
@@ -493,7 +494,7 @@ namespace Ishlang {
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        std::string name_;
+        IdenType iden_;
     };
 
     // -------------------------------------------------------------
@@ -573,7 +574,7 @@ namespace Ishlang {
         Instance::InitArgs makeInitArgs(Environment::SharedPtr &env) const;
 
     private:
-        std::string name_;
+        IdenType       iden_;
         NameSharedPtrs initList_;
     };
 
@@ -1736,7 +1737,7 @@ namespace Ishlang {
         virtual Value exec(Environment::SharedPtr env) const override;
 
     private:
-        std::string name_;
+        IdenType            iden_;
         CodeNode::SharedPtr body_;
     };
 }

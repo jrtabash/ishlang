@@ -257,7 +257,7 @@ DEFINE_TEST(testCodeNodeFileIO_WithFileRead) {
                                  "6789\n");
 
     auto env = Environment::make();
-    env->def("catText", Value(""));
+    env->defByName("catText", Value(""));
 
     const auto fileVal = CodeNode::make<Define>(
         "file",
@@ -282,7 +282,7 @@ DEFINE_TEST(testCodeNodeFileIO_WithFileRead) {
     TEST_CASE_MSG(result.isString(), "actual=" << result.typeToString());
     TEST_CASE_MSG(result.text() == "123456789", "actual=" << result.text());
 
-    auto const &catText = env->get("catText");
+    auto const &catText = env->getByName("catText");
     TEST_CASE_MSG(catText.isString(), "actual=" << catText.typeToString());
     TEST_CASE_MSG(catText.text() == "123456789", "actual=" << catText.text());
 }

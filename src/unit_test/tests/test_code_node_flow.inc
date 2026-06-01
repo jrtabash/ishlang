@@ -17,8 +17,8 @@ using namespace Ishlang;
 DEFINE_TEST(testCodeNodeSequence) {
     auto env = Environment::make();
 
-    env->def("x", Value(1ll));
-    env->def("y", Value(2ll));
+    env->defByName("x", Value(1ll));
+    env->defByName("y", Value(2ll));
 
     { // Block
         CodeNode::SharedPtr def1(new Define("x", CodeNode::SharedPtr(new Literal(Value(1ll)))));
@@ -38,8 +38,8 @@ DEFINE_TEST(testCodeNodeSequence) {
         Value result = block->eval(env);
         TEST_CASE_MSG(result.isChar(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.character() == 'T', "actual=" << result);
-        TEST_CASE_MSG(env->get("x") == Value(1ll), "actual=" << env->get("x"));
-        TEST_CASE_MSG(env->get("y") == Value(2ll), "actual=" << env->get("y"));
+        TEST_CASE_MSG(env->getByName("x") == Value(1ll), "actual=" << env->getByName("x"));
+        TEST_CASE_MSG(env->getByName("y") == Value(2ll), "actual=" << env->getByName("y"));
     }
 
     { // ProgN
@@ -56,8 +56,8 @@ DEFINE_TEST(testCodeNodeSequence) {
         Value result = progN->eval(env);
         TEST_CASE_MSG(result.isChar(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.character() == 'T', "actual=" << result);
-        TEST_CASE_MSG(env->get("x") == Value(2ll), "actual=" << env->get("x"));
-        TEST_CASE_MSG(env->get("y") == Value(3ll), "actual=" << env->get("y"));
+        TEST_CASE_MSG(env->getByName("x") == Value(2ll), "actual=" << env->getByName("x"));
+        TEST_CASE_MSG(env->getByName("y") == Value(3ll), "actual=" << env->getByName("y"));
     }
 }
 
@@ -93,8 +93,8 @@ DEFINE_TEST(testCodeNodeCond) {
         }
 
         {
-            env->def("x", Value(1ll));
-            env->def("y", Value(2ll));
+            env->defByName("x", Value(1ll));
+            env->defByName("y", Value(2ll));
 
             CodeNode::SharedPtr tPred(new Literal(Value::True));
             CodeNode::SharedPtr fPred(new Literal(Value::False));
@@ -105,15 +105,15 @@ DEFINE_TEST(testCodeNodeCond) {
             Value result = cond->eval(env);
             TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
             TEST_CASE_MSG(result.integer() == 3ll, "actual=" << result);
-            TEST_CASE_MSG(env->get("x") == Value(1ll), "actual=" << env->get("x"));
-            TEST_CASE_MSG(env->get("y") == Value(2ll), "actual=" << env->get("y"));
+            TEST_CASE_MSG(env->getByName("x") == Value(1ll), "actual=" << env->getByName("x"));
+            TEST_CASE_MSG(env->getByName("y") == Value(2ll), "actual=" << env->getByName("y"));
 
             cond.reset(new If(fPred, tCode, fCode));
             result = cond->eval(env);
             TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
             TEST_CASE_MSG(result.integer() == 4ll, "actual=" << result);
-            TEST_CASE_MSG(env->get("x") == Value(1ll), "actual=" << env->get("x"));
-            TEST_CASE_MSG(env->get("y") == Value(4ll), "actual=" << env->get("y"));
+            TEST_CASE_MSG(env->getByName("x") == Value(1ll), "actual=" << env->getByName("x"));
+            TEST_CASE_MSG(env->getByName("y") == Value(4ll), "actual=" << env->getByName("y"));
         }
     }
 
@@ -152,7 +152,7 @@ DEFINE_TEST(testCodeNodeCond) {
         }
 
         {
-            env->def("x", Value(3ll));
+            env->defByName("x", Value(3ll));
             CodeNode::SharedPtr var(new Variable("x"));
 
             CodeNode::SharedPtrPairs cases;
@@ -213,7 +213,7 @@ DEFINE_TEST(testCodeNodeLoop) {
     auto env = Environment::make();
 
     { // For
-        env->def("sum", Value(0ll));
+        env->defByName("sum", Value(0ll));
 
         CodeNode::SharedPtr loop(
             new Loop(
@@ -238,7 +238,7 @@ DEFINE_TEST(testCodeNodeLoop) {
         TEST_CASE_MSG(result.integer() == 55ll, "actual=" << result);
 
         try {
-            env->get("i");
+            env->getByName("i");
             TEST_CASE(false);
         }
         catch (const UnknownSymbol &ex) {}
@@ -246,7 +246,7 @@ DEFINE_TEST(testCodeNodeLoop) {
     }
 
     { // While
-        env->def("count", Value(1ll));
+        env->defByName("count", Value(1ll));
 
         CodeNode::SharedPtr loop(
                 new Loop(
@@ -265,7 +265,7 @@ DEFINE_TEST(testCodeNodeLoop) {
     }
 
     { // Break
-        env->def("x", Value(0ll));
+        env->defByName("x", Value(0ll));
 
         CodeNode::SharedPtrList exprs;
         exprs.push_back(
@@ -290,7 +290,7 @@ DEFINE_TEST(testCodeNodeLoop) {
 
         Value result = loop->eval(env);
         TEST_CASE_MSG(result.isNull(), "actual=" << result.typeToString());
-        TEST_CASE_MSG(env->get("x") == Value(2ll), "actual=" << env->get("x"));
+        TEST_CASE_MSG(env->getByName("x") == Value(2ll), "actual=" << env->getByName("x"));
     }
 }
 
@@ -299,7 +299,7 @@ DEFINE_TEST(testCodeNodeWhile) {
     auto env = Environment::make();
 
     { // While
-        env->def("count", Value(1ll));
+        env->defByName("count", Value(1ll));
 
         CodeNode::SharedPtr wLoop(
                 new While(
@@ -318,7 +318,7 @@ DEFINE_TEST(testCodeNodeWhile) {
     }
 
     { // Break
-        env->def("x", Value(0ll));
+        env->defByName("x", Value(0ll));
 
         CodeNode::SharedPtrList exprs;
         exprs.push_back(
@@ -343,7 +343,7 @@ DEFINE_TEST(testCodeNodeWhile) {
 
         Value result = wLoop->eval(env);
         TEST_CASE_MSG(result.isNull(), "actual=" << result.typeToString());
-        TEST_CASE_MSG(env->get("x") == Value(2ll), "actual=" << env->get("x"));
+        TEST_CASE_MSG(env->getByName("x") == Value(2ll), "actual=" << env->getByName("x"));
     }
 }
 
@@ -377,8 +377,8 @@ DEFINE_TEST(testCodeNodeForeach) {
 
     { // String
         auto env = Environment::make();
-        env->def("str", Value("1234567890"));
-        env->def("cnt", Value(0ll));
+        env->defByName("str", Value("1234567890"));
+        env->defByName("cnt", Value(0ll));
 
         auto foreach = CodeNode::make<Foreach>(
             "c",
@@ -388,15 +388,15 @@ DEFINE_TEST(testCodeNodeForeach) {
         TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.integer() == 10ll, "actual=" << result);
 
-        auto const & cnt = env->get("cnt");
+        auto const & cnt = env->getByName("cnt");
         TEST_CASE_MSG(cnt.isInt(), "actual=" << cnt.typeToString());
         TEST_CASE_MSG(cnt.integer() == 10ll, "actual=" << cnt);
     }
 
     { // Array
         auto env = Environment::make();
-        env->def("arr", Value(Sequence::generate(10, [i = 1ll]() mutable { return Value(i++); })));
-        env->def("sum", Value(0ll));
+        env->defByName("arr", Value(Sequence::generate(10, [i = 1ll]() mutable { return Value(i++); })));
+        env->defByName("sum", Value(0ll));
 
         auto foreach = CodeNode::make<Foreach>(
             "i",
@@ -406,7 +406,7 @@ DEFINE_TEST(testCodeNodeForeach) {
         TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.integer() == 55ll, "actual=" << result);
 
-        auto const & sum = env->get("sum");
+        auto const & sum = env->getByName("sum");
         TEST_CASE_MSG(sum.isInt(), "actual=" << sum.typeToString());
         TEST_CASE_MSG(sum.integer() == 55ll, "actual=" << sum);
     }
@@ -422,10 +422,10 @@ DEFINE_TEST(testCodeNodeForeach) {
                 std::pair{ 5ll, 50ll } }) {
             ht.set(Value(k), Value(v));
         }
-        env->def("ht", Value(ht));
-        env->def("cnt", Value(0ll));
-        env->def("keySum", Value(0ll));
-        env->def("valSum", Value(0ll));
+        env->defByName("ht", Value(ht));
+        env->defByName("cnt", Value(0ll));
+        env->defByName("keySum", Value(0ll));
+        env->defByName("valSum", Value(0ll));
 
         auto foreach = CodeNode::make<Foreach>(
             "kv",
@@ -438,15 +438,15 @@ DEFINE_TEST(testCodeNodeForeach) {
         TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.integer() == 150ll, "actual=" << result);
 
-        auto const & cnt = env->get("cnt");
+        auto const & cnt = env->getByName("cnt");
         TEST_CASE_MSG(cnt.isInt(), "actual=" << cnt.typeToString());
         TEST_CASE_MSG(cnt.integer() == 5ll, "actual=" << cnt);
 
-        auto const & keySum = env->get("keySum");
+        auto const & keySum = env->getByName("keySum");
         TEST_CASE_MSG(keySum.isInt(), "actual=" << keySum.typeToString());
         TEST_CASE_MSG(keySum.integer() == 15ll, "actual=" << keySum);
 
-        auto const & valSum = env->get("valSum");
+        auto const & valSum = env->getByName("valSum");
         TEST_CASE_MSG(valSum.isInt(), "actual=" << valSum.typeToString());
         TEST_CASE_MSG(valSum.integer() == 150ll, "actual=" << valSum);
     }
@@ -462,10 +462,10 @@ DEFINE_TEST(testCodeNodeForeach) {
                 std::pair{ 5ll, 50ll } }) {
             ot.set(Value(k), Value(v));
         }
-        env->def("ot", Value(ot));
-        env->def("cnt", Value(0ll));
-        env->def("keySum", Value(0ll));
-        env->def("valSum", Value(0ll));
+        env->defByName("ot", Value(ot));
+        env->defByName("cnt", Value(0ll));
+        env->defByName("keySum", Value(0ll));
+        env->defByName("valSum", Value(0ll));
 
         auto foreach = CodeNode::make<Foreach>(
             "kv",
@@ -478,23 +478,23 @@ DEFINE_TEST(testCodeNodeForeach) {
         TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.integer() == 150ll, "actual=" << result);
 
-        auto const & cnt = env->get("cnt");
+        auto const & cnt = env->getByName("cnt");
         TEST_CASE_MSG(cnt.isInt(), "actual=" << cnt.typeToString());
         TEST_CASE_MSG(cnt.integer() == 5ll, "actual=" << cnt);
 
-        auto const & keySum = env->get("keySum");
+        auto const & keySum = env->getByName("keySum");
         TEST_CASE_MSG(keySum.isInt(), "actual=" << keySum.typeToString());
         TEST_CASE_MSG(keySum.integer() == 15ll, "actual=" << keySum);
 
-        auto const & valSum = env->get("valSum");
+        auto const & valSum = env->getByName("valSum");
         TEST_CASE_MSG(valSum.isInt(), "actual=" << valSum.typeToString());
         TEST_CASE_MSG(valSum.integer() == 150ll, "actual=" << valSum);
     }
 
     { // Range
         auto env = Environment::make();
-        env->def("rng", Value(IntegerRange(0, 20, 2)));
-        env->def("sum", Value(0ll));
+        env->defByName("rng", Value(IntegerRange(0, 20, 2)));
+        env->defByName("sum", Value(0ll));
 
         auto foreach = CodeNode::make<Foreach>(
             "i",
@@ -504,7 +504,7 @@ DEFINE_TEST(testCodeNodeForeach) {
         TEST_CASE_MSG(result.isInt(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.integer() == 90ll, "actual=" << result);
 
-        auto const & sum = env->get("sum");
+        auto const & sum = env->getByName("sum");
         TEST_CASE_MSG(sum.isInt(), "actual=" << sum.typeToString());
         TEST_CASE_MSG(sum.integer() == 90ll, "actual=" << sum);
     }
@@ -517,7 +517,7 @@ DEFINE_TEST(testCodeNodeForeach) {
                                      "4444\n");
 
         auto env = Environment::make();
-        env->def("str", Value(""));
+        env->defByName("str", Value(""));
 
         const auto fileVal = CodeNode::make<Define>(
             "f",
@@ -534,7 +534,7 @@ DEFINE_TEST(testCodeNodeForeach) {
         TEST_CASE_MSG(result.isString(), "actual=" << result.typeToString());
         TEST_CASE_MSG(result.text() == "1223334444", "actual=" << result.text());
 
-        auto const & str = env->get("str");
+        auto const & str = env->getByName("str");
         TEST_CASE_MSG(str.isString(), "actual=" << str.typeToString());
         TEST_CASE_MSG(str.text() == "1223334444", "actual=" << str.text());
 
@@ -549,7 +549,7 @@ DEFINE_TEST(testCodeNodeForeach) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeLambdaExpr) {
     auto env = Environment::make();
-    env->def("foo", Value(1ll));
+    env->defByName("foo", Value(1ll));
 
     const Lambda::ParamList params({"x", "y"});
 
@@ -617,7 +617,7 @@ DEFINE_TEST(testCodeNodeFunctionExpr) {
     args.push_back(Value(3ll));
     args.push_back(Value(4ll));
 
-    const Value &ftn = env->get("myfunc");
+    const Value &ftn = env->getByName("myfunc");
     TEST_CASE_MSG(ftn.isClosure(), "actual=" << ftn.typeToString());
 
     Value result = ftn.closure().exec(args);

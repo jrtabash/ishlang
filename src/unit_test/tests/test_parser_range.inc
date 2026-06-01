@@ -39,7 +39,7 @@ DEFINE_TEST(testParserRangeGetters) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("rng", Value(IntegerRange(1, 25, 2)));
+    env->defByName("rng", Value(IntegerRange(1, 25, 2)));
 
     TEST_CASE(parserTest(parser, env, "(rngbegin rng)", Value(1ll),  true));
     TEST_CASE(parserTest(parser, env, "(rngend rng)",   Value(25ll), true));
@@ -61,10 +61,10 @@ DEFINE_TEST(testParserExpand) {
     auto env = Environment::make();
     Parser parser;
 
-    env->def("rng1", Value(IntegerRange(1, 6, 2)));
-    env->def("rng2", Value(IntegerRange(7, 9, 2)));
-    env->def("rng3", Value(IntegerRange(10, 10, 1)));
-    env->def("rng4", Value(IntegerRange(-2, -2, -2)));
+    env->defByName("rng1", Value(IntegerRange(1, 6, 2)));
+    env->defByName("rng2", Value(IntegerRange(7, 9, 2)));
+    env->defByName("rng3", Value(IntegerRange(10, 10, 1)));
+    env->defByName("rng4", Value(IntegerRange(-2, -2, -2)));
 
     const auto val1 = Value(Sequence(std::vector{Value(1ll), Value(3ll), Value(5ll)}));
     const auto val2 = Value(Sequence(std::vector{Value(1ll), Value(3ll), Value(5ll), Value(7ll)}));

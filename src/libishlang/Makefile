@@ -17,6 +17,7 @@ OBJS=\
 	util.o \
 	value.o \
 	value_pair.o \
+	iden_table.o \
 	environment.o \
 	lambda.o \
 	struct.o \
@@ -49,6 +50,9 @@ value.o: value.h value.cpp value_pair.h lambda.h instance.h file_io.h
 
 value_pair.o: value_pair.cpp value_pair.h value.h
 	$(CPP) $(CFLAGS) -c value_pair.cpp -o $(BUILD)/value_pair.o
+
+iden_table.o: iden_table.cpp iden_table.h
+	$(CPP) $(CFLAGS) -c iden_table.cpp -o $(BUILD)/iden_table.o
 
 environment.o: environment.cpp environment.h value.h exception.h
 	$(CPP) $(CFLAGS) -c environment.cpp -o $(BUILD)/environment.o

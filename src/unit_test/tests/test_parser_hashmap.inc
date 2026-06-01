@@ -59,7 +59,7 @@ DEFINE_TEST(testParserHashMapContains) {
     ht.set(Value('a'), Value(1ll));
     ht.set(Value('b'), Value(2ll));
     ht.set(Value('c'), Value(3ll));
-    env->def("ht", ht);
+    env->defByName("ht", ht);
 
     TEST_CASE(parserTest(parser, env, "(hmhas (hashmap) 'a')",  Value::False, true));
     TEST_CASE(parserTest(parser, env, "(hmhas ht 'a')",         Value::True,  true));
@@ -82,7 +82,7 @@ DEFINE_TEST(testParserHashMapGet) {
     ht.set(Value('a'), Value(1ll));
     ht.set(Value('b'), Value(2ll));
     ht.set(Value('c'), Value(3ll));
-    env->def("ht", ht);
+    env->defByName("ht", ht);
 
     TEST_CASE(parserTest(parser, env, "(hmget (hashmap) 'a')", Value::Null, true));
     TEST_CASE(parserTest(parser, env, "(hmget ht 'a')",        Value(1ll),  true));
@@ -108,10 +108,10 @@ DEFINE_TEST(testParserHashMapSet) {
     Parser parser;
 
     Hashtable ht;
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
-    auto htget = [&env](Value::Char key) { return env->get("ht").hashMap().get(Value(key)); };
-    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
+    auto htget = [&env](Value::Char key) { return env->getByName("ht").hashMap().get(Value(key)); };
+    auto htlen = [&env]() { return env->getByName("ht").hashMap().size(); };
 
     TEST_CASE(parserTest(parser, env, "(hmset ht 'a' 1)", Value(1ll), true));
     TEST_CASE(parserTest(parser, env, "(hmset ht 'b' 2)", Value(2ll), true));
@@ -147,10 +147,10 @@ DEFINE_TEST(testParserHashMapRemove) {
     ht.set(Value('a'), Value(1ll));
     ht.set(Value('b'), Value(2ll));
     ht.set(Value('c'), Value(3ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
-    auto hthas = [&env](Value::Char key) { return env->get("ht").hashMap().exists(Value(key)); };
-    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
+    auto hthas = [&env](Value::Char key) { return env->getByName("ht").hashMap().exists(Value(key)); };
+    auto htlen = [&env]() { return env->getByName("ht").hashMap().size(); };
 
     TEST_CASE(parserTest(parser, env, "(hmrem ht 'd')", Value::Null, true));
     TEST_CASE(htlen() == 3);
@@ -191,10 +191,10 @@ DEFINE_TEST(testParserHashMapClear) {
     ht.set(Value('a'), Value(1ll));
     ht.set(Value('b'), Value(2ll));
     ht.set(Value('c'), Value(3ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
-    auto hthas = [&env](Value::Char key) { return env->get("ht").hashMap().exists(Value(key)); };
-    auto htlen = [&env]() { return env->get("ht").hashMap().size(); };
+    auto hthas = [&env](Value::Char key) { return env->getByName("ht").hashMap().exists(Value(key)); };
+    auto htlen = [&env]() { return env->getByName("ht").hashMap().size(); };
 
     TEST_CASE(htlen() == 3);
     TEST_CASE(hthas('a'));
@@ -224,7 +224,7 @@ DEFINE_TEST(testParserHashMapFind) {
     ht.set(Value('a'), Value(1ll));
     ht.set(Value('b'), Value(2ll));
     ht.set(Value('c'), Value(3ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
     TEST_CASE(parserTest(parser, env, "(hmfind ht 1)", Value('a'),  true));
     TEST_CASE(parserTest(parser, env, "(hmfind ht 2)", Value('b'),  true));
@@ -247,7 +247,7 @@ DEFINE_TEST(testParserHashMapCount) {
     ht.set(Value('b'), Value(2ll));
     ht.set(Value('c'), Value(3ll));
     ht.set(Value('2'), Value(2ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
     TEST_CASE(parserTest(parser, env, "(hmcount ht 1)", Value(1ll),  true));
     TEST_CASE(parserTest(parser, env, "(hmcount ht 2)", Value(2ll),  true));
@@ -269,7 +269,7 @@ DEFINE_TEST(testParserHashMapKeys) {
     ht.set(Value('a'), Value(1ll));
     ht.set(Value('b'), Value(2ll));
     ht.set(Value('c'), Value(3ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
     TEST_CASE(parserTest(parser, env, "(hmkeys (hashmap))",   Value(Sequence()), true));
     TEST_CASE(parserTest(parser, env, "(arrlen (hmkeys ht))", Value(3ll),        true));
@@ -289,7 +289,7 @@ DEFINE_TEST(testParserHashMapVals) {
     ht.set(Value('b'), Value(2ll));
     ht.set(Value('c'), Value(3ll));
     ht.set(Value('2'), Value(2ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
     TEST_CASE(parserTest(parser, env, "(hmvals (hashmap))",   Value(Sequence()), true));
     TEST_CASE(parserTest(parser, env, "(arrlen (hmvals ht))", Value(4ll),        true));
@@ -309,7 +309,7 @@ DEFINE_TEST(testParserHashMapItems) {
     ht.set(Value('b'), Value(2ll));
     ht.set(Value('c'), Value(3ll));
     ht.set(Value('2'), Value(2ll));
-    env->def("ht", Value(ht));
+    env->defByName("ht", Value(ht));
 
     TEST_CASE(parserTest(parser, env, "(hmitems (hashmap))",   Value(Sequence()), true));
     TEST_CASE(parserTest(parser, env, "(arrlen (hmitems ht))", Value(4ll),        true));

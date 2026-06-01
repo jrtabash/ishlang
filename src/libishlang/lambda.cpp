@@ -21,7 +21,7 @@ Value Lambda::exec(const ArgList &args) const {
         ParamList::const_iterator pIter = params_.begin();
         ArgList::const_iterator aIter = args.begin();
         for (; pIter != params_.end() && aIter != args.end(); ++pIter, ++aIter) {
-            lambdaEnv->def(*pIter, *aIter);
+            lambdaEnv->defByName(*pIter, *aIter);
         }
 
         return body_->eval(lambdaEnv);

@@ -73,7 +73,7 @@ DEFINE_TEST(testCodeNodeMakeRange) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeRangeGetters) {
     auto env = Environment::make();
-    env->def("rng", Value(IntegerRange(10)));
+    env->defByName("rng", Value(IntegerRange(10)));
 
     auto ilit = [](Value::Long value) { return CodeNode::make<Literal>(Value(value)); };
     auto rVar = []() { return CodeNode::make<Variable>("rng"); };
@@ -134,8 +134,8 @@ DEFINE_TEST(testCodeNodeRangeGetters) {
 // -------------------------------------------------------------
 DEFINE_TEST(testCodeNodeExpand) {
     auto env = Environment::make();
-    env->def("rng1", Value(IntegerRange(4)));
-    env->def("rng2", Value(IntegerRange(4, 8, 2)));
+    env->defByName("rng1", Value(IntegerRange(4)));
+    env->defByName("rng2", Value(IntegerRange(4, 8, 2)));
 
     auto ilit = [](Value::Long value) { return CodeNode::make<Literal>(Value(value)); };
     auto rVar = [](const char * name) { return CodeNode::make<Variable>(name); };
