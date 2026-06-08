@@ -1,6 +1,6 @@
 ## TODO
 
-### Add more generic functions
+### More Generic Functions
 - Map
   - (map `<object>` `<function>`)
   - Supports string, array, pair, hashmap or range
@@ -28,8 +28,32 @@
   - Supports string, array, pair or hashmap
   - Example: `(findif (array 1 3 5 6 7) (lambda (i) (== (% i 2) 0)))` -> `3`
 
-### Implement built-in data structures:
-- List
+### Math Functions
+- abs
+  - (abs `<number>`)
+  - Example: `(abs -1)` -> `1`
+- min
+  - (min `<number>` `<number>`)
+  - Example: `(min 2 5)` -> `2`
+- max
+  - (max `<number>` `<number>`)
+  - Example: `(max 2 5)` -> `5`
+- sign
+  - (sign `<number>`)
+  - Example 1: `(sign 2)` -> `1`
+  - Example 2: `(sign -5)` -> `-1`
+- sqrt
+  - (sqrt `<number>`)
+  - Example: `(sqrt 25.0)` -> `5.0`
+- ceil
+  - (ceil `<number>`)
+  - Example: `(ceil 2.5)` -> `3.0`
+- floor
+  - (floor `<number>`)
+  - Example: `(floor 2.5)` -> `2.0`
+
+### Linked List:
+- Operations
   - **list**: make list
   - **lislen**: list length
   - **lisfront**: list front
@@ -49,4 +73,26 @@
   - **liscount**: list count value
   - **lissort**: list sort
   - **lisrev**: list reverse
-  - Add list support to generic functions
+- Add list support to generic functions
+
+### Struct Combine
+```
+(scombine <name>
+  (<struct> [<struct> ...])
+  [(<member> [<member> ...])])
+```
+Example
+```
+(struct Aggregate
+  (count
+   sum
+   mean))
+
+(struct MinMax
+  (min
+   max))
+
+(scombine Summary (Aggregate MinMax)
+  (median
+   stddev))
+```
