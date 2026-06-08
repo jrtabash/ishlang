@@ -100,6 +100,9 @@ Type checking functions:
   istypeof - check expression type matches any of provided types
              (istypeof <expr> <type> [<type> ...])
 
+    isnone - check expression type is none
+             (isnone <expr>)
+
   typename - Get name of expression type
              (typename <expr>)
 

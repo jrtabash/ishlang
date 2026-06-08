@@ -456,6 +456,19 @@ Check expression type matches any of provided types.
 (istypeof Person usertype)
 ```
 
+Is none?
+```
+(isnone <expression>)
+```
+
+Check expression type is none.
+
+### Example
+```
+(isnone null)
+(isnone 1)
+```
+
 Is struct name?
 ```
 (isstructname <expression> <struct>)

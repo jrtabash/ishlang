@@ -92,6 +92,26 @@ DEFINE_TEST(testParserIsType) {
 }
 
 // -------------------------------------------------------------
+DEFINE_TEST(testParserIsNone) {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(isnone null)",               Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(isnone 3)",                  Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnone 1.0)",                Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnone 'c')",                Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnone true)",               Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnone \"txt\")",            Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnone (lambda () 1))",      Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnone (struct Foo (x y)))", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnone (makeinstance Foo))", Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnone (array 1 1))",        Value::False, true));
+
+    TEST_CASE(parserTest(parser, env, "(isnone)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(isnone 3 3)", Value::Null, false));
+}
+
+// -------------------------------------------------------------
 DEFINE_TEST(testParserTypeName) {
     auto env = Environment::make();
     Parser parser;

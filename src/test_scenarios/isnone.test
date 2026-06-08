@@ -1,0 +1,33 @@
+__CODE__
+(struct MyStruct (field1 field2))
+
+(println (isnone null))
+(println (isnone 1))
+(println (isnone 1.5))
+(println (isnone true))
+(println (isnone 'a'))
+(println (isnone "foobar"))
+(println (isnone (pair 1 2)))
+(println (isnone (array 1 2 3)))
+(println (isnone (hashmap (pair 1 10))))
+(println (isnone (orderedmap (pair 1 10))))
+(println (isnone (range 10)))
+(println (isnone (lambda (x y) (+ x y))))
+(println (isnone MyStruct))
+(println (isnone (makeinstance MyStruct)))
+
+__EXPECT__
+true
+false
+false
+false
+false
+false
+false
+false
+false
+false
+false
+false
+false
+false

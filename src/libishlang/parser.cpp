@@ -625,6 +625,13 @@ void Parser::initAppFtns() {
           }
         },
 
+        { "isnone",
+          [this]() {
+              auto exprs(readAndCheckExprList("isnone", 1));
+              return CodeNode::make<IsType>(exprs[0], Value::TypeList{Value::eNone});
+          }
+        },
+
         { "typename",
           [this]() {
               auto exprs(readAndCheckExprList("typename", 1));
