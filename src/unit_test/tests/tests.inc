@@ -24,6 +24,7 @@
 #include "test_code_node_range.inc"
 #include "test_code_node_generic.inc"
 #include "test_code_node_file_io.inc"
+#include "test_code_node_math.inc"
 
 #include "test_parser_misc.inc"
 #include "test_parser_ops.inc"
@@ -36,3 +37,4 @@
 #include "test_parser_range.inc"
 #include "test_parser_generic.inc"
 #include "test_parser_file_io.inc"
+#include "test_parser_math.inc"

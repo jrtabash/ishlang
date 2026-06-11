@@ -1,0 +1,89 @@
+__CODE__
+(println "-- abs ---")
+(println (abs 5))
+(println (abs -5))
+(println (abs 1.414))
+(println (abs -1.414))
+(println (abs 0))
+
+(println "-- min ---")
+(println (min 2 1))
+(println (min -1 1))
+(println (min 2 -2 5 -5 10 6))
+
+(println "-- max ---")
+(println (max 2 1))
+(println (max -1 1))
+(println (max 2 -2 5 -5 10 6))
+
+(println "-- sign ---")
+(println (sign 5))
+(println (sign -5))
+(println (sign 0))
+
+(println "-- sqrt ---")
+(println (sqrt 0))
+(println (sqrt 1.0))
+(println (sqrt 4))
+(println (sqrt 25.0))
+(println (<= (abs (- 1.41421356 (sqrt 2.0))) 0.00000001))
+
+(println "-- ceil ---")
+(println (ceil 1.2))
+(println (ceil 1.0))
+(println (ceil 0.5))
+(println (ceil 0.0))
+(println (ceil -0.5))
+(println (ceil -1.0))
+(println (ceil -1.2))
+
+(println "-- floor ---")
+(println (floor 1.2))
+(println (floor 1.0))
+(println (floor 0.5))
+(println (floor 0.0))
+(println (floor -0.5))
+(println (floor -1.0))
+(println (floor -1.2))
+
+__EXPECT__
+-- abs ---
+5
+5
+1.414
+1.414
+0
+-- min ---
+1
+-1
+-5
+-- max ---
+2
+1
+10
+-- sign ---
+1
+-1
+0
+-- sqrt ---
+0
+1
+2
+5
+true
+-- ceil ---
+2
+1
+1
+0
+-0
+-1
+-1
+-- floor ---
+1
+1
+0
+0
+-1
+-1
+-2

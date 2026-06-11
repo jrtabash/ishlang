@@ -15,6 +15,8 @@ using namespace Ishlang;
 const Value Value::True(true);
 const Value Value::False(false);
 const Value Value::Zero(0ll);
+const Value Value::PlusOne(1ll);
+const Value Value::MinusOne(-1ll);
 const Value Value::Null;
 const Value Value::EmptyPair(Pair(Value::Null, Value::Null));
 

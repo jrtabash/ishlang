@@ -37,6 +37,8 @@ namespace Ishlang {
         static const Value True;
         static const Value False;
         static const Value Zero;
+        static const Value PlusOne;
+        static const Value MinusOne;
         static const Value Null;
         static const Value EmptyPair;
 

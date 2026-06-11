@@ -1347,6 +1347,57 @@ Examples:
 (hash a)
 ```
 
+## Math Functions
+**abs**: Return absolute value of number
+```
+(abs <number>)
+```
+
+**min**: Return minimum of numbers
+```
+(min <number> <number> [<number> ...])
+```
+
+**max**: Return maximum of numbers
+```
+(max <number> <number> [<number> ...])
+```
+
+**sign**: Return sign of number
+```
+(sign <number>)
+```
+
+- If `<number>` is positive, return 1
+- If `<number>` is negative, return -1
+- If `<number>` is zero, return 0
+
+**sqrt**: Return square root of number
+```
+(sqrt <number>)
+```
+
+**ceil**: Round number up to nearest integer
+```
+(ceil <number>)
+```
+
+**floor**: Round number down to nearest integer
+```
+(floor <number>)
+```
+
+### Examples
+```
+(abs 5)
+(min 2 -3 4 -5)
+(max 2.0 -3.0 4.0 -5.0)
+(sign -5)
+(sqrt 25.0)
+(ceil 1.2)
+(floor 2.9)
+```
+
 ## TimeIt Function
 Return average time in microseconds to evaluate expression
 ```

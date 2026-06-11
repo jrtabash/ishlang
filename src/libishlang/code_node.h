@@ -1740,6 +1740,31 @@ namespace Ishlang {
         IdenType            iden_;
         CodeNode::SharedPtr body_;
     };
+
+    // -------------------------------------------------------------
+    class MathFunction : public VariadicOp {
+    public:
+        enum Type {
+            Abs   = 'A',
+            Min   = 'M',
+            Max   = 'X',
+            Sign  = 'S',
+            Sqrt  = 'R',
+            Ceil  = 'C',
+            Floor = 'F',
+        };
+
+    public:
+        MathFunction(Type type, CodeNode::SharedPtrList operands);
+        virtual ~MathFunction() {}
+
+    protected:
+        virtual Value exec(Environment::SharedPtr env) const override;
+
+    private:
+        Type type_;
+    };
+
 }
 
 #endif	// ISHLANG_CODE_NODE_H

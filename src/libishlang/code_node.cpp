@@ -4,6 +4,7 @@
 #include "file_io.h"
 #include "generic_functions.h"
 #include "lambda.h"
+#include "math_functions.h"
 #include "module.h"
 #include "parser.h"
 #include "sequence.h"
@@ -2473,4 +2474,28 @@ Value WithFile::exec(Environment::SharedPtr env) const {
         }
     }
     return Value::Null;
+}
+
+// -------------------------------------------------------------
+MathFunction::MathFunction(Type type, CodeNode::SharedPtrList operands)
+    : VariadicOp(operands)
+    , type_(type)
+{
+}
+
+Value MathFunction::exec(Environment::SharedPtr env) const {
+    if (!operands_.empty()) {
+        const auto values = evalOperands(env, operands_, Value::eInteger, Value::eReal);
+
+        switch (type_) {
+        case Abs:   return Math::abs(values);
+        case Min:   return Math::min(values);
+        case Max:   return Math::max(values);
+        case Sign:  return Math::sign(values);
+        case Sqrt:  return Math::sqrt(values);
+        case Ceil:  return Math::ceil(values);
+        case Floor: return Math::floor(values);
+        }
+    }
+    return Value::Zero;
 }

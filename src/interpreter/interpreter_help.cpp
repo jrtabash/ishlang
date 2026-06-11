@@ -60,6 +60,7 @@ void HelpDict::populateDict(Dict &dict) {
     tmp.emplace("orderedmap", help_orderedmap());
     tmp.emplace("range", help_range());
     tmp.emplace("generic", help_generic());
+    tmp.emplace("math", help_math());
     tmp.emplace("block", help_block());
     tmp.emplace("misc", help_misc());
     tmp.emplace("import", help_import());
@@ -702,6 +703,37 @@ Generic Functions
             (apply <ftn> <obj>)
 
             * Length of <ftn> parameters must match <obj> length
+)";
+}
+
+const char *HelpDict::help_math() {
+    return R"(
+Math Functions
+--------------
+    abs - Return absolute value of number
+          (abs <number>)
+
+    min - Return minimum of numbers
+          (min <number> <number> [<number> ...])
+
+    max - Return maximum of numbers
+          (max <number> <number> [<number> ...])
+
+   sign - Return sign of number
+          (sign <number>)
+
+          * If `<number>` is positive, return 1
+          * If `<number>` is negative, return -1
+          * If `<number>` is zero, return 0
+
+   sqrt - Return square root of number
+          (sqrt <number>)
+
+   ceil - Round number up to nearest integer
+          (ceil <number>)
+
+  floor - Round number down to nearest integer
+          (floor <number>)
 )";
 }
 

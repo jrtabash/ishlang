@@ -1416,6 +1416,55 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("withfile", 2));
               return CodeNode::make<WithFile>(name, exprs[0], exprs[1]);
           }
+        },
+
+        { "abs",
+          [this]() {
+              auto exprs(readAndCheckExprList("abs", 1));
+              return CodeNode::make<MathFunction>(MathFunction::Abs, exprs);
+          }
+        },
+
+        { "min",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("min", 2, std::nullopt));
+              return CodeNode::make<MathFunction>(MathFunction::Min, exprs);
+          }
+        },
+
+        { "max",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("max", 2, std::nullopt));
+              return CodeNode::make<MathFunction>(MathFunction::Max, exprs);
+          }
+        },
+
+        { "sign",
+          [this]() {
+              auto exprs(readAndCheckExprList("sign", 1));
+              return CodeNode::make<MathFunction>(MathFunction::Sign, exprs);
+          }
+        },
+
+        { "sqrt",
+          [this]() {
+              auto exprs(readAndCheckExprList("sqrt", 1));
+              return CodeNode::make<MathFunction>(MathFunction::Sqrt, exprs);
+          }
+        },
+
+        { "ceil",
+          [this]() {
+              auto exprs(readAndCheckExprList("ceil", 1));
+              return CodeNode::make<MathFunction>(MathFunction::Ceil, exprs);
+          }
+        },
+
+        { "floor",
+          [this]() {
+              auto exprs(readAndCheckExprList("floor", 1));
+              return CodeNode::make<MathFunction>(MathFunction::Floor, exprs);
+          }
         }
     };
 }
