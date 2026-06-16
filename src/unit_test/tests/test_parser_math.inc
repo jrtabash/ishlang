@@ -123,3 +123,21 @@ DEFINE_TEST(testParserMathFloor) {
     TEST_CASE(parserTest(parser, env, "(floor 'x')", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(floor 1 2)", Value::Null, false));
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserMathRound) {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(round 2.9)",   Value(3.0),  true));
+    TEST_CASE(parserTest(parser, env, "(round 2.1)",   Value(2.0),  true));
+    TEST_CASE(parserTest(parser, env, "(round -2.1)",  Value(-2.0), true));
+    TEST_CASE(parserTest(parser, env, "(round -2.7)",  Value(-3.0), true));
+    TEST_CASE(parserTest(parser, env, "(round 1.0)",   Value(1.0),  true));
+    TEST_CASE(parserTest(parser, env, "(round -1.0)",  Value(-1.0), true));
+    TEST_CASE(parserTest(parser, env, "(round 0.0)",   Value(0.0),  true));
+
+    TEST_CASE(parserTest(parser, env, "(round)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(round 'x')", Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(round 1 2)", Value::Null, false));
+}

@@ -1387,6 +1387,11 @@ Examples:
 (floor <number>)
 ```
 
+**round**: Round number to nearest integer
+```
+(round <number>)
+```
+
 ### Examples
 ```
 (abs 5)

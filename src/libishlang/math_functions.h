@@ -62,6 +62,12 @@ namespace Ishlang {
             assert(nums[0].isNumber());
             return Value(std::floor(nums[0].real()));
         }
+
+        static inline Value round(const Values &nums) {
+            assert(nums.size() == 1);
+            assert(nums[0].isNumber());
+            return Value(std::round(nums[0].real()));
+        }
     };
 
 }

@@ -734,6 +734,9 @@ Math Functions
 
   floor - Round number down to nearest integer
           (floor <number>)
+
+  round - Round number to nearest integer
+          (round <number>)
 )";
 }
 

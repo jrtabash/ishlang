@@ -304,3 +304,51 @@ DEFINE_TEST(testCodeNodeMathFloor) {
         TEST_CASE(false);
     }
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeMathRound) {
+    auto env = Environment::make();
+
+    auto round = [](Value const & num) {
+        return CodeNode::make<MathFunction>(
+            MathFunction::Round,
+            CodeNode::SharedPtrList{ CodeNode::make<Literal>(num) });
+    };
+
+    auto val = round(Value(1.2))->eval(env);
+    TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.real() == 1.0, "actual=" << val);
+
+    val = round(Value(1.6))->eval(env);
+    TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.real() == 2.0, "actual=" << val);
+
+    val = round(Value(-1.2))->eval(env);
+    TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.real() == -1.0, "actual=" << val);
+
+    val = round(Value(-1.8))->eval(env);
+    TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.real() == -2.0, "actual=" << val);
+
+    val = round(Value(1.0))->eval(env);
+    TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.real() == 1.0, "actual=" << val);
+
+    val = round(Value(-1.0))->eval(env);
+    TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.real() == -1.0, "actual=" << val);
+
+    val = round(Value(0.0))->eval(env);
+    TEST_CASE_MSG(val.isReal(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.real() == 0.0, "actual=" << val);
+
+    try {
+        round(Value('x'))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}

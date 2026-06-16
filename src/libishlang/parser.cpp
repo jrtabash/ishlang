@@ -1465,6 +1465,13 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("floor", 1));
               return CodeNode::make<MathFunction>(MathFunction::Floor, exprs);
           }
+        },
+
+        { "round",
+          [this]() {
+              auto exprs(readAndCheckExprList("round", 1));
+              return CodeNode::make<MathFunction>(MathFunction::Round, exprs);
+          }
         }
     };
 }

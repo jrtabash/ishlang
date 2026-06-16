@@ -1752,6 +1752,7 @@ namespace Ishlang {
             Sqrt  = 'R',
             Ceil  = 'C',
             Floor = 'F',
+            Round = 'O',
         };
 
     public:

@@ -46,6 +46,17 @@ __CODE__
 (println (floor -1.0))
 (println (floor -1.2))
 
+(println "-- round ---")
+(println (round 1.9))
+(println (round 1.1))
+(println (round 0.5))
+(println (round 0.2))
+(println (round 0.0))
+(println (round -0.4))
+(println (round -0.5))
+(println (round -1.1))
+(println (round -1.9))
+
 __EXPECT__
 -- abs ---
 5
@@ -84,6 +95,16 @@ true
 1
 0
 0
+-1
+-1
+-2
+-- round ---
+2
+1
+1
+0
+0
+-0
 -1
 -1
 -2
