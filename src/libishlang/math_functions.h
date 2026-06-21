@@ -68,6 +68,18 @@ namespace Ishlang {
             assert(nums[0].isNumber());
             return Value(std::round(nums[0].real()));
         }
+
+        static inline Value isNan(const Values &nums) {
+            assert(nums.size() >= 1);
+            assert(std::ranges::all_of(nums, [](const Value &v) { return v.isNumber(); }));
+            return Value(std::ranges::any_of(nums, [](const Value &v) { return std::isnan(v.real()); }));
+        }
+
+        static inline Value isInf(const Values &nums) {
+            assert(nums.size() >= 1);
+            assert(std::ranges::all_of(nums, [](const Value &v) { return v.isNumber(); }));
+            return Value(std::ranges::any_of(nums, [](const Value &v) { return std::isinf(v.real()); }));
+        }
     };
 
 }

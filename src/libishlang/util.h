@@ -26,7 +26,7 @@ namespace Ishlang {
 
     class Util {
     public:
-        static const double RealThreshold;
+        static constexpr double RealThreshold = 0.000000000000001;
 
     public:
         using TokenList = std::forward_list<std::string>;

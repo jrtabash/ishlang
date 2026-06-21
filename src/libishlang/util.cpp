@@ -9,8 +9,6 @@ namespace fs = std::filesystem;
 
 using namespace Ishlang;
 
-const double Util::RealThreshold = 0.0000000001;
-
 // -------------------------------------------------------------
 bool Util::isZero(double val) { return std::fabs(val) <= RealThreshold; }
 

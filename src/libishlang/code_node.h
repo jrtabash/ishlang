@@ -1753,6 +1753,8 @@ namespace Ishlang {
             Ceil  = 'C',
             Floor = 'F',
             Round = 'O',
+            IsNan = 'N',
+            IsInf = 'I',
         };
 
     public:

@@ -141,3 +141,35 @@ DEFINE_TEST(testParserMathRound) {
     TEST_CASE(parserTest(parser, env, "(round 'x')", Value::Null, false));
     TEST_CASE(parserTest(parser, env, "(round 1 2)", Value::Null, false));
 }
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserMathIsNan) {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(isnan 2)",               Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnan 5 2)",             Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnan 2.0 -3.0)",        Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnan -3.0)",            Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isnan (sqrt -1.0))",     Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(isnan 1.0 (sqrt -1.0))", Value::True,  true));
+
+    TEST_CASE(parserTest(parser, env, "(isnan)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(isnan 'x')", Value::Null, false));
+}
+
+// -------------------------------------------------------------
+DEFINE_TEST(testParserMathIsInf) {
+    auto env = Environment::make();
+    Parser parser;
+
+    TEST_CASE(parserTest(parser, env, "(isinf 2)",                Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isinf 5 2)",              Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isinf 2.0 -3.0)",         Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isinf -3.0)",             Value::False, true));
+    TEST_CASE(parserTest(parser, env, "(isinf (^ 10.0 309))",     Value::True,  true));
+    TEST_CASE(parserTest(parser, env, "(isinf 1.0 (^ 10.0 309))", Value::True,  true));
+
+    TEST_CASE(parserTest(parser, env, "(isinf)",     Value::Null, false));
+    TEST_CASE(parserTest(parser, env, "(isinf 'x')", Value::Null, false));
+}

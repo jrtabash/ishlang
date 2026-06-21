@@ -737,6 +737,12 @@ Math Functions
 
   round - Round number to nearest integer
           (round <number>)
+
+  isnan - Is any of numbers NaN?
+          (isnan <number> [<number> ...])
+
+  isinf - Is any of numbers Inf?
+          (isinf <number> [<number> ...])
 )";
 }
 

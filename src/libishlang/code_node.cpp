@@ -2496,6 +2496,8 @@ Value MathFunction::exec(Environment::SharedPtr env) const {
         case Ceil:  return Math::ceil(values);
         case Floor: return Math::floor(values);
         case Round: return Math::round(values);
+        case IsNan: return Math::isNan(values);
+        case IsInf: return Math::isInf(values);
         }
     }
     return Value::Zero;

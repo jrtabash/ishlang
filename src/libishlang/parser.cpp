@@ -1472,6 +1472,20 @@ void Parser::initAppFtns() {
               auto exprs(readAndCheckExprList("round", 1));
               return CodeNode::make<MathFunction>(MathFunction::Round, exprs);
           }
+        },
+
+        { "isnan",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("isnan", 1, std::nullopt));
+              return CodeNode::make<MathFunction>(MathFunction::IsNan, exprs);
+          }
+        },
+
+        { "isinf",
+          [this]() {
+              auto exprs(readAndCheckRangeExprList("isinf", 1, std::nullopt));
+              return CodeNode::make<MathFunction>(MathFunction::IsInf, exprs);
+          }
         }
     };
 }

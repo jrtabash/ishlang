@@ -1392,6 +1392,16 @@ Examples:
 (round <number>)
 ```
 
+**isnan**: Is any of numbers NaN?
+```
+(isnan <number> [<number> ...])
+```
+
+**isinf**: Is any of numbers Inf?
+```
+(isinf <number> [<number> ...])
+```
+
 ### Examples
 ```
 (abs 5)
@@ -1401,6 +1411,8 @@ Examples:
 (sqrt 25.0)
 (ceil 1.2)
 (floor 2.9)
+(isnan 1.0 (sqrt -1.0))
+(isinf (^ 10.0 309))
 ```
 
 ## TimeIt Function

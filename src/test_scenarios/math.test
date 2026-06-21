@@ -57,6 +57,20 @@ __CODE__
 (println (round -1.1))
 (println (round -1.9))
 
+(println "-- isnan ---")
+(println (isnan 1.0))
+(println (isnan (sqrt -1.0)))
+(println (isnan 1.0 2.0))
+(println (isnan 1.0 (sqrt -1.0) 2.0))
+(println (isnan (^ 10.0 309)))
+
+(println "-- isinf ---")
+(println (isinf 1.0))
+(println (isinf (^ 10.0 309)))
+(println (isinf 1.0 2.0))
+(println (isinf 1.0 (^ 10.0 309) 2.0))
+(println (isinf (sqrt -1)))
+
 __EXPECT__
 -- abs ---
 5
@@ -108,3 +122,15 @@ true
 -1
 -1
 -2
+-- isnan ---
+false
+true
+false
+true
+false
+-- isinf ---
+false
+true
+false
+true
+false

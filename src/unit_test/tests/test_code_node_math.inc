@@ -5,6 +5,8 @@
 #include "exception.h"
 #include "value.h"
 
+#include <cmath>
+
 using namespace Ishlang;
 
 // -------------------------------------------------------------
@@ -345,6 +347,92 @@ DEFINE_TEST(testCodeNodeMathRound) {
 
     try {
         round(Value('x'))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeMathIsNan) {
+    auto env = Environment::make();
+
+    auto isNan = [](const Value &num1, const Value &num2 = Value::Null, const Value &num3 = Value::Null) {
+        std::vector<CodeNode::SharedPtr> nums { CodeNode::make<Literal>(num1) };
+        if (!num2.isNull()) nums.push_back(CodeNode::make<Literal>(num2));
+        if (!num3.isNull()) nums.push_back(CodeNode::make<Literal>(num3));
+        return CodeNode::make<MathFunction>(
+            MathFunction::IsNan,
+            CodeNode::SharedPtrList{ nums });
+    };
+
+    auto val = isNan(Value(1.2))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.boolean() == false, "actual=" << val);
+
+    val = isNan(Value(std::sqrt(-1.0)))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.boolean(), "actual=" << val);
+
+    val = isNan(Value(1.2), Value(2.4))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.boolean() == false, "actual=" << val);
+
+    val = isNan(Value(1.2), Value(std::sqrt(-1.0)))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.boolean(), "actual=" << val);
+
+    val = isNan(Value(std::pow(10.0, 309)))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.boolean() == false, "actual=" << val);
+
+    try {
+        isNan(Value('x'))->eval(env);
+        TEST_CASE(false);
+    }
+    catch (const InvalidOperandType &) {}
+    catch (...) {
+        TEST_CASE(false);
+    }
+}
+
+// -------------------------------------------------------------
+DEFINE_TEST(testCodeNodeMathIsInf) {
+    auto env = Environment::make();
+
+    auto isInf = [](const Value &num1, const Value &num2 = Value::Null, const Value &num3 = Value::Null) {
+        std::vector<CodeNode::SharedPtr> nums { CodeNode::make<Literal>(num1) };
+        if (!num2.isNull()) nums.push_back(CodeNode::make<Literal>(num2));
+        if (!num3.isNull()) nums.push_back(CodeNode::make<Literal>(num3));
+        return CodeNode::make<MathFunction>(
+            MathFunction::IsInf,
+            CodeNode::SharedPtrList{ nums });
+    };
+
+    auto val = isInf(Value(1.2))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.boolean() == false, "actual=" << val);
+
+    val = isInf(Value(std::pow(10.0, 309)))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.boolean(), "actual=" << val);
+
+    val = isInf(Value(1.2), Value(2.4))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.boolean() == false, "actual=" << val);
+
+    val = isInf(Value(1.2), Value(std::pow(10.0, 309)))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.boolean(), "actual=" << val);
+
+    val = isInf(Value(std::sqrt(-1.0)))->eval(env);
+    TEST_CASE_MSG(val.isBool(), "actual=" << val.typeToString());
+    TEST_CASE_MSG(val.boolean() == false, "actual=" << val);
+
+    try {
+        isInf(Value('x'))->eval(env);
         TEST_CASE(false);
     }
     catch (const InvalidOperandType &) {}
